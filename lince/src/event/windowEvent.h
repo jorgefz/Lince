@@ -1,0 +1,18 @@
+#ifndef LINCE_WINDOW_EVENT_H
+#define LINCE_WINDOW_EVENT_H
+
+#include "event/event.h"
+
+typedef struct WindowCloseEvent {
+    int dummy;
+} WindowCloseEvent;
+
+typedef struct WindowResizeEvent {
+    unsigned int height, width;
+} WindowResizeEvent;
+
+
+Event LinceEvent_NewWindowCloseEvent();
+Event LinceEvent_NewWindowResizeEvent(int width, int height);
+
+#endif // LINCE_WINDOW_EVENT_H

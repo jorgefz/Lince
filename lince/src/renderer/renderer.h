@@ -1,0 +1,4 @@
+#ifndef LINCE_RENDERER_H
+#define LINCE_RENDERER_H
+
+#endif // LINCE_RENDERER_H
