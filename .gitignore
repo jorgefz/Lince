@@ -1,0 +1,9 @@
+.vscode
+obj/*
+bin/*
+
+vendor/glfw/bin/*
+vendor/glfw/obj/*
+vendor/glfw/build/*
+vendor/glad/bin/*
+vendor/glad/obj/*
