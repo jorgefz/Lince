@@ -55,10 +55,9 @@ video tutorials.
  - Robin Eklind
  - Jan Ekström
  - Siavash Eliasi
- - Ahmad Fatoum
+ - TheExileFox
  - Felipe Ferreira
  - Michael Fogleman
- - Jason Francis
  - Gerald Franz
  - Mário Freitas
  - GeO4d
@@ -135,17 +134,14 @@ video tutorials.
  - Jon Morton
  - Pierre Moulon
  - Martins Mozeiko
- - Pascal Muetschard
  - Julian Møller
  - ndogxj
- - n3rdopolis
  - Kristian Nielsen
  - Kamil Nowakowski
  - onox
  - Denis Ovod
  - Ozzy
  - Andri Pálsson
- - luz paz
  - Peoro
  - Braden Pellett
  - Christopher Pelloux
@@ -168,7 +164,6 @@ video tutorials.
  - Eddie Ringle
  - Max Risuhin
  - Jorge Rodriguez
- - Jari Ronkainen
  - Luca Rood
  - Ed Ropple
  - Aleksey Rybalkin
@@ -184,7 +179,6 @@ video tutorials.
  - Yoshiki Shibukawa
  - Dmitri Shuralyov
  - Daniel Skorupski
- - Anthony Smith
  - Bradley Smith
  - Cliff Smolinsky
  - Patrick Snape
@@ -198,7 +192,6 @@ video tutorials.
  - Paul Sultana
  - Nathan Sweet
  - TTK-Bandit
- - Jared Tiala
  - Sergey Tikhomirov
  - Arthur Tombs
  - Ioannis Tsakpinis
@@ -217,11 +210,10 @@ video tutorials.
  - Xo Wang
  - Jay Weisskopf
  - Frank Wille
- - Andy Williams
- - Joel Winarske
  - Richard A. Wilkes
  - Tatsuya Yatagawa
  - Ryogo Yoshimura
+ - Rácz Zalán
  - Lukas Zanner
  - Andrey Zholos
  - Aihui Zhu

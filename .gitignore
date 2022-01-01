@@ -14,7 +14,7 @@ null.d
 **.sh
 
 # Output files
-Makefile
+**/Makefile
 obj/
 bin/
 vendor/glfw/bin/

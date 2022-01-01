@@ -49,13 +49,22 @@ project "lince"
 
     links {
         "GLAD",
-        "GL",
         "glfw",
-        "rt",
-        "m",
-        "dl",
-        "pthread"
     }
+
+    filter "system:windows"
+        links {
+            "opengl32"
+        }
+
+    filter "system:linux"
+        links {
+            "GL",
+            "rt",
+            "m",
+            "dl",
+            "pthread"
+        }
 
     libdirs {
         "vendor/glad/bin/" .. outputdir .. "/glad",

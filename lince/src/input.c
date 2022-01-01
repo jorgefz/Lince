@@ -20,7 +20,8 @@ unsigned int LinceInput_IsMouseButtonPressed(int button){
 
 void LinceInput_GetMousePos(float* xpos, float* ypos){
     double x, y;
-	glfwGetCursorPos(window, &x, &y);
+    GLFWwindow* handle = LinceApp_GetApplication()->window->handle;
+	glfwGetCursorPos(handle, &x, &y);
     if (xpos) *xpos = (float)x;
     if (ypos) *ypos = (float)y;
 }

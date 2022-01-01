@@ -1,5 +1,5 @@
 //========================================================================
-// GLFW 3.4 WGL - www.glfw.org
+// GLFW 3.3 WGL - www.glfw.org
 //------------------------------------------------------------------------
 // Copyright (c) 2002-2006 Marcus Geelnard
 // Copyright (c) 2006-2019 Camilla Löwy <elmindreda@glfw.org>
@@ -30,14 +30,15 @@
 #include "internal.h"
 
 #include <stdlib.h>
+#include <malloc.h>
 #include <assert.h>
 
 // Return the value corresponding to the specified attribute
 //
-static int findPixelFormatAttribValueWGL(const int* attribs,
-                                         int attribCount,
-                                         const int* values,
-                                         int attrib)
+static int findPixelFormatAttribValue(const int* attribs,
+                                      int attribCount,
+                                      const int* values,
+                                      int attrib)
 {
     int i;
 
@@ -58,13 +59,13 @@ static int findPixelFormatAttribValueWGL(const int* attribs,
     attribs[attribCount++] = a; \
 }
 #define findAttribValue(a) \
-    findPixelFormatAttribValueWGL(attribs, attribCount, values, a)
+    findPixelFormatAttribValue(attribs, attribCount, values, a)
 
 // Return a list of available and usable framebuffer configs
 //
-static int choosePixelFormatWGL(_GLFWwindow* window,
-                                const _GLFWctxconfig* ctxconfig,
-                                const _GLFWfbconfig* fbconfig)
+static int choosePixelFormat(_GLFWwindow* window,
+                             const _GLFWctxconfig* ctxconfig,
+                             const _GLFWfbconfig* fbconfig)
 {
     _GLFWfbconfig* usableConfigs;
     const _GLFWfbconfig* closest;
@@ -129,7 +130,7 @@ static int choosePixelFormatWGL(_GLFWwindow* window,
                                           NULL);
     }
 
-    usableConfigs = _glfw_calloc(nativeCount, sizeof(_GLFWfbconfig));
+    usableConfigs = calloc(nativeCount, sizeof(_GLFWfbconfig));
 
     for (i = 0;  i < nativeCount;  i++)
     {
@@ -148,7 +149,7 @@ static int choosePixelFormatWGL(_GLFWwindow* window,
                 _glfwInputErrorWin32(GLFW_PLATFORM_ERROR,
                                     "WGL: Failed to retrieve pixel format attributes");
 
-                _glfw_free(usableConfigs);
+                free(usableConfigs);
                 return 0;
             }
 
@@ -220,7 +221,7 @@ static int choosePixelFormatWGL(_GLFWwindow* window,
                 _glfwInputErrorWin32(GLFW_PLATFORM_ERROR,
                                     "WGL: Failed to describe pixel format");
 
-                _glfw_free(usableConfigs);
+                free(usableConfigs);
                 return 0;
             }
 
@@ -270,7 +271,7 @@ static int choosePixelFormatWGL(_GLFWwindow* window,
         _glfwInputError(GLFW_API_UNAVAILABLE,
                         "WGL: The driver does not appear to support OpenGL");
 
-        _glfw_free(usableConfigs);
+        free(usableConfigs);
         return 0;
     }
 
@@ -280,12 +281,12 @@ static int choosePixelFormatWGL(_GLFWwindow* window,
         _glfwInputError(GLFW_FORMAT_UNAVAILABLE,
                         "WGL: Failed to find a suitable pixel format");
 
-        _glfw_free(usableConfigs);
+        free(usableConfigs);
         return 0;
     }
 
     pixelFormat = (int) closest->handle;
-    _glfw_free(usableConfigs);
+    free(usableConfigs);
 
     return pixelFormat;
 }
@@ -322,12 +323,14 @@ static void swapBuffersWGL(_GLFWwindow* window)
 {
     if (!window->monitor)
     {
-        // HACK: Use DwmFlush when desktop composition is enabled on Windows Vista and 7
-        if (!IsWindows8OrGreater() && IsWindowsVistaOrGreater())
+        if (IsWindowsVistaOrGreater())
         {
-            BOOL enabled = FALSE;
+            // DWM Composition is always enabled on Win8+
+            BOOL enabled = IsWindows8OrGreater();
 
-            if (SUCCEEDED(DwmIsCompositionEnabled(&enabled)) && enabled)
+            // HACK: Use DwmFlush when desktop composition is enabled
+            if (enabled ||
+                (SUCCEEDED(DwmIsCompositionEnabled(&enabled)) && enabled))
             {
                 int count = abs(window->context.wgl.interval);
                 while (count--)
@@ -347,13 +350,15 @@ static void swapIntervalWGL(int interval)
 
     if (!window->monitor)
     {
-        // HACK: Disable WGL swap interval when desktop composition is enabled on Windows
-        //       Vista and 7 to avoid interfering with DWM vsync
-        if (!IsWindows8OrGreater() && IsWindowsVistaOrGreater())
+        if (IsWindowsVistaOrGreater())
         {
-            BOOL enabled = FALSE;
+            // DWM Composition is always enabled on Win8+
+            BOOL enabled = IsWindows8OrGreater();
 
-            if (SUCCEEDED(DwmIsCompositionEnabled(&enabled)) && enabled)
+            // HACK: Disable WGL swap interval when desktop composition is enabled to
+            //       avoid interfering with DWM vsync
+            if (enabled ||
+                (SUCCEEDED(DwmIsCompositionEnabled(&enabled)) && enabled))
                 interval = 0;
         }
     }
@@ -383,7 +388,7 @@ static GLFWglproc getProcAddressWGL(const char* procname)
     if (proc)
         return proc;
 
-    return (GLFWglproc) _glfwPlatformGetModuleSymbol(_glfw.wgl.instance, procname);
+    return (GLFWglproc) GetProcAddress(_glfw.wgl.instance, procname);
 }
 
 static void destroyContextWGL(_GLFWwindow* window)
@@ -394,6 +399,11 @@ static void destroyContextWGL(_GLFWwindow* window)
         window->context.wgl.handle = NULL;
     }
 }
+
+
+//////////////////////////////////////////////////////////////////////////
+//////                       GLFW internal API                      //////
+//////////////////////////////////////////////////////////////////////////
 
 // Initialize WGL
 //
@@ -406,7 +416,7 @@ GLFWbool _glfwInitWGL(void)
     if (_glfw.wgl.instance)
         return GLFW_TRUE;
 
-    _glfw.wgl.instance = _glfwPlatformLoadModule("opengl32.dll");
+    _glfw.wgl.instance = LoadLibraryA("opengl32.dll");
     if (!_glfw.wgl.instance)
     {
         _glfwInputErrorWin32(GLFW_PLATFORM_ERROR,
@@ -415,19 +425,19 @@ GLFWbool _glfwInitWGL(void)
     }
 
     _glfw.wgl.CreateContext = (PFN_wglCreateContext)
-        _glfwPlatformGetModuleSymbol(_glfw.wgl.instance, "wglCreateContext");
+        GetProcAddress(_glfw.wgl.instance, "wglCreateContext");
     _glfw.wgl.DeleteContext = (PFN_wglDeleteContext)
-        _glfwPlatformGetModuleSymbol(_glfw.wgl.instance, "wglDeleteContext");
+        GetProcAddress(_glfw.wgl.instance, "wglDeleteContext");
     _glfw.wgl.GetProcAddress = (PFN_wglGetProcAddress)
-        _glfwPlatformGetModuleSymbol(_glfw.wgl.instance, "wglGetProcAddress");
+        GetProcAddress(_glfw.wgl.instance, "wglGetProcAddress");
     _glfw.wgl.GetCurrentDC = (PFN_wglGetCurrentDC)
-        _glfwPlatformGetModuleSymbol(_glfw.wgl.instance, "wglGetCurrentDC");
+        GetProcAddress(_glfw.wgl.instance, "wglGetCurrentDC");
     _glfw.wgl.GetCurrentContext = (PFN_wglGetCurrentContext)
-        _glfwPlatformGetModuleSymbol(_glfw.wgl.instance, "wglGetCurrentContext");
+        GetProcAddress(_glfw.wgl.instance, "wglGetCurrentContext");
     _glfw.wgl.MakeCurrent = (PFN_wglMakeCurrent)
-        _glfwPlatformGetModuleSymbol(_glfw.wgl.instance, "wglMakeCurrent");
+        GetProcAddress(_glfw.wgl.instance, "wglMakeCurrent");
     _glfw.wgl.ShareLists = (PFN_wglShareLists)
-        _glfwPlatformGetModuleSymbol(_glfw.wgl.instance, "wglShareLists");
+        GetProcAddress(_glfw.wgl.instance, "wglShareLists");
 
     // NOTE: A dummy context has to be created for opengl32.dll to load the
     //       OpenGL ICD, from which we can then query WGL extensions
@@ -520,7 +530,7 @@ GLFWbool _glfwInitWGL(void)
 void _glfwTerminateWGL(void)
 {
     if (_glfw.wgl.instance)
-        _glfwPlatformFreeModule(_glfw.wgl.instance);
+        FreeLibrary(_glfw.wgl.instance);
 }
 
 #define setAttrib(a, v) \
@@ -552,7 +562,7 @@ GLFWbool _glfwCreateContextWGL(_GLFWwindow* window,
         return GLFW_FALSE;
     }
 
-    pixelFormat = choosePixelFormatWGL(window, ctxconfig, fbconfig);
+    pixelFormat = choosePixelFormat(window, ctxconfig, fbconfig);
     if (!pixelFormat)
         return GLFW_FALSE;
 
@@ -767,17 +777,15 @@ GLFWbool _glfwCreateContextWGL(_GLFWwindow* window,
 
 #undef setAttrib
 
+
+//////////////////////////////////////////////////////////////////////////
+//////                        GLFW native API                       //////
+//////////////////////////////////////////////////////////////////////////
+
 GLFWAPI HGLRC glfwGetWGLContext(GLFWwindow* handle)
 {
     _GLFWwindow* window = (_GLFWwindow*) handle;
     _GLFW_REQUIRE_INIT_OR_RETURN(NULL);
-
-    if (_glfw.platform.platformID != GLFW_PLATFORM_WIN32)
-    {
-        _glfwInputError(GLFW_PLATFORM_UNAVAILABLE,
-                        "WGL: Platform not initialized");
-        return NULL;
-    }
 
     if (window->context.source != GLFW_NATIVE_CONTEXT_API)
     {

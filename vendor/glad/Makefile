@@ -35,9 +35,9 @@ define POSTBUILDCMDS
 endef
 
 ifeq ($(config),debug_win64)
-TARGETDIR = bin/Debug-linux-x86_64
-TARGET = $(TARGETDIR)/libglad.a
-OBJDIR = obj/Debug-linux-x86_64/Win64
+TARGETDIR = bin/Debug-windows-x86_64
+TARGET = $(TARGETDIR)/glad.lib
+OBJDIR = obj/Debug-windows-x86_64
 ALL_CFLAGS += $(CFLAGS) $(ALL_CPPFLAGS) -m64 -g -Wall -Wextra
 ALL_CXXFLAGS += $(CXXFLAGS) $(ALL_CPPFLAGS) -m64 -g -Wall -Wextra
 ALL_LDFLAGS += $(LDFLAGS) -L/usr/lib64 -m64
@@ -45,15 +45,15 @@ ALL_LDFLAGS += $(LDFLAGS) -L/usr/lib64 -m64
 else ifeq ($(config),debug_linux)
 TARGETDIR = bin/Debug-linux-x86_64
 TARGET = $(TARGETDIR)/libglad.a
-OBJDIR = obj/Debug-linux-x86_64/Linux
+OBJDIR = obj/Debug-linux-x86_64
 ALL_CFLAGS += $(CFLAGS) $(ALL_CPPFLAGS) -m64 -g -Wall -Wextra
 ALL_CXXFLAGS += $(CXXFLAGS) $(ALL_CPPFLAGS) -m64 -g -Wall -Wextra
 ALL_LDFLAGS += $(LDFLAGS) -L/usr/lib64 -m64
 
 else ifeq ($(config),release_win64)
-TARGETDIR = bin/Release-linux-x86_64
-TARGET = $(TARGETDIR)/libglad.a
-OBJDIR = obj/Release-linux-x86_64/Win64
+TARGETDIR = bin/Release-windows-x86_64
+TARGET = $(TARGETDIR)/glad.lib
+OBJDIR = obj/Release-windows-x86_64
 ALL_CFLAGS += $(CFLAGS) $(ALL_CPPFLAGS) -m64 -O2 -Wall -Wextra
 ALL_CXXFLAGS += $(CXXFLAGS) $(ALL_CPPFLAGS) -m64 -O2 -Wall -Wextra
 ALL_LDFLAGS += $(LDFLAGS) -L/usr/lib64 -m64 -s
@@ -61,7 +61,7 @@ ALL_LDFLAGS += $(LDFLAGS) -L/usr/lib64 -m64 -s
 else ifeq ($(config),release_linux)
 TARGETDIR = bin/Release-linux-x86_64
 TARGET = $(TARGETDIR)/libglad.a
-OBJDIR = obj/Release-linux-x86_64/Linux
+OBJDIR = obj/Release-linux-x86_64
 ALL_CFLAGS += $(CFLAGS) $(ALL_CPPFLAGS) -m64 -O2 -Wall -Wextra
 ALL_CXXFLAGS += $(CXXFLAGS) $(ALL_CPPFLAGS) -m64 -O2 -Wall -Wextra
 ALL_LDFLAGS += $(LDFLAGS) -L/usr/lib64 -m64 -s

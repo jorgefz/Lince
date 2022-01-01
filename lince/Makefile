@@ -34,36 +34,36 @@ define POSTBUILDCMDS
 endef
 
 ifeq ($(config),debug_win64)
-TARGETDIR = ../bin/Debug-linux-x86_64/lince
-TARGET = $(TARGETDIR)/lince
-OBJDIR = ../obj/Debug-linux-x86_64/lince/Win64
-DEFINES += -DGLFW_INCLUDED_NONE -DGLFW_INCLUDE_NONE -DLINCE_LINUX -DLINCE_DEBUG
-LIBS += ../vendor/glad/bin/Debug-linux-x86_64/libglad.a ../vendor/glfw/bin/Debug-linux-x86_64/libglfw.a -lGL -lrt -lm -ldl -lpthread
-LDDEPS += ../vendor/glad/bin/Debug-linux-x86_64/libglad.a ../vendor/glfw/bin/Debug-linux-x86_64/libglfw.a
-ALL_LDFLAGS += $(LDFLAGS) -L../vendor/glad/bin/Debug-linux-x86_64/glad -L../vendor/glad/bin/Debug-linux-x86_64/glfw -L/usr/lib64 -m64
+TARGETDIR = ../bin/Debug-windows-x86_64/lince
+TARGET = $(TARGETDIR)/lince.exe
+OBJDIR = ../obj/Debug-windows-x86_64/lince
+DEFINES += -DGLFW_INCLUDED_NONE -DGLFW_INCLUDE_NONE -DLINCE_WINDOWS -D_CRT_SECURE_NO_WARNINGS -DLINCE_DEBUG
+LIBS += ../vendor/glad/bin/Debug-windows-x86_64/glad.lib ../vendor/glfw/bin/Debug-windows-x86_64/glfw.lib -lGL -lrt -lm -ldl -lpthread
+LDDEPS += ../vendor/glad/bin/Debug-windows-x86_64/glad.lib ../vendor/glfw/bin/Debug-windows-x86_64/glfw.lib
+ALL_LDFLAGS += $(LDFLAGS) -L../vendor/glad/bin/Debug-windows-x86_64/glad -L../vendor/glad/bin/Debug-windows-x86_64/glfw -L/usr/lib64 -m64
 
 else ifeq ($(config),debug_linux)
 TARGETDIR = ../bin/Debug-linux-x86_64/lince
 TARGET = $(TARGETDIR)/lince
-OBJDIR = ../obj/Debug-linux-x86_64/lince/Linux
+OBJDIR = ../obj/Debug-linux-x86_64/lince
 DEFINES += -DGLFW_INCLUDED_NONE -DGLFW_INCLUDE_NONE -DLINCE_LINUX -DLINCE_DEBUG
 LIBS += ../vendor/glad/bin/Debug-linux-x86_64/libglad.a ../vendor/glfw/bin/Debug-linux-x86_64/libglfw.a -lGL -lrt -lm -ldl -lpthread
 LDDEPS += ../vendor/glad/bin/Debug-linux-x86_64/libglad.a ../vendor/glfw/bin/Debug-linux-x86_64/libglfw.a
 ALL_LDFLAGS += $(LDFLAGS) -L../vendor/glad/bin/Debug-linux-x86_64/glad -L../vendor/glad/bin/Debug-linux-x86_64/glfw -L/usr/lib64 -m64
 
 else ifeq ($(config),release_win64)
-TARGETDIR = ../bin/Release-linux-x86_64/lince
-TARGET = $(TARGETDIR)/lince
-OBJDIR = ../obj/Release-linux-x86_64/lince/Win64
-DEFINES += -DGLFW_INCLUDED_NONE -DGLFW_INCLUDE_NONE -DLINCE_LINUX -DLINCE_RELEASE
-LIBS += ../vendor/glad/bin/Release-linux-x86_64/libglad.a ../vendor/glfw/bin/Release-linux-x86_64/libglfw.a -lGL -lrt -lm -ldl -lpthread
-LDDEPS += ../vendor/glad/bin/Release-linux-x86_64/libglad.a ../vendor/glfw/bin/Release-linux-x86_64/libglfw.a
-ALL_LDFLAGS += $(LDFLAGS) -L../vendor/glad/bin/Release-linux-x86_64/glad -L../vendor/glad/bin/Release-linux-x86_64/glfw -L/usr/lib64 -m64
+TARGETDIR = ../bin/Release-windows-x86_64/lince
+TARGET = $(TARGETDIR)/lince.exe
+OBJDIR = ../obj/Release-windows-x86_64/lince
+DEFINES += -DGLFW_INCLUDED_NONE -DGLFW_INCLUDE_NONE -DLINCE_WINDOWS -D_CRT_SECURE_NO_WARNINGS -DLINCE_RELEASE
+LIBS += ../vendor/glad/bin/Release-windows-x86_64/glad.lib ../vendor/glfw/bin/Release-windows-x86_64/glfw.lib -lGL -lrt -lm -ldl -lpthread
+LDDEPS += ../vendor/glad/bin/Release-windows-x86_64/glad.lib ../vendor/glfw/bin/Release-windows-x86_64/glfw.lib
+ALL_LDFLAGS += $(LDFLAGS) -L../vendor/glad/bin/Release-windows-x86_64/glad -L../vendor/glad/bin/Release-windows-x86_64/glfw -L/usr/lib64 -m64
 
 else ifeq ($(config),release_linux)
 TARGETDIR = ../bin/Release-linux-x86_64/lince
 TARGET = $(TARGETDIR)/lince
-OBJDIR = ../obj/Release-linux-x86_64/lince/Linux
+OBJDIR = ../obj/Release-linux-x86_64/lince
 DEFINES += -DGLFW_INCLUDED_NONE -DGLFW_INCLUDE_NONE -DLINCE_LINUX -DLINCE_RELEASE
 LIBS += ../vendor/glad/bin/Release-linux-x86_64/libglad.a ../vendor/glfw/bin/Release-linux-x86_64/libglfw.a -lGL -lrt -lm -ldl -lpthread
 LDDEPS += ../vendor/glad/bin/Release-linux-x86_64/libglad.a ../vendor/glfw/bin/Release-linux-x86_64/libglfw.a
@@ -85,6 +85,7 @@ GENERATED += $(OBJDIR)/app.o
 GENERATED += $(OBJDIR)/buffer.o
 GENERATED += $(OBJDIR)/context.o
 GENERATED += $(OBJDIR)/event.o
+GENERATED += $(OBJDIR)/input.o
 GENERATED += $(OBJDIR)/keyEvent.o
 GENERATED += $(OBJDIR)/mouseEvent.o
 GENERATED += $(OBJDIR)/renderer.o
@@ -94,6 +95,7 @@ OBJECTS += $(OBJDIR)/app.o
 OBJECTS += $(OBJDIR)/buffer.o
 OBJECTS += $(OBJDIR)/context.o
 OBJECTS += $(OBJDIR)/event.o
+OBJECTS += $(OBJDIR)/input.o
 OBJECTS += $(OBJDIR)/keyEvent.o
 OBJECTS += $(OBJDIR)/mouseEvent.o
 OBJECTS += $(OBJDIR)/renderer.o
@@ -175,6 +177,9 @@ $(OBJDIR)/mouseEvent.o: src/event/mouseEvent.c
 	@echo $(notdir $<)
 	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/windowEvent.o: src/event/windowEvent.c
+	@echo $(notdir $<)
+	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
+$(OBJDIR)/input.o: src/input.c
 	@echo $(notdir $<)
 	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/buffer.o: src/renderer/buffer.c
