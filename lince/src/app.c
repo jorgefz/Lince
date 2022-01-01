@@ -4,13 +4,14 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
-#include "lince.h"
 
-typedef struct {
-    LinceWindow* window;
-} LinceApp;
+#include "app.h"
 
 LinceApp app = {0};
+
+LinceApp* LinceApp_GetApplication(){
+    return &app;
+}
 
 void LinceApp_OnEvent(Event* e);
 
@@ -35,21 +36,27 @@ unsigned int LinceApp_OnMouseMoved(Event* e){
     return 0;
 }
 
+unsigned int LinceApp_OnWindowResize(Event* e){
+    printf("Window resized to %d x %d\n", e->data.WindowResize->width, e->data.WindowResize->width);
+    return 0;
+}
+
 void LinceApp_OnEvent(Event* e){
-    LinceEvent_Dispatch(e, EventType_MouseMoved, LinceApp_OnMouseMoved);
+    //LinceEvent_Dispatch(e, EventType_MouseMoved, LinceApp_OnMouseMoved);
     LinceEvent_Dispatch(e, EventType_KeyPressed, LinceApp_OnKeyPressed);
+    LinceEvent_Dispatch(e, EventType_WindowResize, LinceApp_OnWindowResize);
 }
 
 void LinceApp_Run(){
 
-    float r = 0.0f, v = 0.0001f;
+    float r = 0.0f, v = 0.0001f, b;
     while (!LinceWindow_ShouldClose(app.window)) {
         // Render here
         r += v;
         if (r >= 1.0f) v = -v;
         else if (r <= 0.0f) v = -v;
-        
-        glClearColor(r, 0.1f, 0.6f, 1.0f);
+        b = 1.0f - r;        
+        glClearColor(r, 0.1f, b, 1.0f);
         LinceApp_OnUpdate();
     }
 }
@@ -69,14 +76,4 @@ int main(int argc, const char* argv[]){
     return 0;
 }
 
-
-// User-defined function pointers
-
-void (*LinceGame_Init_ptr)(LinceWindow*, void* args);
-
-void (*LinceGame_OnUpdate_ptr)(LinceWindow*, void* args);
-
-void (*LinceGame_OnEvent_ptr)(LinceWindow*, void *args);
-
-void (*LinceGame_Terminate_ptr)(LinceWindow*, void *args);
 
