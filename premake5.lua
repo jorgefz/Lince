@@ -63,7 +63,8 @@ project "lince"
             "rt",
             "m",
             "dl",
-            "pthread"
+            "pthread",
+            "X11"
         }
 
     libdirs {

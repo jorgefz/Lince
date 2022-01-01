@@ -15,6 +15,7 @@ null.d
 
 # Output files
 **/Makefile
+**.d
 obj/
 bin/
 vendor/glfw/bin/

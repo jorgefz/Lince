@@ -18,10 +18,9 @@ project "glfw"
     }
 
     filter "system:linux"
-        system "linux"
         systemversion "latest"
         files {
-            "src/posix_module.c",
+            --"src/posix_module.c",
             "src/posix_time.c",
             "src/posix_thread.c",
 
