@@ -1,8 +1,22 @@
 .vscode
+
 null.d
+
+# Visual Studio files
+.vs
+**.sln
+**.vcxproj
+**.vcxproj.filters
+**.vcxproj.user
+
+# Build tools ans scripts
+**.exe
+**.sh
+
+# Output files
+Makefile
 obj/
 bin/
-
 vendor/glfw/bin/
 vendor/glfw/obj/
 vendor/glfw/build/
