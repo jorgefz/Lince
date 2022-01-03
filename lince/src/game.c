@@ -13,7 +13,7 @@ void MyLayer_OnAttach(LinceLayer* layer) {
 }
 
 void MyLayer_OnDetach(LinceLayer* layer) {
-    printf("MyLayer Destroy\n");
+    printf("MyLayer detached\n");
     free(layer->data.GenericLayer);
     free(layer);
 }
@@ -38,14 +38,9 @@ LinceLayer* MyLayer_Init() {
 
 
 
-
-
 void GameInit() {
 	printf("Game initialised!\n");
-
     LinceApp_PushLayer(MyLayer_Init());
-
-
 }
 
 void GameOnUpdate() {
@@ -63,10 +58,10 @@ void GameTerminate() {
 
 int main(int argc, const char* argv[]) {
 
-    LinceGame_Init_ptr = GameInit;
-    LinceGame_OnUpdate_ptr = GameOnUpdate;
-    LinceGame_OnEvent_ptr = GameOnEvent;
-    LinceGame_Terminate_ptr = GameTerminate;
+    Lince_SetGameInitFn(GameInit);
+    Lince_SetGameOnUpdateFn(GameOnUpdate);
+    Lince_SetGameOnEventFn(GameOnEvent);
+    Lince_SetGameTerminateFn(GameTerminate);
     
     LinceApp_Run();
 

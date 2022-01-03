@@ -6,18 +6,35 @@
 
 #include "app.h"
 
-// User-defined function pointers
-void (*LinceGame_Init_ptr)() = NULL;
-void (*LinceGame_OnUpdate_ptr)() = NULL;
-void (*LinceGame_OnEvent_ptr)(Event*) = NULL;
-void (*LinceGame_Terminate_ptr)() = NULL;
-
-
 static LinceApp app = {0};
 
 // Public API
+void Lince_SetGameInitFn(LinceGame_InitFn func) {
+    app.game_init = func;
+}
+
+void Lince_SetGameOnUpdateFn(LinceGame_OnUpdateFn func) {
+    app.game_on_update = func;
+}
+
+void Lince_SetGameOnEventFn(LinceGame_OnEventFn func) {
+    app.game_on_event = func;
+}
+
+void Lince_SetGameTerminateFn(LinceGame_TerminateFn func) {
+    app.game_terminate = func;
+}
+
 LinceApp* LinceApp_GetApplication(){
     return &app;
+}
+
+void LinceApp_SetGameData(void* data) {
+    app.game_data = data;
+}
+
+void* LinceApp_GetGameData() {
+    return app.game_data;
 }
 
 void LinceApp_PushLayer(LinceLayer* layer) {
@@ -44,8 +61,7 @@ static void LinceApp_Init(){
     app.layer_stack = LinceLayerStack_Create();
     app.overlay_stack = LinceLayerStack_Create();
     
-    if (LinceGame_Init_ptr) LinceGame_Init_ptr();
-
+    if (app.game_init) app.game_init(); // user may push layers onto stack
 }
 
 static void LinceApp_OnUpdate(){
@@ -65,7 +81,7 @@ static void LinceApp_OnUpdate(){
     }
     
     // update game app
-    if (LinceGame_OnUpdate_ptr) LinceGame_OnUpdate_ptr();
+    if (app.game_on_update) app.game_on_update();
 }
 
 static unsigned int LinceApp_OnKeyPressed(Event* e){
@@ -109,7 +125,7 @@ static void LinceApp_OnEvent(Event* e){
     }
 
     // pass event to game app
-    if (LinceGame_OnEvent_ptr) LinceGame_OnEvent_ptr(e);
+    if (app.game_on_event) app.game_on_event(e);
 }
 
 void LinceApp_Run(){
@@ -142,7 +158,7 @@ static void LinceApp_Terminate(){
     app.layer_stack = NULL;
     app.overlay_stack = NULL;
 
-    if (LinceGame_Terminate_ptr) LinceGame_Terminate_ptr();
+    if (app.game_terminate) app.game_terminate();
 }
 
 

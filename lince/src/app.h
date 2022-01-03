@@ -9,24 +9,39 @@
 
 #include "layer.h"
 
+typedef void (*LinceGame_InitFn)();
+typedef void (*LinceGame_OnUpdateFn)();
+typedef void (*LinceGame_OnEventFn)(Event*);
+typedef void (*LinceGame_TerminateFn)();
+
 typedef struct {
     LinceWindow* window;
     LinceLayerStack *layer_stack, *overlay_stack;
     unsigned int running;
+
+    // User-defined game data & function pointers
+    void* game_data;
+    LinceGame_InitFn game_init;
+    LinceGame_OnUpdateFn game_on_update;
+    LinceGame_OnEventFn game_on_event;
+    LinceGame_TerminateFn game_terminate;
+
 } LinceApp;
 
+
+void Lince_SetGameInitFn(LinceGame_InitFn func);
+void Lince_SetGameOnUpdateFn(LinceGame_OnUpdateFn func);
+void Lince_SetGameOnEventFn(LinceGame_OnEventFn func);
+void Lince_SetGameTerminateFn(LinceGame_TerminateFn func);
 
 void LinceApp_Run();
 
 LinceApp* LinceApp_GetApplication();
+void LinceApp_SetGameData(void* data);
+void* LinceApp_GetGameData();
+
 void LinceApp_PushLayer(LinceLayer* layer);
 void LinceApp_PushOverlay(LinceLayer* overlay);
 
-
-// User-defined function pointers
-extern void (*LinceGame_Init_ptr)();
-extern void (*LinceGame_OnUpdate_ptr)();
-extern void (*LinceGame_OnEvent_ptr)(Event*);
-extern void (*LinceGame_Terminate_ptr)();
 
 #endif // LINCE_APP_H
