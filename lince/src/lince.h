@@ -1,4 +1,7 @@
 
+#ifndef LINCE_H
+#define LINCE_H
+
 #include "core.h"
 
 #include "event/event.h"
@@ -8,3 +11,10 @@
 
 #include "renderer/context.h"
 #include "renderer/window.h"
+
+#include "input.h"
+#include "keycodes.h"
+#include "layer.h"
+#include "app.h"
+
+#endif //LINCE_H

@@ -4,76 +4,146 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
-
 #include "app.h"
 
-LinceApp app = {0};
+// User-defined function pointers
+void (*LinceGame_Init_ptr)() = NULL;
+void (*LinceGame_OnUpdate_ptr)() = NULL;
+void (*LinceGame_OnEvent_ptr)(Event*) = NULL;
+void (*LinceGame_Terminate_ptr)() = NULL;
 
+
+static LinceApp app = {0};
+
+// Public API
 LinceApp* LinceApp_GetApplication(){
     return &app;
 }
 
-void LinceApp_OnEvent(Event* e);
+void LinceApp_PushLayer(LinceLayer* layer) {
+    LinceLayerStack_Push(app.layer_stack, layer);
+}
 
-void LinceApp_Init(){
+void LinceApp_PushOverlay(LinceLayer* overlay) {
+    LinceLayerStack_Push(app.overlay_stack, overlay);
+}
+
+
+// Private functions
+
+static void LinceApp_OnEvent(Event* e);
+
+static void LinceApp_Terminate();
+
+static void LinceApp_Init(){
     // Create a windowed mode window and its OpenGL context
     app.window = LinceWindow_Create(1280, 720);
     LinceWindow_SetEventCallback(app.window, LinceApp_OnEvent);
+
+    // init layer and overlay stacks
+    app.layer_stack = LinceLayerStack_Create();
+    app.overlay_stack = LinceLayerStack_Create();
+    
+    if (LinceGame_Init_ptr) LinceGame_Init_ptr();
+
 }
 
-void LinceApp_OnUpdate(){
+static void LinceApp_OnUpdate(){
     glClear(GL_COLOR_BUFFER_BIT);
     LinceWindow_Update(app.window);
+
+    // update layers
+    unsigned int i;
+    for (i = 0; i != app.layer_stack->count; ++i) {
+        LinceLayer* layer = app.layer_stack->layers[i];
+        if (layer && layer->OnUpdate) layer->OnUpdate(layer);
+    }
+    // update overlays
+    for (i = 0; i != app.overlay_stack->count; ++i) {
+        LinceLayer* overlay = app.overlay_stack->layers[i];
+        if (overlay && overlay->OnUpdate) overlay->OnUpdate(overlay);
+    }
+    
+    // update game app
+    if (LinceGame_OnUpdate_ptr) LinceGame_OnUpdate_ptr();
 }
 
-unsigned int LinceApp_OnKeyPressed(Event* e){
-    printf("Key %d\n", e->data.KeyPressed->keycode);
+static unsigned int LinceApp_OnKeyPressed(Event* e){
+    int key = e->data.KeyPressed->keycode;
+    if (key >= 33 || key <= 126) printf("%c", (char)key);
+    else printf(" key(%d) ", key);
+    fflush(stdout);
     return 0;
 }
 
-unsigned int LinceApp_OnMouseMoved(Event* e){
+static unsigned int LinceApp_OnMouseMoved(Event* e){
     printf("Mouse %f %f\n", e->data.MouseMoved->xpos, e->data.MouseMoved->ypos);
     return 0;
 }
 
-unsigned int LinceApp_OnWindowResize(Event* e){
+static unsigned int LinceApp_OnWindowResize(Event* e){
     printf("Window resized to %d x %d\n", e->data.WindowResize->width, e->data.WindowResize->width);
     return 0;
 }
 
-void LinceApp_OnEvent(Event* e){
+static unsigned int LinceApp_OnWindowClose(Event* e) {
+    app.running = 0;
+    return 0;
+}
+
+static void LinceApp_OnEvent(Event* e){
     //LinceEvent_Dispatch(e, EventType_MouseMoved, LinceApp_OnMouseMoved);
     LinceEvent_Dispatch(e, EventType_KeyPressed, LinceApp_OnKeyPressed);
     LinceEvent_Dispatch(e, EventType_WindowResize, LinceApp_OnWindowResize);
+    LinceEvent_Dispatch(e, EventType_WindowClose, LinceApp_OnWindowClose);
+
+    // pass event to layers and overlays
+    unsigned int i;
+    for (i = 0; i != app.layer_stack->count; ++i) {
+        LinceLayer* layer = app.layer_stack->layers[i];
+        if (layer && layer->OnEvent) layer->OnEvent(layer, e);
+    }
+    for (i = 0; i != app.overlay_stack->count; ++i) {
+        LinceLayer* overlay = app.overlay_stack->layers[i];
+        if (overlay && overlay->OnEvent) overlay->OnEvent(overlay, e);
+    }
+
+    // pass event to game app
+    if (LinceGame_OnEvent_ptr) LinceGame_OnEvent_ptr(e);
 }
 
 void LinceApp_Run(){
+    
+    LinceApp_Init();
+    app.running = 1;
 
     float r = 0.0f, v = 0.0001f, b;
-    while (!LinceWindow_ShouldClose(app.window)) {
-        // Render here
+    while(app.running){
         r += v;
         if (r >= 1.0f) v = -v;
         else if (r <= 0.0f) v = -v;
         b = 1.0f - r;        
         glClearColor(r, 0.1f, b, 1.0f);
+
         LinceApp_OnUpdate();
     }
+
+    LinceApp_Terminate();
 }
 
-void LinceApp_Terminate(){
+static void LinceApp_Terminate(){
     LinceWindow_Destroy(app.window);
     app.window = NULL;
+    app.running = 0;
+
+    // destroy layer and overlay stacks
+    LinceLayerStack_Destroy(app.layer_stack);
+    LinceLayerStack_Destroy(app.overlay_stack);
+    app.layer_stack = NULL;
+    app.overlay_stack = NULL;
+
+    if (LinceGame_Terminate_ptr) LinceGame_Terminate_ptr();
 }
 
-
-int main(int argc, const char* argv[]){
-
-    LinceApp_Init();
-    LinceApp_Run();
-    LinceApp_Terminate();
-    
-    return 0;
-}
 
 
