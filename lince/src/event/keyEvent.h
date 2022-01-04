@@ -15,8 +15,8 @@ typedef struct KeyTypeEvent {
     int keycode;
 } KeyTypeEvent;
 
-Event LinceEvent_NewKeyPressedEvent(int key, int repeats);
-Event LinceEvent_NewKeyReleasedEvent(int key);
-Event LinceEvent_NewKeyTypeEvent(int key);
+LinceEvent LinceEvent_NewKeyPressedEvent(int key, int repeats);
+LinceEvent LinceEvent_NewKeyReleasedEvent(int key);
+LinceEvent LinceEvent_NewKeyTypeEvent(int key);
 
 #endif // LINCE_KEY_EVENT_H

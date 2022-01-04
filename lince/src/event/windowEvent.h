@@ -12,7 +12,7 @@ typedef struct WindowResizeEvent {
 } WindowResizeEvent;
 
 
-Event LinceEvent_NewWindowCloseEvent();
-Event LinceEvent_NewWindowResizeEvent(int width, int height);
+LinceEvent LinceEvent_NewWindowCloseEvent();
+LinceEvent LinceEvent_NewWindowResizeEvent(int width, int height);
 
 #endif // LINCE_WINDOW_EVENT_H

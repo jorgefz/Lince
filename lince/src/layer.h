@@ -16,7 +16,7 @@ typedef struct LinceLayer {
 	void (*OnAttach)(struct LinceLayer*); // called when layer is pushed on stack
 	void (*OnDetach)(struct LinceLayer*); // called when layer is popped from stack (must be freed)
 	void (*OnUpdate)(struct LinceLayer*); // called on each game tick
-	void (*OnEvent)(struct LinceLayer*, Event*); // called on each game event
+	void (*OnEvent)(struct LinceLayer*, LinceEvent*); // called on each game event
 } LinceLayer;
 
 LinceLayer* LinceLayer_Create(void* data);
@@ -24,7 +24,7 @@ void* LinceLayer_GetData(LinceLayer* layer);
 
 typedef struct LinceLayerStack {
 	LinceLayer** layers;
-	unsigned int count, insert_index;
+	unsigned int count;
 } LinceLayerStack;
 
 /*

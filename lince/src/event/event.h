@@ -3,17 +3,17 @@
 
 #include "core.h"
 
-typedef enum {
-    EventType_None = 0,
-    EventType_WindowClose, EventType_WindowResize,
-    EventType_KeyPressed, EventType_KeyReleased, EventType_KeyType,
-    EventType_MouseButtonPressed, EventType_MouseButtonReleased,
-    EventType_MouseMoved, EventType_MouseScrolled,
+typedef enum LinceEventType {
+    LinceEventType_None = 0,
+    LinceEventType_WindowClose, LinceEventType_WindowResize,
+    LinceEventType_KeyPressed, LinceEventType_KeyReleased, LinceEventType_KeyType,
+    LinceEventType_MouseButtonPressed, LinceEventType_MouseButtonReleased,
+    LinceEventType_MouseMoved, LinceEventType_MouseScrolled,
     // add new event types here
-    EventType_EventNum
-} EventType;
+    EventType_EventNum // number of pre-defined events
+} LinceEventType;
 
-typedef union EventData {
+typedef union LinceEventData {
     struct KeyPressedEvent* KeyPressed;
     struct KeyReleasedEvent* KeyReleased;
     struct KeyTypeEvent* KeyType;
@@ -25,19 +25,19 @@ typedef union EventData {
     struct MouseScrolledEvent* MouseScrolled;
     // add new event declarations here
     void* GenericEvent;
-} EventData;
+} LinceEventData;
 
-typedef struct Event {
-    EventType type;
+typedef struct LinceEvent {
+    LinceEventType type;
     char name[LINCE_STR_MAX];
-    lince_bool handled;
-    EventData data;
-} Event;
+    LinceBool handled;
+    LinceEventData data;
+} LinceEvent;
 
-typedef unsigned int (*EventFn)(Event*);
+typedef LinceBool (*LinceEventFn)(LinceEvent*);
 
 // Functions
-unsigned int LinceEvent_Dispatch(Event* e, EventType etype, EventFn func);
-void LinceEvent_Destroy(Event* e);
+LinceBool LinceEvent_Dispatch(LinceEvent* e, LinceEventType etype, LinceEventFn func);
+void LinceEvent_Destroy(LinceEvent* e);
 
 #endif // LINCE_EVENT_H

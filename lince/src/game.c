@@ -18,7 +18,7 @@ void MyLayer_OnDetach(LinceLayer* layer) {
     free(layer);
 }
 
-unsigned int MyLayer_OnKeyPressed(Event* e) {
+LinceBool MyLayer_OnKeyPressed(LinceEvent* e) {
     int key = e->data.KeyPressed->keycode;
     switch (key) {
     case LinceKey_Backspace:
@@ -31,11 +31,11 @@ unsigned int MyLayer_OnKeyPressed(Event* e) {
         printf("%c", (char)key);
     }
     fflush(stdout);
-    return 1;
+    return LinceTrue;
 }
 
-void MyLayer_OnEvent(LinceLayer* layer, Event* e) {
-    LinceEvent_Dispatch(e, EventType_KeyPressed, MyLayer_OnKeyPressed);
+void MyLayer_OnEvent(LinceLayer* layer, LinceEvent* e) {
+    LinceEvent_Dispatch(e, LinceEventType_KeyPressed, MyLayer_OnKeyPressed);
 }
 
 LinceLayer* MyLayer_Init(int n) {
@@ -66,7 +66,7 @@ void GameOnUpdate() {
 
 }
 
-void GameOnEvent(Event* e) {
+void GameOnEvent(LinceEvent* e) {
 
 }
 

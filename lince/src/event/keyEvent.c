@@ -1,9 +1,9 @@
 
 #include "event/keyEvent.h"
 
-Event LinceEvent_NewKeyPressedEvent(int key, int repeats){
-    Event e = (Event){
-        .type = EventType_KeyPressed,
+LinceEvent LinceEvent_NewKeyPressedEvent(int key, int repeats){
+    LinceEvent e = {
+        .type = LinceEventType_KeyPressed,
         .name = "KeyPressedEvent",
         .handled = 0,
         .data = {0}
@@ -19,9 +19,9 @@ Event LinceEvent_NewKeyPressedEvent(int key, int repeats){
 }
 
 
-Event LinceEvent_NewKeyReleasedEvent(int key){
-    Event e = (Event){
-        .type = EventType_KeyReleased,
+LinceEvent LinceEvent_NewKeyReleasedEvent(int key){
+    LinceEvent e = {
+        .type = LinceEventType_KeyReleased,
         .name = "KeyReleasedEvent",
         .handled = 0,
         .data = {0}
@@ -34,9 +34,9 @@ Event LinceEvent_NewKeyReleasedEvent(int key){
 }
 
 
-Event LinceEvent_NewKeyTypeEvent(int key){
-    Event e = (Event){
-        .type = EventType_KeyType,
+LinceEvent LinceEvent_NewKeyTypeEvent(int key){
+    LinceEvent e = {
+        .type = LinceEventType_KeyType,
         .name = "KeyTypeEvent",
         .handled = 0,
         .data = {0}

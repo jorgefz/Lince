@@ -6,17 +6,19 @@
 #include <string.h>
 
 #ifdef LINCE_WINDOWS
-    #include <windows.h>
+    // #include <windows.h>
+#elif defined(LINCE_LINUX)
+    // linux
+#elif defined(LINCE_MACOS)
+    // MacOS
 #else
-    //unix
+    // other
 #endif
 
 #define LINCE_STR_MAX 100
 
 // Bool
-typedef unsigned int lince_bool;
-#define lince_false (lince_bool)0
-#define lince_true (lince_bool)(!lince_false)
+typedef enum LinceBool{ LinceFalse = 0, LinceTrue = 1 } LinceBool;
 
 // Assert
 #define LINCE_ASSERT(condition, msg) \

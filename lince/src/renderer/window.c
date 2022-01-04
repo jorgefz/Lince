@@ -76,7 +76,7 @@ void LinceWindow_Destroy(LinceWindow* window){
 	free(window);
 }
 
-void LinceWindow_SetEventCallback(LinceWindow* window, EventCallbackFn func){
+void LinceWindow_SetEventCallback(LinceWindow* window, LinceEventCallbackFn func){
     window->event_callback = func;
 }
 
@@ -93,21 +93,21 @@ static void WindowResizeCallback(GLFWwindow* wptr, int width, int height){
     w->width = (unsigned int)width;
     w->height = (unsigned int)height;
 
-    Event e = LinceEvent_NewWindowResizeEvent(width, height);
+    LinceEvent e = LinceEvent_NewWindowResizeEvent(width, height);
     if (w->event_callback) w->event_callback(&e);
     LinceEvent_Destroy(&e);
 }
 
 static void WindowCloseCallback(GLFWwindow* wptr){
     LinceWindow* w = (LinceWindow*)glfwGetWindowUserPointer(wptr);
-    Event e = LinceEvent_NewWindowCloseEvent();
+    LinceEvent e = LinceEvent_NewWindowCloseEvent();
     if (w->event_callback) w->event_callback(&e);
     LinceEvent_Destroy(&e);
 }
 
 static void KeyCallback(GLFWwindow* wptr, int key, int scancode, int action, int mods){
     LinceWindow* w = (LinceWindow*)glfwGetWindowUserPointer(wptr);
-    Event e;
+    LinceEvent e;
     switch (action) {
         case GLFW_PRESS:
             e = LinceEvent_NewKeyPressedEvent(key, 0);
@@ -128,14 +128,14 @@ static void KeyCallback(GLFWwindow* wptr, int key, int scancode, int action, int
 
 static void CharCallback(GLFWwindow* wptr, unsigned int key_typed){
     LinceWindow* w = (LinceWindow*)glfwGetWindowUserPointer(wptr);
-    Event e = LinceEvent_NewKeyTypeEvent(key_typed);
+    LinceEvent e = LinceEvent_NewKeyTypeEvent(key_typed);
     if (w->event_callback) w->event_callback(&e);
     LinceEvent_Destroy(&e);
 }
 
 static void MouseButtonCallback(GLFWwindow* wptr, int button, int action, int mods){
     LinceWindow* w = (LinceWindow*)glfwGetWindowUserPointer(wptr);
-    Event e;
+    LinceEvent e;
     switch (action) {
         case GLFW_PRESS: {
             e = LinceEvent_NewMouseButtonPressedEvent(button);
@@ -155,14 +155,14 @@ static void MouseButtonCallback(GLFWwindow* wptr, int button, int action, int mo
 
 static void MouseScrolledCallback(GLFWwindow* wptr, double xoff, double yoff){
     LinceWindow* w = (LinceWindow*)glfwGetWindowUserPointer(wptr);
-    Event e = LinceEvent_NewMouseScrolledEvent(xoff, yoff);
+    LinceEvent e = LinceEvent_NewMouseScrolledEvent(xoff, yoff);
     if (w->event_callback) w->event_callback(&e);
     LinceEvent_Destroy(&e);
 }
 
 static void MouseMovedCallback(GLFWwindow* wptr, double xpos, double ypos){
     LinceWindow* w = (LinceWindow*)glfwGetWindowUserPointer(wptr);
-    Event e = LinceEvent_NewMouseMovedEvent(xpos, ypos);
+    LinceEvent e = LinceEvent_NewMouseMovedEvent(xpos, ypos);
     if (w->event_callback) w->event_callback(&e);
     LinceEvent_Destroy(&e);
 }

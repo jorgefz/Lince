@@ -3,13 +3,13 @@
 
 #include "event/event.h"
 
-typedef void (*EventCallbackFn)(Event*);
+typedef void (*LinceEventCallbackFn)(LinceEvent*);
 
 typedef struct {
     void* handle;
     unsigned int height, width, initialised;
     char title[LINCE_STR_MAX];
-    EventCallbackFn event_callback;
+    LinceEventCallbackFn event_callback;
 } LinceWindow; 
 
 LinceWindow* LinceWindow_Create(unsigned int width, unsigned int height);
@@ -20,7 +20,7 @@ void LinceWindow_Update(LinceWindow* window);
 
 void LinceWindow_Destroy(LinceWindow* window);
 
-void LinceWindow_SetEventCallback(LinceWindow* window, EventCallbackFn func);
+void LinceWindow_SetEventCallback(LinceWindow* window, LinceEventCallbackFn func);
 
 
 

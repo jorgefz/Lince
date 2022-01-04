@@ -48,7 +48,7 @@ void LinceApp_PushOverlay(LinceLayer* overlay) {
 
 // Private functions
 
-static void LinceApp_OnEvent(Event* e);
+static void LinceApp_OnEvent(LinceEvent* e);
 
 static void LinceApp_Terminate();
 
@@ -85,20 +85,20 @@ static void LinceApp_OnUpdate(){
 }
 
 
-static unsigned int LinceApp_OnWindowResize(Event* e){
+static LinceBool LinceApp_OnWindowResize(LinceEvent* e){
     printf("Window resized to %d x %d\n", e->data.WindowResize->width, e->data.WindowResize->width);
-    return 0; // allow other layers to receive event
+    return LinceFalse; // allow other layers to receive event
 }
 
-static unsigned int LinceApp_OnWindowClose(Event* e) {
-    app.running = 0;
-    return 0; // allow other layers to receive event
+static LinceBool LinceApp_OnWindowClose(LinceEvent* e) {
+    app.running = LinceFalse;
+    return LinceFalse; // allow other layers to receive event
 }
 
-static void LinceApp_OnEvent(Event* e){
+static void LinceApp_OnEvent(LinceEvent* e){
     // Pre-defined event responses
-    LinceEvent_Dispatch(e, EventType_WindowResize, LinceApp_OnWindowResize);
-    LinceEvent_Dispatch(e, EventType_WindowClose, LinceApp_OnWindowClose);
+    LinceEvent_Dispatch(e, LinceEventType_WindowResize, LinceApp_OnWindowResize);
+    LinceEvent_Dispatch(e, LinceEventType_WindowClose, LinceApp_OnWindowClose);
 
     // pass event to layers and overlays
     // the ones in front receive it first
@@ -121,7 +121,7 @@ static void LinceApp_OnEvent(Event* e){
 void LinceApp_Run(){
     
     LinceApp_Init();
-    app.running = 1;
+    app.running = LinceTrue;
 
     float r = 0.0f, v = 0.0001f, b;
     while(app.running){

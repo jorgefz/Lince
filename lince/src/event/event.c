@@ -1,15 +1,15 @@
 
 #include "event/event.h"
 
-unsigned int LinceEvent_Dispatch(Event* e, EventType etype, EventFn func){
+LinceBool LinceEvent_Dispatch(LinceEvent* e, LinceEventType etype, LinceEventFn func){
     if (e->type == etype){
         e->handled = func(e);
-        return 1;
+        return LinceTrue;
     }
-    return 0;
+    return LinceFalse;
 }
 
-void LinceEvent_Destroy(Event* e){
+void LinceEvent_Destroy(LinceEvent* e){
     if(!e || !e->data.GenericEvent) return;
     free(e->data.GenericEvent);
 }

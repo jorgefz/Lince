@@ -2,9 +2,9 @@
 #include "event/windowEvent.h"
 
 
-Event LinceEvent_NewWindowCloseEvent(){
-    Event e = (Event){
-        .type = EventType_WindowClose,
+LinceEvent LinceEvent_NewWindowCloseEvent(){
+    LinceEvent e = {
+        .type = LinceEventType_WindowClose,
         .name = "WindowCloseEvent",
         .handled = 0,
         .data = {0} // this event doesn't need to hold any data.
@@ -12,9 +12,9 @@ Event LinceEvent_NewWindowCloseEvent(){
     return e;
 }
 
-Event LinceEvent_NewWindowResizeEvent(int width, int height){
-    Event e = (Event){
-        .type = EventType_WindowResize,
+LinceEvent LinceEvent_NewWindowResizeEvent(int width, int height){
+    LinceEvent e = {
+        .type = LinceEventType_WindowResize,
         .name = "WindowResizeEvent",
         .handled = 0,
         .data = {0}

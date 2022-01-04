@@ -11,13 +11,13 @@
 
 typedef void (*LinceGame_InitFn)();
 typedef void (*LinceGame_OnUpdateFn)();
-typedef void (*LinceGame_OnEventFn)(Event*);
+typedef void (*LinceGame_OnEventFn)(LinceEvent*);
 typedef void (*LinceGame_TerminateFn)();
 
 typedef struct {
     LinceWindow* window;
     LinceLayerStack *layer_stack, *overlay_stack;
-    unsigned int running;
+    LinceBool running;
 
     // User-defined game data & function pointers
     void* game_data;
