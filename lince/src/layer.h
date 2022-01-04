@@ -19,6 +19,9 @@ typedef struct LinceLayer {
 	void (*OnEvent)(struct LinceLayer*, Event*); // called on each game event
 } LinceLayer;
 
+LinceLayer* LinceLayer_Create(void* data);
+void* LinceLayer_GetData(LinceLayer* layer);
+
 typedef struct LinceLayerStack {
 	LinceLayer** layers;
 	unsigned int count, insert_index;

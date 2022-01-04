@@ -1,6 +1,18 @@
 
 #include "layer.h"
 
+
+LinceLayer* LinceLayer_Create(void* data) {
+	LinceLayer* layer = calloc(1, sizeof(LinceLayer));
+	LINCE_ASSERT(layer, "Failed to allocate layer");
+	layer->data.GenericLayer = data;
+	return layer;
+}
+
+void* LinceLayer_GetData(LinceLayer* layer) {
+	return layer->data.GenericLayer;
+}
+
 LinceLayerStack* LinceLayerStack_Create() {
 	LinceLayerStack* stack;
 	stack = calloc(1, sizeof(LinceLayerStack));
@@ -56,7 +68,6 @@ void LinceLayerStack_Pop(LinceLayerStack* stack, LinceLayer* layer) {
 
 	// detach layer
 	if (layer->OnDetach) layer->OnDetach(layer);
-	//stack->layers[which]->OnDetach(stack->layers[which]);
 
 	// resize layer stack
 	if (stack->count == 1) {

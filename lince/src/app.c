@@ -84,48 +84,38 @@ static void LinceApp_OnUpdate(){
     if (app.game_on_update) app.game_on_update();
 }
 
-static unsigned int LinceApp_OnKeyPressed(Event* e){
-    int key = e->data.KeyPressed->keycode;
-    if (key >= 33 || key <= 126) printf("%c", (char)key);
-    else printf(" key(%d) ", key);
-    fflush(stdout);
-    return 0;
-}
-
-static unsigned int LinceApp_OnMouseMoved(Event* e){
-    printf("Mouse %f %f\n", e->data.MouseMoved->xpos, e->data.MouseMoved->ypos);
-    return 0;
-}
 
 static unsigned int LinceApp_OnWindowResize(Event* e){
     printf("Window resized to %d x %d\n", e->data.WindowResize->width, e->data.WindowResize->width);
-    return 0;
+    return 0; // allow other layers to receive event
 }
 
 static unsigned int LinceApp_OnWindowClose(Event* e) {
     app.running = 0;
-    return 0;
+    return 0; // allow other layers to receive event
 }
 
 static void LinceApp_OnEvent(Event* e){
-    //LinceEvent_Dispatch(e, EventType_MouseMoved, LinceApp_OnMouseMoved);
-    LinceEvent_Dispatch(e, EventType_KeyPressed, LinceApp_OnKeyPressed);
+    // Pre-defined event responses
     LinceEvent_Dispatch(e, EventType_WindowResize, LinceApp_OnWindowResize);
     LinceEvent_Dispatch(e, EventType_WindowClose, LinceApp_OnWindowClose);
 
     // pass event to layers and overlays
-    unsigned int i;
-    for (i = 0; i != app.layer_stack->count; ++i) {
-        LinceLayer* layer = app.layer_stack->layers[i];
-        if (layer && layer->OnEvent) layer->OnEvent(layer, e);
-    }
-    for (i = 0; i != app.overlay_stack->count; ++i) {
+    // the ones in front receive it first
+    int i;
+    for (i = (int)app.overlay_stack->count - 1; i >= 0; --i) {
+        if (e->handled) break;
         LinceLayer* overlay = app.overlay_stack->layers[i];
         if (overlay && overlay->OnEvent) overlay->OnEvent(overlay, e);
     }
+    for (i = (int)app.layer_stack->count - 1; i >= 0; --i) {
+        if (e->handled) break;
+        LinceLayer* layer = app.layer_stack->layers[i];
+        if (layer && layer->OnEvent) layer->OnEvent(layer, e);
+    }
 
     // pass event to game app
-    if (app.game_on_event) app.game_on_event(e);
+    if (app.game_on_event && !e->handled ) app.game_on_event(e);
 }
 
 void LinceApp_Run(){

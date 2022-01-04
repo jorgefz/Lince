@@ -18,20 +18,38 @@ void MyLayer_OnDetach(LinceLayer* layer) {
     free(layer);
 }
 
-LinceLayer* MyLayer_Init() {
-    printf("MyLayer Init\n");
+unsigned int MyLayer_OnKeyPressed(Event* e) {
+    int key = e->data.KeyPressed->keycode;
+    switch (key) {
+    case LinceKey_Backspace:
+        printf("\b \b");
+        break;
+    case LinceKey_Enter:
+        printf("\n");
+        break;
+    default:
+        printf("%c", (char)key);
+    }
+    fflush(stdout);
+    return 1;
+}
 
-    LinceLayer* layer = malloc(sizeof(LinceLayer));
-    LINCE_ASSERT(layer, "Failed to allocate layer");
-    *layer = (LinceLayer){ 0 };
-    layer->OnAttach = MyLayer_OnAttach;
-    layer->OnDetach = MyLayer_OnDetach;
+void MyLayer_OnEvent(LinceLayer* layer, Event* e) {
+    LinceEvent_Dispatch(e, EventType_KeyPressed, MyLayer_OnKeyPressed);
+}
+
+LinceLayer* MyLayer_Init(int n) {
+    printf("MyLayer Init\n");
 
     MyLayer* my_layer = malloc(sizeof(MyLayer));
     LINCE_ASSERT(my_layer, "Failed to allocate layer data");
-    my_layer->dummy = 99;
+    my_layer->dummy = n;
 
-    layer->data.GenericLayer = (void*)my_layer;
+    LinceLayer* layer = LinceLayer_Create(my_layer);
+    layer->OnAttach = MyLayer_OnAttach;
+    layer->OnDetach = MyLayer_OnDetach;
+    layer->OnEvent = MyLayer_OnEvent;
+    //layer->OnUpdate = 
 
     return layer;
 }
@@ -40,7 +58,8 @@ LinceLayer* MyLayer_Init() {
 
 void GameInit() {
 	printf("Game initialised!\n");
-    LinceApp_PushLayer(MyLayer_Init());
+    LinceApp_PushLayer(MyLayer_Init(1));
+    LinceApp_PushLayer(MyLayer_Init(2));
 }
 
 void GameOnUpdate() {
@@ -51,10 +70,10 @@ void GameOnEvent(Event* e) {
 
 }
 
+
 void GameTerminate() {
     printf("Game terminated\n");
 }
-
 
 int main(int argc, const char* argv[]) {
 
