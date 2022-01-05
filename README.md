@@ -1,5 +1,11 @@
 # Lince
 An OpenGL game engine written in C, currently in development.
 
-It uses GLFW (glfw.org) as the windowing system and GLAD (https://glad.dav1d.de/) as the OpenGL loader, as well as Premake5 as the build system.
+## Dependencies
+
+* GLFW: windowing system (https://glfw.org)
+* GLAD: OpenGL loader (https://glad.dav1d.de/)
+* Premake5: build system.
+* CGLM: OpenGL vector and matrix mathematics (https://cglm.readthedocs.io/en/latest)
+
 

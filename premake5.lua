@@ -19,9 +19,11 @@ outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 IncludeDir = {}
 IncludeDir["glfw"] = "vendor/glfw/include"
 IncludeDir["glad"] = "vendor/glad/include"
+IncludeDir["cglm"] = "vendor/cglm/include"
 
 include "vendor/glfw"
 include "vendor/glad"
+include "vendor/cglm"
 
 project "lince"
     location "lince"
@@ -45,11 +47,13 @@ project "lince"
         "%{prj.name}/src",
         "%{IncludeDir.glfw}",
         "%{IncludeDir.glad}",
+        "%{IncludeDir.cglm}"
     }
 
     links {
         "GLAD",
         "glfw",
+        "cglm"
     }
 
     filter "system:windows"
