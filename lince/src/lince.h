@@ -11,6 +11,7 @@
 
 #include "renderer/context.h"
 #include "renderer/window.h"
+#include "renderer/renderer.h"
 
 #include "input.h"
 #include "keycodes.h"

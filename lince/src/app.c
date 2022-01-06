@@ -5,6 +5,7 @@
 #include <GLFW/glfw3.h>
 
 #include "app.h"
+#include "renderer/renderer.h"
 
 static LinceApp app = {0};
 
@@ -123,14 +124,7 @@ void LinceApp_Run(){
     LinceApp_Init();
     app.running = LinceTrue;
 
-    float r = 0.0f, v = 0.0001f, b;
     while(app.running){
-        r += v;
-        if (r >= 1.0f) v = -v;
-        else if (r <= 0.0f) v = -v;
-        b = 1.0f - r;        
-        glClearColor(r, 0.1f, b, 1.0f);
-
         LinceApp_OnUpdate();
     }
 
