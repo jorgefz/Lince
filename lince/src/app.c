@@ -9,6 +9,7 @@
 
 static LinceApp app = {0};
 
+
 // Public API
 void Lince_SetGameInitFn(LinceGame_InitFn func) {
     app.game_init = func;
@@ -26,37 +27,60 @@ void Lince_SetGameTerminateFn(LinceGame_TerminateFn func) {
     app.game_terminate = func;
 }
 
-LinceApp* LinceApp_GetApplication(){
+LinceApp* LinceGetAppState(){
     return &app;
 }
 
-void LinceApp_SetGameData(void* data) {
-    app.game_data = data;
+void LinceSetUserData(void* data) {
+    app.user_data = data;
 }
 
-void* LinceApp_GetGameData() {
-    return app.game_data;
+void* LinceGetUserData() {
+    return app.user_data;
 }
 
-void LinceApp_PushLayer(LinceLayer* layer) {
+void LincePushLayer(LinceLayer* layer) {
     LinceLayerStack_Push(app.layer_stack, layer);
 }
 
-void LinceApp_PushOverlay(LinceLayer* overlay) {
+void LincePushOverlay(LinceLayer* overlay) {
     LinceLayerStack_Push(app.overlay_stack, overlay);
 }
 
+// Returns time since initialization in milliseconds
+double LinceGetTimeMS(){
+    return (glfwGetTime() * 1000.0);
+}
 
-// Private functions
 
-static void LinceApp_OnEvent(LinceEvent* e);
+/* --- Static functions --- */
 
-static void LinceApp_Terminate();
+/* Initialises OpenGL window and layer stacks */
+static void LinceInit();
 
-static void LinceApp_Init(){
+/* Calls the program's main loop */
+void LinceRun();
+
+/* Called once per frame, updates window and renders layers */
+static void LinceOnUpdate();
+
+/* Shuts down application and frees allocated memory */
+static void LinceTerminate();
+
+/* Called when game event occurs,
+propagates it to layers and user */
+static void LinceOnEvent(LinceEvent* e);
+
+static LinceBool LinceOnEventWindowResize(LinceEvent* e);
+static LinceBool LinceOnEventWindowClose(LinceEvent* e);
+
+
+/* --- Implementations of static functions */
+
+static void LinceInit(){
     // Create a windowed mode window and its OpenGL context
     app.window = LinceWindow_Create(1280, 720);
-    LinceWindow_SetEventCallback(app.window, LinceApp_OnEvent);
+    LinceWindow_SetEventCallback(app.window, LinceOnEvent);
 
     // init layer and overlay stacks
     app.layer_stack = LinceLayerStack_Create();
@@ -65,7 +89,18 @@ static void LinceApp_Init(){
     if (app.game_init) app.game_init(); // user may push layers onto stack
 }
 
-static void LinceApp_OnUpdate(){
+void LinceRun(){
+
+    LinceInit();
+    app.running = LinceTrue;
+
+    while(app.running){
+        LinceOnUpdate();
+    }
+    LinceTerminate();
+}
+
+static void LinceOnUpdate(){
     glClear(GL_COLOR_BUFFER_BIT);
     LinceWindow_Update(app.window);
 
@@ -85,24 +120,36 @@ static void LinceApp_OnUpdate(){
     if (app.game_on_update) app.game_on_update();
 }
 
+static void LinceTerminate(){
+    LinceWindow_Destroy(app.window); // shutdown opengl window
+    app.window = NULL;
+    app.running = 0;
 
-static LinceBool LinceApp_OnWindowResize(LinceEvent* e){
-    printf("Window resized to %d x %d\n", e->data.WindowResize->width, e->data.WindowResize->width);
-    return LinceFalse; // allow other layers to receive event
+    // free layer and overlay stacks
+    LinceLayerStack_Destroy(app.layer_stack);
+    LinceLayerStack_Destroy(app.overlay_stack);
+    app.layer_stack = NULL;
+    app.overlay_stack = NULL;
+
+    if (app.game_terminate) app.game_terminate();
 }
 
-static LinceBool LinceApp_OnWindowClose(LinceEvent* e) {
-    app.running = LinceFalse;
-    return LinceFalse; // allow other layers to receive event
-}
+static void LinceOnEvent(LinceEvent* e){
+    /* Pre-defined event responses:
+    adapt viewport when window is resized,
+    and shutdown program when window is closed */
+    LinceEvent_Dispatch(
+        e,
+        LinceEventType_WindowResize,
+        LinceOnEventWindowResize
+    );
+    LinceEvent_Dispatch(e,
+        LinceEventType_WindowClose,
+        LinceOnEventWindowClose
+    );
 
-static void LinceApp_OnEvent(LinceEvent* e){
-    // Pre-defined event responses
-    LinceEvent_Dispatch(e, LinceEventType_WindowResize, LinceApp_OnWindowResize);
-    LinceEvent_Dispatch(e, LinceEventType_WindowClose, LinceApp_OnWindowClose);
-
-    // pass event to layers and overlays
-    // the ones in front receive it first
+    /* propagate event to layers and overlays,
+    the ones in front (rendered last) receive it first */
     int i;
     for (i = (int)app.overlay_stack->count - 1; i >= 0; --i) {
         if (e->handled) break;
@@ -115,34 +162,19 @@ static void LinceApp_OnEvent(LinceEvent* e){
         if (layer && layer->OnEvent) layer->OnEvent(layer, e);
     }
 
-    // pass event to game app
+    // propagate event to user
     if (app.game_on_event && !e->handled ) app.game_on_event(e);
 }
 
-void LinceApp_Run(){
-    
-    LinceApp_Init();
-    app.running = LinceTrue;
 
-    while(app.running){
-        LinceApp_OnUpdate();
-    }
-
-    LinceApp_Terminate();
+static LinceBool LinceOnEventWindowResize(LinceEvent* e){
+    printf("Window resized to %d x %d\n", e->data.WindowResize->width, e->data.WindowResize->width);
+    return LinceFalse; // allow other layers to receive event
 }
 
-static void LinceApp_Terminate(){
-    LinceWindow_Destroy(app.window);
-    app.window = NULL;
-    app.running = 0;
-
-    // destroy layer and overlay stacks
-    LinceLayerStack_Destroy(app.layer_stack);
-    LinceLayerStack_Destroy(app.overlay_stack);
-    app.layer_stack = NULL;
-    app.overlay_stack = NULL;
-
-    if (app.game_terminate) app.game_terminate();
+static LinceBool LinceOnEventWindowClose(LinceEvent* e) {
+    app.running = LinceFalse;
+    return LinceFalse; // allow other layers to receive event
 }
 
 

@@ -33,7 +33,7 @@ LinceWindow* LinceWindow_Create(unsigned int width, unsigned int height){
     }
     GLContextInit(handle); // load GLAD
 
-    //glfwSwapInterval(1); // activate VSYNC, WILL FREEZE WINDOW !!!
+    glfwSwapInterval(1); // activate VSYNC
     glViewport(0, 0, width, height);
 
     int glfw_major, glfw_minor, glfw_rev;

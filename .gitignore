@@ -9,9 +9,10 @@ null.d
 **.vcxproj.filters
 **.vcxproj.user
 
-# Build tools ans scripts
+# Build tools and scripts
 **.exe
 **.sh
+premake5
 
 # Output files
 **/Makefile

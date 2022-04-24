@@ -45,7 +45,7 @@ int main(){
 ## Entry Point
 
 ```c
-void LinceApp_Run()
+void LinceRun()
 ```
 Initialises the game engine and runs the main rendering loop. This function takes no arguments and returns no values, and should only be called once.
 
@@ -54,7 +54,7 @@ Initialises the game engine and runs the main rendering loop. This function take
 
 In order for the engine to communicate with your application and vice-versa, you should provide the engine with a set of functions
 
-These should be set before `LinceApp_Run` is called.
+These should be set before `LinceRun` is called.
 
 ```c
 void Lince_SetGameInitFn( void (*init)() )
