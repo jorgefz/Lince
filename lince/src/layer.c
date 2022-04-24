@@ -1,25 +1,28 @@
 
 #include "layer.h"
 
+/* Layer */
 
-LinceLayer* LinceLayer_Create(void* data) {
+LinceLayer* LinceCreateLayer(void* data) {
 	LinceLayer* layer = calloc(1, sizeof(LinceLayer));
 	LINCE_ASSERT(layer, "Failed to allocate layer");
-	layer->data.GenericLayer = data;
+	layer->data = data;
 	return layer;
 }
 
-void* LinceLayer_GetData(LinceLayer* layer) {
-	return layer->data.GenericLayer;
+void* LinceGetLayerData(LinceLayer* layer) {
+	return layer->data;
 }
 
-LinceLayerStack* LinceLayerStack_Create() {
+/* LayerStack */
+
+LinceLayerStack* LinceCreateLayerStack() {
 	LinceLayerStack* stack;
 	stack = calloc(1, sizeof(LinceLayerStack));
 	return stack;
 }
 
-void LinceLayerStack_Destroy(LinceLayerStack* stack) {
+void LinceDestroyLayerStack(LinceLayerStack* stack) {
 	if (!stack) return;
 	if (!stack->layers) {
 		free(stack);
@@ -28,20 +31,24 @@ void LinceLayerStack_Destroy(LinceLayerStack* stack) {
 	unsigned int i;
 	for (i = 0; i != stack->count; ++i) {
 		if (stack->layers[i] && stack->layers[i]->OnDetach) {
-			stack->layers[i]->OnDetach(stack->layers[i]);
+			if (stack->layers[i]->OnDetach) {
+				stack->layers[i]->OnDetach(stack->layers[i]);
+			}
+			free( stack->layers[i] );
 		}
 	}
 	free(stack->layers);
 	free(stack);
 }
 
-void LinceLayerStack_Push(LinceLayerStack* stack, LinceLayer* layer) {
+void LinceLayerStackPush(LinceLayerStack* stack, LinceLayer* layer) {
 	if (!stack || !layer) return;
 	
 	// resize stack
 	LinceLayer** ret = realloc(stack->layers, ((size_t)stack->count+1) * sizeof(LinceLayer*));
 	if (!ret) {
-		LinceLayerStack_Destroy(stack);
+		// Failed to allocate more space for additional pointer
+		LinceDestroyLayerStack(stack);
 		LINCE_ASSERT(0, "Failed to allocate memory");
 	}
 	stack->count++;
@@ -52,7 +59,7 @@ void LinceLayerStack_Push(LinceLayerStack* stack, LinceLayer* layer) {
 	if (layer->OnAttach) layer->OnAttach(layer);
 }
 
-void LinceLayerStack_Pop(LinceLayerStack* stack, LinceLayer* layer) {
+void LinceLayerStackPop(LinceLayerStack* stack, LinceLayer* layer) {
 	if (!stack || !layer) return;
 	
 	// find input layer
@@ -83,7 +90,7 @@ void LinceLayerStack_Pop(LinceLayerStack* stack, LinceLayer* layer) {
 
 	LinceLayer** ret = realloc(stack->layers, (stack->count - 1) * sizeof(LinceLayer*));
 	if (!ret) {
-		LinceLayerStack_Destroy(stack);
+		LinceDestroyLayerStack(stack);
 		LINCE_ASSERT(0, "Failed to allocate memory");
 	}
 	stack->layers = ret;

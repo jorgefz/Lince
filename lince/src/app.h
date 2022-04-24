@@ -50,11 +50,12 @@ void LincePushOverlay(LinceLayer* overlay);
 This is useful to pass custom data to runtime functions
 such as OnEvent or OnUpdate */
 void LinceSetUserData(void* data);
+
 /* Retrieve user data during runtime */
 void* LinceGetUserData();
 
 /* Returns time since initialisation in milliseconds */
-double LinceGetTimeMS();
+double LinceGetTimeMillis();
 
 /* Returns the current state of the running program */
 LinceApp* LinceGetAppState();

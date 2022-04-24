@@ -4,23 +4,30 @@
 #include "event/event.h"
 
 
-typedef union LinceLayerData {
-	// other predefined layers here
-	void* GenericLayer;
-} LinceLayerData;
+typedef void* LinceLayerData;
 
 typedef struct LinceLayer {
-	// data
+	// custom user layer pointer
 	LinceLayerData data;
-	// methods
-	void (*OnAttach)(struct LinceLayer*); // called when layer is pushed on stack
-	void (*OnDetach)(struct LinceLayer*); // called when layer is popped from stack (must be freed)
-	void (*OnUpdate)(struct LinceLayer*); // called on each game tick
-	void (*OnEvent)(struct LinceLayer*, LinceEvent*); // called on each game event
+
+	/// TODO: add debug name?
+
+	// callbacks, should these be snake_case?
+	/* Called when layer is pushed onto stack */
+	void (*OnAttach)(struct LinceLayer*);
+	/* Called when layer is popped from stack,
+	should free the user layer but not the LinceLayer itself */
+	void (*OnDetach)(struct LinceLayer*);
+	/* called on each game frame */
+	void (*OnUpdate)(struct LinceLayer*);
+	/* called only when an event takes place and hasn't been handled yet */
+	void (*OnEvent)(struct LinceLayer*, LinceEvent*);
 } LinceLayer;
 
-LinceLayer* LinceLayer_Create(void* data);
-void* LinceLayer_GetData(LinceLayer* layer);
+/* Creates new layer using custom data passed to it */
+LinceLayer* LinceCreateLayer(void* data);
+/* Retrieves pointer to user-defined layer */
+void* LinceGetLayerData(LinceLayer* layer);
 
 typedef struct LinceLayerStack {
 	LinceLayer** layers;
@@ -34,11 +41,17 @@ typedef struct LinceLayerStack {
 	when the stack is popped or destroyed.
 */
 
-LinceLayerStack* LinceLayerStack_Create();
-void LinceLayerStack_Destroy(LinceLayerStack*);
+/* Initialises an empty layer stack */
+LinceLayerStack* LinceCreateLayerStack();
 
-void LinceLayerStack_Push(LinceLayerStack*, LinceLayer*);
-void LinceLayerStack_Pop(LinceLayerStack*, LinceLayer*);
+/* Detaches and frees all layers */
+void LinceDestroyLayerStack(LinceLayerStack*);
+
+/* Adds a layer to the stack */
+void LinceLayerStackPush(LinceLayerStack*, LinceLayer*);
+
+/* Removes a layer from the top of the stack */
+void LinceLayerStackPop(LinceLayerStack*, LinceLayer*);
 
 
 #endif // LINCE_LAYER_H

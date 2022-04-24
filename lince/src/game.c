@@ -15,15 +15,14 @@ double fps = 0.0;
 LinceBool show_fps = LinceFalse;
 
 void MyLayer_OnAttach(LinceLayer* layer) {
-    MyLayer* custom_data = layer->data.GenericLayer;
-    custom_data->red = 0.0f;
-    custom_data->vel = 0.001f;
+    MyLayer* data = LinceGetLayerData(layer);
+    data->red = 0.0f;
+    data->vel = 0.001f;
 }
 
 void MyLayer_OnDetach(LinceLayer* layer) {
     printf("MyLayer detached\n");
-    free(layer->data.GenericLayer);
-    free(layer); // should be done through API call
+    free(LinceGetLayerData(layer));
 }
 
 LinceBool MyLayer_OnKeyPressed(LinceEvent* e) {
@@ -51,7 +50,7 @@ void MyLayer_OnEvent(LinceLayer* layer, LinceEvent* e) {
 }
 
 void MyLayer_OnUpdate(LinceLayer* layer) {
-    MyLayer* data = layer->data.GenericLayer;
+    MyLayer* data = LinceGetLayerData(layer);
 
     data->red += data->vel;
     if (data->red >= 1.0f) data->vel = -data->vel;
@@ -66,7 +65,7 @@ LinceLayer* MyLayer_Init(int n) {
 
     MyLayer* my_layer = malloc(sizeof(MyLayer));
     LINCE_ASSERT(my_layer, "Failed to allocate layer data");
-    LinceLayer* layer = LinceLayer_Create(my_layer);
+    LinceLayer* layer = LinceCreateLayer(my_layer);
     layer->OnAttach = MyLayer_OnAttach;
     layer->OnDetach = MyLayer_OnDetach;
     layer->OnEvent = MyLayer_OnEvent;
@@ -74,7 +73,6 @@ LinceLayer* MyLayer_Init(int n) {
 
     return layer;
 }
-
 
 
 void GameInit() {
@@ -85,7 +83,7 @@ void GameInit() {
 
 void GameOnUpdate() {
     double old_time = time_ms;
-    time_ms = LinceGetTimeMS();
+    time_ms = LinceGetTimeMillis();
     
     dt = (time_ms - old_time); // delta time in ms
     fps = 1000.0 / dt;
@@ -96,10 +94,12 @@ void GameOnUpdate() {
         for(int i=0; i!=100; ++i) printf("\b");
         fflush(stdout);
     }
-
-    printf("Mouse: %.2f %.2f ", LinceGetMouseX(), LinceGetMouseY());
-    for(int i=0; i!=100; ++i) printf("\b");
-
+    if (LinceIsKeyPressed(LinceKey_m)){
+        printf("Mouse: %.2f %.2f ", LinceGetMouseX(), LinceGetMouseY());
+        fflush(stdout);
+        for(int i=0; i!=100; ++i) printf("\b");
+        fflush(stdout);
+    }
 }
 
 void GameOnEvent(LinceEvent* e) {

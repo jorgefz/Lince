@@ -40,15 +40,14 @@ void* LinceGetUserData() {
 }
 
 void LincePushLayer(LinceLayer* layer) {
-    LinceLayerStack_Push(app.layer_stack, layer);
+    LinceLayerStackPush(app.layer_stack, layer);
 }
 
 void LincePushOverlay(LinceLayer* overlay) {
-    LinceLayerStack_Push(app.overlay_stack, overlay);
+    LinceLayerStackPush(app.overlay_stack, overlay);
 }
 
-// Returns time since initialization in milliseconds
-double LinceGetTimeMS(){
+double LinceGetTimeMillis(){
     return (glfwGetTime() * 1000.0);
 }
 
@@ -83,8 +82,8 @@ static void LinceInit(){
     LinceWindow_SetEventCallback(app.window, LinceOnEvent);
 
     // init layer and overlay stacks
-    app.layer_stack = LinceLayerStack_Create();
-    app.overlay_stack = LinceLayerStack_Create();
+    app.layer_stack = LinceCreateLayerStack();
+    app.overlay_stack = LinceCreateLayerStack();
     
     if (app.game_init) app.game_init(); // user may push layers onto stack
 }
@@ -126,8 +125,8 @@ static void LinceTerminate(){
     app.running = 0;
 
     // free layer and overlay stacks
-    LinceLayerStack_Destroy(app.layer_stack);
-    LinceLayerStack_Destroy(app.overlay_stack);
+    LinceDestroyLayerStack(app.layer_stack);
+    LinceDestroyLayerStack(app.overlay_stack);
     app.layer_stack = NULL;
     app.overlay_stack = NULL;
 
