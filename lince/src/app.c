@@ -168,7 +168,10 @@ static void LinceOnEvent(LinceEvent* e){
 
 
 static LinceBool LinceOnEventWindowResize(LinceEvent* e){
-    printf("Window resized to %d x %d\n", e->data.WindowResize->width, e->data.WindowResize->width);
+    printf("Window resized to %d x %d\n", 
+        e->data.WindowResize->width,
+        e->data.WindowResize->width
+    );
     return LinceFalse; // allow other layers to receive event
 }
 

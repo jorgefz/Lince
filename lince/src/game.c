@@ -96,6 +96,10 @@ void GameOnUpdate() {
         for(int i=0; i!=100; ++i) printf("\b");
         fflush(stdout);
     }
+
+    printf("Mouse: %.2f %.2f ", LinceGetMouseX(), LinceGetMouseY());
+    for(int i=0; i!=100; ++i) printf("\b");
+
 }
 
 void GameOnEvent(LinceEvent* e) {

@@ -3,22 +3,21 @@
 #include <GLFW/glfw3.h>
 
 #include "input.h"
-
 #include "app.h"
 
-unsigned int LinceInput_IsKeyPressed(int key){
+unsigned int LinceIsKeyPressed(int key){
     GLFWwindow* handle = LinceGetAppState()->window->handle;
     int state = glfwGetKey(handle, key);
     return (state == GLFW_PRESS || state == GLFW_REPEAT);
 }
 
-unsigned int LinceInput_IsMouseButtonPressed(int button){
+unsigned int LinceIsMouseButtonPressed(int button){
     GLFWwindow* handle = LinceGetAppState()->window->handle;
     int state = glfwGetMouseButton(handle, button);
 	return (state == GLFW_PRESS);
 }
 
-void LinceInput_GetMousePos(float* xpos, float* ypos){
+void LinceGetMousePos(float* xpos, float* ypos){
     double x, y;
     GLFWwindow* handle = LinceGetAppState()->window->handle;
 	glfwGetCursorPos(handle, &x, &y);
@@ -26,14 +25,14 @@ void LinceInput_GetMousePos(float* xpos, float* ypos){
     if (ypos) *ypos = (float)y;
 }
 
-float LinceInput_GetMouseX(){
+float LinceGetMouseX(){
     float x;
-    LinceInput_GetMousePos(&x, NULL);
+    LinceGetMousePos(&x, NULL);
     return x;
 }
 
-float LinceInput_GetMouseY(){
+float LinceGetMouseY(){
     float y;
-    LinceInput_GetMousePos(NULL, &y);
+    LinceGetMousePos(NULL, &y);
     return y;
 }
