@@ -9,7 +9,6 @@
 #include "event/mouseEvent.h"
 #include "event/windowEvent.h"
 
-#include "renderer/context.h"
 #include "renderer/window.h"
 #include "renderer/renderer.h"
 

@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+/* Platform */
 #ifdef LINCE_WINDOWS
     // #include <windows.h>
 #elif defined(LINCE_LINUX)
@@ -15,13 +16,10 @@
     // other
 #endif
 
-#define LINCE_STR_MAX 100
-
-// Bool
-typedef enum LinceBool{ LinceFalse = 0, LinceTrue = 1 } LinceBool;
-
-// Assert
-#define LINCE_ASSERT(condition, msg) \
+/* Debugging */
+#ifdef LINCE_DEBUG
+#   define LINCE_LOG(...) fprintf(stderr, __VA_ARGS__);
+#   define LINCE_ASSERT(condition, msg) \
     if(!(condition)) { \
         do { \
             fprintf(stderr, "Error: '%s':%d in function '%s': %s (%s) \n", \
@@ -29,5 +27,14 @@ typedef enum LinceBool{ LinceFalse = 0, LinceTrue = 1 } LinceBool;
             exit(-1); \
         } while(0); \
     }
+#else
+#   define LINCE_LOG
+#   define LINCE_ASSERT
+#endif
+
+/* Constants & typedefs */
+#define LINCE_STR_MAX 100
+typedef enum LinceBool{ LinceFalse = 0, LinceTrue = 1 } LinceBool;
+
 
 #endif // LINCE_CORE_H

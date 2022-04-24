@@ -13,7 +13,7 @@ void GLContextInit(GLFWwindow* handle){
     int status = gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
     LINCE_ASSERT(status, "[GLAD] Fatal error: failed to load!");
     
-    // Debug info
+    // Debug info - use
     fprintf(stderr, "GPU: %s\n", glGetString(GL_RENDERER));
     fprintf(stderr, "Vendor: %s\n", glGetString(GL_VENDOR));
     fprintf(stderr, "OpenGL Version: %s\n", glGetString(GL_VERSION));

@@ -12,14 +12,14 @@ typedef enum {
 } BufferElement;
 
 typedef struct BufferLayout {
-    unsigned int num; // number of buffer elements
+    unsigned int elems; // number of buffer elements
     unsigned int comp; // number of components /(e.g. Int4 counts as 4)
     unsigned int bytes; // size in bytes
     BufferElement* elements; // array of ints
 } BufferLayout;
 
 unsigned int BufferElementBytes(BufferElement elem);
-BufferLayout* CreateBufferLayout(unsigned int num, ...);
+BufferLayout* CreateBufferLayout(unsigned int count, ...);
 
 
 #endif // LINCE_BUFFER_H

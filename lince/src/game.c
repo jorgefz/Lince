@@ -117,7 +117,6 @@ int main(int argc, const char* argv[]) {
     Lince_SetGameOnUpdateFn(GameOnUpdate);
     Lince_SetGameOnEventFn(GameOnEvent);
     Lince_SetGameTerminateFn(GameTerminate);
-    // Lince_SetGameData();
     
     LinceRun();
 

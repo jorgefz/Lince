@@ -65,7 +65,8 @@ unsigned int LinceWindow_ShouldClose(LinceWindow* window){
 }
 
 void LinceWindow_Update(LinceWindow* window){
-    glfwSwapBuffers((GLFWwindow*)(window->handle));
+    //glfwSwapBuffers((GLFWwindow*)(window->handle));
+    GLContextSwapBuffers(window->handle);
 	glfwPollEvents();
 }
 
