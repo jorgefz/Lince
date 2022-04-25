@@ -2,19 +2,20 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
-#include "core.h"
+#include "core/core.h"
+#include "core/window.h"
 
 #include "event/event.h"
-#include "event/keyEvent.h"
-#include "event/mouseEvent.h"
-#include "event/windowEvent.h"
+#include "event/key_event.h"
+#include "event/mouse_event.h"
+#include "event/window_event.h"
 
 #include "renderer/context.h"
-#include "renderer/window.h"
+
 
 
 static void GLFWErrorCallback(int error, const char* description) {
-    fprintf(stderr, "GLFW ERROR %d -> ", error);
+    LINCE_INFO("GLFW ERROR %d -> ", error);
     LINCE_ASSERT(0, description);
 }
 
@@ -38,7 +39,7 @@ LinceWindow* LinceWindow_Create(unsigned int width, unsigned int height){
 
     int glfw_major, glfw_minor, glfw_rev;
     glfwGetVersion(&glfw_major, &glfw_minor, &glfw_rev);
-    fprintf(stderr, "GLFW Version %d.%d.%d\n", glfw_major, glfw_minor, glfw_rev);
+    LINCE_INFO("GLFW Version %d.%d.%d\n", glfw_major, glfw_minor, glfw_rev);
 
     LinceWindow* window = malloc(sizeof(LinceWindow));
     LINCE_ASSERT(window, "Failed to allocate memory");
@@ -94,14 +95,14 @@ static void WindowResizeCallback(GLFWwindow* wptr, int width, int height){
     w->width = (unsigned int)width;
     w->height = (unsigned int)height;
 
-    LinceEvent e = LinceEvent_NewWindowResizeEvent(width, height);
+    LinceEvent e = LinceNewWindowResizeEvent(width, height);
     if (w->event_callback) w->event_callback(&e);
     LinceEvent_Destroy(&e);
 }
 
 static void WindowCloseCallback(GLFWwindow* wptr){
     LinceWindow* w = (LinceWindow*)glfwGetWindowUserPointer(wptr);
-    LinceEvent e = LinceEvent_NewWindowCloseEvent();
+    LinceEvent e = LinceNewWindowCloseEvent();
     if (w->event_callback) w->event_callback(&e);
     LinceEvent_Destroy(&e);
 }
@@ -111,13 +112,13 @@ static void KeyCallback(GLFWwindow* wptr, int key, int scancode, int action, int
     LinceEvent e;
     switch (action) {
         case GLFW_PRESS:
-            e = LinceEvent_NewKeyPressedEvent(key, 0);
+            e = LinceNewKeyPressedEvent(key, 0);
             break;
         case GLFW_RELEASE:
-            e = LinceEvent_NewKeyReleasedEvent(key);
+            e = LinceNewKeyReleasedEvent(key);
             break;
         case GLFW_REPEAT:
-            e = LinceEvent_NewKeyPressedEvent(key, 1);
+            e = LinceNewKeyPressedEvent(key, 1);
             break;
         default:
             LINCE_ASSERT(0, "Invalid KeyCallback action\n");
@@ -129,7 +130,7 @@ static void KeyCallback(GLFWwindow* wptr, int key, int scancode, int action, int
 
 static void CharCallback(GLFWwindow* wptr, unsigned int key_typed){
     LinceWindow* w = (LinceWindow*)glfwGetWindowUserPointer(wptr);
-    LinceEvent e = LinceEvent_NewKeyTypeEvent(key_typed);
+    LinceEvent e = LinceNewKeyTypeEvent(key_typed);
     if (w->event_callback) w->event_callback(&e);
     LinceEvent_Destroy(&e);
 }
@@ -139,11 +140,11 @@ static void MouseButtonCallback(GLFWwindow* wptr, int button, int action, int mo
     LinceEvent e;
     switch (action) {
         case GLFW_PRESS: {
-            e = LinceEvent_NewMouseButtonPressedEvent(button);
+            e = LinceNewMouseButtonPressedEvent(button);
             break;
         }
         case GLFW_RELEASE: {
-            e = LinceEvent_NewMouseButtonReleasedEvent(button);
+            e = LinceNewMouseButtonReleasedEvent(button);
             break;
         }
         default:
@@ -156,14 +157,14 @@ static void MouseButtonCallback(GLFWwindow* wptr, int button, int action, int mo
 
 static void MouseScrolledCallback(GLFWwindow* wptr, double xoff, double yoff){
     LinceWindow* w = (LinceWindow*)glfwGetWindowUserPointer(wptr);
-    LinceEvent e = LinceEvent_NewMouseScrolledEvent(xoff, yoff);
+    LinceEvent e = LinceNewMouseScrolledEvent(xoff, yoff);
     if (w->event_callback) w->event_callback(&e);
     LinceEvent_Destroy(&e);
 }
 
 static void MouseMovedCallback(GLFWwindow* wptr, double xpos, double ypos){
     LinceWindow* w = (LinceWindow*)glfwGetWindowUserPointer(wptr);
-    LinceEvent e = LinceEvent_NewMouseMovedEvent(xpos, ypos);
+    LinceEvent e = LinceNewMouseMovedEvent(xpos, ypos);
     if (w->event_callback) w->event_callback(&e);
     LinceEvent_Destroy(&e);
 }

@@ -1,7 +1,7 @@
 
-#include "event/mouseEvent.h"
+#include "event/mouse_event.h"
 
-LinceEvent LinceEvent_NewMouseButtonPressedEvent(int button){
+LinceEvent LinceNewMouseButtonPressedEvent(int button){
     LinceEvent e = {
         .type = LinceEventType_MouseButtonPressed,
         .name = "MouseButtonPressedEvent",
@@ -15,7 +15,7 @@ LinceEvent LinceEvent_NewMouseButtonPressedEvent(int button){
     return e;
 }
 
-LinceEvent LinceEvent_NewMouseButtonReleasedEvent(int button){
+LinceEvent LinceNewMouseButtonReleasedEvent(int button){
     LinceEvent e = {
         .type = LinceEventType_MouseButtonReleased,
         .name = "MouseButtonReleasedEvent",
@@ -29,7 +29,7 @@ LinceEvent LinceEvent_NewMouseButtonReleasedEvent(int button){
     return e;
 }
 
-LinceEvent LinceEvent_NewMouseMovedEvent(double xpos, double ypos){
+LinceEvent LinceNewMouseMovedEvent(double xpos, double ypos){
     LinceEvent e = {
         .type = LinceEventType_MouseMoved,
         .name = "MouseMovedEvent",
@@ -43,7 +43,7 @@ LinceEvent LinceEvent_NewMouseMovedEvent(double xpos, double ypos){
     return e;
 }
 
-LinceEvent LinceEvent_NewMouseScrolledEvent(double xoff, double yoff){
+LinceEvent LinceNewMouseScrolledEvent(double xoff, double yoff){
     LinceEvent e = {
         .type = LinceEventType_MouseScrolled,
         .name = "MouseScrolledEvent",

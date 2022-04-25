@@ -1,11 +1,11 @@
 
-#include "event/keyEvent.h"
+#include "event/key_event.h"
 
-LinceEvent LinceEvent_NewKeyPressedEvent(int key, int repeats){
+LinceEvent LinceNewKeyPressedEvent(int key, int repeats){
     LinceEvent e = {
         .type = LinceEventType_KeyPressed,
         .name = "KeyPressedEvent",
-        .handled = 0,
+        .handled = LinceFalse,
         .data = {0}
     };
     KeyPressedEvent k = {
@@ -19,11 +19,11 @@ LinceEvent LinceEvent_NewKeyPressedEvent(int key, int repeats){
 }
 
 
-LinceEvent LinceEvent_NewKeyReleasedEvent(int key){
+LinceEvent LinceNewKeyReleasedEvent(int key){
     LinceEvent e = {
         .type = LinceEventType_KeyReleased,
         .name = "KeyReleasedEvent",
-        .handled = 0,
+        .handled = LinceFalse,
         .data = {0}
     };
     KeyReleasedEvent k = {.keycode = key};
@@ -34,11 +34,11 @@ LinceEvent LinceEvent_NewKeyReleasedEvent(int key){
 }
 
 
-LinceEvent LinceEvent_NewKeyTypeEvent(int key){
+LinceEvent LinceNewKeyTypeEvent(int key){
     LinceEvent e = {
         .type = LinceEventType_KeyType,
         .name = "KeyTypeEvent",
-        .handled = 0,
+        .handled = LinceFalse,
         .data = {0}
     };
     KeyTypeEvent k = {.keycode = key};

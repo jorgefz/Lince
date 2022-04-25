@@ -2,19 +2,19 @@
 #ifndef LINCE_H
 #define LINCE_H
 
-#include "core.h"
+#include "core/core.h"
 
 #include "event/event.h"
-#include "event/keyEvent.h"
-#include "event/mouseEvent.h"
-#include "event/windowEvent.h"
+#include "event/key_event.h"
+#include "event/mouse_event.h"
+#include "event/window_event.h"
 
-#include "renderer/window.h"
+#include "core/window.h"
 #include "renderer/renderer.h"
 
-#include "input.h"
-#include "keycodes.h"
-#include "layer.h"
-#include "app.h"
+#include "core/input.h"
+#include "core/keycodes.h"
+#include "core/layer.h"
+#include "core/app.h"
 
 #endif //LINCE_H

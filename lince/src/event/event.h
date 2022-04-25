@@ -1,7 +1,7 @@
 #ifndef LINCE_EVENT_H
 #define LINCE_EVENT_H
 
-#include "core.h"
+#include "core/core.h"
 
 typedef enum LinceEventType {
     LinceEventType_None = 0,
@@ -9,7 +9,6 @@ typedef enum LinceEventType {
     LinceEventType_KeyPressed, LinceEventType_KeyReleased, LinceEventType_KeyType,
     LinceEventType_MouseButtonPressed, LinceEventType_MouseButtonReleased,
     LinceEventType_MouseMoved, LinceEventType_MouseScrolled,
-    // add new event types here
     EventType_EventNum // number of pre-defined events
 } LinceEventType;
 
@@ -23,7 +22,6 @@ typedef union LinceEventData {
     struct MouseButtonReleasedEvent* MouseButtonReleased;
     struct MouseMovedEvent* MouseMoved;
     struct MouseScrolledEvent* MouseScrolled;
-    // add new event declarations here
     void* GenericEvent;
 } LinceEventData;
 

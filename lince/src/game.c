@@ -1,5 +1,6 @@
 
 #include <time.h>
+
 #include "lince.h"
 #include "cglm/vec4.h"
 
@@ -7,10 +8,6 @@
 typedef struct MyLayer {
     float red, vel;
 } MyLayer;
-
-double time_ms = 0.0;
-double dt = 0.0;
-double fps = 0.0;
 
 LinceBool show_fps = LinceFalse;
 
@@ -81,6 +78,10 @@ void GameInit() {
     LincePushLayer(MyLayer_Init(2));
 }
 
+double time_ms = 0.0;
+double dt = 0.0;
+double fps = 0.0;
+
 void GameOnUpdate() {
     double old_time = time_ms;
     time_ms = LinceGetTimeMillis();
@@ -88,13 +89,13 @@ void GameOnUpdate() {
     dt = (time_ms - old_time); // delta time in ms
     fps = 1000.0 / dt;
 
-    if (show_fps){
+    if (show_fps){ // displays and updates frame rate every fram
         printf(" FPS: %.4g (dt: %.4g ms) ", fps, dt);
         fflush(stdout);
         for(int i=0; i!=100; ++i) printf("\b");
         fflush(stdout);
     }
-    if (LinceIsKeyPressed(LinceKey_m)){
+    if (LinceIsKeyPressed(LinceKey_m)){ // prints mouse position
         printf("Mouse: %.2f %.2f ", LinceGetMouseX(), LinceGetMouseY());
         fflush(stdout);
         for(int i=0; i!=100; ++i) printf("\b");
@@ -113,10 +114,14 @@ void GameTerminate() {
 
 int main(int argc, const char* argv[]) {
 
-    Lince_SetGameInitFn(GameInit);
-    Lince_SetGameOnUpdateFn(GameOnUpdate);
-    Lince_SetGameOnEventFn(GameOnEvent);
-    Lince_SetGameTerminateFn(GameTerminate);
+    #ifdef LINCE_DEBUG
+    printf(" --- DEBUG MODE -- \n");
+    #endif
+
+    LinceSetGameInitFn(GameInit);
+    LinceSetGameOnUpdateFn(GameOnUpdate);
+    LinceSetGameOnEventFn(GameOnEvent);
+    LinceSetGameTerminateFn(GameTerminate);
     
     LinceRun();
 

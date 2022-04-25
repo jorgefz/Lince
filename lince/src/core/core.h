@@ -18,7 +18,7 @@
 
 /* Debugging */
 #ifdef LINCE_DEBUG
-#   define LINCE_LOG(...) fprintf(stderr, __VA_ARGS__);
+#   define LINCE_INFO(...) fprintf(stderr, __VA_ARGS__);
 #   define LINCE_ASSERT(condition, msg) \
     if(!(condition)) { \
         do { \
@@ -28,7 +28,7 @@
         } while(0); \
     }
 #else
-#   define LINCE_LOG
+#   define LINCE_INFO
 #   define LINCE_ASSERT
 #endif
 

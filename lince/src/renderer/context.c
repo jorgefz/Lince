@@ -2,7 +2,7 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
-#include "core.h"
+#include "core/core.h"
 #include "renderer/context.h"
 
 void GLContextInit(GLFWwindow* handle){
@@ -14,9 +14,9 @@ void GLContextInit(GLFWwindow* handle){
     LINCE_ASSERT(status, "[GLAD] Fatal error: failed to load!");
     
     // Debug info - use
-    fprintf(stderr, "GPU: %s\n", glGetString(GL_RENDERER));
-    fprintf(stderr, "Vendor: %s\n", glGetString(GL_VENDOR));
-    fprintf(stderr, "OpenGL Version: %s\n", glGetString(GL_VERSION));
+    LINCE_INFO("GPU: %s\n", glGetString(GL_RENDERER));
+    LINCE_INFO("Vendor: %s\n", glGetString(GL_VENDOR));
+    LINCE_INFO("OpenGL Version: %s\n", glGetString(GL_VERSION));
 }
 
 void GLContextSwapBuffers(GLFWwindow* handle){

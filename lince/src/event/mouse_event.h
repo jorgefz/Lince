@@ -19,10 +19,11 @@ typedef struct MouseScrolledEvent {
     float xoff, yoff;
 } MouseScrolledEvent;
 
-LinceEvent LinceEvent_NewMouseButtonPressedEvent(int button);
-LinceEvent LinceEvent_NewMouseButtonReleasedEvent(int button);
-LinceEvent LinceEvent_NewMouseMovedEvent(double xpos, double ypos);
-LinceEvent LinceEvent_NewMouseScrolledEvent(double xoff, double yoff);
+/* Helper functions to create and allocate new events */
+LinceEvent LinceNewMouseButtonPressedEvent(int button);
+LinceEvent LinceNewMouseButtonReleasedEvent(int button);
+LinceEvent LinceNewMouseMovedEvent(double xpos, double ypos);
+LinceEvent LinceNewMouseScrolledEvent(double xoff, double yoff);
 
 
 #endif // LINCE_MOUSE_EVENT_H

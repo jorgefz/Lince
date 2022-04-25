@@ -4,26 +4,27 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
-#include "app.h"
+#include "core/app.h"
 #include "renderer/renderer.h"
 
+/* Private application state - stack allocated */
 static LinceApp app = {0};
 
+/* --- Public API --- */
 
-// Public API
-void Lince_SetGameInitFn(LinceGame_InitFn func) {
+void LinceSetGameInitFn(LinceGameInitFn func) {
     app.game_init = func;
 }
 
-void Lince_SetGameOnUpdateFn(LinceGame_OnUpdateFn func) {
+void LinceSetGameOnUpdateFn(LinceGameOnUpdateFn func) {
     app.game_on_update = func;
 }
 
-void Lince_SetGameOnEventFn(LinceGame_OnEventFn func) {
+void LinceSetGameOnEventFn(LinceGameOnEventFn func) {
     app.game_on_event = func;
 }
 
-void Lince_SetGameTerminateFn(LinceGame_TerminateFn func) {
+void LinceSetGameTerminateFn(LinceGameTerminateFn func) {
     app.game_terminate = func;
 }
 
@@ -74,7 +75,7 @@ static LinceBool LinceOnEventWindowResize(LinceEvent* e);
 static LinceBool LinceOnEventWindowClose(LinceEvent* e);
 
 
-/* --- Implementations of static functions */
+/* --- Implementations of static functions --- */
 
 static void LinceInit(){
     // Create a windowed mode window and its OpenGL context
@@ -167,7 +168,7 @@ static void LinceOnEvent(LinceEvent* e){
 
 
 static LinceBool LinceOnEventWindowResize(LinceEvent* e){
-    printf("Window resized to %d x %d\n", 
+    LINCE_INFO("Window resized to %d x %d\n", 
         e->data.WindowResize->width,
         e->data.WindowResize->width
     );

@@ -1,8 +1,8 @@
 
-#include "event/windowEvent.h"
+#include "event/window_event.h"
 
 
-LinceEvent LinceEvent_NewWindowCloseEvent(){
+LinceEvent LinceNewWindowCloseEvent(){
     LinceEvent e = {
         .type = LinceEventType_WindowClose,
         .name = "WindowCloseEvent",
@@ -12,7 +12,7 @@ LinceEvent LinceEvent_NewWindowCloseEvent(){
     return e;
 }
 
-LinceEvent LinceEvent_NewWindowResizeEvent(int width, int height){
+LinceEvent LinceNewWindowResizeEvent(int width, int height){
     LinceEvent e = {
         .type = LinceEventType_WindowResize,
         .name = "WindowResizeEvent",

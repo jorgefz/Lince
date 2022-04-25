@@ -2,8 +2,8 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
-#include "input.h"
-#include "app.h"
+#include "core/input.h"
+#include "core/app.h"
 
 unsigned int LinceIsKeyPressed(int key){
     GLFWwindow* handle = LinceGetAppState()->window->handle;
