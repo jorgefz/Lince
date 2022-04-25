@@ -23,8 +23,14 @@ typedef struct LinceBufferElement {
     unsigned int gl_type; // OpenGL API type
     unsigned int comps; // number of components
     unsigned int bytes; // size in bytes
-    // offset, ...
+    unsigned int offset; // offset, norm, ...
 } LinceBufferElement;
+
+/* Provides the unique data of a buffer type: component count, size, and OpenGL type */
+LinceBufferElement LinceGetBufferTypeData(LinceBufferType type);
+
+/* Populates buffer element data given its type */
+void LinceSetupBufferElementData(LinceBufferElement* elem);
 
 
 /* --- Vertex Buffer --- */

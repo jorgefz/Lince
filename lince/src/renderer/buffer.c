@@ -3,7 +3,6 @@
 #include "renderer/buffer.h"
 #include "core/core.h"
 
-#include <GLFW/glfw3.h>
 #include <glad/glad.h>
 
 /* --- Buffer Element & Layout ---*/
@@ -27,9 +26,17 @@ static const LinceBufferElement buffer_types_data[] = {
 };
 
 /* Provides the unique data of a buffer type: component count, size, and OpenGL type */
-static LinceBufferElement LinceGetBufferTypeData(LinceBufferType type){
+LinceBufferElement LinceGetBufferTypeData(LinceBufferType type){
 	LINCE_ASSERT(type < LinceBufferType_Count, "Unknown buffer data type");
 	return buffer_types_data[type];
+}
+
+void LinceSetupBufferElementData(LinceBufferElement* elem){
+	LINCE_ASSERT(elem->type < LinceBufferType_Count, "Unknown buffer data type");
+	LinceBufferElement data = buffer_types_data[elem->type];
+	elem->comps = data.comps;
+	elem->gl_type = data.gl_type;
+	elem->bytes = data.bytes;
 }
 
 static void DebugPrint_BufferLayout(LinceBufferElement* layout, int len){
