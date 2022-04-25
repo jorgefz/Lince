@@ -77,10 +77,10 @@ static LinceBool LinceOnEventWindowClose(LinceEvent* e);
 
 /* --- Implementations of static functions --- */
 
-static void LinceInit(){
+static void LinceInit(unsigned int width, unsigned int height, int flags){
     // Create a windowed mode window and its OpenGL context
-    app.window = LinceWindow_Create(1280, 720);
-    LinceWindow_SetEventCallback(app.window, LinceOnEvent);
+    app.window = LinceCreateWindow(width, height);
+    LinceSetMainEventCallback(app.window, LinceOnEvent);
 
     // init layer and overlay stacks
     app.layer_stack = LinceCreateLayerStack();
@@ -91,7 +91,7 @@ static void LinceInit(){
 
 void LinceRun(){
 
-    LinceInit();
+    LinceInit(500, 282, 0);
     app.running = LinceTrue;
 
     while(app.running){
@@ -102,7 +102,7 @@ void LinceRun(){
 
 static void LinceOnUpdate(){
     LinceRender_Clear();
-    LinceWindow_Update(app.window);
+    LinceUpdateWindow(app.window);
 
     // Calculate delta time
     float new_time_ms = (float)(glfwGetTime() * 1000.0);
@@ -126,7 +126,7 @@ static void LinceOnUpdate(){
 }
 
 static void LinceTerminate(){
-    LinceWindow_Destroy(app.window); // shutdown opengl window
+    LinceDestroyWindow(app.window); // shutdown opengl window
     app.window = NULL;
     app.running = 0;
 

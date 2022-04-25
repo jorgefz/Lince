@@ -78,10 +78,8 @@ void GameInit() {
     LincePushLayer(MyLayer_Init(2));
 }
 
-float fps = 0.0;
-
 void GameOnUpdate(float dt) {
-    fps = 1000.0 / dt;
+    float fps = 1000.0 / dt;
 
     if (show_fps){ // displays and updates frame rate every fram
         printf(" FPS: %.4g (dt: %.4g ms) ", fps, dt);
@@ -97,6 +95,7 @@ void GameOnUpdate(float dt) {
     }
 
     /*
+    // Idea for 2D renderer API
     LinceBeginScene(camera);
     LinceDrawQuad({});
     LinceEndScene();

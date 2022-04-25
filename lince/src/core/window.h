@@ -12,16 +12,23 @@ typedef struct {
     LinceEventCallbackFn event_callback;
 } LinceWindow; 
 
-LinceWindow* LinceWindow_Create(unsigned int width, unsigned int height);
+/* Initialises GLFW window */
+LinceWindow* LinceCreateWindow(unsigned int width, unsigned int height);
 
-unsigned int LinceWindow_ShouldClose(LinceWindow* window);
+/* Signals whether the window should be shutdown */
+unsigned int LinceShouldCloseWindow(LinceWindow* window);
 
-void LinceWindow_Update(LinceWindow* window);
+/* Swaps buffers and polls GLFW events */
+void LinceUpdateWindow(LinceWindow* window);
 
-void LinceWindow_Destroy(LinceWindow* window);
+/* Shutds down window */
+void LinceDestroyWindow(LinceWindow* window);
 
-void LinceWindow_SetEventCallback(LinceWindow* window, LinceEventCallbackFn func);
-
+/* Set the function called every time an event occurs,
+which then propagates it to other callbacks */
+void LinceSetMainEventCallback(LinceWindow* window, LinceEventCallbackFn func);
+// LinceSetMainEventCallback
+// LinceSetEventCallback
 
 
 #endif // LINCE_WINDOW_H

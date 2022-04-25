@@ -22,9 +22,10 @@ static void GLFWErrorCallback(int error, const char* description) {
 // forward declare to call from CreateWindow
 static void SetGLFWCallbacks();
 
-// Public functions
+/* Public API */
 
-LinceWindow* LinceWindow_Create(unsigned int width, unsigned int height){
+/// TODO: third argument bit flags for fullscreen, vsync, etc
+LinceWindow* LinceCreateWindow(unsigned int width, unsigned int height){
 
     LINCE_ASSERT(glfwInit(), "Failed to initialise GLFW");
     GLFWwindow* handle = glfwCreateWindow(width, height, "Lince Window", NULL, NULL);
@@ -32,9 +33,9 @@ LinceWindow* LinceWindow_Create(unsigned int width, unsigned int height){
         glfwTerminate();
         LINCE_ASSERT(0, "Failed to create window");
     }
-    LinceGLContextInit(handle); // load GLAD
+    LinceGLContextInit(handle); // load glad
 
-    glfwSwapInterval(1); // activate VSYNC
+    glfwSwapInterval(1); // activate vsync
     glViewport(0, 0, width, height);
 
     int glfw_major, glfw_minor, glfw_rev;
@@ -61,24 +62,23 @@ LinceWindow* LinceWindow_Create(unsigned int width, unsigned int height){
     return window;
 }
 
-unsigned int LinceWindow_ShouldClose(LinceWindow* window){
+unsigned int LinceShouldCloseWindow(LinceWindow* window){
     return glfwWindowShouldClose((GLFWwindow*)(window->handle));
 }
 
-void LinceWindow_Update(LinceWindow* window){
-    //glfwSwapBuffers((GLFWwindow*)(window->handle));
+void LinceUpdateWindow(LinceWindow* window){
     LinceGLContextSwapBuffers(window->handle);
 	glfwPollEvents();
 }
 
-void LinceWindow_Destroy(LinceWindow* window){
-    glfwSetErrorCallback(NULL);
+void LinceDestroyWindow(LinceWindow* window){
+    glfwSetErrorCallback(NULL); // otherwise GLFW throws an error on shutdown
     if (window->initialised) glfwTerminate();
     if (window->handle) glfwDestroyWindow((GLFWwindow*)(window->handle));
 	free(window);
 }
 
-void LinceWindow_SetEventCallback(LinceWindow* window, LinceEventCallbackFn func){
+void LinceSetMainEventCallback(LinceWindow* window, LinceEventCallbackFn func){
     window->event_callback = func;
 }
 

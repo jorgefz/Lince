@@ -3,13 +3,11 @@
 
 #include "event/event.h"
 
-
 typedef void* LinceLayerData;
 
 typedef struct LinceLayer {
 	// custom user layer pointer
 	LinceLayerData data;
-
 	/// TODO: add debug name?
 
 	// callbacks
@@ -26,9 +24,11 @@ typedef struct LinceLayer {
 
 /* Creates new layer using custom data passed to it */
 LinceLayer* LinceCreateLayer(void* data);
+
 /* Retrieves pointer to user-defined layer */
 void* LinceGetLayerData(LinceLayer* layer);
 
+/* Layer stack stored as array of pointers */
 typedef struct LinceLayerStack {
 	LinceLayer** layers;
 	unsigned int count;
