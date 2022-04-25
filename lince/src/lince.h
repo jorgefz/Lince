@@ -9,9 +9,11 @@
 #include "event/mouse_event.h"
 #include "event/window_event.h"
 
-#include "core/window.h"
 #include "renderer/renderer.h"
+#include "renderer/buffer.h"
+#include "renderer/vertex_array.h"
 
+#include "core/window.h"
 #include "core/input.h"
 #include "core/keycodes.h"
 #include "core/layer.h"
