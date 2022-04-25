@@ -11,7 +11,7 @@
 
 /* Function pointer typedefs for user callbacks */
 typedef void (*LinceGameInitFn)();
-typedef void (*LinceGameOnUpdateFn)();
+typedef void (*LinceGameOnUpdateFn)(float dt);
 typedef void (*LinceGameOnEventFn)(LinceEvent*);
 typedef void (*LinceGameTerminateFn)();
 
@@ -21,6 +21,8 @@ typedef struct {
     LinceLayerStack *layer_stack;
     LinceLayerStack *overlay_stack;
     LinceBool        running;
+    float time_ms;  // clock in milliseconds
+    float dt;       // timestep in ms
 
     /* User-defined data & functions */
     void* user_data;

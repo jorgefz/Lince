@@ -5,7 +5,7 @@
 #include "core/core.h"
 #include "renderer/context.h"
 
-void GLContextInit(GLFWwindow* handle){
+void LinceGLContextInit(GLFWwindow* handle){
     LINCE_ASSERT(handle, "Window handle is null");
     glfwMakeContextCurrent(handle);
 
@@ -19,6 +19,6 @@ void GLContextInit(GLFWwindow* handle){
     LINCE_INFO("OpenGL Version: %s\n", glGetString(GL_VERSION));
 }
 
-void GLContextSwapBuffers(GLFWwindow* handle){
+void LinceGLContextSwapBuffers(GLFWwindow* handle){
     glfwSwapBuffers(handle);
 }

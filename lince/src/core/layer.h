@@ -12,14 +12,14 @@ typedef struct LinceLayer {
 
 	/// TODO: add debug name?
 
-	// callbacks, should these be snake_case?
+	// callbacks
 	/* Called when layer is pushed onto stack */
 	void (*OnAttach)(struct LinceLayer*);
 	/* Called when layer is popped from stack,
 	should free the user layer but not the LinceLayer itself */
 	void (*OnDetach)(struct LinceLayer*);
 	/* called on each game frame */
-	void (*OnUpdate)(struct LinceLayer*);
+	void (*OnUpdate)(struct LinceLayer*, float dt);
 	/* called only when an event takes place and hasn't been handled yet */
 	void (*OnEvent)(struct LinceLayer*, LinceEvent*);
 } LinceLayer;

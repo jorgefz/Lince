@@ -46,7 +46,7 @@ void MyLayer_OnEvent(LinceLayer* layer, LinceEvent* e) {
     LinceEvent_Dispatch(e, LinceEventType_KeyPressed, MyLayer_OnKeyPressed);
 }
 
-void MyLayer_OnUpdate(LinceLayer* layer) {
+void MyLayer_OnUpdate(LinceLayer* layer, float dt) {
     MyLayer* data = LinceGetLayerData(layer);
 
     data->red += data->vel;
@@ -78,15 +78,9 @@ void GameInit() {
     LincePushLayer(MyLayer_Init(2));
 }
 
-double time_ms = 0.0;
-double dt = 0.0;
-double fps = 0.0;
+float fps = 0.0;
 
-void GameOnUpdate() {
-    double old_time = time_ms;
-    time_ms = LinceGetTimeMillis();
-    
-    dt = (time_ms - old_time); // delta time in ms
+void GameOnUpdate(float dt) {
     fps = 1000.0 / dt;
 
     if (show_fps){ // displays and updates frame rate every fram
@@ -101,6 +95,12 @@ void GameOnUpdate() {
         for(int i=0; i!=100; ++i) printf("\b");
         fflush(stdout);
     }
+
+    /*
+    LinceBeginScene(camera);
+    LinceDrawQuad({});
+    LinceEndScene();
+    */
 }
 
 void GameOnEvent(LinceEvent* e) {

@@ -101,23 +101,28 @@ void LinceRun(){
 }
 
 static void LinceOnUpdate(){
-    glClear(GL_COLOR_BUFFER_BIT);
+    LinceRender_Clear();
     LinceWindow_Update(app.window);
+
+    // Calculate delta time
+    float new_time_ms = (float)(glfwGetTime() * 1000.0);
+    app.dt = new_time_ms - app.time_ms;
+    app.time_ms = new_time_ms;
 
     // update layers
     unsigned int i;
     for (i = 0; i != app.layer_stack->count; ++i) {
         LinceLayer* layer = app.layer_stack->layers[i];
-        if (layer && layer->OnUpdate) layer->OnUpdate(layer);
+        if (layer && layer->OnUpdate) layer->OnUpdate(layer, app.dt);
     }
     // update overlays
     for (i = 0; i != app.overlay_stack->count; ++i) {
         LinceLayer* overlay = app.overlay_stack->layers[i];
-        if (overlay && overlay->OnUpdate) overlay->OnUpdate(overlay);
+        if (overlay && overlay->OnUpdate) overlay->OnUpdate(overlay, app.dt);
     }
     
     // update game app
-    if (app.game_on_update) app.game_on_update();
+    if (app.game_on_update) app.game_on_update(app.dt);
 }
 
 static void LinceTerminate(){

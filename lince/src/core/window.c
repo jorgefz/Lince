@@ -32,7 +32,7 @@ LinceWindow* LinceWindow_Create(unsigned int width, unsigned int height){
         glfwTerminate();
         LINCE_ASSERT(0, "Failed to create window");
     }
-    GLContextInit(handle); // load GLAD
+    LinceGLContextInit(handle); // load GLAD
 
     glfwSwapInterval(1); // activate VSYNC
     glViewport(0, 0, width, height);
@@ -67,7 +67,7 @@ unsigned int LinceWindow_ShouldClose(LinceWindow* window){
 
 void LinceWindow_Update(LinceWindow* window){
     //glfwSwapBuffers((GLFWwindow*)(window->handle));
-    GLContextSwapBuffers(window->handle);
+    LinceGLContextSwapBuffers(window->handle);
 	glfwPollEvents();
 }
 

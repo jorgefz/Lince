@@ -1,0 +1,5 @@
+#ifndef LINCE_VERTEX_ARRAY_H
+#define LINCE_VERTEX_ARRAY_H
+
+
+#endif // LINCE_VERTEX_ARRAY_H
