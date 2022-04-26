@@ -44,6 +44,10 @@ void LinceSetGameTerminateFn(LinceGameTerminateFn func); /* Called on shutdown *
  /* Runs main application loop */
 void LinceRun();
 
+/* TEMPORARY */
+void LinceInit(unsigned int width, unsigned int height, int flags);
+void LinceOnUpdate();
+
 /* Adds a rendering layer to the program */
 void LincePushLayer(LinceLayer* layer);
 

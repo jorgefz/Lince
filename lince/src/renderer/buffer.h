@@ -40,10 +40,10 @@ typedef unsigned int LinceVertexBuffer;
 
 /* Stores given data in new vertex buffer and returns renderer ID,
 the supplied data may be empty (NULL) */
-LinceVertexBuffer LinceCreateVertexBuffer(float* data, unsigned int size);
+LinceVertexBuffer LinceCreateVertexBuffer(void* data, unsigned int size);
 
 /* Populates an already existing buffer with data */
-void LinceSetVertexBufferData(LinceVertexBuffer vb, float* data, unsigned int size);
+void LinceSetVertexBufferData(LinceVertexBuffer vb, void* data, unsigned int size);
 
 void LinceBindVertexBuffer(LinceVertexBuffer vb);
 void LinceUnbindVertexBuffer();

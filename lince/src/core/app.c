@@ -13,13 +13,13 @@ static LinceApp app = {0};
 /* --- Static functions --- */
 
 /* Initialises OpenGL window and layer stacks */
-static void LinceInit();
+/* static void LinceInit(); */
 
 /* Calls the program's main loop */
 void LinceRun();
 
 /* Called once per frame, updates window and renders layers */
-static void LinceOnUpdate();
+/* static void LinceOnUpdate(); */
 
 /* Shuts down application and frees allocated memory */
 static void LinceTerminate();
@@ -36,7 +36,7 @@ static LinceBool LinceOnEventWindowClose(LinceEvent* e);
 
 void LinceRun(){
 
-    LinceInit(500, 282, 0); // width, height, flags
+    LinceInit(530, 300, 0); // width, height, flags
     app.running = LinceTrue;
 
     while(app.running){
@@ -99,7 +99,7 @@ LinceLayer* LinceGetCurrentOverlay(){
 
 /* --- Implementations of static functions --- */
 
-static void LinceInit(unsigned int width, unsigned int height, int flags){
+/*static*/ void LinceInit(unsigned int width, unsigned int height, int flags){
     // Create a windowed mode window and its OpenGL context
     app.window = LinceCreateWindow(width, height);
     LinceSetMainEventCallback(app.window, LinceOnEvent);
@@ -112,9 +112,9 @@ static void LinceInit(unsigned int width, unsigned int height, int flags){
 }
 
 
-static void LinceOnUpdate(){
-    LinceRender_Clear();
-    LinceUpdateWindow(app.window);
+/*static*/ void LinceOnUpdate(){
+    //LinceRender_Clear();
+    glClear(GL_COLOR_BUFFER_BIT);
 
     // Calculate delta time
     float new_time_ms = (float)(glfwGetTime() * 1000.0);
@@ -137,15 +137,16 @@ static void LinceOnUpdate(){
         if (overlay && overlay->OnUpdate) overlay->OnUpdate(overlay, app.dt);
     }
     app.current_overlay = -1;
-    
-    // update game app
+
+    // update user application
     if (app.game_on_update) app.game_on_update(app.dt);
+
+    //LinceUpdateWindow(app.window);
+    glfwSwapBuffers(app.window->handle);
+	glfwPollEvents();
 }
 
 static void LinceTerminate(){
-    LinceDestroyWindow(app.window); // shutdown opengl window
-    app.window = NULL;
-    app.running = 0;
 
     // free layer and overlay stacks
     LinceDestroyLayerStack(app.layer_stack);
@@ -154,6 +155,12 @@ static void LinceTerminate(){
     app.overlay_stack = NULL;
 
     if (app.game_terminate) app.game_terminate();
+
+    /* shutdown window last, as it destroys opengl context
+    and all its functions */
+    LinceDestroyWindow(app.window);
+    app.window = NULL;
+    app.running = 0;
 }
 
 static void LinceOnEvent(LinceEvent* e){
@@ -195,7 +202,7 @@ static void LinceOnEvent(LinceEvent* e){
 
 
 static LinceBool LinceOnEventWindowResize(LinceEvent* e){
-    LINCE_INFO("Window resized to %d x %d\n", 
+    LINCE_INFO("Window resized to %d x %d", 
         e->data.WindowResize->width,
         e->data.WindowResize->width
     );

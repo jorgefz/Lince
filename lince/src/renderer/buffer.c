@@ -40,19 +40,10 @@ void LinceSetupBufferElementData(LinceBufferElement* elem){
 	elem->bytes = data.bytes;
 }
 
-static void DebugPrint_BufferLayout(LinceBufferElement* layout, int len){
-	for(int i=0; i!=len; ++i){
-		printf("%d) '%s': type %d, %d comps and %d bytes",
-			i, layout[i].name, layout[i].type,
-			layout[i].comps, layout[i].bytes
-		);
-	}
-}
-
 
 /* --- Vertex Buffer --- */
 
-LinceVertexBuffer CreateVertexBuffer(float* data, unsigned int size){
+LinceVertexBuffer LinceCreateVertexBuffer(void* data, unsigned int size){
 	unsigned int id;
 	glGenBuffers(1, &id);
 	glBindBuffer(GL_ARRAY_BUFFER, id);
@@ -61,7 +52,7 @@ LinceVertexBuffer CreateVertexBuffer(float* data, unsigned int size){
 	return (LinceVertexBuffer)id;
 }
 
-void LinceSetVertexBufferData(LinceVertexBuffer vb, float* data, unsigned int size){
+void LinceSetVertexBufferData(LinceVertexBuffer vb, void* data, unsigned int size){
 	LinceBindVertexBuffer(vb);
 	glBufferSubData(GL_ARRAY_BUFFER, 0, size, data);
 }

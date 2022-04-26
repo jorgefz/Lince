@@ -10,9 +10,6 @@
 #include "event/mouse_event.h"
 #include "event/window_event.h"
 
-#include "renderer/context.h"
-
-
 
 static void GLFWErrorCallback(int error, const char* description) {
     LINCE_INFO("GLFW ERROR %d -> ", error);
@@ -22,25 +19,48 @@ static void GLFWErrorCallback(int error, const char* description) {
 // forward declare to call from CreateWindow
 static void SetGLFWCallbacks();
 
+/* Initialise OpenGL context */
+static void LinceInitGLContext(GLFWwindow* handle){
+    LINCE_ASSERT(handle, "Window handle is null");
+    glfwMakeContextCurrent(handle);
+
+    // Load GLAD
+    int status = gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
+    LINCE_ASSERT(status, "[GLAD] Fatal error: failed to load!");
+    
+    // Debug info
+    LINCE_INFO("GPU: %s", glGetString(GL_RENDERER));
+    LINCE_INFO("Vendor: %s", glGetString(GL_VENDOR));
+    LINCE_INFO("OpenGL Version: %s", glGetString(GL_VERSION));
+}
+
+
 /* Public API */
 
 /// TODO: third argument bit flags for fullscreen, vsync, etc
 LinceWindow* LinceCreateWindow(unsigned int width, unsigned int height){
 
     LINCE_ASSERT(glfwInit(), "Failed to initialise GLFW");
+    
+    /* Using OpenGL 4.0 */
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    
     GLFWwindow* handle = glfwCreateWindow(width, height, "Lince Window", NULL, NULL);
     if (!handle) {
         glfwTerminate();
         LINCE_ASSERT(0, "Failed to create window");
     }
-    LinceGLContextInit(handle); // load glad
+    LINCE_INFO("Window %dx%d created", width, height);
+    LinceInitGLContext(handle);
 
     glfwSwapInterval(1); // activate vsync
     glViewport(0, 0, width, height);
 
     int glfw_major, glfw_minor, glfw_rev;
     glfwGetVersion(&glfw_major, &glfw_minor, &glfw_rev);
-    LINCE_INFO("GLFW Version %d.%d.%d\n", glfw_major, glfw_minor, glfw_rev);
+    LINCE_INFO("GLFW Version %d.%d.%d", glfw_major, glfw_minor, glfw_rev);
 
     LinceWindow* window = malloc(sizeof(LinceWindow));
     LINCE_ASSERT(window, "Failed to allocate memory");
@@ -67,7 +87,7 @@ unsigned int LinceShouldCloseWindow(LinceWindow* window){
 }
 
 void LinceUpdateWindow(LinceWindow* window){
-    LinceGLContextSwapBuffers(window->handle);
+    glfwSwapBuffers(window->handle);
 	glfwPollEvents();
 }
 

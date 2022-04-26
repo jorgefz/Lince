@@ -19,11 +19,11 @@ void LinceUnbindVertexArray(void);
 
 /* Sets up vertex buffer attributes and appends given buffer */
 void LinceAddVertexArrayAttributes(
-	LinceVertexArray* vertex_array, /* must have been initialised already */
+	LinceVertexArray* vertex_array,  /* must have been initialised already */
 	LinceVertexBuffer vertex_buffer, /* stores raw vertex data */
-	LinceBufferElement* layout, /* list of buffer elements that 
-								together constitute the data layout */
-	unsigned int layout_elements /* Number of buffer elements */
+	LinceBufferElement* layout,      /* list of buffer elements that 
+								        together constitute the data layout */
+	unsigned int layout_elements     /* Number of buffer elements */
 );
 
 void LinceDeleteVertexArray(LinceVertexArray* vertex_array);

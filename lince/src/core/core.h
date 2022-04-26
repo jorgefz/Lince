@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdint.h>
 
 /* Platform */
 #ifdef LINCE_WINDOWS
@@ -18,12 +19,15 @@
 
 /* Debugging */
 #ifdef LINCE_DEBUG
-#   define LINCE_INFO(...) fprintf(stderr, __VA_ARGS__);
-#   define LINCE_ASSERT(condition, msg) \
+#   define LINCE_INFO(...) do{ fprintf(stderr, __VA_ARGS__); fprintf(stderr,"\n"); } while(0);
+#   define LINCE_ASSERT(condition, msg, ...) \
     if(!(condition)) { \
         do { \
-            fprintf(stderr, "Error: '%s':%d in function '%s': %s (%s) \n", \
-                            __FILE__, __LINE__, __func__, msg, #condition); \
+            fprintf(stderr, " --- Error: %s:%d in function '%s' ('%s' failed)\n",\
+                            __FILE__, __LINE__, __func__, #condition); \
+            fprintf(stderr, "\t"); \
+            fprintf(stderr, msg, ##__VA_ARGS__); \
+            fprintf(stderr, "\n"); \
             exit(-1); \
         } while(0); \
     }

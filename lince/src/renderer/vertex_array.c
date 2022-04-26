@@ -1,11 +1,20 @@
 #include "renderer/vertex_array.h"
+#include <glad/glad.h>
+#include <stdlib.h>
 
 /* Allocates new vertex array and generates OpenGL ID for it */
 LinceVertexArray* LinceCreateVertexArray(LinceIndexBuffer ib){
+	LINCE_INFO("Creating vertex array");
+	LINCE_INFO("%d bytes\n", (int)sizeof(LinceVertexArray));
+	
 	LinceVertexArray* va = calloc(1, sizeof(LinceVertexArray));
 	LINCE_ASSERT(va, "Failed to allocate memory");
+
 	va->index_buffer = ib;
-	glCreateVertexArrays(1, &va->id);
+	va->vb_count = 0;
+	va->vb_list = NULL;
+	glGenVertexArrays(1, &va->id);
+	glBindVertexArray(va->id);
 	return va;
 }
 
@@ -27,15 +36,17 @@ void LinceAddVertexArrayAttributes(
 
 	LinceBindVertexArray(va);
 	LinceBindVertexBuffer(vb);
-	LinceBindIndexBuffer(va->ib);
+	LinceBindIndexBuffer(va->index_buffer);
 
 	// Calculate layout offsets & stride
-	unsigned int i, stride;
+	unsigned int i, stride = 0;
 	for(i =0; i != layout_elements; ++i){
 		LinceSetupBufferElementData(&layout[i]);
 		layout[i].offset = stride;
+		LINCE_INFO(" offset = %u", layout[i].offset);
 		stride += layout[i].bytes;
 	}
+	LINCE_INFO("stride = %u", stride);
 
 	// Set vertex attributes
 	for(i = 0; i != layout_elements; ++i){
@@ -46,9 +57,8 @@ void LinceAddVertexArrayAttributes(
 			layout[i].gl_type, // OpenGL type
 			GL_FALSE, // element.norm ? GL_TRUE : GL_FALSE,
 			stride,
-			(const void*)(const uintptr_t)layout[i].offset
+			(const void*)(const uintptr_t)(layout[i].offset)
 		);
-		index++;
 	}
 
 	// Append vertex buffer to list
@@ -60,7 +70,13 @@ void LinceAddVertexArrayAttributes(
 
 void LinceDeleteVertexArray(LinceVertexArray* va){
 	if (!va) return;
+	if (va->vb_list && va->vb_count > 0){
+		for(int i=0; i!=(int)va->vb_count; ++i){
+			LinceDeleteVertexBuffer(va->vb_list[i]);
+		}
+		free(va->vb_list);
+	}
+	LinceDeleteIndexBuffer(va->index_buffer);
 	glDeleteVertexArrays(1, &va->id);
-	if (va->vb_list) free(va->vb_list);
 	free(va);
 }
