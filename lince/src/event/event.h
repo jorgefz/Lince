@@ -12,6 +12,7 @@ typedef enum LinceEventType {
     EventType_EventNum // number of pre-defined events
 } LinceEventType;
 
+/* Handy way of accessing specific event data without casting */
 typedef union LinceEventData {
     struct KeyPressedEvent* KeyPressed;
     struct KeyReleasedEvent* KeyReleased;
@@ -25,17 +26,21 @@ typedef union LinceEventData {
     void* GenericEvent;
 } LinceEventData;
 
+/* Stores event info that is propagated through the program */
 typedef struct LinceEvent {
     LinceEventType type;
-    char name[LINCE_STR_MAX];
+    char name[LINCE_NAME_MAX];
     LinceBool handled;
     LinceEventData data;
 } LinceEvent;
 
+/* Signature of function called when event is dispatched */
 typedef LinceBool (*LinceEventFn)(LinceEvent*);
 
-// Functions
-LinceBool LinceEvent_Dispatch(LinceEvent* e, LinceEventType etype, LinceEventFn func);
-void LinceEvent_Destroy(LinceEvent* e);
+/* Calls given function to deal with event */
+LinceBool LinceDispatchEvent(LinceEvent* e, LinceEventType etype, LinceEventFn func);
+
+/* Deallocates and terminates an event */
+void LinceEndEvent(LinceEvent* e);
 
 #endif // LINCE_EVENT_H

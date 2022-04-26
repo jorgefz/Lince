@@ -143,12 +143,12 @@ static void LinceOnEvent(LinceEvent* e){
     /* Pre-defined event responses:
     adapt viewport when window is resized,
     and shutdown program when window is closed */
-    LinceEvent_Dispatch(
+    LinceDispatchEvent(
         e,
         LinceEventType_WindowResize,
         LinceOnEventWindowResize
     );
-    LinceEvent_Dispatch(e,
+    LinceDispatchEvent(e,
         LinceEventType_WindowClose,
         LinceOnEventWindowClose
     );

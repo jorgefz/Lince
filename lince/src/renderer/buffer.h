@@ -8,7 +8,7 @@
 /* Allowed data types for buffer elements */
 typedef enum {
     LinceBufferType_None = 0,
-    LinceBufferType_Bool,
+    LinceBufferType_Bool, /* identical to int */
     LinceBufferType_Int,   LinceBufferType_Int2,   LinceBufferType_Int3,   LinceBufferType_Int4,
     LinceBufferType_Float, LinceBufferType_Float2, LinceBufferType_Float3, LinceBufferType_Float4,
     LinceBufferType_Mat3,  LinceBufferType_Mat4,
@@ -17,19 +17,19 @@ typedef enum {
 
 /* Describes one element of a buffer layout */
 typedef struct LinceBufferElement {
-    LinceBufferType type; // BufferType
-    const char name[LINCE_STR_MAX]; // name in GLSL code
+    LinceBufferType type; /* Lince API data type */
+    const char name[LINCE_NAME_MAX]; /* variable name in the shader */
 
-    unsigned int gl_type; // OpenGL API type
-    unsigned int comps; // number of components
-    unsigned int bytes; // size in bytes
-    unsigned int offset; // offset, norm, ...
+    unsigned int gl_type; /* OpenGL API type */
+    unsigned int comps; /* component count, e.g. Int4 has 4 components */
+    unsigned int bytes; /* size in bytes */
+    unsigned int offset; /* bytes from front of layout to this element */
 } LinceBufferElement;
 
-/* Provides the unique data of a buffer type: component count, size, and OpenGL type */
+/* Returns details of a buffer type: component count, size, and OpenGL type */
 LinceBufferElement LinceGetBufferTypeData(LinceBufferType type);
 
-/* Populates buffer element data given its type */
+/* Copies buffer type details into provided buffer element */
 void LinceSetupBufferElementData(LinceBufferElement* elem);
 
 

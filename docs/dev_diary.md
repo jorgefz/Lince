@@ -4,9 +4,18 @@
 ## To-Do
 
 * Make user application a separate project that links to lince static library.
-* Add vertex array and layouts, shaders, textures, and 2D renderer
+* Test vertex arrays and buffer layouts
 * BUG: smaller windows have shorter delta-time
 * Add application settings and window flags
+
+
+## Roadmap
+
+1. Basic 2D Renderer
+	1. Vertex Arrays
+	2. Shaders
+	3. Textures
+	4. Renderer2D API
 
 
 ## 23 Apr 2022

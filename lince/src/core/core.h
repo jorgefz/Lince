@@ -33,6 +33,7 @@
 #endif
 
 /* Constants & typedefs */
+#define LINCE_NAME_MAX 100 /* used for shader variable names, etc*/
 #define LINCE_STR_MAX 100
 typedef enum LinceBool{ LinceFalse = 0, LinceTrue = 1 } LinceBool;
 

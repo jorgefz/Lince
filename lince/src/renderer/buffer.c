@@ -7,7 +7,7 @@
 
 /* --- Buffer Element & Layout ---*/
 
-/* Data on each buffer data type */
+/* Lookup table for details on buffer data types  */
 static const LinceBufferElement buffer_types_data[] = {
     {.type=LinceBufferType_None,   .gl_type=GL_NONE,  .comps=0, .bytes=0},
     {.type=LinceBufferType_Bool,   .gl_type=GL_BOOL,  .comps=1, .bytes=sizeof(int)  },
@@ -25,12 +25,13 @@ static const LinceBufferElement buffer_types_data[] = {
 	{.type=LinceBufferType_Mat4,   .gl_type=GL_FLOAT, .comps=4*4, .bytes=sizeof(float)*4*4},
 };
 
-/* Provides the unique data of a buffer type: component count, size, and OpenGL type */
+/* Returns details of a buffer type: component count, size, and OpenGL type */
 LinceBufferElement LinceGetBufferTypeData(LinceBufferType type){
 	LINCE_ASSERT(type < LinceBufferType_Count, "Unknown buffer data type");
 	return buffer_types_data[type];
 }
 
+/* Copies buffer type details into provided buffer element */
 void LinceSetupBufferElementData(LinceBufferElement* elem){
 	LINCE_ASSERT(elem->type < LinceBufferType_Count, "Unknown buffer data type");
 	LinceBufferElement data = buffer_types_data[elem->type];

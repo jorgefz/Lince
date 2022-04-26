@@ -97,14 +97,14 @@ static void WindowResizeCallback(GLFWwindow* wptr, int width, int height){
 
     LinceEvent e = LinceNewWindowResizeEvent(width, height);
     if (w->event_callback) w->event_callback(&e);
-    LinceEvent_Destroy(&e);
+    LinceEndEvent(&e);
 }
 
 static void WindowCloseCallback(GLFWwindow* wptr){
     LinceWindow* w = (LinceWindow*)glfwGetWindowUserPointer(wptr);
     LinceEvent e = LinceNewWindowCloseEvent();
     if (w->event_callback) w->event_callback(&e);
-    LinceEvent_Destroy(&e);
+    LinceEndEvent(&e);
 }
 
 static void KeyCallback(GLFWwindow* wptr, int key, int scancode, int action, int mods){
@@ -125,14 +125,14 @@ static void KeyCallback(GLFWwindow* wptr, int key, int scancode, int action, int
             break;
     }
     if (w->event_callback) w->event_callback(&e);
-    LinceEvent_Destroy(&e);
+    LinceEndEvent(&e);
 }
 
 static void CharCallback(GLFWwindow* wptr, unsigned int key_typed){
     LinceWindow* w = (LinceWindow*)glfwGetWindowUserPointer(wptr);
     LinceEvent e = LinceNewKeyTypeEvent(key_typed);
     if (w->event_callback) w->event_callback(&e);
-    LinceEvent_Destroy(&e);
+    LinceEndEvent(&e);
 }
 
 static void MouseButtonCallback(GLFWwindow* wptr, int button, int action, int mods){
@@ -152,21 +152,21 @@ static void MouseButtonCallback(GLFWwindow* wptr, int button, int action, int mo
             break;
     }
     if (w->event_callback) w->event_callback(&e);
-    LinceEvent_Destroy(&e);
+    LinceEndEvent(&e);
 }
 
 static void MouseScrolledCallback(GLFWwindow* wptr, double xoff, double yoff){
     LinceWindow* w = (LinceWindow*)glfwGetWindowUserPointer(wptr);
     LinceEvent e = LinceNewMouseScrolledEvent(xoff, yoff);
     if (w->event_callback) w->event_callback(&e);
-    LinceEvent_Destroy(&e);
+    LinceEndEvent(&e);
 }
 
 static void MouseMovedCallback(GLFWwindow* wptr, double xpos, double ypos){
     LinceWindow* w = (LinceWindow*)glfwGetWindowUserPointer(wptr);
     LinceEvent e = LinceNewMouseMovedEvent(xpos, ypos);
     if (w->event_callback) w->event_callback(&e);
-    LinceEvent_Destroy(&e);
+    LinceEndEvent(&e);
 }
 
 

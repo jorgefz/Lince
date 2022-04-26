@@ -1,7 +1,7 @@
 
 #include "event/event.h"
 
-LinceBool LinceEvent_Dispatch(LinceEvent* e, LinceEventType etype, LinceEventFn func){
+LinceBool LinceDispatchEvent(LinceEvent* e, LinceEventType etype, LinceEventFn func){
     if (e->type == etype){
         e->handled = func(e);
         return LinceTrue;
@@ -9,7 +9,7 @@ LinceBool LinceEvent_Dispatch(LinceEvent* e, LinceEventType etype, LinceEventFn 
     return LinceFalse;
 }
 
-void LinceEvent_Destroy(LinceEvent* e){
+void LinceEndEvent(LinceEvent* e){
     if(!e || !e->data.GenericEvent) return;
     free(e->data.GenericEvent);
 }

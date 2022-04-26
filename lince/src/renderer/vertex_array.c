@@ -13,7 +13,7 @@ void LinceBindVertexArray(LinceVertexArray* va){
 	glBindVertexArray(va->id);
 }
 
-void LinceUnbindVertexArray(){
+void LinceUnbindVertexArray(void){
 	glBindVertexArray(0);
 }
 
