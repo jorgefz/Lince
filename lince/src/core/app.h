@@ -23,6 +23,8 @@ typedef struct {
     LinceBool        running;
     float time_ms;  // clock in milliseconds
     float dt;       // timestep in ms
+    int current_layer; // index of layer baing updated/handled
+    int current_overlay; // index of layer baing updated/handled
 
     /* User-defined data & functions */
     void* user_data;
@@ -57,11 +59,26 @@ void LinceSetUserData(void* data);
 /* Retrieve user data during runtime */
 void* LinceGetUserData();
 
-/* Returns time since initialisation in milliseconds */
+/* IMPROVE THIS -
+Returns time since initialisation in milliseconds */
 double LinceGetTimeMillis();
 
 /* Returns the current state of the running program */
 LinceApp* LinceGetAppState();
+
+/*
+Returns current layer being handled or updated
+Useful on specific event callbacks.
+Returns NULL if no layer is being handled.
+*/
+LinceLayer* LinceGetCurrentLayer();
+
+/*
+Returns current overlay being handled or updated
+Useful on specific event callbacks.
+Returns NULL if no overlay is being handled.
+*/
+LinceLayer* LinceGetCurrentOverlay();
 
 
 #endif // LINCE_APP_H

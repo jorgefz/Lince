@@ -30,7 +30,11 @@ void MyLayer_OnDetach(LinceLayer* layer) {
 }
 
 LinceBool MyLayer_OnKeyPressed(LinceEvent* e) {
-    /* how to pass layer data here?? */
+
+    LinceLayer* layer = LinceGetCurrentLayer();
+    LINCE_ASSERT(layer, "No current layer");
+    MyLayer* data = LinceGetLayerData(layer);
+
     int key = e->data.KeyPressed->keycode;
     switch (key) {
     case LinceKey_Backspace:
@@ -38,6 +42,16 @@ LinceBool MyLayer_OnKeyPressed(LinceEvent* e) {
         break;
     case LinceKey_Enter:
         printf("\n");
+        break;
+    case LinceKey_Up:
+        data->show_fps = !data->show_fps;
+        printf("\n");
+        fflush(stdout);
+        break;
+    case LinceKey_Down:
+        data->show_mouse_pos = !data->show_mouse_pos;
+        printf("\n");
+        fflush(stdout);
         break;
     default:
         printf("%c", (char)key);
@@ -60,22 +74,15 @@ void MyLayer_OnUpdate(LinceLayer* layer, float dt) {
     float blue = 1.0f - data->red;
     LinceRender_SetClearColor(data->red, 0.1f, blue, 1.0f);
 
-    /* display data */
-    if (LinceIsKeyPressed(LinceKey_Up)){
-        data->show_fps != data->show_fps;
-        printf("\n");
-    }
-    if (LinceIsKeyPressed(LinceKey_Down)){
-        data->show_mouse_pos != data->show_mouse_pos;
-        printf("\n");
-    }
-
+    /* display fps and mouse position */
     float fps = 1000.0 / dt;
-    if (data->show_fps){ // displays and updates frame rate every fram
-        printf(" FPS: %.4g (dt: %.4g ms) ", fps, dt);
-    }
     if (data->show_mouse_pos){ // prints mouse position
         printf(" Mouse: %.2f %.2f ", LinceGetMouseX(), LinceGetMouseY());
+        fflush(stdout);
+    }
+    if (data->show_fps){ // displays and updates frame rate every frame
+        printf(" FPS: %.04g (dt: %.04g ms) ", fps, dt);
+        fflush(stdout);
     }
     if (data->show_fps || data->show_mouse_pos){
         fflush(stdout);
@@ -101,6 +108,8 @@ LinceLayer* MyLayer_Init(int n) {
 
 void GameInit() {
 	printf("Game initialised!\n");
+    printf(" Info: press UP to display FPS and DOWN to display mouse position\n");
+    printf(" Info: press any alphabetic key to type and backspace to delete\n");
     LincePushLayer(MyLayer_Init(1));
     LincePushLayer(MyLayer_Init(2));
 }

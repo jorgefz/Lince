@@ -10,7 +10,40 @@
 /* Private application state - stack allocated */
 static LinceApp app = {0};
 
+/* --- Static functions --- */
+
+/* Initialises OpenGL window and layer stacks */
+static void LinceInit();
+
+/* Calls the program's main loop */
+void LinceRun();
+
+/* Called once per frame, updates window and renders layers */
+static void LinceOnUpdate();
+
+/* Shuts down application and frees allocated memory */
+static void LinceTerminate();
+
+/* Called when game event occurs,
+propagates it to layers and user */
+static void LinceOnEvent(LinceEvent* e);
+
+static LinceBool LinceOnEventWindowResize(LinceEvent* e);
+static LinceBool LinceOnEventWindowClose(LinceEvent* e);
+
+
 /* --- Public API --- */
+
+void LinceRun(){
+
+    LinceInit(500, 282, 0); // width, height, flags
+    app.running = LinceTrue;
+
+    while(app.running){
+        LinceOnUpdate();
+    }
+    LinceTerminate();
+}
 
 void LinceSetGameInitFn(LinceGameInitFn func) {
     app.game_init = func;
@@ -27,6 +60,7 @@ void LinceSetGameOnEventFn(LinceGameOnEventFn func) {
 void LinceSetGameTerminateFn(LinceGameTerminateFn func) {
     app.game_terminate = func;
 }
+
 
 LinceApp* LinceGetAppState(){
     return &app;
@@ -52,27 +86,15 @@ double LinceGetTimeMillis(){
     return (glfwGetTime() * 1000.0);
 }
 
+LinceLayer* LinceGetCurrentLayer(){
+    if (app.current_layer < 0) return NULL;
+    return app.layer_stack->layers[app.current_layer];
+}
 
-/* --- Static functions --- */
-
-/* Initialises OpenGL window and layer stacks */
-static void LinceInit();
-
-/* Calls the program's main loop */
-void LinceRun();
-
-/* Called once per frame, updates window and renders layers */
-static void LinceOnUpdate();
-
-/* Shuts down application and frees allocated memory */
-static void LinceTerminate();
-
-/* Called when game event occurs,
-propagates it to layers and user */
-static void LinceOnEvent(LinceEvent* e);
-
-static LinceBool LinceOnEventWindowResize(LinceEvent* e);
-static LinceBool LinceOnEventWindowClose(LinceEvent* e);
+LinceLayer* LinceGetCurrentOverlay(){
+    if (app.current_overlay < 0) return NULL;
+    return app.overlay_stack->layers[app.current_overlay];
+}
 
 
 /* --- Implementations of static functions --- */
@@ -89,16 +111,6 @@ static void LinceInit(unsigned int width, unsigned int height, int flags){
     if (app.game_init) app.game_init(); // user may push layers onto stack
 }
 
-void LinceRun(){
-
-    LinceInit(500, 282, 0);
-    app.running = LinceTrue;
-
-    while(app.running){
-        LinceOnUpdate();
-    }
-    LinceTerminate();
-}
 
 static void LinceOnUpdate(){
     LinceRender_Clear();
@@ -113,13 +125,18 @@ static void LinceOnUpdate(){
     unsigned int i;
     for (i = 0; i != app.layer_stack->count; ++i) {
         LinceLayer* layer = app.layer_stack->layers[i];
+        app.current_layer = i;
         if (layer && layer->OnUpdate) layer->OnUpdate(layer, app.dt);
     }
+    app.current_layer = -1;
+
     // update overlays
     for (i = 0; i != app.overlay_stack->count; ++i) {
         LinceLayer* overlay = app.overlay_stack->layers[i];
+        app.current_overlay = i;
         if (overlay && overlay->OnUpdate) overlay->OnUpdate(overlay, app.dt);
     }
+    app.current_overlay = -1;
     
     // update game app
     if (app.game_on_update) app.game_on_update(app.dt);
@@ -159,13 +176,18 @@ static void LinceOnEvent(LinceEvent* e){
     for (i = (int)app.overlay_stack->count - 1; i >= 0; --i) {
         if (e->handled) break;
         LinceLayer* overlay = app.overlay_stack->layers[i];
+        app.current_overlay = i;
         if (overlay && overlay->OnEvent) overlay->OnEvent(overlay, e);
     }
+    app.current_overlay = -1;
+
     for (i = (int)app.layer_stack->count - 1; i >= 0; --i) {
         if (e->handled) break;
         LinceLayer* layer = app.layer_stack->layers[i];
+        app.current_layer = i;
         if (layer && layer->OnEvent) layer->OnEvent(layer, e);
     }
+    app.current_layer = -1;
 
     // propagate event to user
     if (app.game_on_event && !e->handled ) app.game_on_event(e);
