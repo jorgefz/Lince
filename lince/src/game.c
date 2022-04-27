@@ -33,10 +33,9 @@ void CheckShaderCompilation(int shader, const char* label){
     glGetShaderiv(shader, GL_COMPILE_STATUS, &is_compiled);
     if(!is_compiled)
     {
-        size_t length = 1;
+        int length = 1;
         char message[1000] = {0};
         glGetShaderInfoLog(shader, sizeof(message), &length, &message[0]);
-        printf("%d bytes returned\n", length);
         printf("Failed to compile shader '%s': %s\n", label, message);
         exit(-1);
     }
@@ -49,14 +48,14 @@ int CreateShaderFast(){
     vertex_shader = glCreateShader(GL_VERTEX_SHADER);
     glShaderSource(vertex_shader, 1, &vertex_shader_source, NULL);
     glCompileShader(vertex_shader);
-    printf("VertexShader Glerror %d \n", glGetError());
+    printf("# VertexShader Glerror %d \n", glGetError());
     glGetShaderiv(vertex_shader, GL_COMPILE_STATUS, &is_compiled);
     if (!is_compiled) printf("Failed to compile vertex shader!\n");
  
     fragment_shader = glCreateShader(GL_FRAGMENT_SHADER);
     glShaderSource(fragment_shader, 1, &fragment_shader_source, NULL);
     glCompileShader(fragment_shader);
-    printf("FragmentShader Glerror %d \n", glGetError());
+    printf("# FragmentShader Glerror %d \n", glGetError());
     glGetShaderiv(fragment_shader, GL_COMPILE_STATUS, &is_compiled);
     if (!is_compiled) printf("Failed to compile vertex shader!\n");
     
@@ -64,7 +63,7 @@ int CreateShaderFast(){
     glAttachShader(program, vertex_shader);
     glAttachShader(program, fragment_shader);
     glLinkProgram(program);
-    printf("Program Glerror %d \n", glGetError());
+    printf("# Program Glerror %d \n", glGetError());
 
 	glUseProgram(program);
     return program;
@@ -74,53 +73,34 @@ int CreateShaderFast(){
 
 
 typedef struct MyLayer {
+    char name[LINCE_NAME_MAX];
     float red, vel;
-    LinceVertexArray* va;
-    LinceBool show_fps;
-    LinceBool show_mouse_pos;
 
-    int program, vao, ib;
+    LinceVertexArray* va;
+    LinceVertexBuffer vb;
+    LinceIndexBuffer ib;
 } MyLayer;
 
-
-void MyLayer_OnAttach(LinceLayer* layer) {
-    printf("MyLayer attached\n");
-
+void MyLayerOnAttach(LinceLayer* layer) {
     MyLayer* data = LinceGetLayerData(layer);
+    LINCE_INFO(" Layer '%s' attached", data->name);
+    
     data->red = 0.0f;
     data->vel = 5e-4f;
-    data->show_fps = LinceFalse;
-    data->show_mouse_pos = LinceFalse;
-
-    /*
-    LinceIndexBuffer ib = LinceCreateIndexBuffer(indices, 6);
-    LinceVertexBuffer vb = LinceCreateVertexBuffer(vertices, sizeof(float)*8);
-    
-    LinceBufferElement layout[] = {
-        {LinceBufferType_Float2, "aPos"}
-    };
-    
-    LinceVertexArray* va = LinceCreateVertexArray(ib);
-    LINCE_ASSERT(va, "Failed to create vertex array");
-    LinceAddVertexArrayAttributes(va, vb, layout, 1);
-    data->va = va;
-    */
-
 }
 
-void MyLayer_OnDetach(LinceLayer* layer) {
-    printf("MyLayer detached\n");
+void MyLayerOnDetach(LinceLayer* layer) {
     MyLayer* data = LinceGetLayerData(layer);
-    //LinceDeleteVertexArray(data->va);
+    LINCE_INFO(" Layer '%s' detached", data->name);
     free(data);
 }
 
 
-void MyLayer_OnEvent(LinceLayer* layer, LinceEvent* e) {
+void MyLayerOnEvent(LinceLayer* layer, LinceEvent* e) {
 
 }
 
-void MyLayer_OnUpdate(LinceLayer* layer, float dt) {
+void MyLayerOnUpdate(LinceLayer* layer, float dt) {
     MyLayer* data = LinceGetLayerData(layer);
 
     GLenum err;
@@ -133,34 +113,23 @@ void MyLayer_OnUpdate(LinceLayer* layer, float dt) {
     if (data->red >= 1.0f) data->vel = -data->vel;
     else if (data->red <= 0.0f) data->vel = -data->vel;
     float blue = 1.0f - data->red;
-    //LinceRender_SetClearColor(data->red, 0.1f, blue, 1.0f);
+    LinceRender_SetClearColor(data->red, 0.1f, blue, 1.0f);
 
-    /* display fps and mouse position */
-    float fps = 1000.0 / dt;
-    if (data->show_mouse_pos){ // prints mouse position
-        printf(" Mouse: %.2f %.2f ", LinceGetMouseX(), LinceGetMouseY());
-        fflush(stdout);
-    }
-    if (data->show_fps){ // displays and updates frame rate every frame
-        printf(" FPS: %.04g (dt: %.04g ms) ", fps, dt);
-        fflush(stdout);
-    }
-    if (data->show_fps || data->show_mouse_pos){
-        fflush(stdout);
-        for(int i=0; i!=100; ++i) printf("\b");
-        fflush(stdout);
-    }
 }
 
-LinceLayer* MyLayer_Init(int n) {
+LinceLayer* MyLayerInit(char* name) {
 
-    MyLayer* my_layer = malloc(sizeof(MyLayer));
+    MyLayer* my_layer = calloc(1, sizeof(MyLayer));
     LINCE_ASSERT(my_layer, "Failed to allocate layer data");
+
+    size_t len = strlen(name) < LINCE_STR_MAX ? strlen(name) : LINCE_STR_MAX;
+    memcpy(my_layer->name, name, len);
+
     LinceLayer* layer = LinceCreateLayer(my_layer);
-    layer->OnAttach = MyLayer_OnAttach;
-    layer->OnDetach = MyLayer_OnDetach;
-    layer->OnEvent = MyLayer_OnEvent;
-    layer->OnUpdate = MyLayer_OnUpdate;
+    layer->OnAttach = MyLayerOnAttach;
+    layer->OnDetach = MyLayerOnDetach;
+    layer->OnEvent = MyLayerOnEvent;
+    layer->OnUpdate = MyLayerOnUpdate;
 
     return layer;
 }
@@ -168,12 +137,12 @@ LinceLayer* MyLayer_Init(int n) {
 
 // =============================================================
 
+LinceVertexArray *global_va;
 
 void GameInit() {
-	printf("Game initialised!\n");
-    printf(" Info: press UP to display FPS and DOWN to display mouse position\n");
-    printf(" Info: press any alphabetic key to type and backspace to delete\n");
-    //LincePushLayer(MyLayer_Init(1));
+	LINCE_INFO("\n User App Initialised");
+
+    LincePushLayer(MyLayerInit("Test"));
 
     static unsigned int indices[] = {0,1,2,2,3,0};
     static float vertices[] = {
@@ -185,14 +154,16 @@ void GameInit() {
 
     LinceIndexBuffer ib = LinceCreateIndexBuffer(indices, 6);
     LinceVertexBuffer vb = LinceCreateVertexBuffer(vertices, sizeof(vertices));
-    LinceVertexArray* va = LinceCreateVertexArray(ib);
-    LinceBindVertexArray(va);
+    global_va = LinceCreateVertexArray(ib);
+
+    LinceBindVertexArray(global_va);
     LinceBindIndexBuffer(ib);
     LinceBufferElement layout[] = {
         {LinceBufferType_Float2, "aPos"},
         {LinceBufferType_Float4, "aColor"},
     };
-    LinceAddVertexArrayAttributes(va, vb, layout, 2);
+    unsigned int elems = sizeof(layout) / sizeof(LinceBufferElement);
+    LinceAddVertexArrayAttributes(global_va, vb, layout, elems);
 
     // Shader
     CreateShaderFast();
@@ -210,14 +181,15 @@ void GameOnEvent(LinceEvent* e) {
 
 
 void GameTerminate() {
-    printf("Game terminated\n");
+    LinceDeleteVertexArray(global_va);
+    LINCE_INFO(" User App Terminated");
 }
 
 
 int main(int argc, const char* argv[]) {
 
     #ifdef LINCE_DEBUG
-    printf(" --- DEBUG MODE -- \n");
+    LINCE_INFO(" --- DEBUG MODE --- ");
     #endif
 
     LinceSetGameInitFn(GameInit);
