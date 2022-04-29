@@ -113,8 +113,7 @@ LinceLayer* LinceGetCurrentOverlay(){
 
 
 /*static*/ void LinceOnUpdate(){
-    //LinceRender_Clear();
-    glClear(GL_COLOR_BUFFER_BIT);
+    LinceRender_Clear();
 
     // Calculate delta time
     float new_time_ms = (float)(glfwGetTime() * 1000.0);
@@ -141,9 +140,7 @@ LinceLayer* LinceGetCurrentOverlay(){
     // update user application
     if (app.game_on_update) app.game_on_update(app.dt);
 
-    //LinceUpdateWindow(app.window);
-    glfwSwapBuffers(app.window->handle);
-	glfwPollEvents();
+    LinceUpdateWindow(app.window);
 }
 
 static void LinceTerminate(){
