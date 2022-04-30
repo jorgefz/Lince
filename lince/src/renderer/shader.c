@@ -7,18 +7,33 @@
 
 /* Reads file and returns contents
 as heap allocated string which must be freed */
-static const char* LinceReadFile(const char* path);
+static char* LinceReadFile(const char* path);
 
 /* Compiles a shader file from source, returns OpenGL ID */
 static int LinceCompileShader(const char* source, int type);
+
 
 /* --- Public API --- */
 
 /* Create shader from paths to vertex and fragment shader source files */
 LinceShader* LinceCreateShader(
+	const char* name,
 	const char* vertex_path,
 	const char* fragment_path
-);
+){
+	LINCE_INFO(" Creating Shader '%s'")
+	LinceShader* shader;
+	char *vsrc, *fsrc;
+
+	vsrc = LinceReadFile(vertex_path);
+	fsrc = LinceReadFile(fragment_path);
+	shader = LinceCreateShaderFromSrc(name, vsrc, fsrc);
+
+	free(vsrc);
+	free(fsrc);
+
+	return shader;
+}
 
 /* Create shader from source code of vertex and fragment shaders */
 LinceShader* LinceCreateShaderFromSrc(
@@ -26,7 +41,7 @@ LinceShader* LinceCreateShaderFromSrc(
 	const char* vertex_src,
 	const char* fragment_src
 ){
-	LINCE_INFO(" Creating Shader '%s'", name);
+	LINCE_INFO(" Creating Shader '%s' From Source", name);
 
 	LinceShader* shader = calloc(1, sizeof(LinceShader));
 	LINCE_ASSERT(shader,
@@ -48,7 +63,7 @@ LinceShader* LinceCreateShaderFromSrc(
 	glLinkProgram(shader->id);
 	glValidateProgram(shader->id);
 	
-	//compiled shader files no longer necessary
+	//compiled shader files are no longer necessary
 	glDeleteShader(vs);
 	glDeleteShader(fs);
 
@@ -79,8 +94,28 @@ void LinceDeleteShader(LinceShader* shader){
 
 /* --- Static functions --- */
 
-int LinceCompileShader(const char* source, int type){
+static char* LinceReadFile(const char* path){
+	LINCE_INFO(" Reading File '%s'", path);
+	FILE* handle = fopen(path, "r");
+	LINCE_ASSERT(handle, " Failed to open file '%s'", path);
 
+	/* Get file length */
+	fseek(handle, 0, SEEK_END);
+	size_t size = ftell(handle);
+	fseek(handle, 0, SEEK_SET);
+	LINCE_ASSERT(size > 0, " Empty file '%s'", path);
+
+	char* source = calloc(size+1, sizeof(char));
+	LINCE_ASSERT(source, " Failed to allocate %d bytes", (int)size+1);
+
+	for(size_t i=0; i!=size; ++i) source[i] = fgetc(handle);
+
+	fclose(handle);
+	return source;
+}
+
+
+int LinceCompileShader(const char* source, int type){
 	int compile_sucess = LinceFalse;
 	int id;
 

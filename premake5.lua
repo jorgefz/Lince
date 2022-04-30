@@ -44,7 +44,8 @@ project "lince"
     }
     
     includedirs {
-        "%{prj.name}/src",
+        "%{prj.name}",
+		"%{prj.name}/src",
         "%{IncludeDir.glfw}",
         "%{IncludeDir.glad}",
         "%{IncludeDir.cglm}"

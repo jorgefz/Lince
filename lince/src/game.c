@@ -125,8 +125,8 @@ void GameInit() {
     LinceAddVertexArrayAttributes(global_va, vb, layout, elems);
 
     // Shader
-    global_shader = LinceCreateShaderFromSrc(
-        "TestShader", vertex_shader_source, fragment_shader_source);
+    global_shader = LinceCreateShader("TestShader",
+        "lince/assets/test.vert.glsl", "lince/assets/test.frag.glsl");
     LinceBindShader(global_shader);
 }
 

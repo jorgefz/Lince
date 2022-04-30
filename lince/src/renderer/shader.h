@@ -15,6 +15,7 @@ typedef struct LinceShader {
 
 /* Create shader from paths to vertex and fragment shader source files */
 LinceShader* LinceCreateShader(
+	const char* name,
 	const char* vertex_path,
 	const char* fragment_path
 );
