@@ -1,3 +1,7 @@
+
+#ifndef LINCE_SHADER_H
+#define LINCE_SHADER_H
+
 #include "core/core.h"
 
 typedef struct LinceShader {
@@ -52,3 +56,6 @@ void LinceSetShaderUniformFloatN(
 /* Add float matrix uniform */
 void LinceSetShaderUniformMat(
 	const char* name, float* values, int rows, int cols);
+
+
+#endif /* LINCE_SHADER_H */

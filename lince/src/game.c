@@ -2,7 +2,6 @@
 #include <time.h>
 
 #include "lince.h"
-#include "renderer/shader.h"
 #include "cglm/vec4.h"
 
 #include <GLFW/glfw3.h>
@@ -105,6 +104,7 @@ void GameInit() {
 
     static unsigned int indices[] = {0,1,2,2,3,0};
     static float vertices[] = {
+        // positions    color RGBA
         -0.5f, -0.5f,   1.0, 0.0, 0.0, 1.0,
          0.5f, -0.5f,   1.0, 1.0, 0.0, 1.0,
          0.5f,  0.5f,   0.0, 1.0, 0.0, 1.0,

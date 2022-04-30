@@ -12,6 +12,7 @@
 #include "renderer/renderer.h"
 #include "renderer/buffer.h"
 #include "renderer/vertex_array.h"
+#include "renderer/shader.h"
 
 #include "core/window.h"
 #include "core/input.h"
