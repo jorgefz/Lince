@@ -2,6 +2,7 @@
 #include <time.h>
 
 #include "lince.h"
+#include "renderer/shader.h"
 #include "cglm/vec4.h"
 
 #include <GLFW/glfw3.h>
@@ -27,49 +28,6 @@ static const char* fragment_shader_source =
 //"    color = vec4(1.0, 0.0, 0.0, 1.0);\n"
 "    color = vColor;\n"
 "}\n";
-
-void CheckShaderCompilation(int shader, const char* label){
-    GLint is_compiled = LinceTrue;
-    glGetShaderiv(shader, GL_COMPILE_STATUS, &is_compiled);
-    if(!is_compiled)
-    {
-        int length = 1;
-        char message[1000] = {0};
-        glGetShaderInfoLog(shader, sizeof(message), &length, &message[0]);
-        printf("Failed to compile shader '%s': %s\n", label, message);
-        exit(-1);
-    }
-}
-
-int CreateShaderFast(){
-    int vertex_shader, fragment_shader, program;
-    int is_compiled = GL_FALSE;
-
-    vertex_shader = glCreateShader(GL_VERTEX_SHADER);
-    glShaderSource(vertex_shader, 1, &vertex_shader_source, NULL);
-    glCompileShader(vertex_shader);
-    printf("# VertexShader Glerror %d \n", glGetError());
-    glGetShaderiv(vertex_shader, GL_COMPILE_STATUS, &is_compiled);
-    if (!is_compiled) printf("Failed to compile vertex shader!\n");
- 
-    fragment_shader = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(fragment_shader, 1, &fragment_shader_source, NULL);
-    glCompileShader(fragment_shader);
-    printf("# FragmentShader Glerror %d \n", glGetError());
-    glGetShaderiv(fragment_shader, GL_COMPILE_STATUS, &is_compiled);
-    if (!is_compiled) printf("Failed to compile vertex shader!\n");
-    
-    program = glCreateProgram();
-    glAttachShader(program, vertex_shader);
-    glAttachShader(program, fragment_shader);
-    glLinkProgram(program);
-    printf("# Program Glerror %d \n", glGetError());
-
-	glUseProgram(program);
-    return program;
-}
-
-
 
 
 typedef struct MyLayer {
@@ -137,7 +95,8 @@ LinceLayer* MyLayerInit(char* name) {
 
 // =============================================================
 
-LinceVertexArray *global_va;
+LinceVertexArray *global_va = NULL;
+LinceShader *global_shader = NULL;
 
 void GameInit() {
 	LINCE_INFO("\n User App Initialised");
@@ -166,7 +125,9 @@ void GameInit() {
     LinceAddVertexArrayAttributes(global_va, vb, layout, elems);
 
     // Shader
-    CreateShaderFast();
+    global_shader = LinceCreateShaderFromSrc(
+        "TestShader", vertex_shader_source, fragment_shader_source);
+    LinceBindShader(global_shader);
 }
 
 
@@ -182,6 +143,7 @@ void GameOnEvent(LinceEvent* e) {
 
 void GameTerminate() {
     LinceDeleteVertexArray(global_va);
+    LinceDeleteShader(global_shader);
     LINCE_INFO(" User App Terminated");
 }
 
