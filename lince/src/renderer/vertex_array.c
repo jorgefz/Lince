@@ -76,7 +76,7 @@ void LinceAddVertexArrayAttributes(
 	}
 
 	// Append vertex buffer to list
-	va->vb_list = realloc(va->vb_list, va->vb_count + 1);
+	va->vb_list = realloc(va->vb_list, (va->vb_count + 1)*sizeof(LinceVertexBuffer));
 	LINCE_ASSERT(va->vb_list, "Failed to allocate memory");
 	va->vb_list[va->vb_count] = vb;
 	va->vb_count++;

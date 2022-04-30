@@ -7,27 +7,6 @@
 #include <GLFW/glfw3.h>
 #include <glad/glad.h>
 
-static const char* vertex_shader_source =
-"#version 330\n"
-"layout (location = 0) in vec2 aPos;\n"
-"layout (location = 1) in vec4 aColor;\n"
-"out vec4 vColor;\n"
-"void main()\n"
-"{\n"
-"   gl_Position = vec4(aPos, 1.0, 1.0);\n"
-"   vColor = aColor;\n"
-"}\n";
- 
-static const char* fragment_shader_source =
-"#version 330\n"
-"out vec4 color;\n"
-"in vec4 vColor;\n"
-"void main()\n"
-"{\n"
-//"    color = vec4(1.0, 0.0, 0.0, 1.0);\n"
-"    color = vColor;\n"
-"}\n";
-
 
 typedef struct MyLayer {
     char name[LINCE_NAME_MAX];
