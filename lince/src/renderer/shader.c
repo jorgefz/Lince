@@ -88,7 +88,16 @@ int LinceCompileShader(const char* source, int type){
 	glShaderSource(id, 1, &source, NULL);
 	glCompileShader(id);
 	glGetShaderiv(id, GL_COMPILE_STATUS, &compile_sucess);
-	LINCE_ASSERT(compile_sucess, "Failed to compile shader");
+
+	if (compile_sucess != GL_TRUE) {
+		// Retrieve GLSL compiler error message
+		int length = 0;
+		char msg[1000] = {0};
+		glGetShaderiv(id, GL_INFO_LOG_LENGTH, &length);
+		glGetShaderInfoLog(id, 1000, &length, &msg[0]);
+		glDeleteShader(id);
+		LINCE_ASSERT(0, " Failed to compile shader\n%s\n", msg);
+	}
 	
 	return id;
 }
