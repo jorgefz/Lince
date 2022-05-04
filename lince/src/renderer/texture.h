@@ -12,10 +12,11 @@ typedef struct LinceTexture {
 } LinceTexture;
 
 /* Creates texture from file */
-LinceTexture* LinceCreateTexture(const char* path);
+LinceTexture* LinceCreateTexture(const char* name, const char* path);
 
 /* Creates empty buffer with given dimensions */
-LinceTexture* LinceCreateEmptyTexture(uint32_t width, uint32_t height);
+LinceTexture* LinceCreateEmptyTexture(const char* name, 
+	uint32_t width, uint32_t height);
 
 /* Provides custom data to an existing texture buffer */
 void LinceSetTextureData(LinceTexture* texture, unsigned char* data);

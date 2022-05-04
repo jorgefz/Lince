@@ -129,7 +129,6 @@ D: decreases blue
 void GameKeyPress(LinceEvent* e){
     int code = e->data.KeyPressed->keycode;
     float step = 0.03f;
-
     switch(code){
     case LinceKey_q: global_color[0]+=step; break;
     case LinceKey_a: global_color[0]-=step; break;
@@ -139,7 +138,6 @@ void GameKeyPress(LinceEvent* e){
     case LinceKey_d: global_color[2]-=step; break;
     default: return;
     }
-
     LinceSetShaderUniformVec4(global_shader, "add_color", global_color);
 }
 

@@ -32,6 +32,7 @@ The project contains the source code for the following packages, which are built
 * GLFW: windowing system (https://glfw.org)
 * GLAD: OpenGL loader (https://glad.dav1d.de/)
 * CGLM: OpenGL vector and matrix mathematics (https://cglm.readthedocs.io/en/latest)
+* stb_image.h: Single-header image loader by Sean Barret (https://github.com/nothings/stb)
 
 
 
