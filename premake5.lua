@@ -7,7 +7,7 @@ workspace "lince"
         "Release"
     }
 
-    startproject "lince"
+    startproject "game"
 
     warnings "Extra"
 
