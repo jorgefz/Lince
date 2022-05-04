@@ -72,6 +72,7 @@ LinceLayer* MyLayerInit(char* name) {
 LinceIndexBuffer global_ib = {0};
 LinceVertexArray *global_va = NULL;
 LinceShader *global_shader = NULL;
+vec4 global_color = {0};
 
 
 void GameInit() {
@@ -107,20 +108,43 @@ void GameInit() {
         "lince/assets/test.vert.glsl", "lince/assets/test.frag.glsl");
     LinceBindShader(global_shader);
 
-    vec4 addc = {0.0, 0.0, 0.5, 0.0};
-    LinceSetShaderUniformVec4(global_shader, "add_color", addc);
-
 }
 
 
 void GameOnUpdate(float dt) {
-    //glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
     LinceDrawIndexed(global_shader, global_va, global_ib);
 }
 
 
-void GameOnEvent(LinceEvent* e) {
+/*
+Q: increases red
+A: decreases red
 
+W: increases green
+S: decreases green
+
+E: increases blue
+D: decreases blue
+*/
+void GameKeyPress(LinceEvent* e){
+    int code = e->data.KeyPressed->keycode;
+    float step = 0.03f;
+
+    switch(code){
+    case LinceKey_q: global_color[0]+=step; break;
+    case LinceKey_a: global_color[0]-=step; break;
+    case LinceKey_w: global_color[1]+=step; break;
+    case LinceKey_s: global_color[1]-=step; break;
+    case LinceKey_e: global_color[2]+=step; break;
+    case LinceKey_d: global_color[2]-=step; break;
+    default: return;
+    }
+
+    LinceSetShaderUniformVec4(global_shader, "add_color", global_color);
+}
+
+void GameOnEvent(LinceEvent* e) {
+    LinceDispatchEvent(e, LinceEventType_KeyPressed, GameKeyPress);
 }
 
 
