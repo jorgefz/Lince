@@ -9,7 +9,7 @@ typedef struct LinceShader {
 	char name[LINCE_NAME_MAX]; // name, normally based on source file
 	
 	char **uniform_names; // name in the shader code
-	unsigned int *uniform_ids; // opengl uniform id
+	int *uniform_ids; // opengl uniform id
 	unsigned int uniform_count; // length of uniform array
 } LinceShader;
 
@@ -38,7 +38,7 @@ void LinceDeleteShader(LinceShader* shader);
 
 /* Uniforms */
 /* Returns OpenGL ID of given uniform name, and -1 if it doesn't exist */
-int LinceGetShaderUniformID(const char* name);
+int LinceGetShaderUniformID(LinceShader* shader, const char* name);
 
 /* Add integer uniform */
 void LinceSetShaderUniformInt(const char* name, int value);

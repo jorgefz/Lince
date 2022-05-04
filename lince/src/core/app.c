@@ -96,6 +96,13 @@ LinceLayer* LinceGetCurrentOverlay(){
     return app.overlay_stack->layers[app.current_overlay];
 }
 
+void LinceCheckErrors(){
+    GLenum err;
+    while((err = glGetError()) != GL_NO_ERROR) {
+        LINCE_ASSERT(LinceFalse, "GLerror: %d", err);
+    }
+}
+
 
 /* --- Implementations of static functions --- */
 
@@ -113,7 +120,7 @@ LinceLayer* LinceGetCurrentOverlay(){
 
 
 /*static*/ void LinceOnUpdate(){
-    LinceRender_Clear();
+    LinceClear();
 
     // Calculate delta time
     float new_time_ms = (float)(glfwGetTime() * 1000.0);

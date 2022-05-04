@@ -4,8 +4,8 @@
 #include "lince.h"
 #include "cglm/vec4.h"
 
-#include <GLFW/glfw3.h>
-#include <glad/glad.h>
+//#include <GLFW/glfw3.h>
+//#include <glad/glad.h>
 
 
 typedef struct MyLayer {
@@ -31,7 +31,6 @@ void MyLayerOnDetach(LinceLayer* layer) {
     free(data);
 }
 
-
 void MyLayerOnEvent(LinceLayer* layer, LinceEvent* e) {
 
 }
@@ -39,17 +38,14 @@ void MyLayerOnEvent(LinceLayer* layer, LinceEvent* e) {
 void MyLayerOnUpdate(LinceLayer* layer, float dt) {
     MyLayer* data = LinceGetLayerData(layer);
 
-    GLenum err;
-    while((err = glGetError()) != GL_NO_ERROR) {
-        LINCE_ASSERT(LinceFalse, "GLerror: %d", err);
-    }
+    LinceCheckErrors();
 
     /* update background color */
     data->red += data->vel * dt;
     if (data->red >= 1.0f) data->vel = -data->vel;
     else if (data->red <= 0.0f) data->vel = -data->vel;
     float blue = 1.0f - data->red;
-    LinceRender_SetClearColor(data->red, 0.1f, blue, 1.0f);
+    LinceSetClearColor(data->red, 0.1f, blue, 1.0f);
 
 }
 
@@ -73,8 +69,10 @@ LinceLayer* MyLayerInit(char* name) {
 
 // =============================================================
 
+LinceIndexBuffer global_ib = {0};
 LinceVertexArray *global_va = NULL;
 LinceShader *global_shader = NULL;
+
 
 void GameInit() {
 	LINCE_INFO("\n User App Initialised");
@@ -90,12 +88,13 @@ void GameInit() {
         -0.5f,  0.5f,   0.0, 0.0, 1.0, 1.0,
     };
 
-    LinceIndexBuffer ib = LinceCreateIndexBuffer(indices, 6);
+    global_ib = LinceCreateIndexBuffer(indices, 6);
     LinceVertexBuffer vb = LinceCreateVertexBuffer(vertices, sizeof(vertices));
-    global_va = LinceCreateVertexArray(ib);
+    global_va = LinceCreateVertexArray(global_ib);
 
     LinceBindVertexArray(global_va);
-    LinceBindIndexBuffer(ib);
+    LinceBindIndexBuffer(global_ib);
+
     LinceBufferElement layout[] = {
         {LinceBufferType_Float2, "aPos"},
         {LinceBufferType_Float4, "aColor"},
@@ -111,7 +110,8 @@ void GameInit() {
 
 
 void GameOnUpdate(float dt) {
-    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+    //glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+    LinceDrawIndexed(global_shader, global_va, global_ib);
 }
 
 

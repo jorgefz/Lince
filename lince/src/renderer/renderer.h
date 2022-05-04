@@ -1,16 +1,19 @@
 #ifndef LINCE_RENDERER_H
 #define LINCE_RENDERER_H
 
+#include "renderer/buffer.h"
+#include "renderer/vertex_array.h"
+#include "renderer/shader.h"
+
 void LinceRender_Init();
 void LinceRender_BeginScene();
 void LinceRender_EndScene();
 void LinceRender_Submit();
 
-void LinceRender_Clear();
-void LinceRender_SetClearColor(float r, float g, float b, float a);
-// void LinceSetRenderClearColor(float r, float g, float b, float a);
-void LinceRender_DrawIndexed();
-
+void LinceClear();
+void LinceSetClearColor(float r, float g, float b, float a);
+void LinceDrawIndexed(
+	LinceShader* shader, LinceVertexArray* va, LinceIndexBuffer vb);
 
 
 // Future rendering API

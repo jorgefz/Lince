@@ -1,5 +1,7 @@
 #include "renderer/shader.h"
+#include <string.h>
 #include <glad/glad.h>
+//#include <cglm>
 
 
 
@@ -21,7 +23,7 @@ LinceShader* LinceCreateShader(
 	const char* vertex_path,
 	const char* fragment_path
 ){
-	LINCE_INFO(" Creating Shader '%s'")
+	LINCE_INFO(" Creating Shader '%s'", name);
 	LinceShader* shader;
 	char *vsrc, *fsrc;
 
@@ -88,7 +90,60 @@ void LinceDeleteShader(LinceShader* shader){
 	if(!shader) return;
 	LINCE_INFO(" Deleting Shader '%s'", shader->name);
 	if(shader->id > 0) glDeleteProgram(shader->id);
+	if(shader->uniform_names){
+		for(int i=0; i!=(int)shader->uniform_count; ++i){
+			if(!shader->uniform_names[i]) continue;
+			free(shader->uniform_names[i]);
+		}
+		free(shader->uniform_names);
+	}
+	if(shader->uniform_ids) free(shader->uniform_ids);
 	free(shader);
+}
+
+int LinceGetShaderUniformID(LinceShader* shader, const char* name){
+	if(!shader || !name) return;
+	LINCE_INFO(" Locating Shader Uniform '%s'", name);
+
+	LINCE_ASSERT(strlen(name) < LINCE_NAME_MAX,
+		" Shader uniform name %d bytes too long '%s'",
+		(int)strlen(name) - LINCE_NAME_MAX, name);
+	
+	/* locate uniform in cache, return if sucessful */
+	for(int i=0; i!=(int)shader->uniform_count; ++i){
+		if(strcmp(name, shader->uniform_names[i]) == 0){
+			return shader->uniform_ids[i];
+		}
+	}
+
+	/* locate uniform in shader */
+	int location = glGetUniformLocation(shader->id, name);
+	if(location < 0){
+		LINCE_INFO(" Shader Uniform '%s' does not exist", name);
+		return -1;
+	}
+
+	/* append uniform to cache */
+	shader->uniform_names = realloc(
+		shader->uniform_names,
+		shader->uniform_count + 1
+	);
+	LINCE_ASSERT(shader->uniform_names, " Failed to allocate memory");
+
+	/* extend name list */
+	char** uname = &shader->uniform_names[shader->uniform_count];
+	*uname = calloc( LINCE_NAME_MAX, sizeof(char) );
+	LINCE_ASSERT(*uname, " Failed to allocate memory");
+	memcpy(*uname, name, strlen(name));
+
+	/* extend ID list */
+	int* loc = &shader->uniform_ids[shader->uniform_count];
+	loc = malloc( sizeof(int) );
+	LINCE_ASSERT(loc, " Failed to allocate memory");
+	*loc = location;
+
+	shader->uniform_count++;
+	return location;
 }
 
 

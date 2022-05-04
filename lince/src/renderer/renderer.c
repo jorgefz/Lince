@@ -30,15 +30,20 @@ void LinceRender_Submit() {
 
 }
 
-void LinceRender_Clear() {
+void LinceClear() {
 	//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glClear(GL_COLOR_BUFFER_BIT);
 }
 
-void LinceRender_SetClearColor(float r, float g, float b, float a) {
+void LinceSetClearColor(float r, float g, float b, float a) {
 	glClearColor(r, g, b, a);
 }
 
-void LinceRender_DrawIndexed() {
-
+void LinceDrawIndexed(
+	LinceShader* shader, LinceVertexArray* va, LinceIndexBuffer ib
+) {
+	LinceBindShader(shader);
+	LinceBindIndexBuffer(ib);
+	LinceBindVertexArray(va);
+	glDrawElements(GL_TRIANGLES, ib.count, GL_UNSIGNED_INT, 0);
 }
