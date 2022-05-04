@@ -3,6 +3,7 @@
 #define LINCE_SHADER_H
 
 #include "core/core.h"
+#include "cglm/types.h"
 
 typedef struct LinceShader {
 	unsigned int id; // opengl id
@@ -36,27 +37,36 @@ const char* LinceGetShaderName(LinceShader* shader);
 /* Destroys and deallocates given shader */
 void LinceDeleteShader(LinceShader* shader);
 
-/* Uniforms */
+/*
+Uniform functions.
+Ensure a shader is bound before using these functions
+*/
 /* Returns OpenGL ID of given uniform name, and -1 if it doesn't exist */
 int LinceGetShaderUniformID(LinceShader* shader, const char* name);
 
-/* Add integer uniform */
-void LinceSetShaderUniformInt(const char* name, int value);
+/* Set integer uniform */
+void LinceSetShaderUniformInt(LinceShader* sh, const char* name, int val);
 
-/* Add integer array uniform */
-void LinceSetShaderUniformIntN(
-	const char* name, int* values, unsigned int count);
+/* Set integer array uniform */
+void LinceSetShaderUniformIntN( LinceShader* sh, const char* name,
+	int* arr, unsigned int count);
 
-/* Add float uniform */
-void LinceSetShaderUniformFloat(const char* name, float value);
+/* Set float uniform */
+void LinceSetShaderUniformFloat(LinceShader* sh, const char* name, float val);
 
-/* Add float array uniform */
-void LinceSetShaderUniformFloatN(
-	const char* name, float* values, unsigned int count);
+/* Set vec2 uniform */
+void LinceSetShaderUniformVec2(LinceShader* sh, const char* name, vec2 v);
 
-/* Add float matrix uniform */
-void LinceSetShaderUniformMat(
-	const char* name, float* values, int rows, int cols);
+/* Set vec3 uniform */
+void LinceSetShaderUniformVec3(LinceShader* sh, const char* name, vec3 v);
 
+/* Set vec4 uniform */
+void LinceSetShaderUniformVec4(LinceShader* sh, const char* name, vec4 v);
+
+/* Set mat3 uniform */
+void LinceSetShaderUniformMat3(LinceShader* sh, const char* name, mat3 m);
+
+/* Set mat4 uniform */
+void LinceSetShaderUniformMat4(LinceShader* sh, const char* name, mat4 m);
 
 #endif /* LINCE_SHADER_H */

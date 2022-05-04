@@ -155,6 +155,57 @@ int LinceGetShaderUniformID(LinceShader* shader, const char* name){
 	*/
 }
 
+/* Set integer uniform */
+void LinceSetShaderUniformInt(LinceShader* sh, const char* name, int val){
+	int loc = LinceGetShaderUniformID(sh, name);
+	glUniform1i(loc, val);
+}
+
+/* Set integer array uniform */
+void LinceSetShaderUniformIntN(
+	LinceShader* sh, const char* name,
+	int* arr, unsigned int count
+) {
+	int loc = LinceGetShaderUniformID(sh, name);
+	glUniform1iv(loc, count, arr);
+}
+
+/* Set float uniform */
+void LinceSetShaderUniformFloat(LinceShader* sh, const char* name, float val){
+	int loc = LinceGetShaderUniformID(sh, name);
+	glUniform1f(loc, val);
+}
+
+/* Set vec2 uniform */
+void LinceSetShaderUniformVec2(LinceShader* sh, const char* name, vec2 v){
+	int loc = LinceGetShaderUniformID(sh, name);
+	glUniform2f(loc, v[0], v[1]);
+}
+
+/* Set vec3 uniform */
+void LinceSetShaderUniformVec3(LinceShader* sh, const char* name, vec3 v){
+	int loc = LinceGetShaderUniformID(sh, name);
+	glUniform3f(loc, v[0], v[1], v[2]);
+}
+
+/* Set vec4 uniform */
+void LinceSetShaderUniformVec4(LinceShader* sh, const char* name, vec4 v){
+	int loc = LinceGetShaderUniformID(sh, name);
+	glUniform4f(loc, v[0], v[1], v[2], v[3]);
+}
+
+/* Set mat3 uniform */
+void LinceSetShaderUniformMat3(LinceShader* sh, const char* name, mat3 m){
+	int loc = LinceGetShaderUniformID(sh, name);
+	glUniformMatrix3fv(loc, 1, GL_FALSE, &m[0][0]);
+}
+
+/* Set mat4 uniform */
+void LinceSetShaderUniformMat4(LinceShader* sh, const char* name, mat4 m){
+	int loc = LinceGetShaderUniformID(sh, name);
+	glUniformMatrix4fv(loc, 1, GL_FALSE, &m[0][0]);
+}
+
 
 /* --- Static functions --- */
 

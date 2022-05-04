@@ -107,7 +107,8 @@ void GameInit() {
         "lince/assets/test.vert.glsl", "lince/assets/test.frag.glsl");
     LinceBindShader(global_shader);
 
-    LinceGetShaderUniformID(global_shader, "Test");
+    vec4 addc = {0.0, 0.0, 0.5, 0.0};
+    LinceSetShaderUniformVec4(global_shader, "add_color", addc);
 
 }
 
