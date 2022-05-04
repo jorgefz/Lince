@@ -38,9 +38,11 @@
             exit(-1); \
         } while(0); \
     }
+#   define LINCE_ASSERT_ALLOC(ptr, size) LINCE_ASSERT(ptr, " Failed to allocate %d bytes", (int)(size))
 #else
 #   define LINCE_INFO
 #   define LINCE_ASSERT
+#   define LINCE_ASSERT_ALLOC
 #endif
 
 /* Constants & typedefs */
