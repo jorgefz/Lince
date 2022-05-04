@@ -171,13 +171,8 @@ static char* LinceReadFile(const char* path){
 
 	char* source = calloc(size+1, sizeof(char));
 	LINCE_ASSERT_ALLOC(source, size+1);
-
-	for(size_t i=0; i!=size; ++i) source[i] = (char)fgetc(handle);
-
-	int chread;
-	char* p = source;
-	while ((chread = fgetc(handle)) != EOF) *(p++) = chread;
-	source[size] = '\0';
+	fread(source, size, 1, handle); // load source into heap
+	source[size] = '\0'; // ensure x2 last character is terminator
 
 	fclose(handle);
 	return source;
