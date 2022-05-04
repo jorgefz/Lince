@@ -13,7 +13,7 @@
 
 static void GLFWErrorCallback(int error, const char* description) {
     LINCE_INFO("GLFW ERROR %d -> ", error);
-    LINCE_ASSERT(0, description);
+    LINCE_ASSERT(0, "%s", description);
 }
 
 // forward declare to call from CreateWindow
