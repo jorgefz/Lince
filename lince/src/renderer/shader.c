@@ -102,48 +102,57 @@ void LinceDeleteShader(LinceShader* shader){
 }
 
 int LinceGetShaderUniformID(LinceShader* shader, const char* name){
-	if(!shader || !name) return;
+	/* Refactor this to cache the uniform locations */
+	if(!shader || !name) return -1;
 	LINCE_INFO(" Locating Shader Uniform '%s'", name);
-
-	LINCE_ASSERT(strlen(name) < LINCE_NAME_MAX,
+	int location =  glGetUniformLocation(shader->id, name);
+	if(location < 0) LINCE_INFO(" Uniform '%s' not found in shader '%s'",
+								name, shader->name);
+	return location;
+	/*
+	LINCE_ASSERT(
+		strlen(name) < LINCE_NAME_MAX,
 		" Shader uniform name %d bytes too long '%s'",
-		(int)strlen(name) - LINCE_NAME_MAX, name);
+		(int)strlen(name) - LINCE_NAME_MAX, name
+	);
 	
-	/* locate uniform in cache, return if sucessful */
+	// locate uniform in cache, return if sucessful
 	for(int i=0; i!=(int)shader->uniform_count; ++i){
 		if(strcmp(name, shader->uniform_names[i]) == 0){
 			return shader->uniform_ids[i];
 		}
 	}
 
-	/* locate uniform in shader */
+	// locate uniform in shader
 	int location = glGetUniformLocation(shader->id, name);
 	if(location < 0){
 		LINCE_INFO(" Shader Uniform '%s' does not exist", name);
 		return -1;
 	}
 
-	/* append uniform to cache */
+	// append uniform to cache
 	shader->uniform_names = realloc(
 		shader->uniform_names,
 		shader->uniform_count + 1
 	);
-	LINCE_ASSERT(shader->uniform_names, " Failed to allocate memory");
+	LINCE_ASSERT_ALLOC(shader->uniform_names, shader->uniform_count + 1);
 
-	/* extend name list */
+	// extend name list
 	char** uname = &shader->uniform_names[shader->uniform_count];
 	*uname = calloc( LINCE_NAME_MAX, sizeof(char) );
-	LINCE_ASSERT(*uname, " Failed to allocate memory");
+	LINCE_ASSERT_ALLOC(*uname, LINCE_NAME_MAX*sizeof(char));
+
 	memcpy(*uname, name, strlen(name));
 
-	/* extend ID list */
+	// extend ID list
 	int* loc = &shader->uniform_ids[shader->uniform_count];
 	loc = malloc( sizeof(int) );
-	LINCE_ASSERT(loc, " Failed to allocate memory");
+	LINCE_ASSERT_ALLOC(loc, sizeof(int));
 	*loc = location;
 
 	shader->uniform_count++;
 	return location;
+	*/
 }
 
 
@@ -161,9 +170,9 @@ static char* LinceReadFile(const char* path){
 	LINCE_ASSERT(size > 0, " Empty file '%s'", path);
 
 	char* source = calloc(size+1, sizeof(char));
-	LINCE_ASSERT(source, " Failed to allocate %d bytes", (int)size+1);
+	LINCE_ASSERT_ALLOC(source, size+1);
 
-	for(size_t i=0; i!=size; ++i) source[i] = fgetc(handle);
+	for(size_t i=0; i!=size; ++i) source[i] = (char)fgetc(handle);
 
 	fclose(handle);
 	return source;

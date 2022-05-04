@@ -106,6 +106,9 @@ void GameInit() {
     global_shader = LinceCreateShader("TestShader",
         "lince/assets/test.vert.glsl", "lince/assets/test.frag.glsl");
     LinceBindShader(global_shader);
+
+    LinceGetShaderUniformID(global_shader, "Test");
+
 }
 
 
