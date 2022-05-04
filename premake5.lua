@@ -7,8 +7,6 @@ workspace "lince"
         "Release"
     }
 
-    platforms { "Win64", "Linux" }
-
     startproject "lince"
 
     warnings "Extra"
