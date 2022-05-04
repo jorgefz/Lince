@@ -173,6 +173,7 @@ static char* LinceReadFile(const char* path){
 	LINCE_ASSERT_ALLOC(source, size+1);
 
 	for(size_t i=0; i!=size; ++i) source[i] = (char)fgetc(handle);
+	source[size] = '\0';
 
 	fclose(handle);
 	return source;
