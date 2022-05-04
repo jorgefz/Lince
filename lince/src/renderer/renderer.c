@@ -10,7 +10,7 @@ typedef struct LinceRenderer {
 
 } LinceRenderer;
 
-void LinceRender_Init() {
+void LinceInitRenderer() {
 
 	// Adds up alpha channels
 	//glEnable(GL_BLEND);
@@ -18,16 +18,26 @@ void LinceRender_Init() {
 
 }
 
-void LinceRender_BeginScene() {
+void LinceBeginRenderScene() {
 
 }
 
-void LinceRender_EndScene() {
+void LinceEndRenderScene() {
 
 }
 
-void LinceRender_Submit() {
+void LinceSubmitQuad() {
 
+}
+
+
+void LinceDrawIndexed(
+	LinceShader* shader, LinceVertexArray* va, LinceIndexBuffer ib
+) {
+	LinceBindShader(shader);
+	LinceBindIndexBuffer(ib);
+	LinceBindVertexArray(va);
+	glDrawElements(GL_TRIANGLES, ib.count, GL_UNSIGNED_INT, 0);
 }
 
 void LinceClear() {
@@ -37,13 +47,4 @@ void LinceClear() {
 
 void LinceSetClearColor(float r, float g, float b, float a) {
 	glClearColor(r, g, b, a);
-}
-
-void LinceDrawIndexed(
-	LinceShader* shader, LinceVertexArray* va, LinceIndexBuffer ib
-) {
-	LinceBindShader(shader);
-	LinceBindIndexBuffer(ib);
-	LinceBindVertexArray(va);
-	glDrawElements(GL_TRIANGLES, ib.count, GL_UNSIGNED_INT, 0);
 }

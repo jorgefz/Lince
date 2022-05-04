@@ -6,7 +6,50 @@
 #include <string.h>
 #include <stdint.h>
 
-/* Platform */
+/*
+--- Macros ---
+
+1) Platform
+
+LINCE_WINDOWS   - Windows
+LINCE_LINUX     - Linux  
+LINCE_MACOS     - MacOS  
+
+2) Debug messages
+
+LINCE_LOGFILE
+    File handle to which debug messages are printed.
+    Set to 'stderr' by default.
+
+LINCE_DEBUG
+    Defined if the application was compiled in debug mode.
+    If undefined, the macros below are set to nothing.
+
+LINCE_INFO( message, ... )
+    Prints message to console.
+
+LINCE_ASSERT( condition, message, ... )
+    If condition is met, prints message and exits.
+
+LINCE_ASSERT_ALLOC( pointer, size )
+    Used for checking that malloc (& family) functions sucessfully
+    allocated requested memory.
+    If 'pointer' is NULL, prints error message quoting
+    number of bytes requested ('size'), and exits. 
+
+3) Engine constants
+
+LINCE_NAME_MAX
+    Specifies maximum length of names, string identifiers, shader uniforms...
+    Set to 100 by default.
+
+LINCE_STR_MAX
+    Maximum length of longer buffers, such as messages or text.
+
+*/
+
+
+/* --- Platform --- */
 #ifdef LINCE_WINDOWS
     // #include <windows.h>
 #elif defined(LINCE_LINUX)
@@ -18,9 +61,9 @@
 #endif
 
 /* Debugging */
-#   ifndef LINCE_LOGFILE
-#       define LINCE_LOGFILE stderr
-#   endif
+#ifndef LINCE_LOGFILE
+#    define LINCE_LOGFILE stderr
+#endif
 
 #ifdef LINCE_DEBUG
 #   define LINCE_INFO(...) do{ \
@@ -47,7 +90,7 @@
 
 /* Constants & typedefs */
 #define LINCE_NAME_MAX 100 /* used for shader variable names, etc*/
-#define LINCE_STR_MAX 100
+#define LINCE_STR_MAX 1000 /* used for longer buffers */
 typedef enum LinceBool{ LinceFalse = 0, LinceTrue = 1 } LinceBool;
 
 

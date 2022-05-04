@@ -5,15 +5,30 @@
 #include "renderer/vertex_array.h"
 #include "renderer/shader.h"
 
-void LinceRender_Init();
-void LinceRender_BeginScene();
-void LinceRender_EndScene();
-void LinceRender_Submit();
+/* Initialises renderer state and openGL rendering settings */
+void LinceInitRenderer();
 
-void LinceClear();
-void LinceSetClearColor(float r, float g, float b, float a);
+/* Begins rendering scene */
+void LinceBeginRenderScene();
+
+/* Renders scene and flushes batch buffers */
+void LinceEndRenderScene();
+
+/* Submits a quad (rectangle) for rendering */
+void LinceSubmitQuad();
+
+/* Draws provided vertices directly */
 void LinceDrawIndexed(
-	LinceShader* shader, LinceVertexArray* va, LinceIndexBuffer vb);
+	LinceShader* shader,
+	LinceVertexArray* va,
+	LinceIndexBuffer vb
+);
+
+/* Empties screen buffer */
+void LinceClear();
+
+/* Sets the default screen color */
+void LinceSetClearColor(float r, float g, float b, float a);
 
 
 // Future rendering API

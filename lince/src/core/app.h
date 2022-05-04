@@ -44,9 +44,11 @@ void LinceSetGameTerminateFn(LinceGameTerminateFn func); /* Called on shutdown *
  /* Runs main application loop */
 void LinceRun();
 
-/* TEMPORARY */
+/* TEMPORARY - Should this be called by user? */
 void LinceInit(unsigned int width, unsigned int height, int flags);
-void LinceOnUpdate();
+
+/* Fetches any OpenGL errors and exits if sucessful */
+void LinceCheckErrors();
 
 /* Adds a rendering layer to the program */
 void LincePushLayer(LinceLayer* layer);

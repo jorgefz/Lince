@@ -19,7 +19,7 @@ static LinceApp app = {0};
 void LinceRun();
 
 /* Called once per frame, updates window and renders layers */
-/* static void LinceOnUpdate(); */
+static void LinceOnUpdate();
 
 /* Shuts down application and frees allocated memory */
 static void LinceTerminate();
@@ -119,7 +119,7 @@ void LinceCheckErrors(){
 }
 
 
-/*static*/ void LinceOnUpdate(){
+static void LinceOnUpdate(){
     LinceClear();
 
     // Calculate delta time

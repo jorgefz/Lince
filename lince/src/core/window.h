@@ -8,7 +8,7 @@ typedef void (*LinceEventCallbackFn)(LinceEvent*);
 typedef struct {
     void* handle;
     unsigned int height, width, initialised;
-    char title[LINCE_STR_MAX];
+    char title[LINCE_NAME_MAX];
     LinceEventCallbackFn event_callback;
 } LinceWindow; 
 
