@@ -158,13 +158,16 @@ project "game"
 
     filter "system:linux"
         systemversion "latest"
+        defines {"LINCE_LINUX"}
     
     filter "system:windows"
         systemversion "latest"
-        defines {"_CRT_SECURE_NO_WARNINGS"}
+        defines {"LINCE_WINDOWS", "_CRT_SECURE_NO_WARNINGS"}
     
     filter "configurations:Debug"
+        defines "LINCE_DEBUG"
         symbols "on"
 
     filter "configurations:Release"
+        defines "LINCE_RELEASE"
         optimize "on"

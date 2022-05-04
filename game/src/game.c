@@ -7,7 +7,6 @@
 //#include <GLFW/glfw3.h>
 //#include <glad/glad.h>
 
-
 typedef struct MyLayer {
     char name[LINCE_NAME_MAX];
     float red, vel;
@@ -108,6 +107,10 @@ void GameInit() {
         "lince/assets/test.vert.glsl", "lince/assets/test.frag.glsl");
     LinceBindShader(global_shader);
 
+    // texture test
+    LinceTexture* texture;
+    texture = LinceCreateTexture("Patrick", "lince/assets/back.png");
+    LinceDeleteTexture(texture);
 }
 
 
@@ -126,7 +129,7 @@ S: decreases green
 E: increases blue
 D: decreases blue
 */
-void GameKeyPress(LinceEvent* e){
+LinceBool GameKeyPress(LinceEvent* e){
     int code = e->data.KeyPressed->keycode;
     float step = 0.03f;
     switch(code){
@@ -136,15 +139,15 @@ void GameKeyPress(LinceEvent* e){
     case LinceKey_s: global_color[1]-=step; break;
     case LinceKey_e: global_color[2]+=step; break;
     case LinceKey_d: global_color[2]-=step; break;
-    default: return;
+    default: return LinceFalse;
     }
     LinceSetShaderUniformVec4(global_shader, "add_color", global_color);
+    return LinceFalse;
 }
 
 void GameOnEvent(LinceEvent* e) {
     LinceDispatchEvent(e, LinceEventType_KeyPressed, GameKeyPress);
 }
-
 
 void GameTerminate() {
     LinceDeleteVertexArray(global_va);
