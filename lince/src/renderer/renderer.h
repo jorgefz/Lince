@@ -28,6 +28,7 @@ typedef struct LinceQuadProps{
 } LinceQuadProps;
 
 typedef struct RendererState {
+	int dummy;
 	// batch pointers, etc
 } RendererState;
 
