@@ -7,6 +7,11 @@
 //#include <GLFW/glfw3.h>
 //#include <glad/glad.h>
 
+LinceIndexBuffer global_ib = {0};
+LinceVertexArray *global_va = NULL;
+LinceShader *global_shader = NULL;
+vec4 global_color = {0};
+
 typedef struct MyLayer {
     char name[LINCE_NAME_MAX];
     float red, vel;
@@ -19,65 +24,6 @@ typedef struct MyLayer {
 void MyLayerOnAttach(LinceLayer* layer) {
     MyLayer* data = LinceGetLayerData(layer);
     LINCE_INFO(" Layer '%s' attached", data->name);
-    
-    data->red = 0.0f;
-    data->vel = 5e-4f;
-}
-
-void MyLayerOnDetach(LinceLayer* layer) {
-    MyLayer* data = LinceGetLayerData(layer);
-    LINCE_INFO(" Layer '%s' detached", data->name);
-    free(data);
-}
-
-void MyLayerOnEvent(LinceLayer* layer, LinceEvent* e) {
-
-}
-
-void MyLayerOnUpdate(LinceLayer* layer, float dt) {
-    MyLayer* data = LinceGetLayerData(layer);
-
-    LinceCheckErrors();
-
-    /* update background color */
-    data->red += data->vel * dt;
-    if (data->red >= 1.0f) data->vel = -data->vel;
-    else if (data->red <= 0.0f) data->vel = -data->vel;
-    float blue = 1.0f - data->red;
-    LinceSetClearColor(data->red, 0.1f, blue, 1.0f);
-
-}
-
-LinceLayer* MyLayerInit(char* name) {
-
-    MyLayer* my_layer = calloc(1, sizeof(MyLayer));
-    LINCE_ASSERT(my_layer, "Failed to allocate layer data");
-
-    size_t len = strlen(name) < LINCE_NAME_MAX ? strlen(name) : LINCE_NAME_MAX;
-    memcpy(my_layer->name, name, len);
-
-    LinceLayer* layer = LinceCreateLayer(my_layer);
-    layer->OnAttach = MyLayerOnAttach;
-    layer->OnDetach = MyLayerOnDetach;
-    layer->OnEvent = MyLayerOnEvent;
-    layer->OnUpdate = MyLayerOnUpdate;
-
-    return layer;
-}
-
-
-// =============================================================
-
-LinceIndexBuffer global_ib = {0};
-LinceVertexArray *global_va = NULL;
-LinceShader *global_shader = NULL;
-vec4 global_color = {0};
-
-
-void GameInit() {
-	LINCE_INFO("\n User App Initialised");
-
-    LincePushLayer(MyLayerInit("Test"));
 
     static unsigned int indices[] = {0,1,2,2,3,0};
     static float vertices[] = {
@@ -111,13 +57,20 @@ void GameInit() {
     LinceTexture* texture;
     texture = LinceCreateTexture("Patrick", "lince/assets/back.png");
     LinceDeleteTexture(texture);
+    
+    data->red = 0.0f;
+    data->vel = 5e-4f;
 }
 
+void MyLayerOnDetach(LinceLayer* layer) {
+    MyLayer* data = LinceGetLayerData(layer);
+    LINCE_INFO(" Layer '%s' detached", data->name);
 
-void GameOnUpdate(float dt) {
-    LinceDrawIndexed(global_shader, global_va, global_ib);
+    LinceDeleteVertexArray(global_va);
+    LinceDeleteShader(global_shader);
+
+    free(data);
 }
-
 
 /*
 Q: increases red
@@ -145,13 +98,62 @@ LinceBool GameKeyPress(LinceEvent* e){
     return LinceFalse;
 }
 
-void GameOnEvent(LinceEvent* e) {
+void MyLayerOnEvent(LinceLayer* layer, LinceEvent* e) {
     LinceDispatchEvent(e, LinceEventType_KeyPressed, GameKeyPress);
 }
 
+void MyLayerOnUpdate(LinceLayer* layer, float dt) {
+    MyLayer* data = LinceGetLayerData(layer);
+
+    LinceDrawIndexed(global_shader, global_va, global_ib);
+
+    /* update background color */
+    data->red += data->vel * dt;
+    if (data->red >= 1.0f) data->vel = -data->vel;
+    else if (data->red <= 0.0f) data->vel = -data->vel;
+    float blue = 1.0f - data->red;
+    LinceSetClearColor(data->red, 0.1f, blue, 1.0f);
+
+}
+
+LinceLayer* MyLayerInit(char* name) {
+
+    MyLayer* my_layer = calloc(1, sizeof(MyLayer));
+    LINCE_ASSERT(my_layer, "Failed to allocate layer data");
+
+    size_t len = strlen(name) < LINCE_NAME_MAX ? strlen(name) : LINCE_NAME_MAX;
+    memcpy(my_layer->name, name, len);
+
+    LinceLayer* layer = LinceCreateLayer(my_layer);
+    layer->OnAttach = MyLayerOnAttach;
+    layer->OnDetach = MyLayerOnDetach;
+    layer->OnEvent = MyLayerOnEvent;
+    layer->OnUpdate = MyLayerOnUpdate;
+
+    return layer;
+}
+
+
+// =============================================================
+
+
+void GameInit() {
+	LINCE_INFO("\n User App Initialised");
+    LincePushLayer(MyLayerInit("Test"));
+}
+
+
+void GameOnUpdate(float dt) {
+    LinceCheckErrors();
+}
+
+
+void GameOnEvent(LinceEvent* e) {
+    
+}
+
 void GameTerminate() {
-    LinceDeleteVertexArray(global_va);
-    LinceDeleteShader(global_shader);
+    
     LINCE_INFO(" User App Terminated");
 }
 
