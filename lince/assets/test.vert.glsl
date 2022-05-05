@@ -7,10 +7,11 @@ layout (location = 2) in vec4 aColor;
 out vec4 vColor;
 out vec2 vTexCoord;
 
-uniform vec2 xyoffset = vec2(0.0, 0.0);
+uniform mat4 u_view_proj = mat4(1.0);
+uniform mat4 u_transform = mat4(1.0); // identity matrix
 
 void main(){
-   gl_Position = vec4(aPos, 1.0, 1.0) + vec4(xyoffset, 0.0, 0.0);
+   gl_Position = u_view_proj * u_transform * vec4(aPos, 1.0, 1.0);
    vColor = aColor;
    vTexCoord = aTexCoord;
 }

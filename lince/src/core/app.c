@@ -86,6 +86,10 @@ double LinceGetTimeMillis(){
     return (glfwGetTime() * 1000.0);
 }
 
+float LinceGetAspectRatio(){
+    return (float)app.window->width / (float)app.window->height;
+}
+
 LinceLayer* LinceGetCurrentLayer(){
     if (app.current_layer < 0) return NULL;
     return app.layer_stack->layers[app.current_layer];

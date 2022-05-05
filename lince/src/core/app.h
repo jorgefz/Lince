@@ -72,6 +72,9 @@ double LinceGetTimeMillis();
 /* Returns the current state of the running program */
 LinceApp* LinceGetAppState();
 
+/* Returns current aspect ratio of the window */
+float LinceGetAspectRatio();
+
 /*
 Returns current layer being handled or updated
 Useful on specific event callbacks.

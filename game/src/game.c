@@ -2,7 +2,9 @@
 #include <time.h>
 
 #include "lince.h"
+#include "cglm/types.h"
 #include "cglm/vec4.h"
+#include "cglm/affine.h"
 
 //#include <GLFW/glfw3.h>
 //#include <glad/glad.h>
@@ -18,7 +20,7 @@ typedef struct MyLayer {
     LinceTexture* tex_front;
     LinceTexture* tex_back;
     vec4 color;
-    vec2 xyoffset;
+    LinceCamera* cam;
 } MyLayer;
 
 void MyLayerOnAttach(LinceLayer* layer) {
@@ -60,7 +62,10 @@ void MyLayerOnAttach(LinceLayer* layer) {
     // assign textures to slots
     LinceBindTexture(data->tex_front, 0);
     LinceBindTexture(data->tex_back, 1);
-    
+
+    data->cam = LinceCreateCamera(LinceGetAspectRatio());
+    LinceSetShaderUniformMat4(data->shader, "u_view_proj", data->cam->view_proj);
+
     data->red = 0.0f;
     data->vel = 5e-4f;
 }
@@ -75,19 +80,15 @@ void MyLayerOnDetach(LinceLayer* layer) {
     LinceDeleteShader(data->shader);
     LinceDeleteTexture(data->tex_front);
     LinceDeleteTexture(data->tex_back);
+    LinceDeleteCamera(data->cam);
 
     free(data);
 }
 
 /*
-Q: increases red
-A: decreases red
-
-W: increases green
-S: decreases green
-
-E: increases blue
-D: decreases blue
+Q, A: increase, decrease red
+W, S: increase, decrease green
+E, D: increase, decrease blue
 */
 LinceBool GameKeyPress(LinceEvent* e){
     LinceLayer* layer = LinceGetCurrentLayer();
@@ -108,22 +109,32 @@ LinceBool GameKeyPress(LinceEvent* e){
     return LinceFalse;
 }
 
+LinceBool GameWindowResize(LinceEvent* e){
+    LinceLayer* layer = LinceGetCurrentLayer();
+    MyLayer* data = LinceGetLayerData(layer);
+    LinceResizeCameraView(data->cam, LinceGetAspectRatio());
+}
+
 void MyLayerOnEvent(LinceLayer* layer, LinceEvent* e) {
     LinceDispatchEvent(e, LinceEventType_KeyPressed, GameKeyPress);
+    LinceDispatchEvent(e, LinceEventType_KeyPressed, GameWindowResize);
 }
 
 void MyLayerOnUpdate(LinceLayer* layer, float dt) {
     MyLayer* data = LinceGetLayerData(layer);
+    LinceUpdateCamera(data->cam);
+    LinceSetShaderUniformMat4(data->shader, "u_view_proj", data->cam->view_proj);
+    mat4 transform;
 
-    data->xyoffset[0] = -0.5;
-    data->xyoffset[1] = -0.5;
-    LinceSetShaderUniformVec2(data->shader, "xyoffset", data->xyoffset);
+    vec4 pos1 = {-0.5, -0.5, 0.0, 1.0};
+    glm_translate_to(GLM_MAT4_IDENTITY, pos1, transform);
+    LinceSetShaderUniformMat4(data->shader, "u_transform", transform);
     LinceSetShaderUniformInt(data->shader, "textureID", 0);
     LinceDrawIndexed(data->shader, data->va, data->ib);
 
-    data->xyoffset[0] = 0.5;
-    data->xyoffset[1] = 0.5;
-    LinceSetShaderUniformVec2(data->shader, "xyoffset", data->xyoffset);
+    vec4 pos2 = {0.5, 0.5, 0.0, 1.0};
+    glm_translate_to(GLM_MAT4_IDENTITY, pos2, transform);
+    LinceSetShaderUniformMat4(data->shader, "u_transform", transform);
     LinceSetShaderUniformInt(data->shader, "textureID", 1);
     LinceDrawIndexed(data->shader, data->va, data->ib);
 
