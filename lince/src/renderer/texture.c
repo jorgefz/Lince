@@ -88,5 +88,7 @@ void LinceBindTexture(LinceTexture* texture, uint32_t slot){
 	The above API call is identical to the following:
 		glActiveTexture(GL_TEXTURE0 + slot);
 		glBindTexture(GL_TEXTURE_2D, texture->id);
+	Note: don't do 'GL_TEXTURE0 + slot' on glBindTextureUnit,
+		rather pass slot value directly.
 	*/
 }

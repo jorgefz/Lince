@@ -9,7 +9,6 @@ uniform vec4 add_color = vec4(0.0);
 uniform sampler2D textureID;
 
 void main(){
-	// color = vColor + add_color;
 	color = texture(textureID, vTexCoord) * (vColor + add_color);
 }
 

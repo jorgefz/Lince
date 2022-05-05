@@ -15,7 +15,8 @@ typedef struct MyLayer {
     LinceVertexBuffer vb;
     LinceIndexBuffer ib;
     LinceShader* shader;
-    LinceTexture* texture;
+    LinceTexture* tex_front;
+    LinceTexture* tex_back;
     vec4 color;
     vec2 xyoffset;
 } MyLayer;
@@ -54,9 +55,11 @@ void MyLayerOnAttach(LinceLayer* layer) {
     LinceBindShader(data->shader);
 
     // texture test
-    data->texture = LinceCreateTexture("Patrick", "lince/assets/back.png");
-    LinceBindTexture(data->texture, 0);
-    LinceSetShaderUniformInt(data->shader, "textureID", 0);
+    data->tex_front = LinceCreateTexture("Patrick", "lince/assets/front.png");
+    data->tex_back  = LinceCreateTexture("Patrick", "lince/assets/back.png");
+    // assign textures to slots
+    LinceBindTexture(data->tex_front, 0);
+    LinceBindTexture(data->tex_back, 1);
     
     data->red = 0.0f;
     data->vel = 5e-4f;
@@ -70,7 +73,8 @@ void MyLayerOnDetach(LinceLayer* layer) {
     LinceDeleteIndexBuffer(data->ib);
     LinceDeleteVertexArray(data->va);
     LinceDeleteShader(data->shader);
-    LinceDeleteTexture(data->texture);
+    LinceDeleteTexture(data->tex_front);
+    LinceDeleteTexture(data->tex_back);
 
     free(data);
 }
@@ -114,11 +118,13 @@ void MyLayerOnUpdate(LinceLayer* layer, float dt) {
     data->xyoffset[0] = -0.5;
     data->xyoffset[1] = -0.5;
     LinceSetShaderUniformVec2(data->shader, "xyoffset", data->xyoffset);
+    LinceSetShaderUniformInt(data->shader, "textureID", 0);
     LinceDrawIndexed(data->shader, data->va, data->ib);
 
     data->xyoffset[0] = 0.5;
     data->xyoffset[1] = 0.5;
     LinceSetShaderUniformVec2(data->shader, "xyoffset", data->xyoffset);
+    LinceSetShaderUniformInt(data->shader, "textureID", 1);
     LinceDrawIndexed(data->shader, data->va, data->ib);
 
     /* update background color */
