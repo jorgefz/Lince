@@ -104,7 +104,6 @@ void LinceDeleteShader(LinceShader* shader){
 int LinceGetShaderUniformID(LinceShader* shader, const char* name){
 	/* Refactor this to cache the uniform locations */
 	if(!shader || !name) return -1;
-	LINCE_INFO(" Locating Shader Uniform '%s'", name);
 	int location =  glGetUniformLocation(shader->id, name);
 	if(location < 0) LINCE_INFO(" Uniform '%s' not found in shader '%s'",
 								name, shader->name);

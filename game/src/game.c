@@ -7,11 +7,6 @@
 //#include <GLFW/glfw3.h>
 //#include <glad/glad.h>
 
-LinceIndexBuffer global_ib = {0};
-LinceVertexArray *global_va = NULL;
-LinceShader *global_shader = NULL;
-vec4 global_color = {0};
-
 typedef struct MyLayer {
     char name[LINCE_NAME_MAX];
     float red, vel;
@@ -19,6 +14,10 @@ typedef struct MyLayer {
     LinceVertexArray* va;
     LinceVertexBuffer vb;
     LinceIndexBuffer ib;
+    LinceShader* shader;
+    LinceTexture* texture;
+    vec4 color;
+    vec2 xyoffset;
 } MyLayer;
 
 void MyLayerOnAttach(LinceLayer* layer) {
@@ -27,36 +26,37 @@ void MyLayerOnAttach(LinceLayer* layer) {
 
     static unsigned int indices[] = {0,1,2,2,3,0};
     static float vertices[] = {
-        // positions    color RGBA
-        -0.5f, -0.5f,   1.0, 0.0, 0.0, 1.0,
-         0.5f, -0.5f,   1.0, 1.0, 0.0, 1.0,
-         0.5f,  0.5f,   0.0, 1.0, 0.0, 1.0,
-        -0.5f,  0.5f,   0.0, 0.0, 1.0, 1.0,
+        // positions    texture     color RGBA
+        -0.5f, -0.5f,   0.0, 0.0,   1.0, 0.0, 0.0, 1.0,
+         0.5f, -0.5f,   1.0, 0.0,   1.0, 1.0, 0.0, 1.0,
+         0.5f,  0.5f,   1.0, 1.0,   0.0, 1.0, 0.0, 1.0,
+        -0.5f,  0.5f,   0.0, 1.0,   0.0, 0.0, 1.0, 1.0,
     };
-
-    global_ib = LinceCreateIndexBuffer(indices, 6);
-    LinceVertexBuffer vb = LinceCreateVertexBuffer(vertices, sizeof(vertices));
-    global_va = LinceCreateVertexArray(global_ib);
-
-    LinceBindVertexArray(global_va);
-    LinceBindIndexBuffer(global_ib);
-
     LinceBufferElement layout[] = {
         {LinceBufferType_Float2, "aPos"},
+        {LinceBufferType_Float2, "aTexCoord"},
         {LinceBufferType_Float4, "aColor"},
     };
+
+    data->ib = LinceCreateIndexBuffer(indices, 6);
+    data->vb = LinceCreateVertexBuffer(vertices, sizeof(vertices));
+    data->va = LinceCreateVertexArray(data->ib);
+
+    LinceBindVertexArray(data->va);
+    LinceBindIndexBuffer(data->ib);
+
     unsigned int elems = sizeof(layout) / sizeof(LinceBufferElement);
-    LinceAddVertexArrayAttributes(global_va, vb, layout, elems);
+    LinceAddVertexArrayAttributes(data->va, data->vb, layout, elems);
 
     // Shader
-    global_shader = LinceCreateShader("TestShader",
+    data->shader = LinceCreateShader("TestShader",
         "lince/assets/test.vert.glsl", "lince/assets/test.frag.glsl");
-    LinceBindShader(global_shader);
+    LinceBindShader(data->shader);
 
     // texture test
-    LinceTexture* texture;
-    texture = LinceCreateTexture("Patrick", "lince/assets/back.png");
-    LinceDeleteTexture(texture);
+    data->texture = LinceCreateTexture("Patrick", "lince/assets/back.png");
+    LinceBindTexture(data->texture, 0);
+    LinceSetShaderUniformInt(data->shader, "textureID", 0);
     
     data->red = 0.0f;
     data->vel = 5e-4f;
@@ -66,8 +66,11 @@ void MyLayerOnDetach(LinceLayer* layer) {
     MyLayer* data = LinceGetLayerData(layer);
     LINCE_INFO(" Layer '%s' detached", data->name);
 
-    LinceDeleteVertexArray(global_va);
-    LinceDeleteShader(global_shader);
+    LinceDeleteVertexBuffer(data->vb);
+    LinceDeleteIndexBuffer(data->ib);
+    LinceDeleteVertexArray(data->va);
+    LinceDeleteShader(data->shader);
+    LinceDeleteTexture(data->texture);
 
     free(data);
 }
@@ -83,18 +86,21 @@ E: increases blue
 D: decreases blue
 */
 LinceBool GameKeyPress(LinceEvent* e){
+    LinceLayer* layer = LinceGetCurrentLayer();
+    MyLayer* data = LinceGetLayerData(layer);
+
     int code = e->data.KeyPressed->keycode;
     float step = 0.03f;
     switch(code){
-    case LinceKey_q: global_color[0]+=step; break;
-    case LinceKey_a: global_color[0]-=step; break;
-    case LinceKey_w: global_color[1]+=step; break;
-    case LinceKey_s: global_color[1]-=step; break;
-    case LinceKey_e: global_color[2]+=step; break;
-    case LinceKey_d: global_color[2]-=step; break;
+    case LinceKey_q: data->color[0]+=step; break;
+    case LinceKey_a: data->color[0]-=step; break;
+    case LinceKey_w: data->color[1]+=step; break;
+    case LinceKey_s: data->color[1]-=step; break;
+    case LinceKey_e: data->color[2]+=step; break;
+    case LinceKey_d: data->color[2]-=step; break;
     default: return LinceFalse;
     }
-    LinceSetShaderUniformVec4(global_shader, "add_color", global_color);
+    LinceSetShaderUniformVec4(data->shader, "add_color", data->color);
     return LinceFalse;
 }
 
@@ -105,7 +111,15 @@ void MyLayerOnEvent(LinceLayer* layer, LinceEvent* e) {
 void MyLayerOnUpdate(LinceLayer* layer, float dt) {
     MyLayer* data = LinceGetLayerData(layer);
 
-    LinceDrawIndexed(global_shader, global_va, global_ib);
+    data->xyoffset[0] = -0.5;
+    data->xyoffset[1] = -0.5;
+    LinceSetShaderUniformVec2(data->shader, "xyoffset", data->xyoffset);
+    LinceDrawIndexed(data->shader, data->va, data->ib);
+
+    data->xyoffset[0] = 0.5;
+    data->xyoffset[1] = 0.5;
+    LinceSetShaderUniformVec2(data->shader, "xyoffset", data->xyoffset);
+    LinceDrawIndexed(data->shader, data->va, data->ib);
 
     /* update background color */
     data->red += data->vel * dt;

@@ -84,4 +84,9 @@ void LinceDeleteTexture(LinceTexture* texture){
 /* Binds the given texture to a slot (there are at least 16 slots) */
 void LinceBindTexture(LinceTexture* texture, uint32_t slot){
 	glBindTextureUnit(slot, texture->id);
+	/*
+	The above API call is identical to the following:
+		glActiveTexture(GL_TEXTURE0 + slot);
+		glBindTexture(GL_TEXTURE_2D, texture->id);
+	*/
 }
