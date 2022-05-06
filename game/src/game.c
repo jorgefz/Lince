@@ -12,6 +12,7 @@
 typedef struct MyLayer {
     char name[LINCE_NAME_MAX];
     float red, vel;
+    float dt;
 
     LinceVertexArray* va;
     LinceVertexBuffer vb;
@@ -91,27 +92,38 @@ W, S: increase, decrease green
 E, D: increase, decrease blue
 */
 LinceBool GameKeyPress(LinceEvent* e){
-    LinceLayer* layer = LinceGetCurrentLayer();
-    MyLayer* data = LinceGetLayerData(layer);
+    MyLayer* data = LinceGetLayerData(LinceGetCurrentLayer());
 
     int code = e->data.KeyPressed->keycode;
-    float step = 0.03f;
+    const float step = 0.03f;
+    const float cam_speed = 0.1f;
+    const float dt = data->dt, zoom = data->cam->zoom;
+
     switch(code){
+    /* change colors */
     case LinceKey_q: data->color[0]+=step; break;
     case LinceKey_a: data->color[0]-=step; break;
     case LinceKey_w: data->color[1]+=step; break;
     case LinceKey_s: data->color[1]-=step; break;
     case LinceKey_e: data->color[2]+=step; break;
     case LinceKey_d: data->color[2]-=step; break;
+    /* camera movement */
+    case LinceKey_Up:    data->cam->pos[1] += cam_speed*dt*zoom; break;
+    case LinceKey_Down:  data->cam->pos[1] -= cam_speed*dt*zoom; break;
+    case LinceKey_Right: data->cam->pos[0] += cam_speed*dt*zoom; break;
+    case LinceKey_Left:  data->cam->pos[0] -= cam_speed*dt*zoom; break;
+    /* camera zoom */
+    case LinceKey_Period: data->cam->zoom += 0.1; break;
+    case LinceKey_Comma:  data->cam->zoom -= 0.1; break;
     default: return LinceFalse;
     }
     LinceSetShaderUniformVec4(data->shader, "add_color", data->color);
+    LinceResizeCameraView(data->cam, LinceGetAspectRatio());
     return LinceFalse;
 }
 
 LinceBool GameWindowResize(LinceEvent* e){
-    LinceLayer* layer = LinceGetCurrentLayer();
-    MyLayer* data = LinceGetLayerData(layer);
+    MyLayer* data = LinceGetLayerData(LinceGetCurrentLayer());
     LinceResizeCameraView(data->cam, LinceGetAspectRatio());
 }
 
@@ -122,6 +134,8 @@ void MyLayerOnEvent(LinceLayer* layer, LinceEvent* e) {
 
 void MyLayerOnUpdate(LinceLayer* layer, float dt) {
     MyLayer* data = LinceGetLayerData(layer);
+    data->dt = dt;
+
     LinceUpdateCamera(data->cam);
     LinceSetShaderUniformMat4(data->shader, "u_view_proj", data->cam->view_proj);
     mat4 transform;

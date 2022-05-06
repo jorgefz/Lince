@@ -6,6 +6,7 @@
 
 static const LinceCamera default_camera = {
 	.scale = 1.0,
+	.zoom = 1.0,
 	.rotation = 0.0,
 	.pos = (vec3){0.0, 0.0, 0.0},
 	.proj = GLM_MAT4_IDENTITY_INIT,
@@ -69,9 +70,9 @@ void LinceResizeCameraView(LinceCamera* cam, float aspect_ratio){
 	cam->aspect_ratio = aspect_ratio;
 	LinceCalculateProjection(
 		 cam->proj,
-		-cam->aspect_ratio * cam->scale,
-		 cam->aspect_ratio * cam->scale,
-		-cam->scale, cam->scale
+		-cam->aspect_ratio * cam->zoom,
+		 cam->aspect_ratio * cam->zoom,
+		-cam->zoom, cam->zoom
 	);
 }
 

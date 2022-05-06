@@ -5,6 +5,7 @@
 
 typedef struct LinceCamera {
 	float scale;
+	float zoom;
 	float rotation; // clockwise rotation in degrees
 	vec3 pos;       // 3D position
 	mat4 proj;      // projection matrix
