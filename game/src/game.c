@@ -117,7 +117,7 @@ LinceBool GameWindowResize(LinceEvent* e){
 
 void MyLayerOnEvent(LinceLayer* layer, LinceEvent* e) {
     LinceDispatchEvent(e, LinceEventType_KeyPressed, GameKeyPress);
-    LinceDispatchEvent(e, LinceEventType_KeyPressed, GameWindowResize);
+    LinceDispatchEvent(e, LinceEventType_WindowResize, GameWindowResize);
 }
 
 void MyLayerOnUpdate(LinceLayer* layer, float dt) {
