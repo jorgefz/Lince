@@ -13,6 +13,7 @@ null.d
 **.exe
 **.sh
 premake5
+docs/mdbook
 
 # Output files
 **/Makefile

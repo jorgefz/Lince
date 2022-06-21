@@ -2,6 +2,10 @@
 
 An OpenGL game engine written in C, currently in development. It uses GLFW for the windowing system, GLAD for the OpenGL loader, Premake5 as the build system, and CGLM for vector and matrix operations.
 
+## Documentation
+
+The documentation is available at `docs/book/index.html` which you can open with your favourite web browser.
+
 ## Dependencies
 
 The project uses Premake5 as the build system (https://premake.github.io/).
@@ -32,7 +36,9 @@ The project contains the source code for the following packages, which are built
 * GLFW: windowing system (https://glfw.org)
 * GLAD: OpenGL loader (https://glad.dav1d.de/)
 * CGLM: OpenGL vector and matrix mathematics (https://cglm.readthedocs.io/en/latest)
-* stb_image.h: Single-header image loader by Sean Barret (https://github.com/nothings/stb)
+* stb\_image.h: Single-header image loader by Sean Barret (https://github.com/nothings/stb)
+
+The project makes use of `mdbook` to generate the documentation website (https://github.com/rust-lang/mdBook)
 
 
 

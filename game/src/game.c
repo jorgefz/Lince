@@ -166,7 +166,8 @@ LinceLayer* MyLayerInit(char* name) {
     MyLayer* my_layer = calloc(1, sizeof(MyLayer));
     LINCE_ASSERT(my_layer, "Failed to allocate layer data");
 
-    size_t len = strlen(name) < LINCE_NAME_MAX ? strlen(name) : LINCE_NAME_MAX;
+    size_t len_orig = strlen(name);
+    size_t len = len_orig < LINCE_NAME_MAX ? len_orig : LINCE_NAME_MAX;
     memcpy(my_layer->name, name, len);
 
     LinceLayer* layer = LinceCreateLayer(my_layer);
