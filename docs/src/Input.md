@@ -2,12 +2,12 @@
 
 ## LinceIsKeyPressed
 ```c
-unsigned int LinceIsKeyPressed(int key)
+LinceBool LinceIsKeyPressed(int key)
 ```
 
 ## LinceIsMouseButtonPressed
 ```c
-unsigned int LinceIsMouseButtonPressed(int button)
+LinceBool LinceIsMouseButtonPressed(int button)
 ```
 
 ## LinceGetMousePos
