@@ -10,13 +10,14 @@
 /* Private application state - stack allocated */
 static LinceApp app = {0};
 
+/* Calls the program's main loop */
+void LinceRun();
+
+
 /* --- Static functions --- */
 
 /* Initialises OpenGL window and layer stacks */
 /* static void LinceInit(); */
-
-/* Calls the program's main loop */
-void LinceRun();
 
 /* Called once per frame, updates window and renders layers */
 static void LinceOnUpdate();
@@ -28,6 +29,7 @@ static void LinceTerminate();
 propagates it to layers and user */
 static void LinceOnEvent(LinceEvent* e);
 
+/* Window event callbacks */
 static LinceBool LinceOnEventWindowResize(LinceEvent* e);
 static LinceBool LinceOnEventWindowClose(LinceEvent* e);
 
@@ -45,33 +47,9 @@ void LinceRun(){
     LinceTerminate();
 }
 
-void LinceSetGameInitFn(LinceGameInitFn func) {
-    app.game_init = func;
-}
-
-void LinceSetGameOnUpdateFn(LinceGameOnUpdateFn func) {
-    app.game_on_update = func;
-}
-
-void LinceSetGameOnEventFn(LinceGameOnEventFn func) {
-    app.game_on_event = func;
-}
-
-void LinceSetGameTerminateFn(LinceGameTerminateFn func) {
-    app.game_terminate = func;
-}
-
 
 LinceApp* LinceGetAppState(){
     return &app;
-}
-
-void LinceSetUserData(void* data) {
-    app.user_data = data;
-}
-
-void* LinceGetUserData() {
-    return app.user_data;
 }
 
 void LincePushLayer(LinceLayer* layer) {

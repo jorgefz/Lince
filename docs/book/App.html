@@ -3,8 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>Page not found - Documentation Website</title>
-        <base href="/">
+        <title>App - Documentation Website</title>
         <!-- Custom HTML head -->
         <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
         <meta name="description" content="">
@@ -76,7 +75,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded affix "><a href="HomePage.html">Home Page</a></li><li class="chapter-item expanded "><a href="App.html"><strong aria-hidden="true">1.</strong> App</a></li><li class="chapter-item expanded "><a href="Events.html"><strong aria-hidden="true">2.</strong> Events</a></li><li class="chapter-item expanded "><a href="Layers.html"><strong aria-hidden="true">3.</strong> Layers</a></li><li class="chapter-item expanded "><a href="Input.html"><strong aria-hidden="true">4.</strong> Input</a></li><li class="chapter-item expanded affix "><div>Development Diary</div></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded affix "><a href="HomePage.html">Home Page</a></li><li class="chapter-item expanded "><a href="App.html" class="active"><strong aria-hidden="true">1.</strong> App</a></li><li class="chapter-item expanded "><a href="Events.html"><strong aria-hidden="true">2.</strong> Events</a></li><li class="chapter-item expanded "><a href="Layers.html"><strong aria-hidden="true">3.</strong> Layers</a></li><li class="chapter-item expanded "><a href="Input.html"><strong aria-hidden="true">4.</strong> Input</a></li><li class="chapter-item expanded affix "><div>Development Diary</div></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -135,19 +134,164 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1 id="document-not-found-404"><a class="header" href="#document-not-found-404">Document not found (404)</a></h1>
-<p>This URL is invalid, sorry. Please use the navigation bar or search to continue.</p>
+                        <h1 id="app"><a class="header" href="#app">App</a></h1>
+<h2 id="linceapp"><a class="header" href="#linceapp">LinceApp</a></h2>
+<p>Structure members of <code>LinceApp</code>.</p>
+<p>The global state of the application is stored in a <code>LinceApp</code> structure allocated on the stack. Prior to running the application, the user may change the program's settings via this structure.</p>
+<p>Once the settings have been tuned, call the function <code>LinceRun()</code> to initialise the application.</p>
+<h3 id="user-settings"><a class="header" href="#user-settings">User settings</a></h3>
+<ul>
+<li><code>void* user_data</code>
+<ul>
+<li>Pointer for custom data set by the user</li>
+</ul>
+</li>
+</ul>
+<h3 id="user-callbacks"><a class="header" href="#user-callbacks">User callbacks</a></h3>
+<p>These callbacks should be set before the applciation starts running.</p>
+<ul>
+<li><code>void game_init(void)</code>
+<ul>
+<li>Function called when the program starts.</li>
+</ul>
+</li>
+<li><code>void game_on_update(float dt)</code>
+<ul>
+<li>Function called on every game tick.</li>
+<li>The sole argument <code>float dt</code> is the delta time between frames.</li>
+</ul>
+</li>
+<li><code>void game_on_event(LinceEvent* event)</code>
+<ul>
+<li>Function called when engine event takes place</li>
+<li>The argument <code>event</code> is the engine event that the user can handle.</li>
+</ul>
+</li>
+<li><code>void game_terminate(void)</code>
+<ul>
+<li>Function called when the application is closed.</li>
+<li>You should free your allocated memory here.</li>
+</ul>
+</li>
+</ul>
+<h3 id="internal-state"><a class="header" href="#internal-state">Internal state</a></h3>
+<p>These structure members handle the internal state of the application and do not act as user-defined settings.</p>
+<ul>
+<li><code>LinceWindow* window</code>
+<ul>
+<li>Stores the state of the window as well as the handle to the GLFw window object.</li>
+</ul>
+</li>
+<li><code>LinceLayerStack* layer_stack</code>
+<ul>
+<li>Stack of rendering layers that are drawn from last to first.</li>
+<li>These are added by the user.</li>
+</ul>
+</li>
+<li><code>LinceLayerStack* overlay_stack</code>
+<ul>
+<li>Stack of overlays, which are layers that are rendered on top of the game proper. </li>
+<li>These usually constitute UI elements and menus.</li>
+</ul>
+</li>
+<li><code>LinceBool running</code>
+<ul>
+<li>Boolean that indicates whether the program is running.</li>
+</ul>
+</li>
+<li><code>float time_ms</code>
+<ul>
+<li>Number of milliseconds since the start of the application.</li>
+</ul>
+</li>
+<li><code>float dt</code>
+<ul>
+<li>Time step in seconds between frames, calculated from the system clock.</li>
+</ul>
+</li>
+<li><code>int current_layer</code>
+<ul>
+<li>Index of the layer that is being rendered on the layer stack.</li>
+<li>If no layer is active, this takes the value <code>-1</code>.</li>
+</ul>
+</li>
+<li><code>int current_overlay</code>
+<ul>
+<li>Index of the overlay that is being rendered on the overlay stack.</li>
+<li>If no overlay is active, this takes the value <code>-1</code>.</li>
+</ul>
+</li>
+</ul>
+<h2 id="lincegetappstate"><a class="header" href="#lincegetappstate">LinceGetAppState</a></h2>
+<pre><code class="language-c">LinceApp* LinceGetAppState()
+</code></pre>
+<p>Returns a pointer the the application state and user settings.</p>
+<p>Example:</p>
+<pre><code class="language-c">void Init() {
+	printf(&quot; Game started!\n&quot;);
+}
+
+void OnUpdate(float dt) {
+	printf(&quot; dt = %.3f ms\n&quot;, dt * 1000.0f);
+}
+
+void Terminate() {
+	printf(&quot; Game terminated!\n&quot;);
+}
+
+int main() {
+
+	// setup callbacks
+	LinceApp* app = LinceGetAppState();
+	app-&gt;game_init = Init;
+	app-&gt;game_on_update = OnUpdate;
+	app-&gt;game_terminate = Terminate;
+
+	// start the application
+	LinceRun();
+
+	return 0;
+}
+</code></pre>
+<h2 id="lincerun"><a class="header" href="#lincerun">LinceRun</a></h2>
+<pre><code class="language-c">void LinceRun()
+</code></pre>
+<p>Creates a window and initialises the application. At this point, you should interact with the app via the callback functions.</p>
+<h2 id="lincecheckerrors"><a class="header" href="#lincecheckerrors">LinceCheckErrors</a></h2>
+<pre><code class="language-c">void LinceCheckErrors()
+</code></pre>
+<p>Fetches OpenGL errors and stops the application if one is found.</p>
+<h2 id="lincegettimemillis"><a class="header" href="#lincegettimemillis">LinceGetTimeMillis</a></h2>
+<pre><code class="language-c">double LinceGetTimeMillis()
+</code></pre>
+<p>Returns the number of milliseconds since the application started.</p>
+<h2 id="lincegetaspectratio"><a class="header" href="#lincegetaspectratio">LinceGetAspectRatio</a></h2>
+<pre><code class="language-c">float LinceGetAspectRatio()
+</code></pre>
+<p>Returns the aspect ratio of the application window.</p>
 
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">
                         <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="HomePage.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+                            <a rel="next" href="Events.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
                         <div style="clear: both"></div>
                     </nav>
                 </div>
             </div>
 
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="HomePage.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+                    <a rel="next" href="Events.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
             </nav>
 
         </div>

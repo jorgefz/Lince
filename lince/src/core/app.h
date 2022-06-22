@@ -17,6 +17,17 @@ typedef void (*LinceGameTerminateFn)();
 
 /* Holds program state */
 typedef struct {
+    /* User settings */
+    void* user_data;
+    // add more settings
+
+    /* User callbacks */
+    LinceGameInitFn      game_init;        /* Called on initialisation */
+    LinceGameOnUpdateFn  game_on_update;   /* Called once per frame */
+    LinceGameOnEventFn   game_on_event;    /* Events are passed to this */
+    LinceGameTerminateFn game_terminate;   /* Called on program end */
+
+    /* Internal state */
     LinceWindow     *window;
     LinceLayerStack *layer_stack;
     LinceLayerStack *overlay_stack;
@@ -26,20 +37,7 @@ typedef struct {
     int current_layer; // index of layer baing updated/handled
     int current_overlay; // index of layer baing updated/handled
 
-    /* User-defined data & functions */
-    void* user_data;
-    LinceGameInitFn      game_init;        /* Called on initialisation */
-    LinceGameOnUpdateFn  game_on_update;   /* Called once per frame */
-    LinceGameOnEventFn   game_on_event;    /* Events are passed to this */
-    LinceGameTerminateFn game_terminate;   /* Called on program end */
-
 } LinceApp;
-
-/* Sets user defined callbacks to interact with program */
-void LinceSetGameInitFn(LinceGameInitFn func); /* Called on initialisation */
-void LinceSetGameOnUpdateFn(LinceGameOnUpdateFn func); /* Called on every frame */
-void LinceSetGameOnEventFn(LinceGameOnEventFn func); /* Called on unhandled event */
-void LinceSetGameTerminateFn(LinceGameTerminateFn func); /* Called on shutdown */
 
  /* Runs main application loop */
 void LinceRun();
@@ -56,14 +54,6 @@ void LincePushLayer(LinceLayer* layer);
 /* Adds a rendering overlay to the program.
 Overlays are rendered after layers */
 void LincePushOverlay(LinceLayer* overlay);
-
-/* Store user data.
-This is useful to pass custom data to runtime functions
-such as OnEvent or OnUpdate */
-void LinceSetUserData(void* data);
-
-/* Retrieve user data during runtime */
-void* LinceGetUserData();
 
 /* IMPROVE THIS -
 Returns time since initialisation in milliseconds */

@@ -210,10 +210,12 @@ int main(int argc, const char* argv[]) {
     LINCE_INFO(" --- DEBUG MODE --- ");
     #endif
 
-    LinceSetGameInitFn(GameInit);
-    LinceSetGameOnUpdateFn(GameOnUpdate);
-    LinceSetGameOnEventFn(GameOnEvent);
-    LinceSetGameTerminateFn(GameTerminate);
+    LinceApp* app = LinceGetAppState();
+
+    app->game_init = GameInit;
+    app->game_on_update = GameOnUpdate;
+    app->game_on_event = GameOnEvent;
+    app->game_terminate = GameTerminate;
     
     LinceRun();
 

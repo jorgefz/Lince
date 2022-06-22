@@ -9,21 +9,21 @@ typedef enum LinceEventType {
     LinceEventType_KeyPressed, LinceEventType_KeyReleased, LinceEventType_KeyType,
     LinceEventType_MouseButtonPressed, LinceEventType_MouseButtonReleased,
     LinceEventType_MouseMoved, LinceEventType_MouseScrolled,
-    EventType_EventNum // number of pre-defined events
+    LinceEventType_EventNum // number of pre-defined events
 } LinceEventType;
 
 /* Handy way of accessing specific event data without casting */
 typedef union LinceEventData {
-    struct KeyPressedEvent* KeyPressed;
-    struct KeyReleasedEvent* KeyReleased;
-    struct KeyTypeEvent* KeyType;
-    struct WindowCloseEvent* WindowClose;
-    struct WindowResizeEvent* WindowResize;
-    struct MouseButtonPressedEvent* MouseButtonPressed;
+    struct KeyPressedEvent*          KeyPressed;
+    struct KeyReleasedEvent*         KeyReleased;
+    struct KeyTypeEvent*             KeyType;
+    struct WindowCloseEvent*         WindowClose;
+    struct WindowResizeEvent*        WindowResize;
+    struct MouseButtonPressedEvent*  MouseButtonPressed;
     struct MouseButtonReleasedEvent* MouseButtonReleased;
-    struct MouseMovedEvent* MouseMoved;
-    struct MouseScrolledEvent* MouseScrolled;
-    void* GenericEvent;
+    struct MouseMovedEvent*          MouseMoved;
+    struct MouseScrolledEvent*       MouseScrolled;
+    void*                            GenericEvent;
 } LinceEventData;
 
 /* Stores event info that is propagated through the program */

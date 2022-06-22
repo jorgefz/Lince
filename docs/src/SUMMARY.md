@@ -1,6 +1,10 @@
 # Summary
 
-- [Home Page](./HomePage.md)
+[Home Page](./HomePage.md)
 
+- [App](./App.md)
+- [Events](./Events.md)
+- [Layers](./Layers.md)
+- [Input](./Input.md)
 
-- [Chapter 1](./chapter_1.md)
+[Development Diary]()
