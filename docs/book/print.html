@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>Documentation Website</title>
+        <title>Lince Documentation Website</title>
         <meta name="robots" content="noindex" />
         <!-- Custom HTML head -->
         <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
@@ -76,7 +76,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded affix "><a href="HomePage.html">Home Page</a></li><li class="chapter-item expanded "><a href="App.html"><strong aria-hidden="true">1.</strong> App</a></li><li class="chapter-item expanded "><a href="Events.html"><strong aria-hidden="true">2.</strong> Events</a></li><li class="chapter-item expanded "><a href="Layers.html"><strong aria-hidden="true">3.</strong> Layers</a></li><li class="chapter-item expanded "><a href="Input.html"><strong aria-hidden="true">4.</strong> Input</a></li><li class="chapter-item expanded affix "><div>Development Diary</div></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded affix "><a href="HomePage.html">Home Page</a></li><li class="chapter-item expanded "><a href="App.html"><strong aria-hidden="true">1.</strong> App</a></li><li class="chapter-item expanded "><a href="Events.html"><strong aria-hidden="true">2.</strong> Events</a></li><li class="chapter-item expanded "><a href="Layers.html"><strong aria-hidden="true">3.</strong> Layers</a></li><li class="chapter-item expanded "><a href="Input.html"><strong aria-hidden="true">4.</strong> Input</a></li><li class="chapter-item expanded "><a href="Rendering.html"><strong aria-hidden="true">5.</strong> Rendering</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="Buffers.html"><strong aria-hidden="true">5.1.</strong> Buffers</a></li><li class="chapter-item expanded "><a href="VertexArrays.html"><strong aria-hidden="true">5.2.</strong> Vertex Arrays</a></li><li class="chapter-item expanded "><a href="Shaders.html"><strong aria-hidden="true">5.3.</strong> Shaders</a></li><li class="chapter-item expanded "><a href="Textures.html"><strong aria-hidden="true">5.4.</strong> Textures</a></li><li class="chapter-item expanded "><a href="Renderer.html"><strong aria-hidden="true">5.5.</strong> Renderer</a></li><li class="chapter-item expanded "><a href="Cameras.html"><strong aria-hidden="true">5.6.</strong> Cameras</a></li></ol></li><li class="chapter-item expanded "><div>Development Diary</div></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -105,7 +105,7 @@
                         </button>
                     </div>
 
-                    <h1 class="menu-title">Documentation Website</h1>
+                    <h1 class="menu-title">Lince Documentation Website</h1>
 
                     <div class="right-buttons">
                         <a href="print.html" title="Print this book" aria-label="Print this book">
@@ -702,20 +702,25 @@ This is useful when you need to retrieve overlat data from within callbacks call
 <h2 id="linceiskeypressed"><a class="header" href="#linceiskeypressed">LinceIsKeyPressed</a></h2>
 <pre><code class="language-c">LinceBool LinceIsKeyPressed(int key)
 </code></pre>
+<p>Returns <code>LinceTrue</code> if the given key is pressed.</p>
 <h2 id="linceismousebuttonpressed"><a class="header" href="#linceismousebuttonpressed">LinceIsMouseButtonPressed</a></h2>
 <pre><code class="language-c">LinceBool LinceIsMouseButtonPressed(int button)
 </code></pre>
+<p>Returns <code>LinceTrue</code> if the given mouse button is pressed.</p>
 <h2 id="lincegetmousepos"><a class="header" href="#lincegetmousepos">LinceGetMousePos</a></h2>
 <pre><code class="language-c">void LinceGetMousePos(float* xpos, float* ypos)
 </code></pre>
+<p>Returns the X and Y position of the mouse via the provided pointers. The position is in screen coordinates with origin on the top-left corner of the window.</p>
 <h2 id="lincegetmousex"><a class="header" href="#lincegetmousex">LinceGetMouseX</a></h2>
 <pre><code class="language-c">float LinceGetMouseX()
 </code></pre>
+<p>Returns the X position of the mouse.</p>
 <h2 id="lincegetmousey"><a class="header" href="#lincegetmousey">LinceGetMouseY</a></h2>
 <pre><code class="language-c">float LinceGetMouseY()
 </code></pre>
+<p>Returns the Y position of the mouse.</p>
 <h2 id="lincekey"><a class="header" href="#lincekey">LinceKey</a></h2>
-<p>Keycodes</p>
+<p>Keycodes follow GLFW codes.</p>
 <table><thead><tr><th>Enum</th><th>Value</th><th>Key</th></tr></thead><tbody>
 <tr><td>LinceKey_Unknown</td><td>-1</td><td></td></tr>
 <tr><td>LinceKey_Space</td><td>32</td><td></td></tr>
@@ -841,7 +846,7 @@ This is useful when you need to retrieve overlat data from within callbacks call
 <tr><td>LinceKey_Last</td><td>LinceKey_Menu</td><td></td></tr>
 </tbody></table>
 <h2 id="lincemousebutton"><a class="header" href="#lincemousebutton">LinceMouseButton</a></h2>
-<p>Mouse button codes</p>
+<p>Mouse button codes follow GLFW codes.</p>
 <table><thead><tr><th>Enum</th><th>Value</th></tr></thead><tbody>
 <tr><td>LinceMouseButton_1</td><td>0</td></tr>
 <tr><td>LinceMouseButton_2</td><td>1</td></tr>
@@ -856,6 +861,216 @@ This is useful when you need to retrieve overlat data from within callbacks call
 <tr><td>LinceMouseButton_Right</td><td>LinceMouseButton_2</td></tr>
 <tr><td>LinceMouseButton_Middle</td><td>LinceMouseButton_3</td></tr>
 </tbody></table>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="rendering"><a class="header" href="#rendering">Rendering</a></h1>
+<ol>
+<li><a href="./Buffers.html">Buffers</a></li>
+<li><a href="./VertexArrays.html">Vertex Arrays</a></li>
+<li><a href="./Shaders.html">Shaders</a></li>
+<li><a href="./Textures.html">Textures</a></li>
+<li><a href="./Renderer.html">Renderer</a></li>
+<li><a href="./Cameras.html">Cameras</a></li>
+</ol>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="buffers"><a class="header" href="#buffers">Buffers</a></h1>
+<p>Buffers are simply memory spaces where vertex data is passed onto OpenGL and stored.</p>
+<h2 id="lincebuffertype"><a class="header" href="#lincebuffertype">LinceBufferType</a></h2>
+<p>Describes the data type of elements in a buffer.
+These are usually integers or floats, and arrays of these with fixed sizes, including square matrices.</p>
+<table><thead><tr><th>Enum</th><th>Value</th><th>Components</th><th>Bytes</th></tr></thead><tbody>
+<tr><td>LinceBufferType_None</td><td>0</td><td>0</td><td>0</td></tr>
+<tr><td>LinceBufferType_Bool</td><td>1</td><td>1</td><td>4</td></tr>
+<tr><td>LinceBufferType_Int</td><td>2</td><td>1</td><td>4</td></tr>
+<tr><td>LinceBufferType_Int2</td><td>3</td><td>2</td><td>8</td></tr>
+<tr><td>LinceBufferType_Int3</td><td>4</td><td>3</td><td>12</td></tr>
+<tr><td>LinceBufferType_Int4</td><td>5</td><td>4</td><td>16</td></tr>
+<tr><td>LinceBufferType_Float</td><td>6</td><td>1</td><td>4</td></tr>
+<tr><td>LinceBufferType_Float2</td><td>7</td><td>2</td><td>8</td></tr>
+<tr><td>LinceBufferType_Float3</td><td>8</td><td>3</td><td>12</td></tr>
+<tr><td>LinceBufferType_Float4</td><td>9</td><td>4</td><td>16</td></tr>
+<tr><td>LinceBufferType_Mat3</td><td>10</td><td>9</td><td>36</td></tr>
+<tr><td>LinceBufferType_Mat4</td><td>11</td><td>16</td><td>64</td></tr>
+<tr><td>LinceBufferType_Count</td><td>12</td><td>--</td><td>--</td></tr>
+</tbody></table>
+<h2 id="lincebufferelement"><a class="header" href="#lincebufferelement">LinceBufferElement</a></h2>
+<ul>
+<li><code>LinceBufferType type</code></li>
+<li><code>const char name[LINCE_NAME_MAX]</code></li>
+<li><code>unsigned int gl_type</code></li>
+<li><code>unsigned int comps</code></li>
+<li><code>unsigned int bytes</code></li>
+<li><code>unsigned int offset</code></li>
+</ul>
+<h2 id="lincegetbuffertypedata"><a class="header" href="#lincegetbuffertypedata">LinceGetBufferTypeData</a></h2>
+<pre><code class="language-c">LinceBufferElement LinceGetBufferTypeData(LinceBufferType type)
+</code></pre>
+<h2 id="lincesetupbufferelementdata"><a class="header" href="#lincesetupbufferelementdata">LinceSetupBufferElementData</a></h2>
+<pre><code class="language-c">void LinceSetupBufferElementData(LinceBufferElement* elem)
+</code></pre>
+<h2 id="lincevertexbuffer"><a class="header" href="#lincevertexbuffer">LinceVertexBuffer</a></h2>
+<pre><code class="language-c">typedef unsigned int LinceVertexBuffer
+</code></pre>
+<h2 id="lincecreatevertexbuffer"><a class="header" href="#lincecreatevertexbuffer">LinceCreateVertexBuffer</a></h2>
+<pre><code class="language-c">LinceVertexBuffer LinceCreateVertexBuffer(void* data, unsigned int size)
+</code></pre>
+<h2 id="lincesetvertexbufferdata"><a class="header" href="#lincesetvertexbufferdata">LinceSetVertexBufferData</a></h2>
+<pre><code class="language-c">void LinceSetVertexBufferData(LinceVertexBuffer vb, void* data, unsigned int size)
+</code></pre>
+<h2 id="lincebindvertexbuffer"><a class="header" href="#lincebindvertexbuffer">LinceBindVertexBuffer</a></h2>
+<pre><code class="language-c">void LinceBindVertexBuffer(LinceVertexBuffer vb)
+</code></pre>
+<h2 id="linceunbindvertexbuffer"><a class="header" href="#linceunbindvertexbuffer">LinceUnbindVertexBuffer</a></h2>
+<pre><code class="language-c">void LinceUnbindVertexBuffer()
+</code></pre>
+<h2 id="lincedeletevertexbuffer"><a class="header" href="#lincedeletevertexbuffer">LinceDeleteVertexBuffer</a></h2>
+<pre><code class="language-c">void LinceDeleteVertexBuffer(LinceVertexBuffer vb)
+</code></pre>
+<h2 id="linceindexbuffer"><a class="header" href="#linceindexbuffer">LinceIndexBuffer</a></h2>
+<ul>
+<li><code>unsigned int id</code></li>
+<li><code>unsigned int count</code></li>
+</ul>
+<h2 id="lincecreateindexbuffer"><a class="header" href="#lincecreateindexbuffer">LinceCreateIndexBuffer</a></h2>
+<pre><code class="language-c">LinceIndexBuffer LinceCreateIndexBuffer(unsigned int* data, unsigned int count)
+</code></pre>
+<h2 id="lincebindindexbuffer"><a class="header" href="#lincebindindexbuffer">LinceBindIndexBuffer</a></h2>
+<pre><code class="language-c">void LinceBindIndexBuffer(LinceIndexBuffer ib)
+</code></pre>
+<h2 id="linceunbindindexbuffer"><a class="header" href="#linceunbindindexbuffer">LinceUnbindIndexBuffer</a></h2>
+<pre><code class="language-c">void LinceUnbindIndexBuffer()
+</code></pre>
+<h2 id="lincedeleteindexbuffer"><a class="header" href="#lincedeleteindexbuffer">LinceDeleteIndexBuffer</a></h2>
+<pre><code class="language-c">void LinceDeleteIndexBuffer(LinceIndexBuffer ib)
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="vertex-arrays"><a class="header" href="#vertex-arrays">Vertex Arrays</a></h1>
+<h2 id="lincevertexarray"><a class="header" href="#lincevertexarray">LinceVertexArray</a></h2>
+<ul>
+<li><code>unsigned int id</code></li>
+<li><code>LinceIndexBuffer index_buffer</code></li>
+<li><code>LinceVertexBuffer vb_list</code></li>
+<li><code>unsigned int vb_count</code></li>
+</ul>
+<h2 id="lincecreatevertexarray"><a class="header" href="#lincecreatevertexarray">LinceCreateVertexArray</a></h2>
+<pre><code class="language-c">LinceVertexArray* LinceCreateVertexArray(LinceIndexBuffer index_buffer)
+</code></pre>
+<h2 id="lincebindvertexarray"><a class="header" href="#lincebindvertexarray">LinceBindVertexArray</a></h2>
+<pre><code class="language-c">void LinceBindVertexArray(LinceVertexArray* vertex_array)
+</code></pre>
+<h2 id="linceunbindvertexarray"><a class="header" href="#linceunbindvertexarray">LinceUnbindVertexArray</a></h2>
+<pre><code class="language-c">void LinceUnbindVertexArray(void)
+</code></pre>
+<h2 id="linceaddvertexarrayattributes"><a class="header" href="#linceaddvertexarrayattributes">LinceAddVertexArrayAttributes</a></h2>
+<pre><code class="language-c">void LinceAddVertexArrayAttributes(
+	LinceVertexArray* vertex_array,
+	LinceVertexBuffer vertex_buffer,
+	LinceBufferElement* layout,
+	unsigned int layout_elements
+)
+</code></pre>
+<h2 id="lincedeletevertexarray"><a class="header" href="#lincedeletevertexarray">LinceDeleteVertexArray</a></h2>
+<pre><code class="language-c">void LinceDeleteVertexArray(LinceVertexArray* vertex_array)
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="shaders"><a class="header" href="#shaders">Shaders</a></h1>
+<h2 id="linceshader"><a class="header" href="#linceshader">LinceShader</a></h2>
+<ul>
+<li><code>unsigned int id</code></li>
+<li><code>char name[LINCE_NAME_MAX]</code></li>
+<li><code>char **uniform_names</code></li>
+<li><code>int *uniform_ids</code></li>
+<li><code>unsigned int uniform_count</code></li>
+</ul>
+<h2 id="lincecreateshader"><a class="header" href="#lincecreateshader">LinceCreateShader</a></h2>
+<pre><code class="language-c">LinceShader* LinceCreateShader(
+	const char* name,
+	const char* vertex_path,
+	const char* fragment_path
+)
+</code></pre>
+<h2 id="lincecreateshaderfromsrc"><a class="header" href="#lincecreateshaderfromsrc">LinceCreateShaderFromSrc</a></h2>
+<pre><code class="language-c">LinceShader* LinceCreateShaderFromSrc(
+	const char* name,
+	const char* vertex_src,
+	const char* fragment_src
+)
+</code></pre>
+<h2 id="lincebindshader"><a class="header" href="#lincebindshader">LinceBindShader</a></h2>
+<pre><code class="language-c">void LinceBindShader(LinceShader* shader)
+</code></pre>
+<h2 id="linceunbindshader"><a class="header" href="#linceunbindshader">LinceUnbindShader</a></h2>
+<pre><code class="language-c">void LinceUnbindShader(void)
+</code></pre>
+<h2 id="lincedeleteshader"><a class="header" href="#lincedeleteshader">LinceDeleteShader</a></h2>
+<pre><code class="language-c">void LinceDeleteShader(LinceShader* shader)
+</code></pre>
+<h2 id="lincegetshaderuniformid"><a class="header" href="#lincegetshaderuniformid">LinceGetShaderUniformID</a></h2>
+<pre><code class="language-c">int LinceGetShaderUniformID(LinceShader* shader, const char* name)
+</code></pre>
+<h2 id="lincesetshaderuniformint"><a class="header" href="#lincesetshaderuniformint">LinceSetShaderUniformInt</a></h2>
+<pre><code class="language-c">void LinceSetShaderUniformInt(
+	LinceShader* sh,
+	const char* name,
+	int val
+)
+</code></pre>
+<h2 id="lincesetshaderuniformintn"><a class="header" href="#lincesetshaderuniformintn">LinceSetShaderUniformIntN</a></h2>
+<pre><code class="language-c">void LinceSetShaderUniformIntN(
+	LinceShader* sh,
+	const char* name,
+	int* arr,
+	unsigned int count
+)
+</code></pre>
+<h2 id="lincesetshaderuniformfloat"><a class="header" href="#lincesetshaderuniformfloat">LinceSetShaderUniformFloat</a></h2>
+<pre><code class="language-c">void LinceSetShaderUniformFloat(
+	LinceShader* sh,
+	const char* name,
+	float val
+)
+</code></pre>
+<h2 id="lincesetshaderuniformvec2"><a class="header" href="#lincesetshaderuniformvec2">LinceSetShaderUniformVec2</a></h2>
+<pre><code class="language-c">void LinceSetShaderUniformVec2(LinceShader* sh, const char* name, vec2 v)
+</code></pre>
+<h2 id="lincesetshaderuniformvec3"><a class="header" href="#lincesetshaderuniformvec3">LinceSetShaderUniformVec3</a></h2>
+<pre><code class="language-c">void LinceSetShaderUniformVec3(LinceShader* sh, const char* name, vec3 v);
+</code></pre>
+<h2 id="lincesetshaderuniformvec4"><a class="header" href="#lincesetshaderuniformvec4">LinceSetShaderUniformVec4</a></h2>
+<pre><code class="language-c">void LinceSetShaderUniformVec4(LinceShader* sh, const char* name, vec4 v);
+</code></pre>
+<h2 id="lincesetshaderuniformmat3"><a class="header" href="#lincesetshaderuniformmat3">LinceSetShaderUniformMat3</a></h2>
+<pre><code class="language-c">void LinceSetShaderUniformMat3(LinceShader* sh, const char* name, mat3 m)
+</code></pre>
+<h2 id="lincesetshaderuniformmat4"><a class="header" href="#lincesetshaderuniformmat4">LinceSetShaderUniformMat4</a></h2>
+<pre><code class="language-c">void LinceSetShaderUniformMat4(LinceShader* sh, const char* name, mat4 m);
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="textures"><a class="header" href="#textures">Textures</a></h1>
+<h2 id="lincetexture"><a class="header" href="#lincetexture">LinceTexture</a></h2>
+<ul>
+<li><code>uint32_t id</code></li>
+<li><code>uint32_t width</code></li>
+<li><code>uint32_t height</code></li>
+<li><code>char name[LINCE_NAME_MAX]</code></li>
+<li><code>int32_t data_format</code></li>
+<li><code>int32_t internal_format</code></li>
+</ul>
+<h2 id="lincecreatetexture"><a class="header" href="#lincecreatetexture">LinceCreateTexture</a></h2>
+<pre><code class="language-c">LinceTexture* LinceCreateTexture(const char* name, const char* path)
+</code></pre>
+<h2 id="lincecreateemptytexture"><a class="header" href="#lincecreateemptytexture">LinceCreateEmptyTexture</a></h2>
+<pre><code class="language-c">LinceTexture* LinceCreateEmptyTexture(
+	const char* name, 
+	uint32_t width,
+	uint32_t height
+)
+</code></pre>
+<h2 id="lincesettexturedata"><a class="header" href="#lincesettexturedata">LinceSetTextureData</a></h2>
+<pre><code class="language-c">void LinceSetTextureData(LinceTexture* texture, unsigned char* data)
+</code></pre>
+<h2 id="lincedeletetexture"><a class="header" href="#lincedeletetexture">LinceDeleteTexture</a></h2>
+<pre><code class="language-c">void LinceDeleteTexture(LinceTexture* texture)
+</code></pre>
+<h2 id="lincebindtexture"><a class="header" href="#lincebindtexture">LinceBindTexture</a></h2>
+<pre><code class="language-c">void LinceBindTexture(LinceTexture* texture, uint32_t slot)
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="renderer"><a class="header" href="#renderer">Renderer</a></h1>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="cameras"><a class="header" href="#cameras">Cameras</a></h1>
 
                     </main>
 

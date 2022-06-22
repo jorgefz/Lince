@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>Input - Documentation Website</title>
+        <title>Input - Lince Documentation Website</title>
         <!-- Custom HTML head -->
         <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
         <meta name="description" content="">
@@ -75,7 +75,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded affix "><a href="HomePage.html">Home Page</a></li><li class="chapter-item expanded "><a href="App.html"><strong aria-hidden="true">1.</strong> App</a></li><li class="chapter-item expanded "><a href="Events.html"><strong aria-hidden="true">2.</strong> Events</a></li><li class="chapter-item expanded "><a href="Layers.html"><strong aria-hidden="true">3.</strong> Layers</a></li><li class="chapter-item expanded "><a href="Input.html" class="active"><strong aria-hidden="true">4.</strong> Input</a></li><li class="chapter-item expanded affix "><div>Development Diary</div></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded affix "><a href="HomePage.html">Home Page</a></li><li class="chapter-item expanded "><a href="App.html"><strong aria-hidden="true">1.</strong> App</a></li><li class="chapter-item expanded "><a href="Events.html"><strong aria-hidden="true">2.</strong> Events</a></li><li class="chapter-item expanded "><a href="Layers.html"><strong aria-hidden="true">3.</strong> Layers</a></li><li class="chapter-item expanded "><a href="Input.html" class="active"><strong aria-hidden="true">4.</strong> Input</a></li><li class="chapter-item expanded "><a href="Rendering.html"><strong aria-hidden="true">5.</strong> Rendering</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="Buffers.html"><strong aria-hidden="true">5.1.</strong> Buffers</a></li><li class="chapter-item expanded "><a href="VertexArrays.html"><strong aria-hidden="true">5.2.</strong> Vertex Arrays</a></li><li class="chapter-item expanded "><a href="Shaders.html"><strong aria-hidden="true">5.3.</strong> Shaders</a></li><li class="chapter-item expanded "><a href="Textures.html"><strong aria-hidden="true">5.4.</strong> Textures</a></li><li class="chapter-item expanded "><a href="Renderer.html"><strong aria-hidden="true">5.5.</strong> Renderer</a></li><li class="chapter-item expanded "><a href="Cameras.html"><strong aria-hidden="true">5.6.</strong> Cameras</a></li></ol></li><li class="chapter-item expanded "><div>Development Diary</div></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -104,7 +104,7 @@
                         </button>
                     </div>
 
-                    <h1 class="menu-title">Documentation Website</h1>
+                    <h1 class="menu-title">Lince Documentation Website</h1>
 
                     <div class="right-buttons">
                         <a href="print.html" title="Print this book" aria-label="Print this book">
@@ -138,20 +138,25 @@
 <h2 id="linceiskeypressed"><a class="header" href="#linceiskeypressed">LinceIsKeyPressed</a></h2>
 <pre><code class="language-c">LinceBool LinceIsKeyPressed(int key)
 </code></pre>
+<p>Returns <code>LinceTrue</code> if the given key is pressed.</p>
 <h2 id="linceismousebuttonpressed"><a class="header" href="#linceismousebuttonpressed">LinceIsMouseButtonPressed</a></h2>
 <pre><code class="language-c">LinceBool LinceIsMouseButtonPressed(int button)
 </code></pre>
+<p>Returns <code>LinceTrue</code> if the given mouse button is pressed.</p>
 <h2 id="lincegetmousepos"><a class="header" href="#lincegetmousepos">LinceGetMousePos</a></h2>
 <pre><code class="language-c">void LinceGetMousePos(float* xpos, float* ypos)
 </code></pre>
+<p>Returns the X and Y position of the mouse via the provided pointers. The position is in screen coordinates with origin on the top-left corner of the window.</p>
 <h2 id="lincegetmousex"><a class="header" href="#lincegetmousex">LinceGetMouseX</a></h2>
 <pre><code class="language-c">float LinceGetMouseX()
 </code></pre>
+<p>Returns the X position of the mouse.</p>
 <h2 id="lincegetmousey"><a class="header" href="#lincegetmousey">LinceGetMouseY</a></h2>
 <pre><code class="language-c">float LinceGetMouseY()
 </code></pre>
+<p>Returns the Y position of the mouse.</p>
 <h2 id="lincekey"><a class="header" href="#lincekey">LinceKey</a></h2>
-<p>Keycodes</p>
+<p>Keycodes follow GLFW codes.</p>
 <table><thead><tr><th>Enum</th><th>Value</th><th>Key</th></tr></thead><tbody>
 <tr><td>LinceKey_Unknown</td><td>-1</td><td></td></tr>
 <tr><td>LinceKey_Space</td><td>32</td><td></td></tr>
@@ -277,7 +282,7 @@
 <tr><td>LinceKey_Last</td><td>LinceKey_Menu</td><td></td></tr>
 </tbody></table>
 <h2 id="lincemousebutton"><a class="header" href="#lincemousebutton">LinceMouseButton</a></h2>
-<p>Mouse button codes</p>
+<p>Mouse button codes follow GLFW codes.</p>
 <table><thead><tr><th>Enum</th><th>Value</th></tr></thead><tbody>
 <tr><td>LinceMouseButton_1</td><td>0</td></tr>
 <tr><td>LinceMouseButton_2</td><td>1</td></tr>
@@ -300,6 +305,9 @@
                             <a rel="prev" href="Layers.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                                 <i class="fa fa-angle-left"></i>
                             </a>
+                            <a rel="next" href="Rendering.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
                         <div style="clear: both"></div>
                     </nav>
                 </div>
@@ -308,6 +316,9 @@
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
                     <a rel="prev" href="Layers.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                         <i class="fa fa-angle-left"></i>
+                    </a>
+                    <a rel="next" href="Rendering.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
                     </a>
             </nav>
 

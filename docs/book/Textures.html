@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>Layers - Lince Documentation Website</title>
+        <title>Textures - Lince Documentation Website</title>
         <!-- Custom HTML head -->
         <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
         <meta name="description" content="">
@@ -75,7 +75,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded affix "><a href="HomePage.html">Home Page</a></li><li class="chapter-item expanded "><a href="App.html"><strong aria-hidden="true">1.</strong> App</a></li><li class="chapter-item expanded "><a href="Events.html"><strong aria-hidden="true">2.</strong> Events</a></li><li class="chapter-item expanded "><a href="Layers.html" class="active"><strong aria-hidden="true">3.</strong> Layers</a></li><li class="chapter-item expanded "><a href="Input.html"><strong aria-hidden="true">4.</strong> Input</a></li><li class="chapter-item expanded "><a href="Rendering.html"><strong aria-hidden="true">5.</strong> Rendering</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="Buffers.html"><strong aria-hidden="true">5.1.</strong> Buffers</a></li><li class="chapter-item expanded "><a href="VertexArrays.html"><strong aria-hidden="true">5.2.</strong> Vertex Arrays</a></li><li class="chapter-item expanded "><a href="Shaders.html"><strong aria-hidden="true">5.3.</strong> Shaders</a></li><li class="chapter-item expanded "><a href="Textures.html"><strong aria-hidden="true">5.4.</strong> Textures</a></li><li class="chapter-item expanded "><a href="Renderer.html"><strong aria-hidden="true">5.5.</strong> Renderer</a></li><li class="chapter-item expanded "><a href="Cameras.html"><strong aria-hidden="true">5.6.</strong> Cameras</a></li></ol></li><li class="chapter-item expanded "><div>Development Diary</div></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded affix "><a href="HomePage.html">Home Page</a></li><li class="chapter-item expanded "><a href="App.html"><strong aria-hidden="true">1.</strong> App</a></li><li class="chapter-item expanded "><a href="Events.html"><strong aria-hidden="true">2.</strong> Events</a></li><li class="chapter-item expanded "><a href="Layers.html"><strong aria-hidden="true">3.</strong> Layers</a></li><li class="chapter-item expanded "><a href="Input.html"><strong aria-hidden="true">4.</strong> Input</a></li><li class="chapter-item expanded "><a href="Rendering.html"><strong aria-hidden="true">5.</strong> Rendering</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="Buffers.html"><strong aria-hidden="true">5.1.</strong> Buffers</a></li><li class="chapter-item expanded "><a href="VertexArrays.html"><strong aria-hidden="true">5.2.</strong> Vertex Arrays</a></li><li class="chapter-item expanded "><a href="Shaders.html"><strong aria-hidden="true">5.3.</strong> Shaders</a></li><li class="chapter-item expanded "><a href="Textures.html" class="active"><strong aria-hidden="true">5.4.</strong> Textures</a></li><li class="chapter-item expanded "><a href="Renderer.html"><strong aria-hidden="true">5.5.</strong> Renderer</a></li><li class="chapter-item expanded "><a href="Cameras.html"><strong aria-hidden="true">5.6.</strong> Cameras</a></li></ol></li><li class="chapter-item expanded "><div>Development Diary</div></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -134,161 +134,44 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1 id="layers"><a class="header" href="#layers">Layers</a></h1>
-<p>A layer is a set of geometry that is rendered together, usually in a single batch, but it can be split into more batches when there's a lot of vertices.</p>
-<p>A layer system in a game engine is important to separate the rendering process into steps, with the vertices on each having different properties, roles, and being rendered in a different order (some layers are rendered after / above others).</p>
-<h2 id="lincelayer"><a class="header" href="#lincelayer">LinceLayer</a></h2>
-<p>The data structure that saves the state of a layer.</p>
+                        <h1 id="textures"><a class="header" href="#textures">Textures</a></h1>
+<h2 id="lincetexture"><a class="header" href="#lincetexture">LinceTexture</a></h2>
 <ul>
-<li><code>void OnAttach(LinceLayer* layer)</code>
-<ul>
-<li>Callback called when a layer is added to the stack.</li>
+<li><code>uint32_t id</code></li>
+<li><code>uint32_t width</code></li>
+<li><code>uint32_t height</code></li>
+<li><code>char name[LINCE_NAME_MAX]</code></li>
+<li><code>int32_t data_format</code></li>
+<li><code>int32_t internal_format</code></li>
 </ul>
-</li>
-<li><code>void OnDetach(LinceLayer* layer)</code>
-<ul>
-<li>Callback called when a layer is removed from the stack.</li>
-</ul>
-</li>
-<li><code>void OnUpdate(LinceLayer* layer, float dt)</code>
-<ul>
-<li>Callback called on every frame.</li>
-<li>The second argument <code>float dt</code> is the delta time in seconds.</li>
-</ul>
-</li>
-<li><code>void OnEvent(LinceLayer* layer, LinceEvent* event)</code>
-<ul>
-<li>Callback called when an event is propagated.</li>
-</ul>
-</li>
-<li><code>void* data</code>
-<ul>
-<li>Custom user data which should be a pointer to an user-defined layer structure.</li>
-</ul>
-</li>
-</ul>
-<h3 id="example-code"><a class="header" href="#example-code">Example code</a></h3>
-<p>This is a simple example of how to create and use a layer in Lince.</p>
-<pre><code class="language-c">void MyLayerOnAttach(LinceLayer* layer){
-	printf(&quot;MyLayer attached\n&quot;);
-}
-
-void MyLayerOnDetach(LinceLayer* layer){
-	printf(&quot;MyLayer detached\n&quot;);
-}
-
-void MyLayerOnUpdate(LinceLayer* layer, float dt){
-
-}
-
-void MyLayerOnEvent(LinceLayer* layer, LinceEvent* e){
-
-}
-
-void GameInit(){
-
-	LinceLayer* layer = LinceCreateLayer(NULL);
-
-	layer-&gt;OnAttach = MyLayerOnAttach;
-	layer-&gt;OnDetach = MyLayerOnDetach;
-	layer-&gt;OnUpdate = MyLayerOnUpdate;
-	layer-&gt;OnEvent = MyLayerOnEvent;
-
-	LincePushLayer(layer);
-}
-
-int main(){
-	// set user callbacks
-	LinceApp* app = LinceGetAppState();
-	app-&gt;game_init = GameInit;
-	
-	// run the application
-	LinceRun();
-
-	return 0;
-}
+<h2 id="lincecreatetexture"><a class="header" href="#lincecreatetexture">LinceCreateTexture</a></h2>
+<pre><code class="language-c">LinceTexture* LinceCreateTexture(const char* name, const char* path)
 </code></pre>
-<h2 id="lincecreatelayer"><a class="header" href="#lincecreatelayer">LinceCreateLayer</a></h2>
-<pre><code class="language-c">LinceLayer* LinceCreateLayer(void* data)
+<h2 id="lincecreateemptytexture"><a class="header" href="#lincecreateemptytexture">LinceCreateEmptyTexture</a></h2>
+<pre><code class="language-c">LinceTexture* LinceCreateEmptyTexture(
+	const char* name, 
+	uint32_t width,
+	uint32_t height
+)
 </code></pre>
-<p>Allocates a new layer.</p>
-<p>Parameters:</p>
-<ul>
-<li><code>void* data</code>
-<ul>
-<li>Custom user layer data
-Returns:</li>
-</ul>
-</li>
-<li><code>LinceLayer*</code>
-<ul>
-<li>Pointer to allocated layer</li>
-</ul>
-</li>
-</ul>
-<h2 id="lincegetlayerdata"><a class="header" href="#lincegetlayerdata">LinceGetLayerData</a></h2>
-<pre><code class="language-c">void* LinceGetLayerData(LinceLayer* layer)
+<h2 id="lincesettexturedata"><a class="header" href="#lincesettexturedata">LinceSetTextureData</a></h2>
+<pre><code class="language-c">void LinceSetTextureData(LinceTexture* texture, unsigned char* data)
 </code></pre>
-<p>Deprecated. Retrieves user data from a layer.</p>
-<h2 id="lincepushlayer"><a class="header" href="#lincepushlayer">LincePushLayer</a></h2>
-<pre><code class="language-c">void LincePushLayer(LinceLayer* layer)
+<h2 id="lincedeletetexture"><a class="header" href="#lincedeletetexture">LinceDeleteTexture</a></h2>
+<pre><code class="language-c">void LinceDeleteTexture(LinceTexture* texture)
 </code></pre>
-<p>Appends a layer to the application's layer stack.</p>
-<h2 id="lincepushoverlay"><a class="header" href="#lincepushoverlay">LincePushOverlay</a></h2>
-<pre><code class="language-c">void LincePushOverlay(LinceLayer* layer)
+<h2 id="lincebindtexture"><a class="header" href="#lincebindtexture">LinceBindTexture</a></h2>
+<pre><code class="language-c">void LinceBindTexture(LinceTexture* texture, uint32_t slot)
 </code></pre>
-<p>Appends an overlay to the application's overlay stack.</p>
-<h2 id="lincegetcurrentlayer"><a class="header" href="#lincegetcurrentlayer">LinceGetCurrentLayer</a></h2>
-<pre><code class="language-c">LinceLayer* LinceGetCurrentLayer()
-</code></pre>
-<p>Retrieves a pointer to the current active layer.
-If no layer is active, returns NULL.
-This is useful when you need to retrieve layer data from within callbacks called on the layer's OnUpdate and OnEvent functions.</p>
-<h2 id="lincegetcurrentoverlay"><a class="header" href="#lincegetcurrentoverlay">LinceGetCurrentOverlay</a></h2>
-<pre><code class="language-c">LinceLayer* LinceGetCurrentOverlay()
-</code></pre>
-<p>Retrieves a pointer to the current active overlay.
-If no overlay is active, returns NULL.
-This is useful when you need to retrieve overlat data from within callbacks called on the overlays's OnUpdate and OnEvent functions.</p>
-<h2 id="lincelayerstack"><a class="header" href="#lincelayerstack">LinceLayerStack</a></h2>
-<p>Stack of layers that are updated from last to first.</p>
-<ul>
-<li><code>LinceLayer** layers</code>
-<ul>
-<li>Array of layer pointers which constitutes the stack.</li>
-</ul>
-</li>
-<li><code>unsigned int count</code>
-<ul>
-<li>Number of layers in the stack.</li>
-</ul>
-</li>
-</ul>
-<h2 id="lincecreatelayerstack"><a class="header" href="#lincecreatelayerstack">LinceCreateLayerStack</a></h2>
-<pre><code class="language-c">LinceLayerStack* LinceCreateLayerStack()
-</code></pre>
-<p>Allocates a new layer stack.</p>
-<h2 id="lincedestroylayerstack"><a class="header" href="#lincedestroylayerstack">LinceDestroyLayerStack</a></h2>
-<pre><code class="language-c">void LinceDestroyLayerStack(LinceLayerStack*)
-</code></pre>
-<p>Deletes all layers on the stack, calling their OnDetach callbacks in order.</p>
-<h2 id="lincelayerstackpush"><a class="header" href="#lincelayerstackpush">LinceLayerStackPush</a></h2>
-<pre><code class="language-c">void LinceLayerStackPush(LinceLayerStack*, LinceLayer*)
-</code></pre>
-<p>Appends a layer to the stack.</p>
-<h2 id="lincelayerstackpop"><a class="header" href="#lincelayerstackpop">LinceLayerStackPop</a></h2>
-<pre><code class="language-c">void LinceLayerStackPop(LinceLayerStack*, LinceLayer*)
-</code></pre>
-<p>Removes a layer from the stack.</p>
 
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">
                         <!-- Mobile navigation buttons -->
-                            <a rel="prev" href="Events.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                            <a rel="prev" href="Shaders.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                                 <i class="fa fa-angle-left"></i>
                             </a>
-                            <a rel="next" href="Input.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                            <a rel="next" href="Renderer.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                                 <i class="fa fa-angle-right"></i>
                             </a>
                         <div style="clear: both"></div>
@@ -297,10 +180,10 @@ This is useful when you need to retrieve overlat data from within callbacks call
             </div>
 
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
-                    <a rel="prev" href="Events.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                    <a rel="prev" href="Shaders.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                         <i class="fa fa-angle-left"></i>
                     </a>
-                    <a rel="next" href="Input.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                    <a rel="next" href="Renderer.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                         <i class="fa fa-angle-right"></i>
                     </a>
             </nav>

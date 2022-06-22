@@ -4,30 +4,35 @@
 ```c
 LinceBool LinceIsKeyPressed(int key)
 ```
+Returns `LinceTrue` if the given key is pressed.
 
 ## LinceIsMouseButtonPressed
 ```c
 LinceBool LinceIsMouseButtonPressed(int button)
 ```
+Returns `LinceTrue` if the given mouse button is pressed.
 
 ## LinceGetMousePos
 ```c
 void LinceGetMousePos(float* xpos, float* ypos)
 ```
+Returns the X and Y position of the mouse via the provided pointers. The position is in screen coordinates with origin on the top-left corner of the window.
 
 ## LinceGetMouseX
 ```c
 float LinceGetMouseX()
 ```
+Returns the X position of the mouse.
 
 ## LinceGetMouseY
 ```c
 float LinceGetMouseY()
 ```
+Returns the Y position of the mouse.
 
 ## LinceKey
 
-Keycodes
+Keycodes follow GLFW codes.
 
 | Enum | Value | Key |
 | ---- | ----- | --- |
@@ -156,7 +161,7 @@ Keycodes
 
 ## LinceMouseButton
 
-Mouse button codes
+Mouse button codes follow GLFW codes.
 
 | Enum 						| Value 			 |
 | ------------------------- | ------------------ |
