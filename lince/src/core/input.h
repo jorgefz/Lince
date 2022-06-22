@@ -1,11 +1,13 @@
 #ifndef LINCE_INPUT_H
 #define LINCE_INPUT_H
 
+#include "core/core.h"
+
 /* Returns true if given LinceKey is held */
-unsigned int LinceIsKeyPressed(int key);
+LinceBool LinceIsKeyPressed(int key);
 
 /* Returns true if given LinceMouseButton is held */
-unsigned int LinceIsMouseButtonPressed(int button);
+LinceBool LinceIsMouseButtonPressed(int button);
 
 /*
 Provides 2D coordinates of the mouse in the screen,

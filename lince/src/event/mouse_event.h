@@ -3,21 +3,21 @@
 
 #include "event/event.h"
 
-typedef struct MouseButtonPressedEvent {
+typedef struct LinceMouseButtonPressedEvent {
     int button;
-} MouseButtonPressedEvent;
+} LinceMouseButtonPressedEvent;
 
-typedef struct MouseButtonReleasedEvent {
+typedef struct LinceMouseButtonReleasedEvent {
     int button;
-} MouseButtonReleasedEvent;
+} LinceMouseButtonReleasedEvent;
 
-typedef struct MouseMovedEvent {
+typedef struct LinceMouseMovedEvent {
     float xpos, ypos;
-} MouseMovedEvent;
+} LinceMouseMovedEvent;
 
-typedef struct MouseScrolledEvent {
+typedef struct LinceMouseScrolledEvent {
     float xoff, yoff;
-} MouseScrolledEvent;
+} LinceMouseScrolledEvent;
 
 /* Helper functions to create and allocate new events */
 LinceEvent LinceNewMouseButtonPressedEvent(int button);

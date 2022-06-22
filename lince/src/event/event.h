@@ -14,16 +14,16 @@ typedef enum LinceEventType {
 
 /* Handy way of accessing specific event data without casting */
 typedef union LinceEventData {
-    struct KeyPressedEvent*          KeyPressed;
-    struct KeyReleasedEvent*         KeyReleased;
-    struct KeyTypeEvent*             KeyType;
-    struct WindowCloseEvent*         WindowClose;
-    struct WindowResizeEvent*        WindowResize;
-    struct MouseButtonPressedEvent*  MouseButtonPressed;
-    struct MouseButtonReleasedEvent* MouseButtonReleased;
-    struct MouseMovedEvent*          MouseMoved;
-    struct MouseScrolledEvent*       MouseScrolled;
-    void*                            GenericEvent;
+    struct LinceKeyPressedEvent*          KeyPressed;
+    struct LinceKeyReleasedEvent*         KeyReleased;
+    struct LinceKeyTypeEvent*             KeyType;
+    struct LinceWindowCloseEvent*         WindowClose;
+    struct LinceWindowResizeEvent*        WindowResize;
+    struct LinceMouseButtonPressedEvent*  MouseButtonPressed;
+    struct LinceMouseButtonReleasedEvent* MouseButtonReleased;
+    struct LinceMouseMovedEvent*          MouseMoved;
+    struct LinceMouseScrolledEvent*       MouseScrolled;
+    void*                                 GenericEvent;
 } LinceEventData;
 
 /* Stores event info that is propagated through the program */

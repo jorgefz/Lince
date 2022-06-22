@@ -3,13 +3,13 @@
 
 #include "event/event.h"
 
-typedef struct WindowCloseEvent {
+typedef struct LinceWindowCloseEvent {
     int dummy;
-} WindowCloseEvent;
+} LinceWindowCloseEvent;
 
-typedef struct WindowResizeEvent {
+typedef struct LinceWindowResizeEvent {
     unsigned int height, width;
-} WindowResizeEvent;
+} LinceWindowResizeEvent;
 
 /* Helper functions to create and allocate events */
 LinceEvent LinceNewWindowCloseEvent();

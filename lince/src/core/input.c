@@ -5,13 +5,13 @@
 #include "core/input.h"
 #include "core/app.h"
 
-unsigned int LinceIsKeyPressed(int key){
+LinceBool LinceIsKeyPressed(int key){
     GLFWwindow* handle = LinceGetAppState()->window->handle;
     int state = glfwGetKey(handle, key);
     return (state == GLFW_PRESS || state == GLFW_REPEAT);
 }
 
-unsigned int LinceIsMouseButtonPressed(int button){
+LinceBool LinceIsMouseButtonPressed(int button){
     GLFWwindow* handle = LinceGetAppState()->window->handle;
     int state = glfwGetMouseButton(handle, button);
 	return (state == GLFW_PRESS);

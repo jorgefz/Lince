@@ -3,17 +3,17 @@
 
 #include "event/event.h"
 
-typedef struct KeyPressedEvent {
+typedef struct LinceKeyPressedEvent {
     int keycode, repeats;
-} KeyPressedEvent;
+} LinceKeyPressedEvent;
 
-typedef struct KeyReleasedEvent {
+typedef struct LinceKeyReleasedEvent {
     int keycode;
-} KeyReleasedEvent;
+} LinceKeyReleasedEvent;
 
-typedef struct KeyTypeEvent {
+typedef struct LinceKeyTypeEvent {
     int keycode;
-} KeyTypeEvent;
+} LinceKeyTypeEvent;
 
 /* Helper functions to initialise and allocate events */
 LinceEvent LinceNewKeyPressedEvent(int key, int repeats);
