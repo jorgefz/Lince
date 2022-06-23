@@ -18,11 +18,11 @@ void LinceInitRenderer() {
 
 }
 
-void LinceBeginRenderScene() {
+void LinceBeginScene() {
 
 }
 
-void LinceEndRenderScene() {
+void LinceEndScene() {
 
 }
 
@@ -41,8 +41,8 @@ void LinceDrawIndexed(
 }
 
 void LinceClear() {
-	//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glClear(GL_COLOR_BUFFER_BIT);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	//glClear(GL_COLOR_BUFFER_BIT);
 }
 
 void LinceSetClearColor(float r, float g, float b, float a) {
