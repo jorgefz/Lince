@@ -6,13 +6,11 @@
 #include "cglm/vec4.h"
 #include "cglm/affine.h"
 
-//#include <GLFW/glfw3.h>
-//#include <glad/glad.h>
-
 typedef struct MyLayer {
     char name[LINCE_NAME_MAX];
     float red, vel;
     float dt;
+    float cam_speed, color_step;
 
     LinceVertexArray* va;
     LinceVertexBuffer vb;
@@ -28,62 +26,32 @@ void MyLayerOnAttach(LinceLayer* layer) {
     MyLayer* data = LinceGetLayerData(layer);
     LINCE_INFO(" Layer '%s' attached", data->name);
 
-    static unsigned int indices[] = {0,1,2,2,3,0};
-    static float vertices[] = {
-        // positions    texture     color RGBA
-        -0.5f, -0.5f,   0.0, 0.0,   1.0, 0.0, 0.0, 1.0,
-         0.5f, -0.5f,   1.0, 0.0,   1.0, 1.0, 0.0, 1.0,
-         0.5f,  0.5f,   1.0, 1.0,   0.0, 1.0, 0.0, 1.0,
-        -0.5f,  0.5f,   0.0, 1.0,   0.0, 0.0, 1.0, 1.0,
-    };
-    LinceBufferElement layout[] = {
-        {LinceBufferType_Float2, "aPos"},
-        {LinceBufferType_Float2, "aTexCoord"},
-        {LinceBufferType_Float4, "aColor"},
-    };
-
-    data->ib = LinceCreateIndexBuffer(indices, 6);
-    data->vb = LinceCreateVertexBuffer(vertices, sizeof(vertices));
-    data->va = LinceCreateVertexArray(data->ib);
-
-    LinceBindVertexArray(data->va);
-    LinceBindIndexBuffer(data->ib);
-
-    unsigned int elems = sizeof(layout) / sizeof(LinceBufferElement);
-    LinceAddVertexArrayAttributes(data->va, data->vb, layout, elems);
-
-    // Shader
-    data->shader = LinceCreateShader("TestShader",
-        "lince/assets/test.vert.glsl", "lince/assets/test.frag.glsl");
-    LinceBindShader(data->shader);
-
-    // texture test
+    
+    LinceInitRenderer(LinceGetAppState()->window);
     data->tex_front = LinceCreateTexture("Patrick", "lince/assets/front.png");
     data->tex_back  = LinceCreateTexture("Patrick", "lince/assets/back.png");
-    // assign textures to slots
-    LinceBindTexture(data->tex_front, 0);
-    LinceBindTexture(data->tex_back, 1);
-
-    data->cam = LinceCreateCamera(LinceGetAspectRatio());
-    LinceSetShaderUniformMat4(data->shader, "u_view_proj", data->cam->view_proj);
 
     data->red = 0.0f;
     data->vel = 5e-4f;
+    data->cam_speed = 0.01f;
+    data->color_step = 0.003f;
+    
 }
 
 void MyLayerOnDetach(LinceLayer* layer) {
     MyLayer* data = LinceGetLayerData(layer);
     LINCE_INFO(" Layer '%s' detached", data->name);
 
-    LinceDeleteVertexBuffer(data->vb);
-    LinceDeleteIndexBuffer(data->ib);
-    LinceDeleteVertexArray(data->va);
-    LinceDeleteShader(data->shader);
+    LinceTerminateRenderer();
     LinceDeleteTexture(data->tex_front);
     LinceDeleteTexture(data->tex_back);
-    LinceDeleteCamera(data->cam);
 
     free(data);
+}
+
+
+void MyLayerOnEvent(LinceLayer* layer, LinceEvent* e) {
+    
 }
 
 /*
@@ -91,74 +59,54 @@ Q, A: increase, decrease red
 W, S: increase, decrease green
 E, D: increase, decrease blue
 */
-LinceBool GameKeyPress(LinceEvent* e){
-    // MyLayer* data = LinceGetLayerData(LinceGetCurrentLayer());
-    e;
-    return LinceFalse;
-}
-
-LinceBool GameWindowResize(LinceEvent* e){
-    MyLayer* data = LinceGetLayerData(LinceGetCurrentLayer());
-    LinceResizeCameraView(data->cam, LinceGetAspectRatio());
-    return LinceFalse;
-}
-
-void MyLayerOnEvent(LinceLayer* layer, LinceEvent* e) {
-    //LinceDispatchEvent(e, LinceEventType_KeyPressed, GameKeyPress);
-    LinceDispatchEvent(e, LinceEventType_WindowResize, GameWindowResize);
-}
-
 void MyLayerOnUpdate(LinceLayer* layer, float dt) {
     MyLayer* data = LinceGetLayerData(layer);
     data->dt = dt;
+    
+    /*
+    // User Input
+    const float color_step = data->color_step;
+    const float cam_speed  = data->cam_speed;
+    const float zoom       = data->cam->zoom;
+    const float dr = cam_speed * dt * zoom;
+    const float dc = color_step * dt;
 
-    /* User Input */
-    const float step = 0.003f;
-    const float cam_speed = 0.01f;
-    const float zoom = data->cam->zoom;
-
-    /* change colors */
-    if (LinceIsKeyPressed(LinceKey_q)) data->color[0] += step * dt;
-    if (LinceIsKeyPressed(LinceKey_a)) data->color[0] -= step * dt;
-    if (LinceIsKeyPressed(LinceKey_w)) data->color[1] += step * dt;
-    if (LinceIsKeyPressed(LinceKey_s)) data->color[1] -= step * dt;
-    if (LinceIsKeyPressed(LinceKey_e)) data->color[2] += step * dt;
-    if (LinceIsKeyPressed(LinceKey_d)) data->color[2] -= step * dt;
-    /* camera movement */
-    if (LinceIsKeyPressed(LinceKey_Up))    data->cam->pos[1] += cam_speed*dt*zoom;
-    if (LinceIsKeyPressed(LinceKey_Down))  data->cam->pos[1] -= cam_speed*dt*zoom;
-    if (LinceIsKeyPressed(LinceKey_Right)) data->cam->pos[0] += cam_speed*dt*zoom;
-    if (LinceIsKeyPressed(LinceKey_Left))  data->cam->pos[0] -= cam_speed*dt*zoom;
-    /* camera zoom */
+    // change colors
+    if (LinceIsKeyPressed(LinceKey_q)) data->color[0] += dc;
+    if (LinceIsKeyPressed(LinceKey_a)) data->color[0] -= dc;
+    if (LinceIsKeyPressed(LinceKey_w)) data->color[1] += dc;
+    if (LinceIsKeyPressed(LinceKey_s)) data->color[1] -= dc;
+    if (LinceIsKeyPressed(LinceKey_e)) data->color[2] += dc;
+    if (LinceIsKeyPressed(LinceKey_d)) data->color[2] -= dc;
+    // camera movement
+    if (LinceIsKeyPressed(LinceKey_Up))    data->cam->pos[1] += dr;
+    if (LinceIsKeyPressed(LinceKey_Down))  data->cam->pos[1] -= dr;
+    if (LinceIsKeyPressed(LinceKey_Right)) data->cam->pos[0] += dr;
+    if (LinceIsKeyPressed(LinceKey_Left))  data->cam->pos[0] -= dr;
+    // camera zoom
     if (LinceIsKeyPressed(LinceKey_Period)) data->cam->zoom *= 0.99;
     if (LinceIsKeyPressed(LinceKey_Comma))  data->cam->zoom /= 0.99;
-    LinceSetShaderUniformVec4(data->shader, "add_color", data->color);
-    LinceResizeCameraView(data->cam, LinceGetAspectRatio());
+    */
+    
+    LinceBeginScene();
+    LinceDrawQuad( (LinceQuadProps){
+        .x=0.5, .y=0.5, .w=0.5, .h=0.5,
+        .color={1.0,1.0,1.0,-0.5},
+        .texture=data->tex_front
+    });
+    LinceDrawQuad( (LinceQuadProps){
+        .x=0.4, .y=0.4, .w=0.5, .h=0.5,
+        .color={1.0,1.0,1.0,-0.5},
+        .texture=data->tex_back
+    });
+    LinceEndScene();
 
-    /* Render Quads */
-    LinceUpdateCamera(data->cam);
-    LinceSetShaderUniformMat4(data->shader, "u_view_proj", data->cam->view_proj);
-    mat4 transform;
-
-    vec4 pos1 = {-0.5, -0.5, 0.0, 1.0};
-    glm_translate_to(GLM_MAT4_IDENTITY, pos1, transform);
-    LinceSetShaderUniformMat4(data->shader, "u_transform", transform);
-    LinceSetShaderUniformInt(data->shader, "textureID", 0);
-    LinceDrawIndexed(data->shader, data->va, data->ib);
-
-    vec4 pos2 = {0.5, 0.5, 0.0, 1.0};
-    glm_translate_to(GLM_MAT4_IDENTITY, pos2, transform);
-    LinceSetShaderUniformMat4(data->shader, "u_transform", transform);
-    LinceSetShaderUniformInt(data->shader, "textureID", 1);
-    LinceDrawIndexed(data->shader, data->va, data->ib);
-
-    /* update background color */
+    /* Update background color */
     data->red += data->vel * dt;
     if (data->red >= 1.0f) data->vel = -data->vel;
     else if (data->red <= 0.0f) data->vel = -data->vel;
     float blue = 1.0f - data->red;
     LinceSetClearColor(data->red, 0.1f, blue, 1.0f);
-
 }
 
 LinceLayer* MyLayerInit(char* name) {
@@ -173,7 +121,7 @@ LinceLayer* MyLayerInit(char* name) {
     LinceLayer* layer = LinceCreateLayer(my_layer);
     layer->OnAttach = MyLayerOnAttach;
     layer->OnDetach = MyLayerOnDetach;
-    layer->OnEvent = MyLayerOnEvent;
+    layer->OnEvent  = MyLayerOnEvent;
     layer->OnUpdate = MyLayerOnUpdate;
 
     return layer;
@@ -193,7 +141,7 @@ void GameOnUpdate(float dt) {
 }
 
 void GameOnEvent(LinceEvent* e) {
-    
+
 }
 
 void GameTerminate() {
