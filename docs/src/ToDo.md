@@ -3,4 +3,6 @@
 1. Improve documentation
 2. Add tests
 3. Add basic 2D renderer using immediate-mode scenes and quads.
-4. Add UI library: [Nuklear](https://github.com/Immediate-Mode-UI/Nuklear/)
+4. Add batching to 2D renderer
+5. Add UI library: [Nuklear](https://github.com/Immediate-Mode-UI/Nuklear/)
+6. Add audio library
