@@ -32,14 +32,15 @@ typedef struct {
     LinceLayerStack *layer_stack;
     LinceLayerStack *overlay_stack;
     LinceBool        running;
-    float time_ms;  // clock in milliseconds
-    float dt;       // timestep in ms
-    int current_layer; // index of layer baing updated/handled
-    int current_overlay; // index of layer baing updated/handled
+    float time_ms;          // clock in milliseconds
+    float dt;               // timestep in ms
+    int current_layer;      // index of layer baing updated/handled
+    int current_overlay;    // index of layer baing updated/handled
 
 } LinceApp;
 
- /* Runs main application loop */
+
+/* Runs main application loop */
 void LinceRun();
 
 /* TEMPORARY - Should this be called by user? */

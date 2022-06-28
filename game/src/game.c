@@ -26,6 +26,7 @@ void MyLayerOnAttach(LinceLayer* layer) {
     MyLayer* data = LinceGetLayerData(layer);
     LINCE_INFO(" Layer '%s' attached", data->name);
 
+    data->cam = LinceCreateCamera(LinceGetAspectRatio());
     
     LinceInitRenderer(LinceGetAppState()->window);
     data->tex_front = LinceCreateTexture("Patrick", "lince/assets/front.png");
@@ -36,6 +37,7 @@ void MyLayerOnAttach(LinceLayer* layer) {
     data->cam_speed = 0.01f;
     data->color_step = 0.003f;
     
+    LinceSetClearColor(0.0, 0.2, 0.5, 1.0);
 }
 
 void MyLayerOnDetach(LinceLayer* layer) {
@@ -45,6 +47,7 @@ void MyLayerOnDetach(LinceLayer* layer) {
     LinceTerminateRenderer();
     LinceDeleteTexture(data->tex_front);
     LinceDeleteTexture(data->tex_back);
+    LinceDeleteCamera(data->cam);
 
     free(data);
 }
@@ -62,15 +65,17 @@ E, D: increase, decrease blue
 void MyLayerOnUpdate(LinceLayer* layer, float dt) {
     MyLayer* data = LinceGetLayerData(layer);
     data->dt = dt;
+
+    LinceResizeCameraView(data->cam, LinceGetAspectRatio());
+	LinceUpdateCamera(data->cam);
     
-    /*
     // User Input
     const float color_step = data->color_step;
     const float cam_speed  = data->cam_speed;
     const float zoom       = data->cam->zoom;
     const float dr = cam_speed * dt * zoom;
     const float dc = color_step * dt;
-
+    /*
     // change colors
     if (LinceIsKeyPressed(LinceKey_q)) data->color[0] += dc;
     if (LinceIsKeyPressed(LinceKey_a)) data->color[0] -= dc;
@@ -78,35 +83,56 @@ void MyLayerOnUpdate(LinceLayer* layer, float dt) {
     if (LinceIsKeyPressed(LinceKey_s)) data->color[1] -= dc;
     if (LinceIsKeyPressed(LinceKey_e)) data->color[2] += dc;
     if (LinceIsKeyPressed(LinceKey_d)) data->color[2] -= dc;
+    */
     // camera movement
     if (LinceIsKeyPressed(LinceKey_Up))    data->cam->pos[1] += dr;
     if (LinceIsKeyPressed(LinceKey_Down))  data->cam->pos[1] -= dr;
     if (LinceIsKeyPressed(LinceKey_Right)) data->cam->pos[0] += dr;
     if (LinceIsKeyPressed(LinceKey_Left))  data->cam->pos[0] -= dr;
     // camera zoom
-    if (LinceIsKeyPressed(LinceKey_Period)) data->cam->zoom *= 0.99;
-    if (LinceIsKeyPressed(LinceKey_Comma))  data->cam->zoom /= 0.99;
-    */
+    if (LinceIsKeyPressed(LinceKey_Period)) data->cam->zoom *= 0.99; // * 0.5 * dt;
+    if (LinceIsKeyPressed(LinceKey_Comma))  data->cam->zoom /= 0.99; // * 0.5 * dt;
+    // debug frame time
+    if (LinceIsKeyPressed(LinceKey_p)) printf("dt: %7.3f ms, fps: %7.1f\n", dt, 1000.0/dt);
     
-    LinceBeginScene();
+    LinceBeginScene(data->cam);
+
+    int gridx = 5;
+    int gridy = 5;
+
+    float r, g, b;
+    for(int i = 0; i != gridx; ++i){
+        for(int j = 0; j != gridy; ++j){
+            r = (float)i/(float)gridx;
+            b = (float)j/(float)gridy;
+            g = 0.8 - b - r;
+            LinceDrawQuad( (LinceQuadProps){
+                .x = (float)i - (float)gridx / 2.0,
+                .y = (float)j - (float)gridy / 2.0,
+                .w = 0.95, .h = 0.95,
+                .color = {r, g, b, 1.0}
+            });
+        }
+    }
+
     LinceDrawQuad( (LinceQuadProps){
-        .x=0.5, .y=0.5, .w=0.5, .h=0.5,
-        .color={1.0,1.0,1.0,-0.5},
+        .x=0.0, .y=0.0, .w=0.9, .h=0.9,
+        .color={1.0,1.0,1.0,-0.1},
         .texture=data->tex_front
     });
     LinceDrawQuad( (LinceQuadProps){
-        .x=0.4, .y=0.4, .w=0.5, .h=0.5,
-        .color={1.0,1.0,1.0,-0.5},
+        .x=1.0, .y=0.0, .w=0.9, .h=0.9,
+        .color={1.0,1.0,1.0,-0.1},
         .texture=data->tex_back
     });
     LinceEndScene();
 
     /* Update background color */
-    data->red += data->vel * dt;
-    if (data->red >= 1.0f) data->vel = -data->vel;
-    else if (data->red <= 0.0f) data->vel = -data->vel;
-    float blue = 1.0f - data->red;
-    LinceSetClearColor(data->red, 0.1f, blue, 1.0f);
+    // data->red += data->vel * dt;
+    // if (data->red >= 1.0f) data->vel = -data->vel;
+    // else if (data->red <= 0.0f) data->vel = -data->vel;
+    // float blue = 1.0f - data->red;
+    // LinceSetClearColor(data->red, 0.1f, blue, 1.0f);
 }
 
 LinceLayer* MyLayerInit(char* name) {

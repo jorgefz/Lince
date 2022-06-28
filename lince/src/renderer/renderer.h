@@ -5,42 +5,27 @@
 #include "renderer/vertex_array.h"
 #include "renderer/shader.h"
 #include "renderer/texture.h"
-#include "core/window.h"
-
-// TEMPORARY
 #include "renderer/camera.h"
-typedef struct LinceRendererState {
-	LinceWindow* window;
-	LinceCamera* cam;
-	LinceShader* shader;
-	LinceTexture* white_texture;
-	
-	LinceVertexArray* va;
-    LinceVertexBuffer vb;
-    LinceIndexBuffer ib;
-
-} LinceRendererState;
-
-LinceRendererState* LinceGetRendererState();
-
+#include "core/window.h"
 
 /* Quad properties, serves as argument for LinceRenderQuad */
 typedef struct LinceQuadProps{
-	float x, y; // 2D position
-	float w, h; // width, height
-	float zorder; // order of rendering
+	float x, y; 			// 2D position
+	float w, h; 			// width, height
+	float zorder; 			// order of rendering
+	float rotation; 		// clockwise rotation in degrees
 	LinceTexture* texture;
-	float color[4]; // rgba
+	float color[4]; 		// flat quad color - rgba
 } LinceQuadProps;
 
 /* Initialises renderer state and openGL rendering settings */
-void LinceInitRenderer(LinceWindow* window);
+void LinceInitRenderer();
 
 /* Terminates renderer state and frees allocated memory */
 void LinceTerminateRenderer();
 
 /* Begins rendering scene */
-void LinceBeginScene();
+void LinceBeginScene(LinceCamera* cam);
 
 /* Renders scene and flushes batch buffers */
 void LinceEndScene();
@@ -52,7 +37,6 @@ are set to zero if at least one has been initialised
 within the brace-enclosed list.
 */
 void LinceDrawQuad(LinceQuadProps props);
-
 
 
 /* Draws provided vertices directly */
@@ -67,10 +51,6 @@ void LinceClear();
 
 /* Sets the default screen color */
 void LinceSetClearColor(float r, float g, float b, float a);
-
-
-/* Renders the vertex batch */
-void LinceRenderBatch();
 
 
 #endif // LINCE_RENDERER_H
