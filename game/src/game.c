@@ -70,20 +70,10 @@ void MyLayerOnUpdate(LinceLayer* layer, float dt) {
 	LinceUpdateCamera(data->cam);
     
     // User Input
-    const float color_step = data->color_step;
     const float cam_speed  = data->cam_speed;
     const float zoom       = data->cam->zoom;
     const float dr = cam_speed * dt * zoom;
-    const float dc = color_step * dt;
-    /*
-    // change colors
-    if (LinceIsKeyPressed(LinceKey_q)) data->color[0] += dc;
-    if (LinceIsKeyPressed(LinceKey_a)) data->color[0] -= dc;
-    if (LinceIsKeyPressed(LinceKey_w)) data->color[1] += dc;
-    if (LinceIsKeyPressed(LinceKey_s)) data->color[1] -= dc;
-    if (LinceIsKeyPressed(LinceKey_e)) data->color[2] += dc;
-    if (LinceIsKeyPressed(LinceKey_d)) data->color[2] -= dc;
-    */
+
     // camera movement
     if (LinceIsKeyPressed(LinceKey_Up))    data->cam->pos[1] += dr;
     if (LinceIsKeyPressed(LinceKey_Down))  data->cam->pos[1] -= dr;
@@ -97,8 +87,8 @@ void MyLayerOnUpdate(LinceLayer* layer, float dt) {
     
     LinceBeginScene(data->cam);
 
-    int gridx = 5;
-    int gridy = 5;
+    int gridx = 10;
+    int gridy = 10;
 
     float r, g, b;
     for(int i = 0; i != gridx; ++i){
@@ -116,13 +106,13 @@ void MyLayerOnUpdate(LinceLayer* layer, float dt) {
     }
 
     LinceDrawQuad( (LinceQuadProps){
-        .x=0.0, .y=0.0, .w=0.9, .h=0.9,
-        .color={1.0,1.0,1.0,-0.1},
+        .x=2.0, .y=2.0, .w=0.9, .h=0.9,
+        .color={1.0,1.0,1.0,1.0},
         .texture=data->tex_front
     });
     LinceDrawQuad( (LinceQuadProps){
-        .x=1.0, .y=0.0, .w=0.9, .h=0.9,
-        .color={1.0,1.0,1.0,-0.1},
+        .x=3.0, .y=2.0, .w=0.9, .h=0.9,
+        .color={1.0,1.0,1.0,1.0},
         .texture=data->tex_back
     });
     LinceEndScene();

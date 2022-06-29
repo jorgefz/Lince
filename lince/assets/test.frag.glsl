@@ -1,14 +1,14 @@
-#version 330
+#version 450
 
 layout(location = 0) out vec4 color;
 
 in vec4 vColor;
 in vec2 vTexCoord;
+in float vTextureID;
 
-uniform vec4 add_color = vec4(0.0);
-uniform sampler2D textureID;
+uniform sampler2D uTextureSlots[32];
 
 void main(){
-	color = texture(textureID, vTexCoord) * (vColor + add_color);
+	color = texture(uTextureSlots[int(vTextureID)], vTexCoord) * vColor;
 }
 
