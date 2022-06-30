@@ -110,22 +110,23 @@ void MyLayerOnUpdate(LinceLayer* layer, float dt) {
         .color={1,1,1,1},
         .rotation = 45,
         .texture=data->tex_front,
-        .zorder = 0.0
+        .zorder = 0.1
     });
     LinceDrawQuad( (LinceQuadProps){
         .x=0.0, .y=0.0, .w=0.9, .h=0.9,
         .color={1,1,1,1},
         .rotation = 45,
         .texture=data->tex_back,
-        .zorder = 1.0
+        .zorder = 0.9
     });
     LinceDrawQuad( (LinceQuadProps){
         .x=0.5, .y=0.0, .w=0.9, .h=0.9,
         .color={1,1,1,1},
         .rotation = 45,
         .texture=data->tex_front,
-        .zorder = 0.0
+        .zorder = 0.1
     });
+    
     LinceEndScene();
 
     /* Update background color */

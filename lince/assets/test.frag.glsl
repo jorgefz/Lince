@@ -10,5 +10,6 @@ uniform sampler2D uTextureSlots[32];
 
 void main(){
 	color = texture(uTextureSlots[int(vTextureID)], vTexCoord) * vColor;
+	if (color.a == 0.0) discard; // temporary solution for full transparency, not translucency.
 }
 

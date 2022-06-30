@@ -82,8 +82,9 @@ void LinceInitRenderer() {
 	// Enable depth
 	glEnable(GL_DEPTH_TEST);
 	glDepthMask(GL_TRUE);
-	glDepthFunc(GL_LEQUAL);
-	glDepthRange(0.0f, 1.0f);
+	//glDepthFunc(GL_LEQUAL);
+	glDepthFunc(GL_LESS);
+	//glDepthRange(0.0f, 1.0f);
 
 	// Initialise geometry
 	renderer_state.vertex_batch = calloc(MAX_VERTICES, sizeof(LinceQuadVertex));
