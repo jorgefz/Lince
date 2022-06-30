@@ -18,7 +18,7 @@
 // stores information of one vertex
 // ensure this struct has no padding
 typedef struct LinceQuadVertex {
-	float x, y; 	   // position
+	float x, y, z; 	   // position
 	float s, t; 	   // texture coordinates
 	float color[4];	   // rgba color
 	float texture_id;  // binding slot for the texture
@@ -47,10 +47,10 @@ static LinceRendererState renderer_state = {0};
 
 /* quad of size 1x1 centred on 0,0 */
 static const LinceQuadVertex quad_vertices[4] = {
-	{.x=-0.5f, .y=-0.5f,  .s=0.0, .t=0.0, .color={0.0, 0.0, 0.0, 1.0}, .texture_id=0.0},
-	{.x= 0.5f, .y=-0.5f,  .s=1.0, .t=0.0, .color={0.0, 0.0, 0.0, 1.0}, .texture_id=0.0},
-	{.x= 0.5f, .y= 0.5f,  .s=1.0, .t=1.0, .color={0.0, 0.0, 0.0, 1.0}, .texture_id=0.0},
-	{.x=-0.5f, .y= 0.5f,  .s=0.0, .t=1.0, .color={0.0, 0.0, 0.0, 1.0}, .texture_id=0.0},
+	{.x=-0.5f, .y=-0.5f, .z=0, .s=0.0, .t=0.0, .color={0.0, 0.0, 0.0, 1.0}, .texture_id=0.0},
+	{.x= 0.5f, .y=-0.5f, .z=0, .s=1.0, .t=0.0, .color={0.0, 0.0, 0.0, 1.0}, .texture_id=0.0},
+	{.x= 0.5f, .y= 0.5f, .z=0, .s=1.0, .t=1.0, .color={0.0, 0.0, 0.0, 1.0}, .texture_id=0.0},
+	{.x=-0.5f, .y= 0.5f, .z=0, .s=0.0, .t=1.0, .color={0.0, 0.0, 0.0, 1.0}, .texture_id=0.0},
 };
 static const unsigned int quad_indices[] = {0,1,2,2,3,0};
 
@@ -79,6 +79,12 @@ void LinceInitRenderer() {
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
+	// Enable depth
+	glEnable(GL_DEPTH_TEST);
+	glDepthMask(GL_TRUE);
+	glDepthFunc(GL_LEQUAL);
+	glDepthRange(0.0f, 1.0f);
+
 	// Initialise geometry
 	renderer_state.vertex_batch = calloc(MAX_VERTICES, sizeof(LinceQuadVertex));
 	renderer_state.index_batch = calloc(MAX_INDICES, sizeof(unsigned int));
@@ -90,7 +96,7 @@ void LinceInitRenderer() {
 		MAX_VERTICES * sizeof(LinceQuadVertex)
 	);
 	LinceBufferElement layout[] = {
-        {LinceBufferType_Float2, "aPos"},
+        {LinceBufferType_Float3, "aPos"},
         {LinceBufferType_Float2, "aTexCoord"},
         {LinceBufferType_Float4, "aColor"},
 		{LinceBufferType_Float,  "aTextureID"}
@@ -215,20 +221,21 @@ void LinceDrawQuad(LinceQuadProps props) {
 
 	// calculate transform
 	mat4 transform = GLM_MAT4_IDENTITY_INIT;
-	vec4 pos = {props.x, props.y, 1.0, 0.0};
+	vec4 pos = {props.x, props.y, props.zorder, 1.0};
 	vec3 scale = {props.w, props.h, 1.0};
     glm_translate(transform, pos);
-	glm_rotate(transform, glm_rad(-props.rotation), (vec3){0.0, 0.0, 1.0});
+	glm_rotate(transform, glm_rad(props.rotation), (vec3){0.0, 0.0, -1.0});
     glm_scale(transform, scale);
 
 	// append transformed vertices to batch
 	for (uint32_t i = 0; i != QUAD_VERTEX_COUNT; ++i) {
 		LinceQuadVertex vertex = {0};
-		vec4 vpos = {quad_vertices[i].x, quad_vertices[i].y, 1.0, 1.0};
+		vec4 vpos = {quad_vertices[i].x, quad_vertices[i].y, 0.0, 1.0};
 		vec4 res;
 		glm_mat4_mulv(transform, vpos, res);
 		vertex.x = res[0];
 		vertex.y = res[1];
+		vertex.z = res[2];
 		vertex.s = quad_vertices[i].s;
 		vertex.t = quad_vertices[i].t;
 		vertex.texture_id = texture_index;
