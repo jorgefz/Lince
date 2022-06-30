@@ -135,6 +135,82 @@
                 <div id="content" class="content">
                     <main>
                         <h1 id="cameras"><a class="header" href="#cameras">Cameras</a></h1>
+<p>Cameras display the world of the game as well as provide the means to move within it, translating the location, shape, and color of game objects into your screen.</p>
+<h2 id="lincecamera"><a class="header" href="#lincecamera">LinceCamera</a></h2>
+<p>These fields may be modified by the user to change the camera's view of the world:</p>
+<ul>
+<li><code>float scale</code></li>
+<li><code>float zoom</code>
+<ul>
+<li>Zoom value of the camera, where a greater value translates to zooming in.</li>
+</ul>
+</li>
+<li><code>float rotation</code>
+<ul>
+<li>Clockwise rotation of the camera in degrees.</li>
+</ul>
+</li>
+<li><code>vec3 pos</code>
+<ul>
+<li>Position of the camera in the world</li>
+</ul>
+</li>
+</ul>
+<p>These fields are internal and are automatically updated with the functions provided below.</p>
+<ul>
+<li><code>mat4 proj</code>
+<ul>
+<li>Projection matrix that calculates what objects are seen by the camera.</li>
+</ul>
+</li>
+<li><code>mat4 view</code>
+<ul>
+<li>View matrix that translates the camera's eye to a flat screen view.</li>
+</ul>
+</li>
+<li><code>mat4 view_proj</code>
+<ul>
+<li>View-projection matrix, calculated by multiplying the view and projection.</li>
+</ul>
+</li>
+<li><code>float aspect_ratio</code>
+<ul>
+<li>Aspect ratio of the window. Using an incorrect value will result in a distorted view of the world.</li>
+</ul>
+</li>
+</ul>
+<h2 id="lincecalculateprojection"><a class="header" href="#lincecalculateprojection">LinceCalculateProjection</a></h2>
+<pre><code class="language-c">void LinceCalculateProjection(
+	mat4 result,
+	float left, float right,
+	float bottom, float top
+)
+</code></pre>
+<p>Calculates the projection matrix given the dimensions of the frustrum: left, right, bottom, and top. The near and far coordinates are hard coded as -1 and 1, respectively. This means that z values outside this range are not rendered.</p>
+<h2 id="lincecreatecamera"><a class="header" href="#lincecreatecamera">LinceCreateCamera</a></h2>
+<pre><code class="language-c">LinceCamera* LinceCreateCamera(float aspect_ratio)
+</code></pre>
+<p>Creates a new camera by calcualting the projection matrix from the window's aspect ratio.</p>
+<h2 id="lincecreatecamerafromproj"><a class="header" href="#lincecreatecamerafromproj">LinceCreateCameraFromProj</a></h2>
+<pre><code class="language-c">LinceCamera* LinceCreateCameraFromProj(mat4 proj)
+</code></pre>
+<p>Creates a new camera using a custom provided projection matrix.</p>
+<h2 id="lincesetcameraproj"><a class="header" href="#lincesetcameraproj">LinceSetCameraProj</a></h2>
+<pre><code class="language-c">void LinceSetCameraProj(LinceCamera* cam, mat4 proj)
+</code></pre>
+<p>Manually updates the projection matrix of an existing camera with the provided one.</p>
+<h2 id="linceupdatecamera"><a class="header" href="#linceupdatecamera">LinceUpdateCamera</a></h2>
+<pre><code class="language-c">void LinceUpdateCamera(LinceCamera* cam)
+</code></pre>
+<p>Recalculates the view-projection matrix using the values for scale, zoom, and rotation.</p>
+<h2 id="linceresizecameraview"><a class="header" href="#linceresizecameraview">LinceResizeCameraView</a></h2>
+<pre><code class="language-c">void LinceResizeCameraView(LinceCamera* cam, float aspect_ratio)
+</code></pre>
+<p>Updates the view matrix using the provided aspect ratio. This function should be called when the window is resized. </p>
+<h2 id="lincedeletecamera"><a class="header" href="#lincedeletecamera">LinceDeleteCamera</a></h2>
+<pre><code class="language-c">void LinceDeleteCamera(LinceCamera* cam)
+</code></pre>
+<p>Frees allocated camera data.</p>
 
                     </main>
 

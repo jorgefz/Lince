@@ -135,6 +135,105 @@
                 <div id="content" class="content">
                     <main>
                         <h1 id="renderer"><a class="header" href="#renderer">Renderer</a></h1>
+<h2 id="linceinitrenderer"><a class="header" href="#linceinitrenderer">LinceInitRenderer</a></h2>
+<pre><code class="language-c">void LinceInitRenderer()
+</code></pre>
+<p>Initialises the rendering state: allocates vertex batch, initialises default shader and texture, etc.
+This should be called only once. </p>
+<h2 id="linceterminaterenderer"><a class="header" href="#linceterminaterenderer">LinceTerminateRenderer</a></h2>
+<pre><code class="language-c">void LinceTerminateRenderer()
+</code></pre>
+<p>Frees allocated memory and destroys OpenGL objects.</p>
+<h2 id="lincequadprops"><a class="header" href="#lincequadprops">LinceQuadProps</a></h2>
+<p>This struct contains the information to render a &quot;quad&quot; (rectangle) on screen, such as location, size, and color.</p>
+<ul>
+<li><code>float x</code>
+<ul>
+<li>X-axis position in the world</li>
+</ul>
+</li>
+<li><code>float y</code>
+<ul>
+<li>Y-axis position in the world</li>
+</ul>
+</li>
+<li><code>float w</code>
+<ul>
+<li>Width, size in the x-axis.</li>
+</ul>
+</li>
+<li><code>float h</code>
+<ul>
+<li>Height, size in the y-axis.</li>
+</ul>
+</li>
+<li><code>float zorder</code>
+<ul>
+<li>Order for rendering overlapping quads. A higher number results in a quad being rendered above others.</li>
+</ul>
+</li>
+<li><code>float rotation</code>
+<ul>
+<li>Clockwise rotation in degrees</li>
+</ul>
+</li>
+<li><code>float color[4]</code>
+<ul>
+<li>RGBA color as floats with values between 0 and 1.</li>
+</ul>
+</li>
+<li><code>LinceTexture* texture</code>
+<ul>
+<li>Texture to apply on the quad. If <code>NULL</code>, a default white texture is used instead.</li>
+</ul>
+</li>
+</ul>
+<p>Note that for ease of use one may use a designated initialiser list, where an struct is initialised enclosed in curly brakets where specific fields are given values <code>{.x = 1, .y = 2}</code>.</p>
+<p>Note that any field that is left uninitialised will be set to zero of the appropriate type. For instance, defining only the x position <code>{.x=1.0}</code> will make <code>y = 0</code> and the texture <code>NULL</code>, however it will also make the color completely transparent (<code>color = {0, 0, 0, 0}</code>, where alpha is zero) as well as the size (width and height) zero.</p>
+<p>This example describes a red square at origin:</p>
+<pre><code class="language-c">LinceQuadProps props = {
+	.w=1.0, .h=1.0,
+	.color={1.0,0.0,0.0,1.0}
+};
+</code></pre>
+<h2 id="lincebeginscene"><a class="header" href="#lincebeginscene">LinceBeginScene</a></h2>
+<pre><code class="language-c">void LinceBeginScene(LinceCamera* camera)
+</code></pre>
+<p>Prepares a new batch for rendering.</p>
+<h2 id="linceendscene"><a class="header" href="#linceendscene">LinceEndScene</a></h2>
+<pre><code class="language-c">void LinceEndScene()
+</code></pre>
+<p>Flushes the vertex batch and renders the geometry.</p>
+<h2 id="lincedrawquad"><a class="header" href="#lincedrawquad">LinceDrawQuad</a></h2>
+<pre><code class="language-c">void LinceDrawQuad(LinceQuadProps props)
+</code></pre>
+<p>Submits a quad (rectangle) for rendering. This function should only be called between <code>LinceBeginScene</code> and <code>LinceEndScene</code> calls.</p>
+<p>This example below shows how to use the rendering API to render quads to the screen. This code snippet should be placed on your <code>OnUpdate</code> function and should be called every frame.</p>
+<pre><code class="language-c">LinceBeginScene(camera);
+
+LinceDrawQuad((LinceQuadProps){
+	.w = 1.0, .h = 1.0,
+	.color = {1.0, 0.0, 0.0, 1.0}
+});
+
+LinceEndScene();
+</code></pre>
+<h2 id="lincedrawindexed"><a class="header" href="#lincedrawindexed">LinceDrawIndexed</a></h2>
+<pre><code class="language-c">void LinceDrawIndexed(
+	LinceShader* shader,
+	LinceVertexArray* va,
+	LinceIndexBuffer vb
+)
+</code></pre>
+<p>Mannually renders geometry with provided OpenGL objects.</p>
+<h2 id="linceclear"><a class="header" href="#linceclear">LinceClear</a></h2>
+<pre><code class="language-c">void LinceClear()
+</code></pre>
+<p>Clears the screen.</p>
+<h2 id="lincesetclearcolor"><a class="header" href="#lincesetclearcolor">LinceSetClearColor</a></h2>
+<pre><code class="language-c">void LinceSetClearColor(float r, float g, float b, float a)
+</code></pre>
+<p>Sets the color to which the screen is cleared.</p>
 
                     </main>
 
