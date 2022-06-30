@@ -218,6 +218,7 @@ void LinceDrawQuad(LinceQuadProps props) {
 	vec4 pos = {props.x, props.y, 1.0, 0.0};
 	vec3 scale = {props.w, props.h, 1.0};
     glm_translate(transform, pos);
+	glm_rotate(transform, glm_rad(-props.rotation), (vec3){0.0, 0.0, 1.0});
     glm_scale(transform, scale);
 
 	// append transformed vertices to batch

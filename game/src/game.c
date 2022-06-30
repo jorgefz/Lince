@@ -108,11 +108,13 @@ void MyLayerOnUpdate(LinceLayer* layer, float dt) {
     LinceDrawQuad( (LinceQuadProps){
         .x=2.0, .y=2.0, .w=0.9, .h=0.9,
         .color={1.0,1.0,1.0,1.0},
+        .rotation = 45.0f,
         .texture=data->tex_front
     });
     LinceDrawQuad( (LinceQuadProps){
         .x=3.0, .y=2.0, .w=0.9, .h=0.9,
         .color={1.0,1.0,1.0,1.0},
+        .rotation = 180,
         .texture=data->tex_back
     });
     LinceEndScene();
