@@ -7,6 +7,8 @@
 #include "core/app.h"
 #include "renderer/renderer.h"
 
+#include "gui/ui_layer.h"
+
 /* Private application state - stack allocated */
 static LinceApp app = {0};
 
@@ -131,6 +133,8 @@ LinceLayer* LinceGetCurrentOverlay(){
     app.overlay_stack = LinceCreateLayerStack();
     
     LinceInitRenderer(app.window);
+    app.ui = LinceInitUI(app.window->handle);
+
     if (app.game_init) app.game_init(); // user may push layers onto stack
 }
 
@@ -142,6 +146,8 @@ static void LinceOnUpdate(){
     float new_time_ms = (float)(glfwGetTime() * 1000.0);
     app.dt = new_time_ms - app.time_ms;
     app.time_ms = new_time_ms;
+
+    LinceUIBegin(app.ui);
 
     // update layers
     unsigned int i;
@@ -163,6 +169,19 @@ static void LinceOnUpdate(){
     // update user application
     if (app.game_on_update) app.game_on_update(app.dt);
 
+    LinceUIEnd(app.ui);
+
+    /* Future API
+    LinceUIBegin(app.ui);
+    for layer in app.layer_stack {
+        layer->OnUIRender();
+    }
+    for overlay in app.overlay_stack {
+        overlay->OnUIRender();
+    }
+    LinceUIEnd(app.ui);
+    */
+
     LinceUpdateWindow(app.window);
 }
 
@@ -177,6 +196,8 @@ static void LinceTerminate(){
     app.overlay_stack = NULL;
 
     if (app.game_terminate) app.game_terminate();
+
+    LinceTerminateUI(app.ui);
 
     /* shutdown window last, as it destroys opengl context
     and all its functions */
@@ -198,6 +219,8 @@ static void LinceOnEvent(LinceEvent* e){
         LinceEventType_WindowClose,
         LinceOnEventWindowClose
     );
+
+    LinceUIOnEvent(app.ui, e);
 
     /* propagate event to layers and overlays,
     the ones in front (rendered last) receive it first */

@@ -8,6 +8,7 @@
 #include "event/window_event.h"
 
 #include "core/layer.h"
+#include "gui/ui_layer.h"
 
 /* Function pointer typedefs for user callbacks */
 typedef void (*LinceGameInitFn)();
@@ -16,7 +17,7 @@ typedef void (*LinceGameOnEventFn)(LinceEvent*);
 typedef void (*LinceGameTerminateFn)();
 
 /* Holds program state */
-typedef struct {
+typedef struct LinceApp{
     /* User settings */
     void* user_data;
     // add more settings
@@ -36,6 +37,9 @@ typedef struct {
     float dt;               // timestep in ms
     int current_layer;      // index of layer baing updated/handled
     int current_overlay;    // index of layer baing updated/handled
+
+    /* UI */
+    LinceUILayer* ui;
 
 } LinceApp;
 

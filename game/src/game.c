@@ -14,43 +14,11 @@
 #include "gui/nuklear_glfw_gl3.h"
 
 
-#define MAX_VERTEX_BUFFER 512 * 1024
-#define MAX_ELEMENT_BUFFER 128 * 1024
-#define WINDOW_WIDTH 1200
-#define WINDOW_HEIGHT 800
-
-typedef struct NKLayer {
-    struct nk_context *ctx;
-    struct nk_glfw glfw;
-} NKLayer;
-
-
-void NKLayerOnAttach(LinceLayer* layer){
-    NKLayer* data = LinceGetLayerData(layer);
-
-    data->ctx = nk_glfw3_init(
-        &data->glfw,
-        LinceGetAppState()->window->handle,
-        NK_GLFW3_DEFAULT
-    );
-
-    // Initialise Font
-    struct nk_font_atlas *atlas;
-    nk_glfw3_font_stash_begin(&data->glfw, &atlas);
-    struct nk_font *font = nk_font_atlas_add_from_file(atlas, "lince/assets/fonts/DroidSans.ttf", 13, 0);
-    nk_glfw3_font_stash_end(&data->glfw);
-    //nk_style_load_all_cursors(data->ctx, atlas->cursors);
-    nk_style_set_font(data->ctx, &font->handle);
-
-}
-
 void NKLayerOnUpdate(LinceLayer* layer, float dt){
-    NKLayer* data = LinceGetLayerData(layer);
-    struct nk_context* ctx = data->ctx;
+    
+    struct nk_context *ctx = LinceGetAppState()->ui->ctx;
     static struct nk_colorf bg = {0.1, 0.18, 0.24, 1.0};
 
-    nk_glfw3_new_frame(&data->glfw);
-    
     if (nk_begin(ctx, "Demo", nk_rect(50, 50, 230, 250),
         NK_WINDOW_BORDER|NK_WINDOW_MOVABLE|NK_WINDOW_SCALABLE|
         NK_WINDOW_MINIMIZABLE|NK_WINDOW_TITLE
@@ -83,55 +51,18 @@ void NKLayerOnUpdate(LinceLayer* layer, float dt){
             nk_combo_end(ctx);
         }
     } 
-    nk_end(data->ctx);
+    nk_end(ctx);
 
     LinceSetClearColor(bg.r, bg.g, bg.b, bg.a);
-    nk_glfw3_render(&data->glfw, NK_ANTI_ALIASING_ON, MAX_VERTEX_BUFFER, MAX_ELEMENT_BUFFER);
     
 }
 
-void NKLayerOnEvent(LinceLayer* layer, LinceEvent* event){
-    void* win = LinceGetAppState()->window->handle;
-    // Since the nuklear API makes use of the glfw user pointer,
-    // we must temporarily change it, and then set it back to the LinceWindow object.
-    glfwSetWindowUserPointer(win, &((NKLayer*)(layer->data))->glfw);
-    switch (event->type) {
-    case LinceEventType_KeyType:
-        nk_glfw3_char_callback(win, event->data.KeyType->keycode);
-        break;
-    case LinceEventType_MouseScrolled:
-        nk_gflw3_scroll_callback(win, event->data.MouseScrolled->xoff, event->data.MouseScrolled->yoff);
-        break;
-    case LinceEventType_MouseButtonPressed:
-        nk_glfw3_mouse_button_callback(win, event->data.MouseButtonPressed->button, GLFW_PRESS, 0);
-        break;
-    case LinceEventType_MouseButtonReleased:
-        nk_glfw3_mouse_button_callback(win, event->data.MouseButtonPressed->button, GLFW_RELEASE, 0);
-        break;
-    default:
-        break;
-    }
-    glfwSetWindowUserPointer(win, LinceGetAppState()->window);
-}
-
-void NKLayerOnDetach(LinceLayer* layer){
-    NKLayer* data = LinceGetLayerData(layer);
-    nk_glfw3_shutdown(&data->glfw);
-    free(layer->data);
-}
-
 LinceLayer* NKLayerInit(){
-    NKLayer *data = calloc(1, sizeof(NKLayer));
-    LINCE_ASSERT(data, "Failed to allocate %d bytes", (int)sizeof(NKLayer));
-
-    LinceLayer* layer = LinceCreateLayer(data);
-    layer->OnAttach = NKLayerOnAttach;
-    layer->OnDetach = NKLayerOnDetach;
-    layer->OnEvent  = NKLayerOnEvent;
-    layer->OnUpdate = NKLayerOnUpdate;
-
+    LinceLayer* layer = LinceCreateLayer(NULL);
+    layer->OnUpdate = NKLayerOnUpdate; 
     return layer;
 }
+
 
 
 typedef struct MyLayer {
