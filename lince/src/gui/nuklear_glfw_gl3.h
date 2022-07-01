@@ -369,7 +369,7 @@ nk_glfw3_clipboard_copy(nk_handle usr, const char *text, int len)
 NK_API struct nk_context*
 nk_glfw3_init(struct nk_glfw* glfw, GLFWwindow *win, enum nk_glfw_init_state init_state)
 {
-    glfwSetWindowUserPointer(win, glfw);
+    // glfwSetWindowUserPointer(win, glfw);
     glfw->win = win;
     if (init_state == NK_GLFW3_INSTALL_CALLBACKS) {
         glfwSetScrollCallback(win, nk_gflw3_scroll_callback);

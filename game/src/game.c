@@ -33,7 +33,7 @@ void NKLayerOnAttach(LinceLayer* layer){
         &data->glfw,
         LinceGetAppState()->window->handle,
         //NK_GLFW3_INSTALL_CALLBACKS
-        0
+        NK_GLFW3_DEFAULT
     );
 
     // Initialise Font
@@ -43,6 +43,8 @@ void NKLayerOnAttach(LinceLayer* layer){
     nk_glfw3_font_stash_end(&data->glfw);
     //nk_style_load_all_cursors(data->ctx, atlas->cursors);
     nk_style_set_font(data->ctx, &font->handle);
+
+    printf("%p == %p\n", nk_glfw3_mouse_button_callback);
 
 }
 
@@ -91,7 +93,31 @@ void NKLayerOnUpdate(LinceLayer* layer, float dt){
     LinceSetClearColor(bg.r, bg.g, bg.b, bg.a);
     nk_glfw3_render(&data->glfw, NK_ANTI_ALIASING_ON, MAX_VERTEX_BUFFER, MAX_ELEMENT_BUFFER);
     
-}  
+}
+
+void NKLayerOnEvent(LinceLayer* layer, LinceEvent* event){
+    void* win = LinceGetAppState()->window->handle;
+    // Since the nuklear API makes use of the glfw user pointer,
+    // we must temporarily change it, and then set it back to the LinceWindow object.
+    glfwSetWindowUserPointer(win, &((NKLayer*)(layer->data))->glfw);
+    switch (event->type) {
+    case LinceEventType_KeyType:
+        nk_glfw3_char_callback(win, event->data.KeyType->keycode);
+        break;
+    case LinceEventType_MouseScrolled:
+        nk_gflw3_scroll_callback(win, event->data.MouseScrolled->xoff, event->data.MouseScrolled->yoff);
+        break;
+    case LinceEventType_MouseButtonPressed:
+        nk_glfw3_mouse_button_callback(win, event->data.MouseButtonPressed->button, GLFW_PRESS, 0);
+        break;
+    case LinceEventType_MouseButtonReleased:
+        nk_glfw3_mouse_button_callback(win, event->data.MouseButtonPressed->button, GLFW_RELEASE, 0);
+        break;
+    default:
+        break;
+    }
+    glfwSetWindowUserPointer(win, LinceGetAppState()->window);
+}
 
 void NKLayerOnDetach(LinceLayer* layer){
     NKLayer* data = LinceGetLayerData(layer);
@@ -106,7 +132,7 @@ LinceLayer* NKLayerInit(){
     LinceLayer* layer = LinceCreateLayer(data);
     layer->OnAttach = NKLayerOnAttach;
     layer->OnDetach = NKLayerOnDetach;
-    //layer->OnEvent  = NKLayerOnEvent;
+    layer->OnEvent  = NKLayerOnEvent;
     layer->OnUpdate = NKLayerOnUpdate;
 
     return layer;
