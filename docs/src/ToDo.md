@@ -14,7 +14,7 @@
 2. ✅ **Add batching to 2D renderer**
 3. ✅ **Add z-order with transparency support**
 4. 🟠 Add z-order with translucency support
-5. 🟠 Move renderer initialisation and termination to the engine, away from the user
+5. ✅ **Move renderer initialisation and termination to the engine, away from the user**
 
 ## Nuklear
 1. ✅ **Add Nuklear to project with appropriate backend**

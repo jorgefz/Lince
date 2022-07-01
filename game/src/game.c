@@ -6,14 +6,13 @@
 #include "cglm/vec4.h"
 #include "cglm/affine.h"
 
-#define NK_SHADER_VERSION "#version 450 core\n"
-
 // TEMPORARY - exposes GLFW API
-#include "gui/nuklear_wrapper.h"
+#include <GLFW/glfw3.h>
+#include <glad/glad.h>
+#include "gui/nuklear_flags.h"
+#include "gui/nuklear.h"
+#include "gui/nuklear_glfw_gl3.h"
 
-#define nuklear_test
-
-#ifdef nuklear_test
 
 #define MAX_VERTEX_BUFFER 512 * 1024
 #define MAX_ELEMENT_BUFFER 128 * 1024
@@ -32,7 +31,6 @@ void NKLayerOnAttach(LinceLayer* layer){
     data->ctx = nk_glfw3_init(
         &data->glfw,
         LinceGetAppState()->window->handle,
-        //NK_GLFW3_INSTALL_CALLBACKS
         NK_GLFW3_DEFAULT
     );
 
@@ -44,21 +42,19 @@ void NKLayerOnAttach(LinceLayer* layer){
     //nk_style_load_all_cursors(data->ctx, atlas->cursors);
     nk_style_set_font(data->ctx, &font->handle);
 
-    printf("%p == %p\n", nk_glfw3_mouse_button_callback);
-
 }
 
 void NKLayerOnUpdate(LinceLayer* layer, float dt){
     NKLayer* data = LinceGetLayerData(layer);
     struct nk_context* ctx = data->ctx;
-    struct nk_colorf bg = {0.1, 0.18, 0.24, 1.0};
+    static struct nk_colorf bg = {0.1, 0.18, 0.24, 1.0};
 
     nk_glfw3_new_frame(&data->glfw);
     
     if (nk_begin(ctx, "Demo", nk_rect(50, 50, 230, 250),
         NK_WINDOW_BORDER|NK_WINDOW_MOVABLE|NK_WINDOW_SCALABLE|
-        NK_WINDOW_MINIMIZABLE|NK_WINDOW_TITLE))
-    {
+        NK_WINDOW_MINIMIZABLE|NK_WINDOW_TITLE
+    )) {
         enum {EASY, HARD};
         static int op = EASY;
         static int property = 20;
@@ -86,8 +82,7 @@ void NKLayerOnUpdate(LinceLayer* layer, float dt){
             bg.a = nk_propertyf(ctx, "#A:", 0, bg.a, 1.0f, 0.01f,0.005f);
             nk_combo_end(ctx);
         }
-    }
-    
+    } 
     nk_end(data->ctx);
 
     LinceSetClearColor(bg.r, bg.g, bg.b, bg.a);
@@ -138,8 +133,6 @@ LinceLayer* NKLayerInit(){
     return layer;
 }
 
-#endif
-
 
 typedef struct MyLayer {
     char name[LINCE_NAME_MAX];
@@ -163,7 +156,6 @@ void MyLayerOnAttach(LinceLayer* layer) {
 
     data->cam = LinceCreateCamera(LinceGetAspectRatio());
     
-    LinceInitRenderer(LinceGetAppState()->window);
     data->tex_front = LinceCreateTexture("Patrick", "lince/assets/front.png");
     data->tex_back  = LinceCreateTexture("Patrick", "lince/assets/back.png");
 
@@ -171,15 +163,12 @@ void MyLayerOnAttach(LinceLayer* layer) {
     data->vel = 5e-4f;
     data->cam_speed = 0.01f;
     data->color_step = 0.003f;
-    
-    LinceSetClearColor(0.0, 0.2, 0.5, 1.0);
 }
 
 void MyLayerOnDetach(LinceLayer* layer) {
     MyLayer* data = LinceGetLayerData(layer);
     LINCE_INFO(" Layer '%s' detached", data->name);
 
-    LinceTerminateRenderer();
     LinceDeleteTexture(data->tex_front);
     LinceDeleteTexture(data->tex_back);
     LinceDeleteCamera(data->cam);
@@ -259,13 +248,6 @@ void MyLayerOnUpdate(LinceLayer* layer, float dt) {
     });
     
     LinceEndScene();
-
-    // Update background color
-    // data->red += data->vel * dt;
-    // if (data->red >= 1.0f) data->vel = -data->vel;
-    // else if (data->red <= 0.0f) data->vel = -data->vel;
-    // float blue = 1.0f - data->red;
-    // LinceSetClearColor(data->red, 0.1f, blue, 1.0f);
 }
 
 LinceLayer* MyLayerInit(char* name) {
@@ -293,9 +275,7 @@ LinceLayer* MyLayerInit(char* name) {
 void GameInit() {
 	LINCE_INFO("\n User App Initialised");
     LincePushLayer(MyLayerInit("Test"));
-#ifdef nuklear_test
     LincePushLayer(NKLayerInit());
-#endif
 }
 
 void GameOnUpdate(float dt) {

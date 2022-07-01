@@ -34,8 +34,6 @@ static LinceBool LinceOnEventWindowResize(LinceEvent* e);
 static LinceBool LinceOnEventWindowClose(LinceEvent* e);
 
 
-/* --- Public API --- */
-
 static char const* GLGetErrorString(GLenum const err) {
   switch (err) {
     // opengl 2 errors (8)
@@ -77,7 +75,6 @@ void LinceCheckErrors(){
         LINCE_ASSERT(LinceFalse, "GLerror %d: %s", err, GLGetErrorString(err));
     }
 }
-
 
 
 void LinceRun(){
@@ -133,6 +130,7 @@ LinceLayer* LinceGetCurrentOverlay(){
     app.layer_stack = LinceCreateLayerStack();
     app.overlay_stack = LinceCreateLayerStack();
     
+    LinceInitRenderer(app.window);
     if (app.game_init) app.game_init(); // user may push layers onto stack
 }
 
@@ -170,6 +168,8 @@ static void LinceOnUpdate(){
 
 static void LinceTerminate(){
 
+    LinceTerminateRenderer();
+    
     // free layer and overlay stacks
     LinceDestroyLayerStack(app.layer_stack);
     LinceDestroyLayerStack(app.overlay_stack);
