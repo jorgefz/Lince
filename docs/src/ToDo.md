@@ -20,8 +20,8 @@
 1. ✅ **Add Nuklear to project with appropriate backend**
 2. ✅ **Add Nuklear layer and render GUI**
 3. ✅ **Sort out issues with event callbacks and GLFW user pointer**
-4. 💛 Stop Nuklear API from exposing GLFW and OpenGL API to the user
-5. 💛 Move Nuklear rendering layer to the engine
+4. ✅ Stop Nuklear API from exposing GLFW and OpenGL API to the user
+5. ✅ Move Nuklear rendering layer to the engine
 6. 🔷 Provide UI callback to layers
 
 ## API ease of use
