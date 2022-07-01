@@ -72,19 +72,24 @@ void LinceSetClearColor(float r, float g, float b, float a) {
 	glClearColor(r, g, b, a);
 }
 
-
-void LinceInitRenderer() {
-
+void LinceEnableAlphaBlend(){
 	// Add up alpha channels
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+}
 
-	// Enable depth
+void LinceEnableDepthTest(){
 	glEnable(GL_DEPTH_TEST);
 	glDepthMask(GL_TRUE);
-	//glDepthFunc(GL_LEQUAL);
-	glDepthFunc(GL_LESS);
+	glDepthFunc(GL_LESS); // GL_LEQUAL
 	//glDepthRange(0.0f, 1.0f);
+}
+
+
+void LinceInitRenderer() {
+
+	LinceEnableAlphaBlend();
+	LinceEnableDepthTest();
 
 	// Initialise geometry
 	renderer_state.vertex_batch = calloc(MAX_VERTICES, sizeof(LinceQuadVertex));

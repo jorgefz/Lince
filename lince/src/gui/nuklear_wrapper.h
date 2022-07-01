@@ -1,3 +1,10 @@
+/*
+Include this header to use nuklear generic and glfw-specific functions
+*/
+
+#ifndef NUKLEAR_WRAPPER_H
+#define NUKLEAR_WRAPPER_H
+
 #include <GLFW/glfw3.h>
 #include <glad/glad.h>
 
@@ -9,12 +16,9 @@
 #define NK_INCLUDE_FONT_BAKING
 #define NK_INCLUDE_DEFAULT_FONT
 
-#define NK_IMPLEMENTATION
-//#define NK_GLFW_GL4_IMPLEMENTATION
-#define NK_GLFW_GL3_IMPLEMENTATION
-
-#define NK_KEYSTATE_BASED_INPUT
-
 #include "gui/nuklear.h"
 //#include "gui/nuklear_glfw_gl4.h"
 #include "gui/nuklear_glfw_gl3.h"
+
+
+#endif
