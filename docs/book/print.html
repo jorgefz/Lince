@@ -1247,13 +1247,45 @@ LinceEndScene();
 </code></pre>
 <p>Frees allocated camera data.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="to-do"><a class="header" href="#to-do">To Do</a></h1>
+<h2 id="symbol-legend"><a class="header" href="#symbol-legend">Symbol legend</a></h2>
+<table><thead><tr><th>Symbol</th><th>Meaning</th></tr></thead><tbody>
+<tr><td>✅</td><td>Completed</td></tr>
+<tr><td>💛</td><td>In-dev</td></tr>
+<tr><td>🟠</td><td>Delayed</td></tr>
+<tr><td>🔷</td><td>Planned</td></tr>
+</tbody></table>
+<h2 id="2d-renderer"><a class="header" href="#2d-renderer">2D Renderer</a></h2>
 <ol>
-<li>Improve documentation</li>
-<li>Add tests</li>
-<li><strong>Add basic 2D renderer using immediate-mode scenes and quads</strong> ✅</li>
-<li><strong>Add batching to 2D renderer</strong> ✅</li>
-<li>Add UI library: <a href="https://github.com/Immediate-Mode-UI/Nuklear/">Nuklear</a></li>
-<li>Add audio library</li>
+<li>✅ <strong>Add basic 2D renderer using immediate-mode scenes and quads</strong></li>
+<li>✅ <strong>Add batching to 2D renderer</strong></li>
+<li>✅ <strong>Add z-order with transparency support</strong></li>
+<li>🟠 Add z-order with translucency support</li>
+<li>🟠 Move renderer initialisation and termination to the engine, away from the user</li>
+</ol>
+<h2 id="nuklear"><a class="header" href="#nuklear">Nuklear</a></h2>
+<ol>
+<li>✅ <strong>Add Nuklear to project with appropriate backend</strong></li>
+<li>✅ <strong>Add Nuklear layer and render GUI</strong></li>
+<li>✅ <strong>Sort out issues with event callbacks and GLFW user pointer</strong></li>
+<li>💛 Stop Nuklear API from exposing GLFW and OpenGL API to the user</li>
+<li>💛 Move Nuklear rendering layer to the engine</li>
+<li>🔷 Provide UI callback to layers</li>
+</ol>
+<h2 id="api-ease-of-use"><a class="header" href="#api-ease-of-use">API ease of use</a></h2>
+<ol>
+<li>🔷 Add more user settings prior to calling <code>LinceRun</code></li>
+</ol>
+<h2 id="next-goals"><a class="header" href="#next-goals">Next goals</a></h2>
+<ol>
+<li>💛 Add UI library: <a href="https://github.com/Immediate-Mode-UI/Nuklear/">Nuklear</a></li>
+<li>🔷 Add tilesets</li>
+<li>🔷 Add tilemaps</li>
+<li>🔷 Add audio library, e.g. <a href="https://github.com/mackron/miniaudio">Miniaudio</a></li>
+</ol>
+<h2 id="extrarecurrent-goals"><a class="header" href="#extrarecurrent-goals">Extra/recurrent goals</a></h2>
+<ol>
+<li>🟠 Improve documentation</li>
+<li>🟠 Add tests</li>
 </ol>
 
                     </main>
