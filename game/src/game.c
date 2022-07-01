@@ -6,13 +6,19 @@
 #include "cglm/vec4.h"
 #include "cglm/affine.h"
 
+#define NK_SHADER_VERSION "#version 450 core\n"
 
-#ifdef nuklear_test
 // TEMPORARY - exposes GLFW API
 #include "gui/nuklear_wrapper.h"
 
+#define nuklear_test
+
+#ifdef nuklear_test
+
 #define MAX_VERTEX_BUFFER 512 * 1024
 #define MAX_ELEMENT_BUFFER 128 * 1024
+#define WINDOW_WIDTH 1200
+#define WINDOW_HEIGHT 800
 
 typedef struct NKLayer {
     struct nk_context *ctx;
@@ -22,22 +28,31 @@ typedef struct NKLayer {
 
 void NKLayerOnAttach(LinceLayer* layer){
     NKLayer* data = LinceGetLayerData(layer);
-    
+
     data->ctx = nk_glfw3_init(
         &data->glfw,
-        LinceGetAppState()->window,
-        NK_GLFW3_INSTALL_CALLBACKS
+        LinceGetAppState()->window->handle,
+        //NK_GLFW3_INSTALL_CALLBACKS
+        0
     );
+
+    // Initialise Font
+    struct nk_font_atlas *atlas;
+    nk_glfw3_font_stash_begin(&data->glfw, &atlas);
+    struct nk_font *font = nk_font_atlas_add_from_file(atlas, "lince/assets/fonts/DroidSans.ttf", 13, 0);
+    nk_glfw3_font_stash_end(&data->glfw);
+    //nk_style_load_all_cursors(data->ctx, atlas->cursors);
+    nk_style_set_font(data->ctx, &font->handle);
+
 }
 
 void NKLayerOnUpdate(LinceLayer* layer, float dt){
     NKLayer* data = LinceGetLayerData(layer);
     struct nk_context* ctx = data->ctx;
+    struct nk_colorf bg = {0.1, 0.18, 0.24, 1.0};
 
     nk_glfw3_new_frame(&data->glfw);
     
-    struct nk_colorf bg = {0.1, 0.18, 0.24, 1.0};
-
     if (nk_begin(ctx, "Demo", nk_rect(50, 50, 230, 250),
         NK_WINDOW_BORDER|NK_WINDOW_MOVABLE|NK_WINDOW_SCALABLE|
         NK_WINDOW_MINIMIZABLE|NK_WINDOW_TITLE))
@@ -70,17 +85,17 @@ void NKLayerOnUpdate(LinceLayer* layer, float dt){
             nk_combo_end(ctx);
         }
     }
-
+    
     nk_end(data->ctx);
 
+    LinceSetClearColor(bg.r, bg.g, bg.b, bg.a);
     nk_glfw3_render(&data->glfw, NK_ANTI_ALIASING_ON, MAX_VERTEX_BUFFER, MAX_ELEMENT_BUFFER);
-    //nk_clear(data->ctx);
+    
 }  
 
 void NKLayerOnDetach(LinceLayer* layer){
     NKLayer* data = LinceGetLayerData(layer);
     nk_glfw3_shutdown(&data->glfw);
-    //nk_free(data->ctx);
     free(layer->data);
 }
 
@@ -151,11 +166,7 @@ void MyLayerOnEvent(LinceLayer* layer, LinceEvent* e) {
     
 }
 
-/*
-Q, A: increase, decrease red
-W, S: increase, decrease green
-E, D: increase, decrease blue
-*/
+
 void MyLayerOnUpdate(LinceLayer* layer, float dt) {
     MyLayer* data = LinceGetLayerData(layer);
     data->dt = dt;
@@ -223,7 +234,7 @@ void MyLayerOnUpdate(LinceLayer* layer, float dt) {
     
     LinceEndScene();
 
-    /* Update background color */
+    // Update background color
     // data->red += data->vel * dt;
     // if (data->red >= 1.0f) data->vel = -data->vel;
     // else if (data->red <= 0.0f) data->vel = -data->vel;

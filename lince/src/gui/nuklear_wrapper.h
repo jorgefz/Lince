@@ -1,5 +1,5 @@
 /*
-Include this header to use nuklear generic and glfw-specific functions
+Include this header to use nuklear functions
 */
 
 #ifndef NUKLEAR_WRAPPER_H
@@ -17,8 +17,6 @@ Include this header to use nuklear generic and glfw-specific functions
 #define NK_INCLUDE_DEFAULT_FONT
 
 #include "gui/nuklear.h"
-//#include "gui/nuklear_glfw_gl4.h"
 #include "gui/nuklear_glfw_gl3.h"
-
 
 #endif

@@ -167,8 +167,18 @@ void LinceTerminateRenderer() {
 }
 
 void LinceBeginScene(LinceCamera* cam) {
+	/* Bind OpenGL objects */
+	LinceBindShader(renderer_state.shader);
+	LinceBindVertexArray(renderer_state.va);
+    LinceBindIndexBuffer(renderer_state.ib);
+
+	/* Update settings */
+	LinceEnableAlphaBlend();
+	LinceEnableDepthTest();
+
 	/* Update camera */
 	LinceSetShaderUniformMat4(renderer_state.shader, "u_view_proj", cam->view_proj);
+	
 	/* Reset batch */
 	renderer_state.quad_count = 0;
 	renderer_state.texture_slots[0] = renderer_state.white_texture;
