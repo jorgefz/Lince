@@ -152,6 +152,8 @@ static void LinceOnUpdate(){
     float new_time_ms = (float)(glfwGetTime() * 1000.0);
     app.dt = new_time_ms - app.time_ms;
     app.time_ms = new_time_ms;
+    app.screen_width = app.window->width;
+    app.screen_height = app.window->height;
 
     LinceUIBegin(app.ui);
 

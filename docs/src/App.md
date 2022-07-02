@@ -11,6 +11,12 @@ Once the settings have been tuned, call the function `LinceRun()` to initialise 
 ### User settings
 - `void* user_data`
 	- Pointer for custom data set by the user
+- `uint32_t screen_width`
+	- Desired window width - should be set before calling `LinceRun`
+- `uint32_t screen_height`
+	- Desired window height - should be set before calling `LinceRun`
+- `const char* title`
+	- String title for the window - should be set before calling `LinceRun`
 
 ### User callbacks
 These callbacks should be set before the applciation starts running.

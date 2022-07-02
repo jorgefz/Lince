@@ -25,7 +25,7 @@
 6. 🔷 Provide UI callback to layers
 
 ## API ease of use
-1. 🔷 Add more user settings prior to calling `LinceRun`
+1. 💛 Add more user settings prior to calling `LinceRun`
 
 ## Next goals
 1. 💛 Add UI library: [Nuklear](https://github.com/Immediate-Mode-UI/Nuklear/)
