@@ -27,8 +27,16 @@ void NKLayerOnUpdate(LinceLayer* layer, float dt){
         static int op = EASY;
         static int property = 20;
         nk_layout_row_static(ctx, 30, 80, 1);
-        if (nk_button_label(ctx, "button"))
-            fprintf(stdout, "button pressed\n");
+
+        if (nk_button_label(ctx, "button")){
+
+        }
+
+        static char buffer[1000] = {0};
+        sprintf(buffer, "dt = %.2f ms", dt);
+        nk_label(ctx, buffer, NK_TEXT_LEFT);
+        sprintf(buffer, "fps = %.2f", 1000.0/dt);
+        nk_label(ctx, buffer, NK_TEXT_LEFT);
 
         nk_layout_row_dynamic(ctx, 30, 2);
         if (nk_option_label(ctx, "easy", op == EASY)) op = EASY;
@@ -134,8 +142,13 @@ void MyLayerOnUpdate(LinceLayer* layer, float dt) {
     if (LinceIsKeyPressed(LinceKey_Period)) data->cam->zoom *= 0.99; // * 0.5 * dt;
     if (LinceIsKeyPressed(LinceKey_Comma))  data->cam->zoom /= 0.99; // * 0.5 * dt;
     // debug frame time
-    if (LinceIsKeyPressed(LinceKey_p)) printf("dt: %7.3f ms, fps: %7.1f\n", dt, 1000.0/dt);
+    if (LinceIsKeyPressed(LinceKey_p)){
+        int n = printf("dt: %7.3f ms, fps: %7.1f", dt, 1000.0/dt);
+        fflush(stdout);
+        for(int i=0; i!=n; ++i) printf("\b \b");
+    }
     
+
     LinceBeginScene(data->cam);
 
     int gridx = 10;
@@ -211,10 +224,7 @@ void GameInit() {
 
 void GameOnUpdate(float dt) {
     LinceCheckErrors();
-}
-
-void GameOnEvent(LinceEvent* e) {
-
+    (void)dt;
 }
 
 void GameTerminate() {
@@ -230,10 +240,19 @@ int main(int argc, const char* argv[]) {
 
     LinceApp* app = LinceGetAppState();
 
+    // app->user_data = NULL;
+    app->screen_width = 900;
+    app->screen_height = 600;
+    app->title = "The Legend of Cheesus Christ";
+    // app->fullscreen
+    // app->vsync
+
     app->game_init = GameInit;
     app->game_on_update = GameOnUpdate;
-    app->game_on_event = GameOnEvent;
+    // app->game_on_event = GameOnEvent;
     app->game_terminate = GameTerminate;
+
+    
     
     LinceRun();
 

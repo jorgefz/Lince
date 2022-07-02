@@ -19,7 +19,7 @@ void LinceRun();
 /* --- Static functions --- */
 
 /* Initialises OpenGL window and layer stacks */
-/* static void LinceInit(); */
+static void LinceInit();
 
 /* Called once per frame, updates window and renders layers */
 static void LinceOnUpdate();
@@ -81,9 +81,9 @@ void LinceCheckErrors(){
 
 void LinceRun(){
 
-    LinceInit(530, 300, 0); // width, height, flags
-    app.running = LinceTrue;
+    LinceInit();
 
+    LINCE_INFO(" Running main loop...");
     while(app.running){
         LinceOnUpdate();
     }
@@ -123,9 +123,14 @@ LinceLayer* LinceGetCurrentOverlay(){
 
 /* --- Implementations of static functions --- */
 
-/*static*/ void LinceInit(unsigned int width, unsigned int height, int flags){
+static void LinceInit(){
+    // Check user settings and set defaults
+    if (app.screen_width == 0) app.screen_width = 500;
+    if (app.screen_height == 0) app.screen_height = 500;
+    if (app.title == NULL) app.title = "Lince Window";
+    
     // Create a windowed mode window and its OpenGL context
-    app.window = LinceCreateWindow(width, height);
+    app.window = LinceCreateWindow(app.screen_width, app.screen_height, app.title);
     LinceSetMainEventCallback(app.window, LinceOnEvent);
 
     // init layer and overlay stacks
@@ -134,6 +139,7 @@ LinceLayer* LinceGetCurrentOverlay(){
     
     LinceInitRenderer(app.window);
     app.ui = LinceInitUI(app.window->handle);
+    app.running = LinceTrue;
 
     if (app.game_init) app.game_init(); // user may push layers onto stack
 }

@@ -38,7 +38,7 @@ static void LinceInitGLContext(GLFWwindow* handle){
 /* Public API */
 
 /// TODO: third argument bit flags for fullscreen, vsync, etc
-LinceWindow* LinceCreateWindow(unsigned int width, unsigned int height){
+LinceWindow* LinceCreateWindow(unsigned int width, unsigned int height, const char* title){
 
     LINCE_ASSERT(glfwInit(), "Failed to initialise GLFW");
     
@@ -47,7 +47,7 @@ LinceWindow* LinceCreateWindow(unsigned int width, unsigned int height){
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     
-    GLFWwindow* handle = glfwCreateWindow(width, height, "Lince Window", NULL, NULL);
+    GLFWwindow* handle = glfwCreateWindow(width, height, title, NULL, NULL);
     if (!handle) {
         glfwTerminate();
         LINCE_ASSERT(0, "Failed to create window");

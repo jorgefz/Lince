@@ -20,6 +20,8 @@ typedef void (*LinceGameTerminateFn)();
 typedef struct LinceApp{
     /* User settings */
     void* user_data;
+    uint32_t screen_width, screen_height;
+    const char* title;
     // add more settings
 
     /* User callbacks */
@@ -46,9 +48,6 @@ typedef struct LinceApp{
 
 /* Runs main application loop */
 void LinceRun();
-
-/* TEMPORARY - Should this be called by user? */
-void LinceInit(unsigned int width, unsigned int height, int flags);
 
 /* Fetches any OpenGL errors and exits if sucessful */
 void LinceCheckErrors();

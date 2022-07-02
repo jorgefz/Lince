@@ -13,7 +13,7 @@ typedef struct {
 } LinceWindow; 
 
 /* Initialises GLFW window */
-LinceWindow* LinceCreateWindow(unsigned int width, unsigned int height);
+LinceWindow* LinceCreateWindow(unsigned int width, unsigned int height, const char* title);
 
 /* Signals whether the window should be shutdown */
 unsigned int LinceShouldCloseWindow(LinceWindow* window);
