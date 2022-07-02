@@ -33,20 +33,26 @@ LinceUILayer* LinceInitUI(void* glfw_window){
 	// Initialise Font
     struct nk_font_atlas *atlas;
     nk_glfw3_font_stash_begin(ui->glfw, &atlas);
-    struct nk_font *font = nk_font_atlas_add_from_file(atlas, "lince/assets/fonts/DroidSans.ttf", 13, 0);
+
+    ui->fonts[LinceFont_Droid15] = nk_font_atlas_add_from_file(atlas, "lince/assets/fonts/DroidSans.ttf", 15, 0);
+    ui->fonts[LinceFont_Droid20] = nk_font_atlas_add_from_file(atlas, "lince/assets/fonts/DroidSans.ttf", 20, 0);
+    ui->fonts[LinceFont_Droid30] = nk_font_atlas_add_from_file(atlas, "lince/assets/fonts/DroidSans.ttf", 30, 0);
+    ui->fonts[LinceFont_Droid50] = nk_font_atlas_add_from_file(atlas, "lince/assets/fonts/DroidSans.ttf", 50, 0);
+    
     nk_glfw3_font_stash_end(ui->glfw);
+    
     //nk_style_load_all_cursors(data->ctx, atlas->cursors);
-    nk_style_set_font(ui->ctx, &font->handle);
+    //nk_style_set_font(ui->ctx, &droid_20->handle);
 
 	LINCE_INFO(" UI Initialised");
 	return ui;
 }
 
-void LinceUIBegin(LinceUILayer* ui){
+void LinceBeginUIRender(LinceUILayer* ui){
 	nk_glfw3_new_frame(ui->glfw);
 }
 
-void LinceUIEnd(LinceUILayer* ui){
+void LinceEndUIRender(LinceUILayer* ui){
 	nk_glfw3_render(ui->glfw, NK_ANTI_ALIASING_ON, MAX_VERTEX_BUFFER, MAX_ELEMENT_BUFFER);
 }
 
@@ -80,5 +86,40 @@ void LinceTerminateUI(LinceUILayer* ui){
     free(ui->glfw);
 	free(ui);
 	LINCE_INFO(" UI Terminated");
+}
+
+void LinceUIText(
+    LinceUILayer* ui,
+    const char* window_name,
+    float x, float y,
+    LinceFonts font,
+    size_t max_size,
+    const char* text, ...
+    ) {
+    
+    struct nk_context* ctx = ui->ctx;
+    struct nk_style_item style_state = ctx->style.window.fixed_background;
+
+    char formatted_text[max_size];
+    //memset(formatted_text, ' ', max_size-1);
+
+    // format given text
+    va_list args;
+    va_start(args, text);
+    size_t len = vsprintf(formatted_text, text, args);
+    va_end(args);
+
+    // hide background
+    ctx->style.window.fixed_background = nk_style_item_hide();
+    
+    nk_style_set_font(ui->ctx, &ui->fonts[font]->handle);
+    if(nk_begin(ctx, window_name, nk_rect(x, y, 20*(float)len, 50), NK_WINDOW_NO_INPUT)){
+        nk_layout_row_static(ctx, 30, 15*(float)len, 1);
+        nk_text(ctx, formatted_text, len, NK_TEXT_CENTERED); 
+    }
+    nk_end(ctx);
+
+    // restore previous style
+    ctx->style.window.fixed_background = style_state;
 }
 

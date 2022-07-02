@@ -155,7 +155,7 @@ static void LinceOnUpdate(){
     app.screen_width = app.window->width;
     app.screen_height = app.window->height;
 
-    LinceUIBegin(app.ui);
+    LinceBeginUIRender(app.ui);
 
     // update layers
     unsigned int i;
@@ -177,18 +177,8 @@ static void LinceOnUpdate(){
     // update user application
     if (app.game_on_update) app.game_on_update(app.dt);
 
-    LinceUIEnd(app.ui);
+    LinceEndUIRender(app.ui);
 
-    /* Future API
-    LinceUIBegin(app.ui);
-    for layer in app.layer_stack {
-        layer->OnUIRender();
-    }
-    for overlay in app.overlay_stack {
-        overlay->OnUIRender();
-    }
-    LinceUIEnd(app.ui);
-    */
 
     LinceUpdateWindow(app.window);
 }
