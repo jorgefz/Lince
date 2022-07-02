@@ -20,8 +20,8 @@
 1. ✅ **Add Nuklear to project with appropriate backend**
 2. ✅ **Add Nuklear layer and render GUI**
 3. ✅ **Sort out issues with event callbacks and GLFW user pointer**
-4. ✅ Stop Nuklear API from exposing GLFW and OpenGL API to the user
-5. ✅ Move Nuklear rendering layer to the engine
+4. ✅ **Stop Nuklear API from exposing GLFW and OpenGL API to the user**
+5. ✅ **Move Nuklear rendering layer to the engine**
 6. 🔷 Provide UI callback to layers
 
 ## API ease of use
@@ -31,8 +31,11 @@
 1. 💛 Add UI library: [Nuklear](https://github.com/Immediate-Mode-UI/Nuklear/)
 2. 🔷 Add tilesets
 3. 🔷 Add tilemaps
-4. 🔷 Add audio library, e.g. [Miniaudio](https://github.com/mackron/miniaudio)
+4. 🔷 Make small games to test the engine
+5. 🔷 Add audio library, e.g. [Miniaudio](https://github.com/mackron/miniaudio)
 
 ## Extra/recurrent goals
 1. 🟠 Improve documentation
 2. 🟠 Add tests
+3. 🟠 Add logging
+4. 🟠 Fix issues with compiling on Windows

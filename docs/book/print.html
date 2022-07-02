@@ -76,7 +76,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded affix "><a href="HomePage.html">Home Page</a></li><li class="chapter-item expanded "><a href="App.html"><strong aria-hidden="true">1.</strong> App</a></li><li class="chapter-item expanded "><a href="Events.html"><strong aria-hidden="true">2.</strong> Events</a></li><li class="chapter-item expanded "><a href="Layers.html"><strong aria-hidden="true">3.</strong> Layers</a></li><li class="chapter-item expanded "><a href="Input.html"><strong aria-hidden="true">4.</strong> Input</a></li><li class="chapter-item expanded "><a href="Rendering.html"><strong aria-hidden="true">5.</strong> Rendering</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="Buffers.html"><strong aria-hidden="true">5.1.</strong> Buffers</a></li><li class="chapter-item expanded "><a href="VertexArrays.html"><strong aria-hidden="true">5.2.</strong> Vertex Arrays</a></li><li class="chapter-item expanded "><a href="Shaders.html"><strong aria-hidden="true">5.3.</strong> Shaders</a></li><li class="chapter-item expanded "><a href="Textures.html"><strong aria-hidden="true">5.4.</strong> Textures</a></li><li class="chapter-item expanded "><a href="Renderer.html"><strong aria-hidden="true">5.5.</strong> Renderer</a></li><li class="chapter-item expanded "><a href="Cameras.html"><strong aria-hidden="true">5.6.</strong> Cameras</a></li></ol></li><li class="chapter-item expanded "><div><strong aria-hidden="true">6.</strong> Development Diary</div></li><li><ol class="section"><li class="chapter-item expanded "><a href="ToDo.html"><strong aria-hidden="true">6.1.</strong> ToDo</a></li></ol></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded affix "><a href="HomePage.html">Home Page</a></li><li class="chapter-item expanded "><a href="App.html"><strong aria-hidden="true">1.</strong> App</a></li><li class="chapter-item expanded "><a href="Events.html"><strong aria-hidden="true">2.</strong> Events</a></li><li class="chapter-item expanded "><a href="Layers.html"><strong aria-hidden="true">3.</strong> Layers</a></li><li class="chapter-item expanded "><a href="Input.html"><strong aria-hidden="true">4.</strong> Input</a></li><li class="chapter-item expanded "><a href="Rendering.html"><strong aria-hidden="true">5.</strong> Rendering</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="Buffers.html"><strong aria-hidden="true">5.1.</strong> Buffers</a></li><li class="chapter-item expanded "><a href="VertexArrays.html"><strong aria-hidden="true">5.2.</strong> Vertex Arrays</a></li><li class="chapter-item expanded "><a href="Shaders.html"><strong aria-hidden="true">5.3.</strong> Shaders</a></li><li class="chapter-item expanded "><a href="Textures.html"><strong aria-hidden="true">5.4.</strong> Textures</a></li><li class="chapter-item expanded "><a href="Renderer.html"><strong aria-hidden="true">5.5.</strong> Renderer</a></li><li class="chapter-item expanded "><a href="Cameras.html"><strong aria-hidden="true">5.6.</strong> Cameras</a></li></ol></li><li class="chapter-item expanded "><a href="UI.html"><strong aria-hidden="true">6.</strong> UI</a></li><li class="chapter-item expanded "><div><strong aria-hidden="true">7.</strong> Development Diary</div></li><li><ol class="section"><li class="chapter-item expanded "><a href="ToDo.html"><strong aria-hidden="true">7.1.</strong> ToDo</a></li></ol></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -1261,6 +1261,112 @@ LinceEndScene();
 <pre><code class="language-c">void LinceDeleteCamera(LinceCamera* cam)
 </code></pre>
 <p>Frees allocated camera data.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="ui"><a class="header" href="#ui">UI</a></h1>
+<p>The Lince engine uses Nuklear for its graphical user interface. See <a href="https://github.com/Immediate-Mode-UI/Nuklear/">the gihub repo</a> for detailed documentation. This document will compile useful Nuklear functions as well a Lince wrappers.</p>
+<p>Any of Nuklear's window functions (anything between and including <code>nk_begin</code> and <code>nk_end</code>) can be used on the <code>OnUpdate</code> callbacks of any given layer. See <a href="./Layers.html">Layers.md</a> for a descriptopn on how to use layers in Lince. </p>
+<p>Example:</p>
+<pre><code class="language-c">void MyLayerOnUpdate(LinceLayer* layer, float dt){
+	struct nk_context *ctx = LinceGetAppState()-&gt;ui-&gt;ctx;
+
+	if (nk_begin(ctx, &quot;Demo&quot;, nk_rect(50, 50, 230, 250),
+        NK_WINDOW_BORDER|NK_WINDOW_MOVABLE|NK_WINDOW_SCALABLE|
+        NK_WINDOW_MINIMIZABLE|NK_WINDOW_TITLE
+    )) {
+		nk_layout_row_static(ctx, 30, 80, 1);
+        if (nk_button_label(ctx, &quot;button&quot;)){
+			printf(&quot;button pressed\n&quot;);
+		}
+	}
+	nk_end(ctx);
+}
+</code></pre>
+<h2 id="linceuilayer"><a class="header" href="#linceuilayer">LinceUILayer</a></h2>
+<p>Wrapper that saves Nuklear's context and its GLFW rendering state.</p>
+<ul>
+<li><code>struct nk_context *ctx</code></li>
+<li><code>void *glfw</code></li>
+<li><code>void *glfw_window</code></li>
+<li><code>struct nk_font* fonts[LinceFont_Count]</code></li>
+</ul>
+<h2 id="lincefonts"><a class="header" href="#lincefonts">LinceFonts</a></h2>
+<p>Enum that offers a handy way to obtain a preloaded Nuklear font.
+The values serve as an index for the array <code>app-&gt;ui-&gt;fonts</code> which holds pointers to all preloaded fonts.
+The number next to the enum name indicates the font size, e.g. <code>LinceFont_Droid20</code> indexes the Droid font with font size 20.</p>
+<table><thead><tr><th>Enum</th><th>Value</th></tr></thead><tbody>
+<tr><td>LinceFont_Droid15</td><td>0</td></tr>
+<tr><td>LinceFont_Droid20</td><td>1</td></tr>
+<tr><td>LinceFont_Droid30</td><td>2</td></tr>
+<tr><td>LinceFont_Droid50</td><td>3</td></tr>
+<tr><td>LinceFont_Count</td><td>4</td></tr>
+</tbody></table>
+<p>Example on how to retrieve a preloaded font:</p>
+<pre><code class="language-c">void MyLayerOnUpdate(LinceLayer* layer, float dt){
+	LinceApp* app = LinceGetAppState();
+	struct nk_font* title_font = app-&gt;ui-&gt;fonts[LinceFont_Droid50];
+	nk_style_set_font(app-&gt;ui-&gt;ctx, &amp;title_font-&gt;handle);
+}
+</code></pre>
+<h2 id="linceuitext"><a class="header" href="#linceuitext">LinceUIText</a></h2>
+<pre><code class="language-c">void LinceUIText(
+    LinceUILayer* ui,
+    const char* name,
+    float x,
+	float y,
+    LinceFonts font, 
+    size_t max_size, 
+    const char* text,
+    ...
+)
+</code></pre>
+<p>Wrapper function that renders plain text to the screen.
+Parameters:</p>
+<ul>
+<li><code>LinceUILayer* ui</code>
+<ul>
+<li>UI state, this can be retrieved from the application state <code>LinceGetAppState()-&gt;ui</code>.</li>
+</ul>
+</li>
+<li><code>const char* name</code>
+<ul>
+<li>Unique string identifier for the Nuklear window.</li>
+</ul>
+</li>
+<li><code>float x</code>
+<ul>
+<li>X position of the text in pixels, measured from the left-end of the text box.</li>
+</ul>
+</li>
+<li><code>float y</code>
+<ul>
+<li>Y position of the text in pixels, measred from the top of the text box.</li>
+</ul>
+</li>
+<li><code>LinceFonts font</code>
+<ul>
+<li>Font and font size to use. See below for available fonts.</li>
+</ul>
+</li>
+<li><code>size_t max_size</code>
+<ul>
+<li>Maximum number of characters to display.</li>
+</ul>
+</li>
+<li><code>const char* text, ...</code>
+<ul>
+<li>String to render. This may be formatted using <code>printf</code> conventions and additional variadic arguments.</li>
+</ul>
+</li>
+</ul>
+<p>This example renders the current delta-time and FPS to the upper left corner of the screen:</p>
+<pre><code class="language-c">void MyLayerOnUpdate(LinceLayer* layer, float dt){
+
+	LinceUILayer* ui = LinceGetAppState()-&gt;ui;
+
+	/*          ui,  identifier,     x,  y,  font,              max, text,       format varargs */
+	LinceUIText(ui, &quot;FPS_indicator&quot;, 10, 10, LinceFont_Droid30, 10,  &quot;FPS %.0f&quot;, 1000.0/dt);
+    LinceUIText(ui, &quot;DT_indicator&quot;,  10, 40, LinceFont_Droid30, 10,  &quot;%.2f ms&quot;,  dt);
+}
+</code></pre>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="to-do"><a class="header" href="#to-do">To Do</a></h1>
 <h2 id="symbol-legend"><a class="header" href="#symbol-legend">Symbol legend</a></h2>
 <table><thead><tr><th>Symbol</th><th>Meaning</th></tr></thead><tbody>
@@ -1282,8 +1388,8 @@ LinceEndScene();
 <li>✅ <strong>Add Nuklear to project with appropriate backend</strong></li>
 <li>✅ <strong>Add Nuklear layer and render GUI</strong></li>
 <li>✅ <strong>Sort out issues with event callbacks and GLFW user pointer</strong></li>
-<li>✅ Stop Nuklear API from exposing GLFW and OpenGL API to the user</li>
-<li>✅ Move Nuklear rendering layer to the engine</li>
+<li>✅ <strong>Stop Nuklear API from exposing GLFW and OpenGL API to the user</strong></li>
+<li>✅ <strong>Move Nuklear rendering layer to the engine</strong></li>
 <li>🔷 Provide UI callback to layers</li>
 </ol>
 <h2 id="api-ease-of-use"><a class="header" href="#api-ease-of-use">API ease of use</a></h2>
@@ -1295,12 +1401,15 @@ LinceEndScene();
 <li>💛 Add UI library: <a href="https://github.com/Immediate-Mode-UI/Nuklear/">Nuklear</a></li>
 <li>🔷 Add tilesets</li>
 <li>🔷 Add tilemaps</li>
+<li>🔷 Make small games to test the engine</li>
 <li>🔷 Add audio library, e.g. <a href="https://github.com/mackron/miniaudio">Miniaudio</a></li>
 </ol>
 <h2 id="extrarecurrent-goals"><a class="header" href="#extrarecurrent-goals">Extra/recurrent goals</a></h2>
 <ol>
 <li>🟠 Improve documentation</li>
 <li>🟠 Add tests</li>
+<li>🟠 Add logging</li>
+<li>🟠 Fix issues with compiling on Windows</li>
 </ol>
 
                     </main>
