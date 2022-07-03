@@ -9,6 +9,7 @@
 #include "gui/nuklear_flags.h"
 #include "gui/nuklear.h"
 
+#include "pong.h"
 
 void NKLayerOnUpdate(LinceLayer* layer, float dt){
     
@@ -217,8 +218,9 @@ LinceLayer* MyLayerInit(char* name) {
 
 void GameInit() {
 	LINCE_INFO("\n User App Initialised");
-    LincePushLayer(MyLayerInit("Test"));
-    LincePushLayer(NKLayerInit());
+    //LincePushLayer(MyLayerInit("Test"));
+    //LincePushLayer(NKLayerInit());
+    LincePushLayer(PongLayerInit());
 }
 
 void GameOnUpdate(float dt) {
