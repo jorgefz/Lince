@@ -102,10 +102,10 @@ void LinceInitRenderer() {
 		MAX_VERTICES * sizeof(LinceQuadVertex)
 	);
 	LinceBufferElement layout[] = {
-        {LinceBufferType_Float3, "aPos"},
-        {LinceBufferType_Float2, "aTexCoord"},
-        {LinceBufferType_Float4, "aColor"},
-		{LinceBufferType_Float,  "aTextureID"}
+        {LinceBufferType_Float3, "aPos",       0,0,0,0},
+        {LinceBufferType_Float2, "aTexCoord",  0,0,0,0},
+        {LinceBufferType_Float4, "aColor",     0,0,0,0},
+		{LinceBufferType_Float,  "aTextureID", 0,0,0,0}
     };
 
 	// Generate indices for all quads in a full batch

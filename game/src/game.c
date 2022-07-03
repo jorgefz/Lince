@@ -6,12 +6,8 @@
 #include "cglm/vec4.h"
 #include "cglm/affine.h"
 
-// TEMPORARY - exposes GLFW API
-#include <GLFW/glfw3.h>
-#include <glad/glad.h>
 #include "gui/nuklear_flags.h"
 #include "gui/nuklear.h"
-#include "gui/nuklear_glfw_gl3.h"
 
 
 void NKLayerOnUpdate(LinceLayer* layer, float dt){

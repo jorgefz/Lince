@@ -102,13 +102,15 @@ void LinceUIText(
     struct nk_context* ctx = ui->ctx;
     struct nk_style_item style_state = ctx->style.window.fixed_background;
 
-    char formatted_text[max_size];
-    //memset(formatted_text, ' ', max_size-1);
+    // SLOW - refactor this in the future
+    char* formatted_text = malloc((max_size+1) * sizeof(char));
+    memset(formatted_text, ' ', max_size-1);
+    formatted_text[max_size-1] = (char)0;
 
     // format given text
     va_list args;
     va_start(args, text);
-    size_t len = vsprintf(formatted_text, text, args);
+    size_t len = vsnprintf(formatted_text, max_size, text, args);
     va_end(args);
 
     // hide background
@@ -120,6 +122,8 @@ void LinceUIText(
         nk_text(ctx, formatted_text, len, NK_TEXT_CENTERED); 
     }
     nk_end(ctx);
+
+    free(formatted_text);
 
     // restore previous style
     ctx->style.window.fixed_background = style_state;
