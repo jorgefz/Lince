@@ -4,8 +4,8 @@
 #include "event/key_event.h"
 #include "event/mouse_event.h"
 
-#include <GLFW/glfw3.h>
 #include <glad/glad.h>
+#include <GLFW/glfw3.h>
 
 #include "gui/nuklear_flags.h"
 #include "gui/nuklear.h"
