@@ -146,6 +146,8 @@ static void KeyCallback(GLFWwindow* wptr, int key, int scancode, int action, int
     }
     if (w->event_callback) w->event_callback(&e);
     LinceEndEvent(&e);
+    LINCE_UNUSED(scancode);
+    LINCE_UNUSED(mods);
 }
 
 static void CharCallback(GLFWwindow* wptr, unsigned int key_typed){
@@ -173,6 +175,7 @@ static void MouseButtonCallback(GLFWwindow* wptr, int button, int action, int mo
     }
     if (w->event_callback) w->event_callback(&e);
     LinceEndEvent(&e);
+    LINCE_UNUSED(mods);
 }
 
 static void MouseScrolledCallback(GLFWwindow* wptr, double xoff, double yoff){

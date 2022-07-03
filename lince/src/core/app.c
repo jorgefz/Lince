@@ -255,6 +255,7 @@ static LinceBool LinceOnEventWindowResize(LinceEvent* e){
 static LinceBool LinceOnEventWindowClose(LinceEvent* e) {
     app.running = LinceFalse;
     return LinceFalse; // allow other layers to receive event
+    LINCE_UNUSED(e);
 }
 
 

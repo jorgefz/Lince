@@ -36,7 +36,7 @@ void NKLayerOnUpdate(LinceLayer* layer, float dt){
         static int property = 20;
         nk_layout_row_static(ctx, 30, 80, 1);
 
-        if (nk_button_label(ctx, "button"));
+        if (nk_button_label(ctx, "button")) { }
 
         static char buffer[1000] = {0};
         sprintf(buffer, "dt = %.2f ms", dt);
@@ -69,6 +69,8 @@ void NKLayerOnUpdate(LinceLayer* layer, float dt){
 
     LinceSetClearColor(bg.r, bg.g, bg.b, bg.a);
     
+    LINCE_UNUSED(window_height);
+    LINCE_UNUSED(layer);
 }
 
 LinceLayer* NKLayerInit(){
@@ -119,11 +121,6 @@ void MyLayerOnDetach(LinceLayer* layer) {
     LinceDeleteCamera(data->cam);
 
     free(data);
-}
-
-
-void MyLayerOnEvent(LinceLayer* layer, LinceEvent* e) {
-    
 }
 
 
@@ -212,7 +209,7 @@ LinceLayer* MyLayerInit(char* name) {
     LinceLayer* layer = LinceCreateLayer(my_layer);
     layer->OnAttach = MyLayerOnAttach;
     layer->OnDetach = MyLayerOnDetach;
-    layer->OnEvent  = MyLayerOnEvent;
+    //layer->OnEvent  = MyLayerOnEvent;
     layer->OnUpdate = MyLayerOnUpdate;
 
     return layer;
@@ -230,13 +227,12 @@ void GameInit() {
 
 void GameOnUpdate(float dt) {
     LinceCheckErrors();
-    (void)dt;
+    LINCE_UNUSED(dt);
 }
 
 void GameTerminate() {
     LINCE_INFO(" User App Terminated");
 }
-
 
 int main(int argc, const char* argv[]) {
 
@@ -257,10 +253,10 @@ int main(int argc, const char* argv[]) {
     app->game_on_update = GameOnUpdate;
     // app->game_on_event = GameOnEvent;
     app->game_terminate = GameTerminate;
-
-    
     
     LinceRun();
 
+    LINCE_UNUSED(argc);
+    LINCE_UNUSED(argv);
     return 0;
 }

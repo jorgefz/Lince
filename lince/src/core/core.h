@@ -17,6 +17,9 @@ LINCE_MACOS     - MacOS
 
 2) Debug messages
 
+LINCE_UNUSED( x )
+    Removes compiler warning about unused variable
+
 LINCE_LOGFILE
     File handle to which debug messages are printed.
     Set to 'stderr' by default.
@@ -61,6 +64,9 @@ LINCE_STR_MAX
 #endif
 
 /* Debugging */
+
+#define LINCE_UNUSED(x) (void)(x)
+
 #ifndef LINCE_LOGFILE
 #    define LINCE_LOGFILE stderr
 #endif

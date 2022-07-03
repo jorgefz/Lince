@@ -76,6 +76,8 @@ void LinceUIOnEvent(LinceUILayer* ui, LinceEvent* event){
     case LinceEventType_MouseButtonReleased:
         nk_glfw3_mouse_button_callback(win, event->data.MouseButtonPressed->button, GLFW_RELEASE, 0);
         break;
+    default:
+        break;
     }
     glfwSetWindowUserPointer(win, lince_window);
 }
