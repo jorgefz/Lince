@@ -19,6 +19,7 @@
 #include "core/window.h"
 #include "core/input.h"
 #include "core/keycodes.h"
+#include "core/mousecodes.h"
 #include "core/layer.h"
 #include "core/app.h"
 
