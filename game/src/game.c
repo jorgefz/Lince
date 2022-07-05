@@ -10,6 +10,7 @@
 #include "gui/nuklear.h"
 
 #include "pong.h"
+#include "missile_command.h"
 
 void NKLayerOnUpdate(LinceLayer* layer, float dt){
     
@@ -220,7 +221,8 @@ void GameInit() {
 	LINCE_INFO("\n User App Initialised");
     //LincePushLayer(MyLayerInit("Test"));
     //LincePushLayer(NKLayerInit());
-    LincePushLayer(PongLayerInit());
+    //LincePushLayer(PongLayerInit());
+    LincePushLayer(MCommandLayerInit());
 }
 
 void GameOnUpdate(float dt) {

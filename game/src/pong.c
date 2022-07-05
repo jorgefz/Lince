@@ -5,6 +5,12 @@ typedef struct PongLayer{
 	LinceTexture *ball_tex, *pad_tex;
 } PongLayer;
 
+typedef struct PongObject {
+	float w, h;   // size
+	float x, y;   // position
+	float vx, vy; // speed
+} PongObject;
+
 enum Collision {
 	NO_COLLISION,
 	LEFT_COLLISION,
@@ -28,13 +34,13 @@ static PongObject ball = {
 
 static PongObject lpad = {
 	.w = 0.2f, .h = 0.5f,
-	.x = -1.0f, .y = 0.0f,
+	.x = -1.4f, .y = 0.0f,
 	.vx = 0.0f, .vy = 0.0f
 };
 
 static PongObject rpad = {
 	.w = 0.2f, .h = 0.5f,
-	.x = 1.0f, .y = 0.0f,
+	.x = 1.4f, .y = 0.0f,
 	.vx = 0.0f, .vy = 0.0f
 };
 
