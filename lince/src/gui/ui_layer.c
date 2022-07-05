@@ -119,7 +119,7 @@ void LinceUIText(
     nk_style_set_font(ui->ctx, &ui->fonts[font]->handle);
     if(nk_begin(ctx, window_name, nk_rect(x, y, 20*(float)len, 50), NK_WINDOW_NO_INPUT)){
         nk_layout_row_static(ctx, 30, 15*(float)len, 1);
-        nk_text(ctx, formatted_text, len, NK_TEXT_CENTERED); 
+        nk_text(ctx, formatted_text, len, NK_TEXT_LEFT); 
     }
     nk_end(ctx);
 
