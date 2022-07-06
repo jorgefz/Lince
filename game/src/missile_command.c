@@ -46,6 +46,7 @@ typedef struct GameState{
 	float missile_vmax;
 	float ymin, ymax;
 	float xmin, xmax;
+	float angle; // cannon angle
 
 	LinceBool missile_cooldown;
 	float bomb_cooldown, bomb_cooldown_max;
@@ -86,19 +87,6 @@ void ToWorldCoords(float *x, float *y, LinceCamera* cam){
 }
 
 void GetMousePosWorld(float *x, float *y, LinceCamera* cam){
-	
-	/*
-	const float width = (float)LinceGetAppState()->window->width;
-	const float height = (float)LinceGetAppState()->window->height;
-	float mouse_x, mouse_y;
-	LinceGetMousePos(&mouse_x, &mouse_y);
-	
-	mouse_x = mouse_x/width - 0.5f;
-	mouse_y = 1.0f - mouse_y/height;
-	*x = mouse_x;
-	*y = mouse_y;
-	*/
-
 	LinceGetMousePos(x, y);
 	ToWorldCoords(x, y, cam);
 }
@@ -108,9 +96,7 @@ void GetMousePosWorld(float *x, float *y, LinceCamera* cam){
 float CalculateCannonAngle(LinceCamera* cam){
 	float mouse_x, mouse_y;
 	GetMousePosWorld(&mouse_x, &mouse_y, cam);
-
 	const float cannon_x = 0.0f, cannon_y = -1.0f;
-	// return atan2f(mouse_x, mouse_y) * 180.0f / M_PI;
 	return 90.0f - atan2f(mouse_y-cannon_y, mouse_x-cannon_x) * 180.0f / M_PI;
 }
 
@@ -307,24 +293,17 @@ void UpdateBombs(GameState* state){
 		bomb->y += bomb->vy;
 	}
 
-	// find and delete crashed bombs
-	LinceBool cleanup = LinceTrue;
-	while(cleanup){
-		int dead_bomb = -1;
-		for(int i=0; i!=state->bomb_count; ++i){
-			Collider* b = &state->bombs[i];
-			// find crashed bomb
-			if (b->y <= state->ymin){
-				dead_bomb = i;
-				state->hp -= BOMB_HP_DAMAGE;
-				break;
-			}
-		}
-		if(dead_bomb == -1){
-			// cleanup done - no more stray missiles
-			cleanup = LinceFalse;
+	int dead_bomb = -1;
+	for(int i=0; i!=state->bomb_count; ++i){
+		Collider* b = &state->bombs[i];
+		// find crashed bomb
+		if (b->y <= state->ymin){
+			dead_bomb = i;
+			state->hp -= BOMB_HP_DAMAGE;
 			break;
 		}
+	}
+	if(dead_bomb > -1){
 		DeleteBomb(state, dead_bomb);
 	}
 }
@@ -354,34 +333,6 @@ void CheckBombIntercept(GameState* state){
 	if(dead_bomb != -1){
 			DeleteBomb(state, dead_bomb);
 			DeleteMissile(state, dead_missile);
-	}
-
-	return;
-
-	LinceBool cleanup = LinceTrue;
-	while(cleanup){
-		int dead_bomb = -1;
-
-		for(int i=0; i!=state->bomb_count; ++i){
-			Collider* b = &state->bombs[i];
-			for(int j=0; j!=state->missile_count; ++i){
-				Collider* m = &state->missiles[j];
-				if(CollidersOverlap(b, m)){
-					dead_bomb = i;
-					state->score += 1;
-					printf("COLLISION!\n");
-					break;
-				}
-			}
-			if (dead_bomb > -1) break;
-		}
-
-		if(dead_bomb == -1){
-			// cleanup done - no more intercepted bombs
-			cleanup = LinceFalse;
-			break;
-		}
-		DeleteBomb(state, dead_bomb);
 	}
 }
 
@@ -442,6 +393,7 @@ void MCommandOnUpdate(LinceLayer* layer, float dt){
 
 	// handle missiles
 	float angle = CalculateCannonAngle(data->cam);
+	data->angle = angle;
 	UpdateMissiles(data);
 
 	// handle bombs
@@ -461,10 +413,6 @@ void MCommandOnUpdate(LinceLayer* layer, float dt){
 	LinceUIText(ui, "HP",       40, 100, LinceFont_Droid30, 20, "HP: %d",  data->hp);
 	LinceUIText(ui, "Score",    40, 120, LinceFont_Droid30, 20, "Score: %d",  data->score);
 	LinceUIText(ui, "Markers",  40, 140, LinceFont_Droid30, 20, "Markers: %d",  data->marker_count);
-	float mx, my;
-	LinceGetMousePos(&mx, &my);
-	ToWorldCoords(&mx, &my, data->cam);
-	LinceUIText(ui, "MousePos", 40, 160, LinceFont_Droid30, 20, "Mouse: %.2f %.2f", mx, my);
 
 	// draw objects
 	LinceBeginScene(data->cam);
@@ -487,8 +435,8 @@ void MCommandLayerOnEvent(LinceLayer* layer, LinceEvent* event){
 	if(event->type != LinceEventType_MouseButtonPressed) return;
 	GameState* state = LinceGetLayerData(layer);
 
-	float angle = CalculateCannonAngle(state->cam);
-	LaunchMissile(state, angle);
+	//float angle = CalculateCannonAngle(state->cam);
+	LaunchMissile(state, state->angle);
 	PlaceMarker(state);
 }
 
