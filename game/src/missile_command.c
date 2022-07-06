@@ -2,6 +2,8 @@
 #include "math.h"
 #include "time.h"
 
+#include <cglm/affine.h>
+
 
 /*
 
@@ -17,9 +19,23 @@
 
 #define BOMB_HP_DAMAGE 10
 
+#define BLAST_RADIUS 0.1f
+#define BLAST_LIFETIME_MS 1000.0f
+#define BLAST_COLOR_INIT {1.0f, 1.0f, 0.0, 1.0f}
+
 typedef struct Collider {
 	float x, y, vx, vy, w, h, angle;
 } Collider;
+
+typedef struct Blast {
+	float color[4];  // color of the blast
+	float lifetime;  // time left
+	float life_loss; // loss rate of lifetime 
+} Blast;
+
+typedef struct Marker {
+	float x, y;
+} Marker;
 
 typedef struct GameState{
 	Collider *missiles;
@@ -34,6 +50,14 @@ typedef struct GameState{
 	LinceBool missile_cooldown;
 	float bomb_cooldown, bomb_cooldown_max;
 
+	Blast* blasts;
+	int blast_count;
+	LinceTexture* blast_tex;
+
+	Marker* markers;
+	int marker_count;
+	LinceTexture* marker_tex;
+
 	LinceCamera* cam;
 } GameState;
 
@@ -44,6 +68,94 @@ float GetRandomFloat(float a, float b) {
     float r = random * diff;
     return a + r;
 }
+
+void ToWorldCoords(float *x, float *y, LinceCamera* cam){
+	float sx = *x, sy = *y;
+	const float w = (float)LinceGetAppState()->window->width;
+	const float h = (float)LinceGetAppState()->window->height;
+	// normalise screen coordinates to range (-1,1)
+	sx = 2.0f*sx/w - 1.0f;
+	sy = 1.0f - 2.0f*sy/h;
+	vec4 svec = {sx, sy, 0.0f, 1.0f};
+	mat4 vp_inv;
+	vec4 wvec;
+	glm_mat4_inv(cam->view_proj, vp_inv);
+	glm_mat4_mulv(vp_inv, svec, wvec);
+	*x = wvec[0] / wvec[3];
+	*y = wvec[1] / wvec[3];
+}
+
+void GetMousePosWorld(float *x, float *y, LinceCamera* cam){
+	
+	/*
+	const float width = (float)LinceGetAppState()->window->width;
+	const float height = (float)LinceGetAppState()->window->height;
+	float mouse_x, mouse_y;
+	LinceGetMousePos(&mouse_x, &mouse_y);
+	
+	mouse_x = mouse_x/width - 0.5f;
+	mouse_y = 1.0f - mouse_y/height;
+	*x = mouse_x;
+	*y = mouse_y;
+	*/
+
+	LinceGetMousePos(x, y);
+	ToWorldCoords(x, y, cam);
+}
+
+// Calculates the angle between the Y axis (centered on the screen)
+// and the line connecting the cannon and the mouse pointer.
+float CalculateCannonAngle(LinceCamera* cam){
+	float mouse_x, mouse_y;
+	GetMousePosWorld(&mouse_x, &mouse_y, cam);
+
+	const float cannon_x = 0.0f, cannon_y = -1.0f;
+	// return atan2f(mouse_x, mouse_y) * 180.0f / M_PI;
+	return 90.0f - atan2f(mouse_y-cannon_y, mouse_x-cannon_x) * 180.0f / M_PI;
+}
+
+void PlaceMarker(GameState* state){
+	float x, y;
+	GetMousePosWorld(&x, &y, state->cam);
+	state->marker_count++;
+	state->markers = realloc(state->markers, state->marker_count * sizeof(Marker));
+	LINCE_ASSERT_ALLOC(state->markers, state->marker_count * sizeof(Marker));
+	Marker* m = &state->markers[state->marker_count-1];
+	m->x = x;
+	m->y = y;
+}
+
+void DeleteMarker(GameState* state, int index){
+	if (state->marker_count == 0 || index < 0) return;
+	if (index >= state->marker_count) return;
+	if (state->marker_count == 1){
+		state->marker_count = 0;
+		free(state->markers);
+		state->markers = NULL;
+		return;
+	}
+
+	for(int i = index; i != state->marker_count-1; ++i){
+		memcpy(&state->markers[i], &state->markers[i+1], sizeof(Marker));
+	}
+	state->marker_count--;
+	Marker* new_list = realloc(state->markers, state->marker_count * sizeof(Marker));
+	LINCE_ASSERT_ALLOC(new_list, state->marker_count * sizeof(Marker));
+}
+
+void DrawMarkers(GameState* state){
+	for(int i=0; i!=state->marker_count; ++i){
+		Marker* m = &state->markers[i];
+		LinceDrawQuad((LinceQuadProps){
+			.x = m->x, .y = m->y,
+			.w = 0.05f, .h = 0.05f,
+			.color = {0.0f, 0.2f, 0.8f, 1.0f},
+			.texture = state->marker_tex
+		});
+	}
+}
+
+
 
 // Check if two non-rotatde rectangles overlap
 LinceBool CollidersOverlap(Collider* a, Collider* b){
@@ -67,18 +179,6 @@ LinceBool CollidersOverlap(Collider* a, Collider* b){
 	return overlap;
 }
 
-// Calculates the angle between the Y axis (centered on the screen)
-// and the line connecting the cannon and the mouse pointer.
-float CalculateCannonAngle(){
-	const float width = (float)LinceGetAppState()->window->width;
-	const float height = (float)LinceGetAppState()->window->height;
-	float mouse_x, mouse_y;
-	const float cannon_x = 0.0f, cannon_y = -1.0f;
-	LinceGetMousePos(&mouse_x, &mouse_y);
-	mouse_x = mouse_x/width - 0.5f;
-	mouse_y = 1.0f - mouse_y/height;
-	return atan2f(mouse_x, mouse_y) * 180.0f / M_PI;
-}
 
 void LaunchMissile(GameState* state, float angle){
 	state->missile_count++;
@@ -319,6 +419,10 @@ void MCommandOnAttach(LinceLayer* layer){
 	data->xmin = -1.5f;
 	data->xmax = 1.5f;
 
+	data->markers = NULL;
+	data->marker_count = 0;
+	data->marker_tex = LinceCreateTexture("Marker", "game/assets/textures/marker.png");
+
 	data->bomb_cooldown_max = 3000.0f; // bomb every 3 seconds
 	data->bomb_cooldown = data->bomb_cooldown_max;
 
@@ -337,16 +441,8 @@ void MCommandOnUpdate(LinceLayer* layer, float dt){
 	LinceUpdateCamera(data->cam);
 
 	// handle missiles
-	float angle = CalculateCannonAngle();
+	float angle = CalculateCannonAngle(data->cam);
 	UpdateMissiles(data);
-	if(LinceIsKeyPressed(LinceKey_Space)){
-		if (!data->missile_cooldown){
-			LaunchMissile(data, angle);
-			data->missile_cooldown = LinceTrue;
-		}
-	} else {
-		data->missile_cooldown = LinceFalse;
-	}
 
 	// handle bombs
 	data->bomb_cooldown -= dt;
@@ -358,12 +454,17 @@ void MCommandOnUpdate(LinceLayer* layer, float dt){
 	CheckBombIntercept(data);
 	
 	// draw UI
-	LinceUIText(ui, "Angle",    40, 20,  LinceFont_Droid30, 20, "Angle: %.2f",  90.0f - angle);
+	LinceUIText(ui, "Angle",    40, 20,  LinceFont_Droid30, 20, "Angle: %.2f",  angle);
 	LinceUIText(ui, "Missiles", 40, 40,  LinceFont_Droid30, 20, "Missiles: %d",  data->missile_count);
 	LinceUIText(ui, "Bombs",    40, 60,  LinceFont_Droid30, 20, "Bombs: %d",  data->bomb_count);
 	LinceUIText(ui, "BombCool", 40, 80,  LinceFont_Droid30, 20, "Cooldown: %.2f",  data->bomb_cooldown);
 	LinceUIText(ui, "HP",       40, 100, LinceFont_Droid30, 20, "HP: %d",  data->hp);
 	LinceUIText(ui, "Score",    40, 120, LinceFont_Droid30, 20, "Score: %d",  data->score);
+	LinceUIText(ui, "Markers",  40, 140, LinceFont_Droid30, 20, "Markers: %d",  data->marker_count);
+	float mx, my;
+	LinceGetMousePos(&mx, &my);
+	ToWorldCoords(&mx, &my, data->cam);
+	LinceUIText(ui, "MousePos", 40, 160, LinceFont_Droid30, 20, "Mouse: %.2f %.2f", mx, my);
 
 	// draw objects
 	LinceBeginScene(data->cam);
@@ -377,13 +478,24 @@ void MCommandOnUpdate(LinceLayer* layer, float dt){
 	});
 	DrawMissiles(data);
 	DrawBombs(data);
+	DrawMarkers(data);
 	LinceEndScene();
 	LinceSetClearColor(0.7, 0.8, 0.9, 1.0);
+}
+
+void MCommandLayerOnEvent(LinceLayer* layer, LinceEvent* event){
+	if(event->type != LinceEventType_MouseButtonPressed) return;
+	GameState* state = LinceGetLayerData(layer);
+
+	float angle = CalculateCannonAngle(state->cam);
+	LaunchMissile(state, angle);
+	PlaceMarker(state);
 }
 
 void MCommandOnDetach(LinceLayer* layer){
 	GameState* data = LinceGetLayerData(layer);
 	LinceDeleteCamera(data->cam);
+	LinceDeleteTexture(data->marker_tex);
 	free(data);
 }
 
@@ -392,7 +504,7 @@ LinceLayer* MCommandLayerInit(){
 
 	layer->OnAttach = MCommandOnAttach;
 	layer->OnUpdate = MCommandOnUpdate;
-	//layer->OnEvent = MCommandLayerOnEvent;
+	layer->OnEvent  = MCommandLayerOnEvent;
 	layer->OnDetach = MCommandOnDetach;
 	layer->data = calloc(1, sizeof(GameState));
 	LINCE_ASSERT_ALLOC(layer->data, sizeof(GameState));
