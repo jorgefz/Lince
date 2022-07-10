@@ -218,6 +218,10 @@ void LinceDrawQuad(LinceQuadProps props) {
 	
 	// calculate texture index
 	float texture_index = 0.0f;
+	if(props.tile){
+		props.texture = props.tile->texture;
+	}
+
 	if(props.texture){
 		uint32_t slots = renderer_state.texture_slot_count;
 
@@ -252,8 +256,15 @@ void LinceDrawQuad(LinceQuadProps props) {
 		vertex.x = res[0];
 		vertex.y = res[1];
 		vertex.z = res[2];
-		vertex.s = quad_vertices[i].s;
-		vertex.t = quad_vertices[i].t;
+
+		if(props.tile){
+			vertex.s = props.tile->coords[i*2];
+			vertex.t = props.tile->coords[i*2 + 1];
+		} else {
+			vertex.s = quad_vertices[i].s;
+			vertex.t = quad_vertices[i].t;
+		}
+
 		vertex.texture_id = texture_index;
 		memcpy(vertex.color, props.color, sizeof(float)*4);
 		size_t offset = renderer_state.quad_count * QUAD_VERTEX_COUNT + i;

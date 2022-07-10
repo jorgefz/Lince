@@ -77,7 +77,7 @@ LinceLayer* NKLayerInit(){
     return layer;
 }
 
-
+#include "renderer/tileset.h"
 
 typedef struct MyLayer {
     char name[LINCE_NAME_MAX];
@@ -91,6 +91,10 @@ typedef struct MyLayer {
     LinceShader* shader;
     LinceTexture* tex_front;
     LinceTexture* tex_back;
+    LinceTexture* tileset;
+
+    LinceTile tile;
+
     vec4 color;
     LinceCamera* cam;
 } MyLayer;
@@ -101,8 +105,10 @@ void MyLayerOnAttach(LinceLayer* layer) {
 
     data->cam = LinceCreateCamera(LinceGetAspectRatio());
     
-    data->tex_front = LinceCreateTexture("Patrick", "lince/assets/front.png");
-    data->tex_back  = LinceCreateTexture("Patrick", "lince/assets/back.png");
+    data->tex_front = LinceCreateTexture("PatrickF", "lince/assets/front.png");
+    data->tex_back  = LinceCreateTexture("PatrickB", "lince/assets/back.png");
+    data->tileset = LinceCreateTexture("Tileset", "game/assets/textures/shubibubi-cozy-farm.png");
+    data->tile = LinceGetTile(data->tileset, (vec2){0,0}, (vec2){16.0f,16.0f}, (vec2){1.0f, 1.0f});
 
     data->red = 0.0f;
     data->vel = 5e-4f;
@@ -191,6 +197,14 @@ void MyLayerOnUpdate(LinceLayer* layer, float dt) {
         .texture=data->tex_front,
         .zorder = 0.1
     });
+
+    LinceDrawQuad((LinceQuadProps){
+        .x=-1.0f, .y=1.0f,
+        .w=1.0f, .h=1.0f,
+        .color={1,1,1,1},
+        .tile = &data->tile,
+        .zorder = 0.1
+    });
     
     LinceEndScene();
 }
@@ -219,10 +233,10 @@ LinceLayer* MyLayerInit(char* name) {
 
 void GameInit() {
 	LINCE_INFO("\n User App Initialised");
-    //LincePushLayer(MyLayerInit("Test"));
+    LincePushLayer(MyLayerInit("Test"));
     //LincePushLayer(NKLayerInit());
     //LincePushLayer(PongLayerInit());
-    LincePushLayer(MCommandLayerInit());
+    //LincePushLayer(MCommandLayerInit());
 }
 
 void GameOnUpdate(float dt) {
@@ -246,8 +260,7 @@ int main(int argc, const char* argv[]) {
     app->screen_width = 900;
     app->screen_height = 600;
     app->title = "The Legend of Cheesus Christ";
-    // app->fullscreen
-    // app->vsync
+    // app->options = LINCE_FULLSCREEN | LINCE_VSYNC | LINCE_RESIZEABLE | ...
 
     app->game_init = GameInit;
     app->game_on_update = GameOnUpdate;

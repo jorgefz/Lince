@@ -7,6 +7,7 @@
 #include "renderer/texture.h"
 #include "renderer/camera.h"
 #include "core/window.h"
+#include "renderer/tileset.h"
 
 /* Quad properties, serves as argument for LinceRenderQuad */
 typedef struct LinceQuadProps{
@@ -14,8 +15,9 @@ typedef struct LinceQuadProps{
 	float w, h; 			// width, height
 	float zorder; 			// order of rendering
 	float rotation; 		// clockwise rotation in degrees
-	LinceTexture* texture;
 	float color[4]; 		// flat quad color - rgba
+	LinceTexture* texture;
+	LinceTile* tile;
 } LinceQuadProps;
 
 /* Initialises renderer state and openGL rendering settings */
