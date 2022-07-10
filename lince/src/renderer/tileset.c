@@ -1,10 +1,6 @@
 #include "renderer/tileset.h"
 
 LinceTile LinceGetTile(LinceTexture* texture, vec2 xy, vec2 cellsize, vec2 tilesize){
-	if(texture->width % (uint32_t)cellsize[0] != 0 &&
-		texture->height % (uint32_t)cellsize[1] != 0){
-		return (LinceTile){0};
-	}
 	
 	const float texw = (float)texture->width;
 	const float texh = (float)texture->height;

@@ -29,7 +29,7 @@
 
 ## Next goals
 1. 💛 Add UI library: [Nuklear](https://github.com/Immediate-Mode-UI/Nuklear/)
-2. 🔷 Add tilesets
+2. 💛 Add tilesets
 3. 🔷 Add tilemaps
 4. 🔷 Make small games to test the engine
 5. 🔷 Add audio library, e.g. [Miniaudio](https://github.com/mackron/miniaudio)

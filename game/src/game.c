@@ -79,6 +79,14 @@ LinceLayer* NKLayerInit(){
 
 #include "renderer/tileset.h"
 
+enum TileNames {
+    TILE_GRASS = 0,
+    TILE_DIRT,
+    TILE_TREE,
+    TILE_CHICKEN,
+    TILE_COUNT
+};
+
 typedef struct MyLayer {
     char name[LINCE_NAME_MAX];
     float red, vel;
@@ -93,7 +101,7 @@ typedef struct MyLayer {
     LinceTexture* tex_back;
     LinceTexture* tileset;
 
-    LinceTile tile;
+    LinceTile tiles[TILE_COUNT];
 
     vec4 color;
     LinceCamera* cam;
@@ -108,11 +116,15 @@ void MyLayerOnAttach(LinceLayer* layer) {
     data->tex_front = LinceCreateTexture("PatrickF", "lince/assets/front.png");
     data->tex_back  = LinceCreateTexture("PatrickB", "lince/assets/back.png");
     data->tileset = LinceCreateTexture("Tileset", "game/assets/textures/shubibubi-cozy-farm.png");
-    data->tile = LinceGetTile(data->tileset, (vec2){0,0}, (vec2){16.0f,16.0f}, (vec2){1.0f, 1.0f});
+
+    data->tiles[TILE_GRASS]   = LinceGetTile(data->tileset, (vec2){1,8}, (vec2){16,16}, (vec2){1, 1});
+    data->tiles[TILE_DIRT]    = LinceGetTile(data->tileset, (vec2){5,9}, (vec2){16,16}, (vec2){1, 1});
+    data->tiles[TILE_TREE]    = LinceGetTile(data->tileset, (vec2){9,5}, (vec2){16,16}, (vec2){2, 2});
+    data->tiles[TILE_CHICKEN] = LinceGetTile(data->tileset, (vec2){0,1}, (vec2){16,16}, (vec2){1, 1});
 
     data->red = 0.0f;
     data->vel = 5e-4f;
-    data->cam_speed = 0.01f;
+    data->cam_speed = 0.005f;
     data->color_step = 0.003f;
 }
 
@@ -198,13 +210,34 @@ void MyLayerOnUpdate(LinceLayer* layer, float dt) {
         .zorder = 0.1
     });
 
+    for(int i = 0; i != 10; ++i){
+        for(int j = 0; j != 10; ++j){
+            LinceDrawQuad((LinceQuadProps){
+                .x=(float)i, .y=(float)j,
+                .w=1.0f, .h=1.0f,
+                .color={1,1,1,1},
+                .tile = &data->tiles[TILE_GRASS],
+                .zorder = 0.1
+            });
+        }
+    }
+
     LinceDrawQuad((LinceQuadProps){
-        .x=-1.0f, .y=1.0f,
+        .x=5.0f, .y=5.0f,
+        .w=2.0f, .h=2.0f,
+        .color={1,1,1,1},
+        .tile = &data->tiles[TILE_TREE],
+        .zorder = 0.5
+    });
+
+    LinceDrawQuad((LinceQuadProps){
+        .x=5.0f, .y=3.0f,
         .w=1.0f, .h=1.0f,
         .color={1,1,1,1},
-        .tile = &data->tile,
-        .zorder = 0.1
+        .tile = &data->tiles[TILE_CHICKEN],
+        .zorder = 0.5
     });
+
     
     LinceEndScene();
 }
