@@ -77,8 +77,8 @@ void LinceSetTextureData(LinceTexture* texture, unsigned char* data){
 /* Deallocates texture memory and destroys OpenGL texture object */
 void LinceDeleteTexture(LinceTexture* texture){
 	if(!texture) return;
-	free(texture);
 	glDeleteTextures(1, &texture->id);
+	free(texture);
 }
 
 /* Binds the given texture to a slot (there are at least 16 slots) */
