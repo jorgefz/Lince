@@ -5,9 +5,8 @@
 #include <cglm/affine.h>
 
 /*
-
-	- Missile explodes when reaching target
-	- When missile explodes, bombs in a radius will explode.
+TO-DO:
+	- Fix bug where duplicates are rendered
 	- Loose / win condition
 
 	- For Colliders, add delete_flag and just iterate+remove at the end of each loop
@@ -23,6 +22,14 @@ Notes:
 #define BLAST_LIFETIME_MS 1000.0f
 #define BLAST_LIFELOSS 0.5f
 #define BLAST_COLOR_INIT {1.0f, 1.0f, 0.0, 1.0f}
+
+#define MISSILE_WIDTH 0.04f
+#define MISSILE_HEIGHT 0.10f
+#define BOMB_WIDTH 0.1f
+#define BOMB_HEIGHT 0.1f
+
+#define BKG_WIDTH 3.5f
+#define BKG_HEIGHT 2.0f
 
 typedef struct Collider {
 	float x, y, vx, vy, w, h, angle;
@@ -41,10 +48,13 @@ typedef struct Marker {
 
 typedef struct GameState{
 	Collider *missiles;
+	int missile_count;
+	LinceTexture* missile_tex;
+
 	Collider *bombs;
 	int bomb_count;
-	int missile_count;
-
+	LinceTexture* bomb_tex;
+	
 	int score, hp;
 	float cannon_x, cannon_y;
 	float missile_vmax;
@@ -63,6 +73,8 @@ typedef struct GameState{
 	Marker* markers;
 	int marker_count;
 	LinceTexture* marker_tex;
+
+	LinceTexture* bkg_city;
 
 	LinceCamera* cam;
 } GameState;
@@ -115,10 +127,13 @@ void DeleteListItem(void** list_address, size_t* items, size_t item_size, size_t
 		*list_address = NULL;
 		return;
 	}
-	void* dest = list + index * item_size;
-	void* src  = list + (index + 1) * item_size;
-	size_t move_bytes = item_size * (*items - index - 1);
-	memmove(dest, src, move_bytes);
+
+	if(index != *items - 1){
+		void* dest = list + index * item_size;
+		void* src  = list + (index + 1) * item_size;
+		size_t move_bytes = item_size * (*items - index - 1);
+		memmove(dest, src, move_bytes);
+	}
 
 	(*items)--;
 	void* new_list = realloc(list, (*items) * item_size);
@@ -246,7 +261,7 @@ void LaunchMissile(GameState* state, float angle){
 	Collider new_missile = {
 		.x = state->cannon_x,
 		.y = state->cannon_y,
-		.w = 0.02f, .h = 0.05f,
+		.w = MISSILE_WIDTH, .h = MISSILE_HEIGHT,
 		.vx = vx,
 		.vy = vy,
 		.angle = angle
@@ -276,6 +291,7 @@ void DeleteMissile(GameState* state, int index){
 		Collider* bomb = &state->bombs[i];
 		distance = FindDistance2D(x, y, bomb->x, bomb->y);
 		if(distance < BLAST_RADIUS){
+			CreateBlast(state, bomb->x, bomb->y);
 			DeleteBomb(state, i);
 			break;
 		}
@@ -315,7 +331,6 @@ void UpdateMissiles(GameState* state){
 	}
 	if(stray_missile > -1){
 		DeleteMissile(state, stray_missile);
-		// detonation
 	}
 }
 
@@ -328,8 +343,10 @@ void DrawMissiles(GameState* state){
 			.y = missile->y,
 			.w = missile->w,
 			.h = missile->h,
-			.color = {1.0f, 0.0f, 0.0f, 1.0f},
-			.rotation = missile->angle
+			//.color = {1.0f, 0.0f, 0.0f, 1.0f},
+			.color = {1.0f, 1.0f, 1.0f, 1.0f},
+			.rotation = missile->angle,
+			.texture = state->missile_tex
 		});
 	}
 }
@@ -346,8 +363,8 @@ void DropBomb(GameState* state){
 	new_bomb->y     = 1.0f;
 	new_bomb->vx    = 0.0f;
 	new_bomb->vy    = -5e-4f;
-	new_bomb->w     = 0.05f;
-	new_bomb->h     = 0.05f;
+	new_bomb->w     = BOMB_WIDTH;
+	new_bomb->h     = BOMB_HEIGHT;
 	new_bomb->angle = 0.0f;
 }
 
@@ -370,6 +387,7 @@ void UpdateBombs(GameState* state){
 		}
 	}
 	if(dead_bomb > -1){
+		CreateBlast(state, state->bombs[dead_bomb].x, state->bombs[dead_bomb].y);
 		DeleteBomb(state, dead_bomb);
 	}
 }
@@ -389,7 +407,6 @@ void CheckBombIntercept(GameState* state){
 				dead_bomb = i;
 				dead_missile = j;
 				state->score += 1;
-				printf("COLLISION!\n");
 				break;
 			}
 		}
@@ -411,8 +428,10 @@ void DrawBombs(GameState* state){
 			.y = bomb->y,
 			.w = bomb->w,
 			.h = bomb->h,
-			.color = {0.6f, 0.0f, 0.8f, 1.0f},
-			.rotation = 0.0f
+			//.color = {0.6f, 0.0f, 0.8f, 1.0f},
+			.color = {1.0f, 1.0f, 1.0f, 1.0f},
+			.rotation = 0.0f,
+			.texture = state->bomb_tex
 		});
 	}
 }
@@ -423,10 +442,7 @@ void MCommandOnAttach(LinceLayer* layer){
 	data->cam = LinceCreateCamera(LinceGetAspectRatio());
 	data->score = 0;
 	data->hp = 100;
-	data->bomb_count = 0;
-	data->missile_count = 0;
-	data->bombs = NULL;
-	data->missiles = NULL;
+		
 	data->cannon_x = 0.0f;
 	data->cannon_y = -1.0f;
 	data->missile_cooldown = LinceFalse;
@@ -436,6 +452,14 @@ void MCommandOnAttach(LinceLayer* layer){
 	data->xmin = -1.5f;
 	data->xmax = 1.5f;
 	data->dt = 0.0f;
+
+	data->bombs = NULL;
+	data->bomb_count = 0;
+	data->bomb_tex = LinceCreateTexture("Bomb", "game/assets/textures/bomb.png");
+
+	data->missiles = NULL;
+	data->missile_count = 0;
+	data->missile_tex = LinceCreateTexture("Missile", "game/assets/textures/missile.png");
 
 	data->markers = NULL;
 	data->marker_count = 0;
@@ -447,6 +471,8 @@ void MCommandOnAttach(LinceLayer* layer){
 	data->blast_count = 0;
 	data->blasts = NULL;
 	data->blast_tex = LinceCreateTexture("Blast", "game/assets/textures/pong_ball.png");
+
+	data->bkg_city = LinceCreateTexture("City", "game/assets/textures/background-city.png");
 
 	srand(time(NULL));
 }
@@ -480,15 +506,30 @@ void MCommandOnUpdate(LinceLayer* layer, float dt){
 	
 	// draw UI
 	LinceUIText(ui, "Angle",    40, 20,  LinceFont_Droid30, 20, "Angle: %.2f",  angle);
-	LinceUIText(ui, "Missiles", 40, 40,  LinceFont_Droid30, 20, "Missiles: %d",  data->missile_count);
-	LinceUIText(ui, "Bombs",    40, 60,  LinceFont_Droid30, 20, "Bombs: %d",  data->bomb_count);
-	LinceUIText(ui, "BombCool", 40, 80,  LinceFont_Droid30, 20, "Cooldown: %.2f",  data->bomb_cooldown);
-	LinceUIText(ui, "HP",       40, 100, LinceFont_Droid30, 20, "HP: %d",  data->hp);
-	LinceUIText(ui, "Score",    40, 120, LinceFont_Droid30, 20, "Score: %d",  data->score);
-	LinceUIText(ui, "Markers",  40, 140, LinceFont_Droid30, 20, "Markers: %d",  data->marker_count);
+	LinceUIText(ui, "BombCool", 40, 40,  LinceFont_Droid30, 20, "Cooldown: %.2f",  data->bomb_cooldown);
+	LinceUIText(ui, "HP",       40, 60,  LinceFont_Droid30, 20, "HP: %d",  data->hp);
+	LinceUIText(ui, "Score",    40, 80,  LinceFont_Droid30, 20, "Score: %d",  data->score);
+
+	LinceUIText(ui, "Missiles", 40, 120,  LinceFont_Droid30, 20, "Missiles: %d",  data->missile_count);
+	LinceUIText(ui, "Bombs",    40, 140,  LinceFont_Droid30, 20, "Bombs: %d",  data->bomb_count);
+	LinceUIText(ui, "Markers",  40, 160,  LinceFont_Droid30, 20, "Markers: %d",  data->marker_count);
+	LinceUIText(ui, "Blasts",   40, 180,  LinceFont_Droid30, 20, "Blasts: %d",  data->blast_count);
 
 	// draw objects
 	LinceBeginScene(data->cam);
+
+	// Background
+	LinceDrawQuad((LinceQuadProps){
+		.x = 0.0f,
+		.y = 0.0f,
+		.w = BKG_WIDTH,
+		.h = BKG_HEIGHT,
+		.color = {1.0, 1.0, 1.0, 1.0},
+		.texture = data->bkg_city,
+		.zorder = -0.1f
+	});
+
+	// Cannon
 	LinceDrawQuad((LinceQuadProps){
 		.x = data->cannon_x,
 		.y = data->cannon_y,
@@ -497,12 +538,13 @@ void MCommandOnUpdate(LinceLayer* layer, float dt){
 		.color = {0.5, 0.5, 0.5, 1.0},
 		.rotation = angle
 	});
+	
 	DrawMissiles(data);
 	DrawBombs(data);
 	DrawMarkers(data);
 	DrawBlasts(data);
 	LinceEndScene();
-	LinceSetClearColor(0.7, 0.8, 0.9, 1.0);
+	LinceSetClearColor(0.0, 0.0, 0.0, 1.0);
 }
 
 void MCommandLayerOnEvent(LinceLayer* layer, LinceEvent* event){
@@ -516,9 +558,19 @@ void MCommandLayerOnEvent(LinceLayer* layer, LinceEvent* event){
 
 void MCommandOnDetach(LinceLayer* layer){
 	GameState* data = LinceGetLayerData(layer);
+
+	if(data->missiles) free(data->missiles);
+	if(data->bombs) free(data->bombs);
+	if(data->markers) free(data->markers);
+	if(data->blasts) free(data->blasts);
+
 	LinceDeleteCamera(data->cam);
+	LinceDeleteTexture(data->missile_tex);
+	LinceDeleteTexture(data->bomb_tex);
+	LinceDeleteTexture(data->bkg_city);
 	LinceDeleteTexture(data->marker_tex);
 	LinceDeleteTexture(data->blast_tex);
+	LinceDeleteTexture(data->bkg_city);
 	free(data);
 }
 
