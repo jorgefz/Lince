@@ -87,6 +87,14 @@ enum TileNames {
     TILE_COUNT
 };
 
+enum WalkingTiles {
+    TILE_FRONT,
+    TILE_BACK,
+    TILE_LEFT,
+    TILE_RIGHT,
+    TILE_WALKING_COUNT
+};
+
 typedef struct MyLayer {
     char name[LINCE_NAME_MAX];
     float red, vel;
@@ -100,8 +108,11 @@ typedef struct MyLayer {
     LinceTexture* tex_front;
     LinceTexture* tex_back;
     LinceTexture* tileset;
+    LinceTexture* walking_tileset;
 
     LinceTile tiles[TILE_COUNT];
+    LinceTile walking_tiles[TILE_WALKING_COUNT];
+    uint8_t player_facing;
 
     vec4 color;
     LinceCamera* cam;
@@ -112,20 +123,30 @@ void MyLayerOnAttach(LinceLayer* layer) {
     LINCE_INFO(" Layer '%s' attached", data->name);
 
     data->cam = LinceCreateCamera(LinceGetAspectRatio());
+
+    data->red = 0.0f;
+    data->vel = 5e-4f;
+    data->cam_speed = 3e-3f;
+    data->cam->zoom = 3.0;
+    data->color_step = 0.003f;
     
     data->tex_front = LinceCreateTexture("PatrickF", "lince/assets/front.png");
     data->tex_back  = LinceCreateTexture("PatrickB", "lince/assets/back.png");
     data->tileset = LinceCreateTexture("Tileset", "game/assets/textures/shubibubi-cozy-farm.png");
+    data->walking_tileset = LinceCreateTexture("Walking", "game/assets/textures/elv-games-movement.png");
 
     data->tiles[TILE_GRASS]   = LinceGetTile(data->tileset, (vec2){1,8}, (vec2){16,16}, (vec2){1, 1});
     data->tiles[TILE_DIRT]    = LinceGetTile(data->tileset, (vec2){5,9}, (vec2){16,16}, (vec2){1, 1});
     data->tiles[TILE_TREE]    = LinceGetTile(data->tileset, (vec2){9,5}, (vec2){16,16}, (vec2){2, 2});
     data->tiles[TILE_CHICKEN] = LinceGetTile(data->tileset, (vec2){0,1}, (vec2){16,16}, (vec2){1, 1});
 
-    data->red = 0.0f;
-    data->vel = 5e-4f;
-    data->cam_speed = 0.005f;
-    data->color_step = 0.003f;
+    data->walking_tiles[TILE_FRONT] = LinceGetTile(data->walking_tileset, (vec2){1,0}, (vec2){24,24}, (vec2){1,1});
+    data->walking_tiles[TILE_BACK]  = LinceGetTile(data->walking_tileset, (vec2){1,3}, (vec2){24,24}, (vec2){1,1});
+    data->walking_tiles[TILE_LEFT]  = LinceGetTile(data->walking_tileset, (vec2){1,2}, (vec2){24,24}, (vec2){1,1});
+    data->walking_tiles[TILE_RIGHT] = LinceGetTile(data->walking_tileset, (vec2){1,1}, (vec2){24,24}, (vec2){1,1});
+
+    data->player_facing = TILE_FRONT;
+    
 }
 
 void MyLayerOnDetach(LinceLayer* layer) {
@@ -134,6 +155,7 @@ void MyLayerOnDetach(LinceLayer* layer) {
 
     LinceDeleteTexture(data->tex_front);
     LinceDeleteTexture(data->tex_back);
+    LinceDeleteTexture(data->walking_tileset);
     LinceDeleteCamera(data->cam);
 
     free(data);
@@ -153,11 +175,23 @@ void MyLayerOnUpdate(LinceLayer* layer, float dt) {
     const float zoom      = data->cam->zoom;
     const float dr = cam_speed * dt * zoom;
 
-    // camera movement
-    if (LinceIsKeyPressed(LinceKey_w)) data->cam->pos[1] += dr;
-    if (LinceIsKeyPressed(LinceKey_s)) data->cam->pos[1] -= dr;
-    if (LinceIsKeyPressed(LinceKey_d)) data->cam->pos[0] += dr;
-    if (LinceIsKeyPressed(LinceKey_a)) data->cam->pos[0] -= dr;
+    // camera & player movement
+    if (LinceIsKeyPressed(LinceKey_w)){
+        data->cam->pos[1] += dr;
+        data->player_facing = TILE_FRONT;
+    }
+    if (LinceIsKeyPressed(LinceKey_s)){
+        data->cam->pos[1] -= dr;
+        data->player_facing = TILE_BACK;
+    }
+    if (LinceIsKeyPressed(LinceKey_d)){
+        data->cam->pos[0] += dr;
+        data->player_facing = TILE_RIGHT;
+    }
+    if (LinceIsKeyPressed(LinceKey_a)){
+        data->cam->pos[0] -= dr;
+        data->player_facing = TILE_LEFT;
+    }
 
     LinceUIText(ui, "DebugFPS", 20, 20, LinceFont_Droid30, 10, "FPS: %.0f", 1000.0/dt);
     LinceUIText(ui, "DebugDT",  20, 42, LinceFont_Droid30, 15, "dt: %.1f ms", dt);
@@ -232,6 +266,15 @@ void MyLayerOnUpdate(LinceLayer* layer, float dt) {
         .zorder = 0.5
     });
 
+    // PLAYER
+    LinceDrawQuad((LinceQuadProps){
+        .x=data->cam->pos[0],
+        .y=data->cam->pos[1],
+        .w=1.5f, .h=1.5f,
+        .color={1,1,1,1},
+        .tile = &data->walking_tiles[data->player_facing],
+        .zorder = 0.6
+    });
     
     LinceEndScene();
 }
