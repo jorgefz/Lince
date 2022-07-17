@@ -143,30 +143,24 @@ void MyLayerOnDetach(LinceLayer* layer) {
 void MyLayerOnUpdate(LinceLayer* layer, float dt) {
     MyLayer* data = LinceGetLayerData(layer);
     data->dt = dt;
+    LinceUILayer* ui = LinceGetAppState()->ui;
 
     LinceResizeCameraView(data->cam, LinceGetAspectRatio());
 	LinceUpdateCamera(data->cam);
     
     // User Input
-    const float cam_speed  = data->cam_speed;
-    const float zoom       = data->cam->zoom;
+    const float cam_speed = data->cam_speed;
+    const float zoom      = data->cam->zoom;
     const float dr = cam_speed * dt * zoom;
 
     // camera movement
-    if (LinceIsKeyPressed(LinceKey_Up))    data->cam->pos[1] += dr;
-    if (LinceIsKeyPressed(LinceKey_Down))  data->cam->pos[1] -= dr;
-    if (LinceIsKeyPressed(LinceKey_Right)) data->cam->pos[0] += dr;
-    if (LinceIsKeyPressed(LinceKey_Left))  data->cam->pos[0] -= dr;
-    // camera zoom
-    if (LinceIsKeyPressed(LinceKey_Period)) data->cam->zoom *= 0.99; // * 0.5 * dt;
-    if (LinceIsKeyPressed(LinceKey_Comma))  data->cam->zoom /= 0.99; // * 0.5 * dt;
-    // debug frame time
-    if (LinceIsKeyPressed(LinceKey_p)){
-        int n = printf("dt: %7.3f ms, fps: %7.1f", dt, 1000.0/dt);
-        fflush(stdout);
-        for(int i=0; i!=n; ++i) printf("\b \b");
-    }
-    
+    if (LinceIsKeyPressed(LinceKey_w)) data->cam->pos[1] += dr;
+    if (LinceIsKeyPressed(LinceKey_s)) data->cam->pos[1] -= dr;
+    if (LinceIsKeyPressed(LinceKey_d)) data->cam->pos[0] += dr;
+    if (LinceIsKeyPressed(LinceKey_a)) data->cam->pos[0] -= dr;
+
+    LinceUIText(ui, "DebugFPS", 20, 20, LinceFont_Droid30, 10, "FPS: %.0f", 1000.0/dt);
+    LinceUIText(ui, "DebugDT",  20, 42, LinceFont_Droid30, 15, "dt: %.1f ms", dt);
 
     LinceBeginScene(data->cam);
 
@@ -242,6 +236,15 @@ void MyLayerOnUpdate(LinceLayer* layer, float dt) {
     LinceEndScene();
 }
 
+void MyLayerOnEvent(LinceLayer* layer, LinceEvent* event){
+    if(event->type == LinceEventType_MouseScrolled){
+        LinceMouseScrolledEvent* scroll = event->data.MouseScrolled;
+        MyLayer* data = LinceGetLayerData(layer);
+        data->cam->zoom *= powf(0.80, scroll->yoff); // * 0.5 * dt;
+    }
+}
+
+
 LinceLayer* MyLayerInit(char* name) {
 
     MyLayer* my_layer = calloc(1, sizeof(MyLayer));
@@ -254,7 +257,7 @@ LinceLayer* MyLayerInit(char* name) {
     LinceLayer* layer = LinceCreateLayer(my_layer);
     layer->OnAttach = MyLayerOnAttach;
     layer->OnDetach = MyLayerOnDetach;
-    //layer->OnEvent  = MyLayerOnEvent;
+    layer->OnEvent  = MyLayerOnEvent;
     layer->OnUpdate = MyLayerOnUpdate;
 
     return layer;
