@@ -129,8 +129,8 @@ void DeleteListItem(void** list_address, size_t* items, size_t item_size, size_t
 	}
 
 	if(index != *items - 1){
-		void* dest = list + index * item_size;
-		void* src  = list + (index + 1) * item_size;
+		void* dest = (char*)list + index * item_size;
+		void* src  = (char*)list + (index + 1) * item_size;
 		size_t move_bytes = item_size * (*items - index - 1);
 		memmove(dest, src, move_bytes);
 	}
@@ -481,8 +481,6 @@ void MCommandOnUpdate(LinceLayer* layer, float dt){
 	
 	GameState* data = LinceGetLayerData(layer);
 	LinceUILayer* ui = LinceGetAppState()->ui;
-	const float width = (float)LinceGetAppState()->window->width;
-	const float height = (float)LinceGetAppState()->window->height;
 	data->dt = dt;
 
 	// update view
