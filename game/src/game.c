@@ -81,13 +81,13 @@ enum TileNames {
 };
 
 enum WalkingAnims {
-    ANIM_FRONT,
-    ANIM_FRONT_IDLE,
+    ANIM_FRONT = 0,
     ANIM_BACK,
-    ANIM_BACK_IDLE,
     ANIM_LEFT,
-    ANIM_LEFT_IDLE,
     ANIM_RIGHT,
+    ANIM_FRONT_IDLE,
+    ANIM_BACK_IDLE,
+    ANIM_LEFT_IDLE,
     ANIM_RIGHT_IDLE,
     ANIM_COUNT
 };
@@ -137,46 +137,39 @@ void MyLayerOnAttach(LinceLayer* layer) {
     data->tiles[TILE_TREE]    = LinceGetTile(data->tileset, (vec2){9,5}, (vec2){16,16}, (vec2){2, 2});
     data->tiles[TILE_CHICKEN] = LinceGetTile(data->tileset, (vec2){0,1}, (vec2){16,16}, (vec2){1, 1});
 
-    LinceTile front_walk_tiles[] = {
+    LinceTile player_tiles[] = {
+        // Walking Forward
         LinceGetTile(data->walking_tileset, (vec2){0,0}, (vec2){24,24}, (vec2){1,1}),
         LinceGetTile(data->walking_tileset, (vec2){2,0}, (vec2){24,24}, (vec2){1,1}),
-    };
-    LinceTile front_idle_tiles[] = {
-        LinceGetTile(data->walking_tileset, (vec2){1,0}, (vec2){24,24}, (vec2){1,1}),
-    };
-    LinceTile back_walk_tiles[] = {
+        // Walking backwards
         LinceGetTile(data->walking_tileset, (vec2){0,3}, (vec2){24,24}, (vec2){1,1}),
         LinceGetTile(data->walking_tileset, (vec2){2,3}, (vec2){24,24}, (vec2){1,1}),
-    };
-    LinceTile back_idle_tiles[] = {
-        LinceGetTile(data->walking_tileset, (vec2){1,3}, (vec2){24,24}, (vec2){1,1}),
-    };
-    LinceTile right_walk_tiles[] = {
-        LinceGetTile(data->walking_tileset, (vec2){0,1}, (vec2){24,24}, (vec2){1,1}),
-        LinceGetTile(data->walking_tileset, (vec2){2,1}, (vec2){24,24}, (vec2){1,1}),
-    };
-    LinceTile right_idle_tiles[] = {
-        LinceGetTile(data->walking_tileset, (vec2){1,1}, (vec2){24,24}, (vec2){1,1}),
-    };
-    LinceTile left_walk_tiles[] = {
+        // Walking Left
         LinceGetTile(data->walking_tileset, (vec2){0,2}, (vec2){24,24}, (vec2){1,1}),
         LinceGetTile(data->walking_tileset, (vec2){2,2}, (vec2){24,24}, (vec2){1,1}),
-    };
-    LinceTile left_idle_tiles[] = {
+        // Walking Right
+        LinceGetTile(data->walking_tileset, (vec2){0,1}, (vec2){24,24}, (vec2){1,1}),
+        LinceGetTile(data->walking_tileset, (vec2){2,1}, (vec2){24,24}, (vec2){1,1}),
+        // Idle Forward
+        LinceGetTile(data->walking_tileset, (vec2){1,0}, (vec2){24,24}, (vec2){1,1}),
+        // Idle backwards
+        LinceGetTile(data->walking_tileset, (vec2){1,3}, (vec2){24,24}, (vec2){1,1}),
+        // Idle Left
         LinceGetTile(data->walking_tileset, (vec2){1,2}, (vec2){24,24}, (vec2){1,1}),
+        // Idle Right
+        LinceGetTile(data->walking_tileset, (vec2){1,1}, (vec2){24,24}, (vec2){1,1}),
     };
 
-    data->player_anims[ANIM_FRONT]      = CreateAnim(front_walk_tiles, 2, 300.0f, 0, 0);
-    data->player_anims[ANIM_BACK]       = CreateAnim(back_walk_tiles, 2, 300.0f, 0, 0);
-    data->player_anims[ANIM_LEFT]       = CreateAnim(left_walk_tiles, 2, 300.0f, 0, 0);
-    data->player_anims[ANIM_RIGHT]      = CreateAnim(right_walk_tiles, 2, 300.0f, 0, 0);
-    data->player_anims[ANIM_FRONT_IDLE] = CreateAnim(front_idle_tiles, 1, 300.0f, 0, 0);
-    data->player_anims[ANIM_BACK_IDLE]  = CreateAnim(back_idle_tiles, 1, 300.0f, 0, 0);
-    data->player_anims[ANIM_LEFT_IDLE]  = CreateAnim(left_idle_tiles, 1, 300.0f, 0, 0);
-    data->player_anims[ANIM_RIGHT_IDLE] = CreateAnim(right_idle_tiles, 1, 300.0f, 0, 0);
+    data->player_anims[ANIM_FRONT     ] = CreateAnim(player_tiles   , 2, 300.0f, 0, 0);
+    data->player_anims[ANIM_BACK      ] = CreateAnim(player_tiles+2 , 2, 300.0f, 0, 0);
+    data->player_anims[ANIM_LEFT      ] = CreateAnim(player_tiles+4 , 2, 300.0f, 0, 0);
+    data->player_anims[ANIM_RIGHT     ] = CreateAnim(player_tiles+6 , 2, 300.0f, 0, 0);
+    data->player_anims[ANIM_FRONT_IDLE] = CreateAnim(player_tiles+8 , 1, 300.0f, 0, 0);
+    data->player_anims[ANIM_BACK_IDLE ] = CreateAnim(player_tiles+9 , 1, 300.0f, 0, 0);
+    data->player_anims[ANIM_LEFT_IDLE ] = CreateAnim(player_tiles+10, 1, 300.0f, 0, 0);
+    data->player_anims[ANIM_RIGHT_IDLE] = CreateAnim(player_tiles+11, 1, 300.0f, 0, 0);
 
     data->current_anim = ANIM_BACK_IDLE;
-    
 }
 
 void MyLayerOnDetach(LinceLayer* layer) {
