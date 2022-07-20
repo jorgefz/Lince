@@ -73,11 +73,43 @@ void DeleteAnim(SpriteAnim* anim){
 }
 
 enum TileNames {
-    TILE_GRASS = 0,
-    TILE_DIRT,
+    // Ground
+    TILE_GRASS             = 0,
+    TILE_DIRT              = 1,
+
+    TILE_GRASS_LEFT        = 2,
+    TILE_GRASS_RIGHT       = 3,
+    TILE_GRASS_UPPER       = 4,
+    TILE_GRASS_LOWER       = 5,
+
+    TILE_GRASS_CORNER_LL   = 6,
+    TILE_GRASS_CORNER_UL   = 7,
+    TILE_GRASS_CORNER_LR   = 8,
+    TILE_GRASS_CORNER_UR   = 9,
+
+    TILE_GRASS_ICORNER_LL   = 10,
+    TILE_GRASS_ICORNER_UL   = 11,
+    TILE_GRASS_ICORNER_LR   = 12,
+    TILE_GRASS_ICORNER_UR   = 13,
+    // Entities
     TILE_TREE,
     TILE_CHICKEN,
+    // Meta
     TILE_COUNT
+};
+
+const uint32_t tm_width = 16, tm_height = 10;
+int tilemap[] = {
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+    4, 4, 4, 4,11, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+    1, 1, 1, 1, 7,11, 0, 0, 0, 0,13, 4, 4, 4, 4, 4, 
+    1, 1, 1, 1, 1, 2, 0, 0, 0, 0, 3, 1, 1, 1, 1, 1, 
+    1, 1, 1, 1, 1, 2, 0, 0, 0, 0, 3, 1, 1, 1, 1, 1, 
+    1, 1, 1, 1, 1, 2, 0, 0, 0, 13,9, 1, 1, 1, 1, 1, 
+    1, 1, 1, 1, 1, 2, 0, 0, 0, 3, 1, 1, 1, 1, 1, 1, 
+    1, 1, 1, 1, 6,10, 0,13, 4, 9, 1, 1, 1, 1, 1, 1, 
+    1, 1, 1, 1, 2, 0, 0, 3, 1, 1, 1, 1, 1, 1, 1, 1, 
+    1, 1, 1, 6,10, 0, 0, 3, 1, 1, 1, 1, 1, 1, 1, 1, 
 };
 
 enum WalkingAnims {
@@ -92,7 +124,7 @@ enum WalkingAnims {
     ANIM_COUNT
 };
 
-typedef struct MyLayer {
+typedef struct TestLayer {
     char name[LINCE_NAME_MAX];
     float red, vel;
     float dt;
@@ -113,20 +145,20 @@ typedef struct MyLayer {
 
     vec4 color;
     LinceCamera* cam;
-} MyLayer;
+} TestLayer;
 
-void MyLayerOnAttach(LinceLayer* layer) {
-    MyLayer* data = LinceGetLayerData(layer);
+void TestLayerOnAttach(LinceLayer* layer) {
+    TestLayer* data = LinceGetLayerData(layer);
     LINCE_INFO(" Layer '%s' attached", data->name);
-
-    data->cam = LinceCreateCamera(LinceGetAspectRatio());
 
     data->red = 0.0f;
     data->vel = 5e-4f;
-    data->cam_speed = 3e-3f;
-    data->cam->zoom = 3.0;
     data->color_step = 0.003f;
     
+    data->cam = LinceCreateCamera(LinceGetAspectRatio());
+    data->cam_speed = 9e-4f;
+    data->cam->zoom = 4.0;
+
     data->tex_front = LinceCreateTexture("PatrickF", "lince/assets/front.png");
     data->tex_back  = LinceCreateTexture("PatrickB", "lince/assets/back.png");
     data->tileset = LinceCreateTexture("Tileset", "game/assets/textures/shubibubi-cozy-farm.png");
@@ -134,6 +166,22 @@ void MyLayerOnAttach(LinceLayer* layer) {
 
     data->tiles[TILE_GRASS]   = LinceGetTile(data->tileset, (vec2){1,8}, (vec2){16,16}, (vec2){1, 1});
     data->tiles[TILE_DIRT]    = LinceGetTile(data->tileset, (vec2){5,9}, (vec2){16,16}, (vec2){1, 1});
+    
+    data->tiles[TILE_GRASS_LEFT ] = LinceGetTile(data->tileset, (vec2){0,8}, (vec2){16,16}, (vec2){1,1});
+    data->tiles[TILE_GRASS_RIGHT] = LinceGetTile(data->tileset, (vec2){2,8}, (vec2){16,16}, (vec2){1,1});
+    data->tiles[TILE_GRASS_UPPER] = LinceGetTile(data->tileset, (vec2){1,9}, (vec2){16,16}, (vec2){1,1});
+    data->tiles[TILE_GRASS_LOWER] = LinceGetTile(data->tileset, (vec2){1,7}, (vec2){16,16}, (vec2){1,1});
+
+    data->tiles[TILE_GRASS_CORNER_LL] = LinceGetTile(data->tileset, (vec2){0,7}, (vec2){16,16}, (vec2){1,1});
+    data->tiles[TILE_GRASS_CORNER_UL] = LinceGetTile(data->tileset, (vec2){0,9}, (vec2){16,16}, (vec2){1,1});
+    data->tiles[TILE_GRASS_CORNER_LR] = LinceGetTile(data->tileset, (vec2){2,7}, (vec2){16,16}, (vec2){1,1});
+    data->tiles[TILE_GRASS_CORNER_UR] = LinceGetTile(data->tileset, (vec2){2,9}, (vec2){16,16}, (vec2){1,1});
+
+    data->tiles[TILE_GRASS_ICORNER_LL] = LinceGetTile(data->tileset, (vec2){4,8}, (vec2){16,16}, (vec2){1,1});
+    data->tiles[TILE_GRASS_ICORNER_UL] = LinceGetTile(data->tileset, (vec2){4,7}, (vec2){16,16}, (vec2){1,1});
+    data->tiles[TILE_GRASS_ICORNER_LR] = LinceGetTile(data->tileset, (vec2){3,8}, (vec2){16,16}, (vec2){1,1});
+    data->tiles[TILE_GRASS_ICORNER_UR] = LinceGetTile(data->tileset, (vec2){3,7}, (vec2){16,16}, (vec2){1,1});
+
     data->tiles[TILE_TREE]    = LinceGetTile(data->tileset, (vec2){9,5}, (vec2){16,16}, (vec2){2, 2});
     data->tiles[TILE_CHICKEN] = LinceGetTile(data->tileset, (vec2){0,1}, (vec2){16,16}, (vec2){1, 1});
 
@@ -172,8 +220,8 @@ void MyLayerOnAttach(LinceLayer* layer) {
     data->current_anim = ANIM_BACK_IDLE;
 }
 
-void MyLayerOnDetach(LinceLayer* layer) {
-    MyLayer* data = LinceGetLayerData(layer);
+void TestLayerOnDetach(LinceLayer* layer) {
+    TestLayer* data = LinceGetLayerData(layer);
     LINCE_INFO(" Layer '%s' detached", data->name);
 
     LinceDeleteTexture(data->tex_front);
@@ -190,8 +238,8 @@ void MyLayerOnDetach(LinceLayer* layer) {
 }
 
 
-void MyLayerOnUpdate(LinceLayer* layer, float dt) {
-    MyLayer* data = LinceGetLayerData(layer);
+void TestLayerOnUpdate(LinceLayer* layer, float dt) {
+    TestLayer* data = LinceGetLayerData(layer);
     data->dt = dt;
     LinceUILayer* ui = LinceGetAppState()->ui;
 
@@ -247,66 +295,39 @@ void MyLayerOnUpdate(LinceLayer* layer, float dt) {
 
     LinceBeginScene(data->cam);
 
-    int gridx = 10;
-    int gridy = 10;
-
-    float r, g, b;
-    for(int i = 0; i != gridx; ++i){
-        for(int j = 0; j != gridy; ++j){
-            r = (float)i/(float)gridx;
-            b = (float)j/(float)gridy;
-            g = 0.8 - b - r;
-            LinceDrawQuad( (LinceQuadProps){
-                .x = (float)i - (float)gridx / 2.0,
-                .y = (float)j - (float)gridy / 2.0,
-                .w = 0.95, .h = 0.95,
-                .color = {r, g, b, 1.0}
-            });
-        }
-    }
-
-    LinceDrawQuad( (LinceQuadProps){
-        .x=-0.5, .y=0.0, .w=0.9, .h=0.9,
-        .color={1,1,1,1},
-        .rotation = 45,
-        .texture=data->tex_front,
-        .zorder = 0.1
-    });
-    LinceDrawQuad( (LinceQuadProps){
-        .x=0.0, .y=0.0, .w=0.9, .h=0.9,
-        .color={1,1,1,1},
-        .rotation = 45,
-        .texture=data->tex_back,
-        .zorder = 0.9
-    });
-    LinceDrawQuad( (LinceQuadProps){
-        .x=0.5, .y=0.0, .w=0.9, .h=0.9,
-        .color={1,1,1,1},
-        .rotation = 45,
-        .texture=data->tex_front,
-        .zorder = 0.1
-    });
-
-    for(int i = 0; i != 10; ++i){
-        for(int j = 0; j != 10; ++j){
+    // Tilemap
+    for(uint32_t i = 0; i != tm_width; ++i){
+        for(uint32_t j = 0; j != tm_height; ++j){
+            uint32_t index = j * tm_width + i;
+            int tile = tilemap[index];
             LinceDrawQuad((LinceQuadProps){
-                .x=(float)i, .y=(float)j,
+                .x = (float)i - (float)tm_width / 2.0f,
+                .y = (float)j - (float)tm_height / 2.0f,
                 .w=1.0f, .h=1.0f,
                 .color={1,1,1,1},
-                .tile = &data->tiles[TILE_GRASS],
+                .tile = &data->tiles[tile],
                 .zorder = 0.1
             });
         }
     }
 
+    // Trees
     LinceDrawQuad((LinceQuadProps){
-        .x=5.0f, .y=5.0f,
+        .x=4.0f, .y=4.0f,
+        .w=2.0f, .h=2.0f,
+        .color={1,1,1,1},
+        .tile = &data->tiles[TILE_TREE],
+        .zorder = 0.5
+    });
+    LinceDrawQuad((LinceQuadProps){
+        .x=-2.0f, .y=-2.0f,
         .w=2.0f, .h=2.0f,
         .color={1,1,1,1},
         .tile = &data->tiles[TILE_TREE],
         .zorder = 0.5
     });
 
+    // Chicken
     LinceDrawQuad((LinceQuadProps){
         .x=5.0f, .y=3.0f,
         .w=1.0f, .h=1.0f,
@@ -316,16 +337,6 @@ void MyLayerOnUpdate(LinceLayer* layer, float dt) {
     });
 
     // PLAYER
-    /*
-    LinceDrawQuad((LinceQuadProps){
-        .x=data->cam->pos[0],
-        .y=data->cam->pos[1],
-        .w=1.5f, .h=1.5f,
-        .color={1,1,1,1},
-        .tile = &data->walking_tiles[data->player_facing],
-        .zorder = 0.6
-    });
-    */
     SpriteAnim* anim = data->player_anims[data->current_anim];
     UpdateAnim(anim, dt);
     LinceDrawQuad((LinceQuadProps){
@@ -340,18 +351,18 @@ void MyLayerOnUpdate(LinceLayer* layer, float dt) {
     LinceEndScene();
 }
 
-void MyLayerOnEvent(LinceLayer* layer, LinceEvent* event){
+void TestLayerOnEvent(LinceLayer* layer, LinceEvent* event){
     if(event->type == LinceEventType_MouseScrolled){
         LinceMouseScrolledEvent* scroll = event->data.MouseScrolled;
-        MyLayer* data = LinceGetLayerData(layer);
+        TestLayer* data = LinceGetLayerData(layer);
         data->cam->zoom *= powf(0.80, scroll->yoff); // * 0.5 * dt;
     }
 }
 
 
-LinceLayer* MyLayerInit(char* name) {
+LinceLayer* TestLayerInit(char* name) {
 
-    MyLayer* my_layer = calloc(1, sizeof(MyLayer));
+    TestLayer* my_layer = calloc(1, sizeof(TestLayer));
     LINCE_ASSERT(my_layer, "Failed to allocate layer data");
 
     size_t len_orig = strlen(name);
@@ -359,10 +370,10 @@ LinceLayer* MyLayerInit(char* name) {
     memcpy(my_layer->name, name, len);
 
     LinceLayer* layer = LinceCreateLayer(my_layer);
-    layer->OnAttach = MyLayerOnAttach;
-    layer->OnDetach = MyLayerOnDetach;
-    layer->OnEvent  = MyLayerOnEvent;
-    layer->OnUpdate = MyLayerOnUpdate;
+    layer->OnAttach = TestLayerOnAttach;
+    layer->OnDetach = TestLayerOnDetach;
+    layer->OnEvent  = TestLayerOnEvent;
+    layer->OnUpdate = TestLayerOnUpdate;
 
     return layer;
 }
@@ -373,7 +384,7 @@ LinceLayer* MyLayerInit(char* name) {
 
 void GameInit() {
 	LINCE_INFO("\n User App Initialised");
-    LincePushLayer(MyLayerInit("Test"));
+    LincePushLayer(TestLayerInit("Test"));
     //LincePushLayer(NKLayerInit());
     //LincePushLayer(PongLayerInit());
     //LincePushLayer(MCommandLayerInit());
