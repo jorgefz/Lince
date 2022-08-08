@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>Home Page - Lince Documentation Website</title>
+        <title>Version History - Lince Documentation Website</title>
         <!-- Custom HTML head -->
         <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
         <meta name="description" content="">
@@ -75,7 +75,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded affix "><a href="HomePage.html" class="active">Home Page</a></li><li class="chapter-item expanded "><a href="App.html"><strong aria-hidden="true">1.</strong> App</a></li><li class="chapter-item expanded "><a href="Events.html"><strong aria-hidden="true">2.</strong> Events</a></li><li class="chapter-item expanded "><a href="Layers.html"><strong aria-hidden="true">3.</strong> Layers</a></li><li class="chapter-item expanded "><a href="Input.html"><strong aria-hidden="true">4.</strong> Input</a></li><li class="chapter-item expanded "><a href="Rendering.html"><strong aria-hidden="true">5.</strong> Rendering</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="Buffers.html"><strong aria-hidden="true">5.1.</strong> Buffers</a></li><li class="chapter-item expanded "><a href="VertexArrays.html"><strong aria-hidden="true">5.2.</strong> Vertex Arrays</a></li><li class="chapter-item expanded "><a href="Shaders.html"><strong aria-hidden="true">5.3.</strong> Shaders</a></li><li class="chapter-item expanded "><a href="Textures.html"><strong aria-hidden="true">5.4.</strong> Textures</a></li><li class="chapter-item expanded "><a href="Renderer.html"><strong aria-hidden="true">5.5.</strong> Renderer</a></li><li class="chapter-item expanded "><a href="Cameras.html"><strong aria-hidden="true">5.6.</strong> Cameras</a></li></ol></li><li class="chapter-item expanded "><a href="UI.html"><strong aria-hidden="true">6.</strong> UI</a></li><li class="chapter-item expanded "><div><strong aria-hidden="true">7.</strong> Development Diary</div></li><li><ol class="section"><li class="chapter-item expanded "><a href="ToDo.html"><strong aria-hidden="true">7.1.</strong> ToDo</a></li><li class="chapter-item expanded "><a href="Versions.html"><strong aria-hidden="true">7.2.</strong> Version History</a></li></ol></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded affix "><a href="HomePage.html">Home Page</a></li><li class="chapter-item expanded "><a href="App.html"><strong aria-hidden="true">1.</strong> App</a></li><li class="chapter-item expanded "><a href="Events.html"><strong aria-hidden="true">2.</strong> Events</a></li><li class="chapter-item expanded "><a href="Layers.html"><strong aria-hidden="true">3.</strong> Layers</a></li><li class="chapter-item expanded "><a href="Input.html"><strong aria-hidden="true">4.</strong> Input</a></li><li class="chapter-item expanded "><a href="Rendering.html"><strong aria-hidden="true">5.</strong> Rendering</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="Buffers.html"><strong aria-hidden="true">5.1.</strong> Buffers</a></li><li class="chapter-item expanded "><a href="VertexArrays.html"><strong aria-hidden="true">5.2.</strong> Vertex Arrays</a></li><li class="chapter-item expanded "><a href="Shaders.html"><strong aria-hidden="true">5.3.</strong> Shaders</a></li><li class="chapter-item expanded "><a href="Textures.html"><strong aria-hidden="true">5.4.</strong> Textures</a></li><li class="chapter-item expanded "><a href="Renderer.html"><strong aria-hidden="true">5.5.</strong> Renderer</a></li><li class="chapter-item expanded "><a href="Cameras.html"><strong aria-hidden="true">5.6.</strong> Cameras</a></li></ol></li><li class="chapter-item expanded "><a href="UI.html"><strong aria-hidden="true">6.</strong> UI</a></li><li class="chapter-item expanded "><div><strong aria-hidden="true">7.</strong> Development Diary</div></li><li><ol class="section"><li class="chapter-item expanded "><a href="ToDo.html"><strong aria-hidden="true">7.1.</strong> ToDo</a></li><li class="chapter-item expanded "><a href="Versions.html" class="active"><strong aria-hidden="true">7.2.</strong> Version History</a></li></ol></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -134,44 +134,21 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1 id="lince-game-engine"><a class="header" href="#lince-game-engine">Lince Game Engine</a></h1>
-<p>Lince is a game engine written entirely in C targetted towards 2D games. The engine is currently a work in progress, and it's so early in its development that it doesn't even qualify as pre-alpha - the basic foundations of the renderer are being built and it won't be usable for some time.</p>
-<h2 id="basic-code-example"><a class="header" href="#basic-code-example">Basic Code Example</a></h2>
-<pre><code class="language-c">#include &lt;stdio.h&gt;
-#include &quot;lince.h&quot;
-
-void Init() {
-	printf(&quot; Game started!\n&quot;);
-}
-
-void OnUpdate(float dt) {
-	printf(&quot; dt = %.3f ms\n&quot;, dt * 1000.0f);
-}
-
-void Terminate() {
-	printf(&quot; Game terminated!\n&quot;);
-}
-
-int main() {
-
-	LinceApp* app = LinceGetAppState();
-
-	app-&gt;game_init = Init;
-	app-&gt;game_on_update = OnUpdate;
-	app-&gt;game_terminate = Terminate;
-
-	LinceRun();
-
-	return 0;
-}
-</code></pre>
+                        <h1 id="version-history"><a class="header" href="#version-history">Version History</a></h1>
+<p>Version codes follow <a href="https://semver.org/">Semantic Versioning</a>.</p>
+<h2 id="v010-alpha"><a class="header" href="#v010-alpha">v0.1.0 (alpha)</a></h2>
+<ul>
+<li>Basic 2D Renderer for quads</li>
+<li>Basic texturing and tilesets</li>
+<li>Event system for user input</li>
+</ul>
 
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">
                         <!-- Mobile navigation buttons -->
-                            <a rel="next" href="App.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
-                                <i class="fa fa-angle-right"></i>
+                            <a rel="prev" href="ToDo.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
                             </a>
                         <div style="clear: both"></div>
                     </nav>
@@ -179,8 +156,8 @@ int main() {
             </div>
 
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
-                    <a rel="next" href="App.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
-                        <i class="fa fa-angle-right"></i>
+                    <a rel="prev" href="ToDo.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
                     </a>
             </nav>
 

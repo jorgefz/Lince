@@ -1,10 +1,10 @@
-# Lince
+# Lince 0.1.0
 
 An OpenGL game engine written in C, currently in development. It uses GLFW for the windowing system, GLAD for the OpenGL loader, Premake5 as the build system, and CGLM for vector and matrix operations.
 
 ## Documentation
 
-The documentation is available at `docs/book/index.html` which you can open with your favourite web browser.
+The documentation is available [here](./docs/src/SUMMARY.md) as Markdown, or at `docs/book/index.html` which you can open with your favourite web browser.
 
 ## Dependencies
 
@@ -37,6 +37,7 @@ The project contains the source code for the following packages, which are built
 * GLAD: OpenGL loader (https://glad.dav1d.de/)
 * CGLM: OpenGL vector and matrix mathematics (https://cglm.readthedocs.io/en/latest)
 * stb\_image.h: Single-header image loader by Sean Barret (https://github.com/nothings/stb)
+* Nucklear: ANSI C single-header UI library (https://github.com/Immediate-Mode-UI/Nuklear)
 
 The project makes use of `mdbook` to generate the documentation website (https://github.com/rust-lang/mdBook)
 

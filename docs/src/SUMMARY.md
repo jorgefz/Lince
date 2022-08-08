@@ -1,4 +1,4 @@
-# Summary
+# Lince v0.1.0 Documentation
 
 [Home Page](./HomePage.md)
 
@@ -17,3 +17,4 @@
 
 - [Development Diary]()
 	- [ToDo](./ToDo.md)
+	- [Version History](./Versions.md)
