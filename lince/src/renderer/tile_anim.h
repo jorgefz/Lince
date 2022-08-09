@@ -33,14 +33,6 @@ LinceTileAnim
 
 Code Example:
 
-anim = CreateAnim()
-
-while(1){
-    UpdateAnim(anim);
-}
-
-DeleteAnim(anim);
-
 */
 
 
@@ -48,9 +40,11 @@ struct LinceTileAnim; // forward declaration
 
 typedef enum LinceTileAnimFlags {
     // Defaults set to zero, useless but reassuring
-    LinceTileAnimFlag_Repeat     = 0x0,
+    LinceTileAnimFlag_Repeat       	= 0x0,
+	LinceTileAnimFlag_EndWithFirst 	= 0x0,
     // Non-defaults
-    LinceTileAnimFlag_Once       = 0x1,  // Run animation only once
+    LinceTileAnimFlag_Once        	= 0x1,  // Run animation only once
+	LinceTileAnimFlag_EndWithLast 	= 0x2,  // Ends animation on the last frame
     // LinceTileAnimFlag_OneFrame // Set frametime to one frame
 } LinceTileAnimFlags;
 
@@ -61,15 +55,17 @@ typedef struct LinceTileAnim {
     uint32_t frame_count;	// number of tiles in the buffer
     float frame_time;		// time in ms between frames
 
-    uint32_t start;			// tile at which to start the animation
+    uint32_t start;			// tile index at which to start the animation
     uint32_t repeats;		// number of repeats to animate
-	uint32_t* order;
-    uint32_t order_count;
+							// if set to zero, it will repeat forever
+	
+	uint32_t* order;		// Array if indices - order in which to render the tiles
+    uint32_t order_count;	// Number of indices in the order array
 
-    LinceTileAnimFn* on_finish;
-    LinceTileAnimFn* on_repeat;
-	// LinceTileAnimFn* on_frame // when frame changes
-    void* callback_args;
+    LinceTileAnimFn* on_finish;		// Called when animation has finished
+    LinceTileAnimFn* on_repeat;		// Called when animation loops over
+	// LinceTileAnimFn* on_frame 	// Called when frame changes
+    void* callback_args;			// Arguments to pass onto callbacks
 
     LinceTileAnimFlags flags;
 
@@ -78,6 +74,7 @@ typedef struct LinceTileAnim {
     uint32_t current_frame;		// index of current frame
     LinceTile* current_tile;	// pointer to current tile in the buffer
 	uint32_t repeat_count;		// number of times the animation has been looped
+	LinceBool finished; 		// indicates whether animation has finished running
 
 } LinceTileAnim;
 
@@ -89,7 +86,7 @@ void LinceUpdateTileAnim(LinceTileAnim* anim, float dt);
 // Resets clock and frames to initial conditions
 void LinceResetTileAnim(LinceTileAnim* anim);
 // Frees animation data
-void LinceDeleteAnim(LinceTileAnim* anim);
+void LinceDeleteTileAnim(LinceTileAnim* anim);
 
 
 

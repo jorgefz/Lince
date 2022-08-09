@@ -1,4 +1,4 @@
-# Lince 0.2.0
+# Lince 0.2.1
 
 An OpenGL game engine written in C, currently in development. It uses GLFW for the windowing system, GLAD for the OpenGL loader, Premake5 as the build system, and CGLM for vector and matrix operations.
 

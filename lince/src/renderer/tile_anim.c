@@ -30,42 +30,56 @@ LinceTileAnim* LinceCreateTileAnim(const LinceTileAnim* props){
 	memmove(anim->frames, props->frames, sizeof(LinceTile) * props->frame_count);
 	
 	// Setup initial conditions
-	anim->time = anim->frame_time;
-	anim->repeat_count = 0;
-	anim->current_frame = anim->start;
-	anim->current_tile = GetCurrentTile(anim);
+	LinceResetTileAnim(anim);
 	return anim;
 }
 
 
 void LinceUpdateTileAnim(LinceTileAnim* anim, float dt){
+	if(anim->finished) return;
+
 	anim->time -= dt;
 
-	if(anim->time <= 0.0f){
-		anim->current_frame++;
-		if(anim->current_frame >= anim->frame_count){
-			anim->current_frame = 0;
-			anim->repeat_count++;
-			if(anim->on_repeat){
-				anim->on_repeat(anim, anim->callback_args);
+	// Time is still ongoing - continue with current frame
+	if(anim->time > 0.0f) return;
+
+	// Timer is finished - change of frame
+	anim->current_frame++;
+	
+	// Reached end of frame list - loop over to beginning?
+	if(anim->current_frame >= anim->frame_count){
+		anim->current_frame = 0;
+		anim->repeat_count++;
+
+		// Reached max number of repeats
+		if(anim->repeats > 0 && anim->repeats == anim->repeat_count){
+			anim->finished = LinceTrue;
+			if(anim->on_finish){
+				anim->on_finish(anim, anim->callback_args);
 			}
 		}
-		anim->time = anim->frame_time; // reset countdown
-		anim->current_tile = GetCurrentTile(anim);
+		
+		else if(anim->on_repeat){
+			anim->on_repeat(anim, anim->callback_args);
+		}
 	}
 
+	anim->time = anim->frame_time; // reset countdown
+	anim->current_tile = GetCurrentTile(anim);
+	
 }
 
 
 void LinceResetTileAnim(LinceTileAnim* anim){
 	anim->time = anim->frame_time;
-	anim->current_frame = 0;
+	anim->current_frame = anim->start;
 	anim->current_tile = GetCurrentTile(anim);
 	anim->repeat_count = 0;
+	anim->finished = LinceFalse;
 }
 
 
-void LinceDeleteAnim(LinceTileAnim* anim){
+void LinceDeleteTileAnim(LinceTileAnim* anim){
 	if(!anim) return;
 	if(anim->frames) free(anim->frames);
 	free(anim);

@@ -79,6 +79,10 @@ void ChickenLoops(LinceTileAnim* anim, void* args){
     printf("Chicken repeats\n");
 }
 
+void ChickenEnds(LinceTileAnim* anim, void* args){
+    printf("Chicken stopped moving!\n");
+}
+
 
 
 // TEST LAYER
@@ -189,7 +193,9 @@ void TestLayerOnAttach(LinceLayer* layer) {
         .frames = chicken_tiles,
         .frame_count = 2,
         .frame_time = 1000.0f,
-        .on_repeat = ChickenLoops
+        .on_repeat = ChickenLoops,
+        .on_finish = ChickenEnds,
+        .repeats = 4
     });
 
 }
@@ -204,11 +210,11 @@ void TestLayerOnDetach(LinceLayer* layer) {
     LinceDeleteCamera(data->cam);
 
     for(int i = 0; i != ANIM_COUNT; ++i){
-        LinceDeleteAnim(data->player_anims[i]);
+        LinceDeleteTileAnim(data->player_anims[i]);
         data->player_anims[i] = NULL;
     }
 
-    LinceDeleteAnim(data->chicken_anim);
+    LinceDeleteTileAnim(data->chicken_anim);
 
     free(data);
 }
@@ -279,7 +285,7 @@ void TestLayerOnUpdate(LinceLayer* layer, float dt) {
             LinceDrawQuad((LinceQuadProps){
                 .x = (float)i - (float)tm_width / 2.0f,
                 .y = (float)j - (float)tm_height / 2.0f,
-                .w=1.0f, .h=1.0f,
+                .w=1.001f, .h=1.001f, // must slightly overlap to avoid black lines
                 .color={1,1,1,1},
                 .tile = &data->tiles[tile],
                 .zorder = 0.1
