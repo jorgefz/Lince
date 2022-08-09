@@ -15,62 +15,9 @@
 #include <assert.h>
 
 #include "renderer/tileset.h"
+#include "renderer/tile_anim.h"
 
 
-typedef struct SpriteAnim {
-	LinceTile* frames;			// array of animation frames
-	uint32_t frame_count;	// number of animation frames
-
-	float frametime;		// duration of each frame in ms
-	float time;				// time counter between frames
-	uint32_t current_frame;	// current active frame to render
-
-	bool loop;				// indicates wether animation loops forever, unused
-} SpriteAnim;
-
-
-SpriteAnim* CreateAnim(LinceTile* frames, uint32_t frame_count, float frametime, uint32_t start_frame, bool loop){
-
-	SpriteAnim* anim = calloc(1, sizeof(SpriteAnim));
-	assert(anim);
-
-	anim->frames = malloc(sizeof(LinceTile) * frame_count);
-	assert(anim->frames);
-	memmove(anim->frames, frames, sizeof(LinceTile) * frame_count);
-
-	anim->frame_count = frame_count;
-	anim->frametime = frametime;
-	anim->time = frametime;
-	anim->current_frame = start_frame;
-	anim->loop = loop;
-
-	return anim;
-}
-
-void UpdateAnim(SpriteAnim* anim, float dt){
-	anim->time -= dt;
-
-	if(anim->time <= 0.0f){
-		anim->current_frame++;
-		if(anim->current_frame >= anim->frame_count){
-			anim->current_frame = 0;
-		}
-		anim->time = anim->frametime;
-	}
-
-}
-
-void ResetAnim(SpriteAnim* anim){
-	anim->time = anim->frametime;
-	anim->current_frame = 0;
-}
-
-
-void DeleteAnim(SpriteAnim* anim){
-	if(!anim) return;
-	if(anim->frames) free(anim->frames);
-	free(anim);
-}
 
 enum TileNames {
     // Ground
@@ -112,6 +59,9 @@ int tilemap[] = {
     1, 1, 1, 6,10, 0, 0, 3, 1, 1, 1, 1, 1, 1, 1, 1, 
 };
 
+
+// WALKING 
+
 enum WalkingAnims {
     ANIM_FRONT = 0,
     ANIM_BACK,
@@ -123,6 +73,15 @@ enum WalkingAnims {
     ANIM_RIGHT_IDLE,
     ANIM_COUNT
 };
+
+
+void ChickenLoops(LinceTileAnim* anim, void* args){
+    printf("Chicken repeats\n");
+}
+
+
+
+// TEST LAYER
 
 typedef struct TestLayer {
     char name[LINCE_NAME_MAX];
@@ -140,8 +99,10 @@ typedef struct TestLayer {
     LinceTexture* walking_tileset;
 
     LinceTile tiles[TILE_COUNT];
-    SpriteAnim* player_anims[ANIM_COUNT];
+    LinceTileAnim* player_anims[ANIM_COUNT];
     uint8_t current_anim;
+
+    LinceTileAnim* chicken_anim;
 
     vec4 color;
     LinceCamera* cam;
@@ -208,16 +169,29 @@ void TestLayerOnAttach(LinceLayer* layer) {
         LinceGetTile(data->walking_tileset, (vec2){1,1}, (vec2){24,24}, (vec2){1,1}),
     };
 
-    data->player_anims[ANIM_FRONT     ] = CreateAnim(player_tiles   , 2, 300.0f, 0, 0);
-    data->player_anims[ANIM_BACK      ] = CreateAnim(player_tiles+2 , 2, 300.0f, 0, 0);
-    data->player_anims[ANIM_LEFT      ] = CreateAnim(player_tiles+4 , 2, 300.0f, 0, 0);
-    data->player_anims[ANIM_RIGHT     ] = CreateAnim(player_tiles+6 , 2, 300.0f, 0, 0);
-    data->player_anims[ANIM_FRONT_IDLE] = CreateAnim(player_tiles+8 , 1, 300.0f, 0, 0);
-    data->player_anims[ANIM_BACK_IDLE ] = CreateAnim(player_tiles+9 , 1, 300.0f, 0, 0);
-    data->player_anims[ANIM_LEFT_IDLE ] = CreateAnim(player_tiles+10, 1, 300.0f, 0, 0);
-    data->player_anims[ANIM_RIGHT_IDLE] = CreateAnim(player_tiles+11, 1, 300.0f, 0, 0);
+    data->player_anims[ANIM_FRONT     ] = LinceCreateTileAnim(&(LinceTileAnim){.frames=player_tiles   , .frame_count=2, .frame_time=300.0f});
+    data->player_anims[ANIM_BACK      ] = LinceCreateTileAnim(&(LinceTileAnim){.frames=player_tiles+2 , .frame_count=2, .frame_time=300.0f});
+    data->player_anims[ANIM_LEFT      ] = LinceCreateTileAnim(&(LinceTileAnim){.frames=player_tiles+4 , .frame_count=2, .frame_time=300.0f});
+    data->player_anims[ANIM_RIGHT     ] = LinceCreateTileAnim(&(LinceTileAnim){.frames=player_tiles+6 , .frame_count=2, .frame_time=300.0f});
+    data->player_anims[ANIM_FRONT_IDLE] = LinceCreateTileAnim(&(LinceTileAnim){.frames=player_tiles+8 , .frame_count=1, .frame_time=300.0f});
+    data->player_anims[ANIM_BACK_IDLE ] = LinceCreateTileAnim(&(LinceTileAnim){.frames=player_tiles+9 , .frame_count=1, .frame_time=300.0f});
+    data->player_anims[ANIM_LEFT_IDLE ] = LinceCreateTileAnim(&(LinceTileAnim){.frames=player_tiles+10, .frame_count=1, .frame_time=300.0f});
+    data->player_anims[ANIM_RIGHT_IDLE] = LinceCreateTileAnim(&(LinceTileAnim){.frames=player_tiles+11, .frame_count=1, .frame_time=300.0f});
 
     data->current_anim = ANIM_BACK_IDLE;
+
+    // chicken idle animation
+    LinceTile chicken_tiles[] = {
+        LinceGetTile(data->tileset, (vec2){0,1}, (vec2){16,16}, (vec2){1, 1}),
+        LinceGetTile(data->tileset, (vec2){0,0}, (vec2){16,16}, (vec2){1, 1})
+    };
+    data->chicken_anim = LinceCreateTileAnim(&(LinceTileAnim){
+        .frames = chicken_tiles,
+        .frame_count = 2,
+        .frame_time = 1000.0f,
+        .on_repeat = ChickenLoops
+    });
+
 }
 
 void TestLayerOnDetach(LinceLayer* layer) {
@@ -230,9 +204,11 @@ void TestLayerOnDetach(LinceLayer* layer) {
     LinceDeleteCamera(data->cam);
 
     for(int i = 0; i != ANIM_COUNT; ++i){
-        DeleteAnim(data->player_anims[i]);
+        LinceDeleteAnim(data->player_anims[i]);
         data->player_anims[i] = NULL;
     }
+
+    LinceDeleteAnim(data->chicken_anim);
 
     free(data);
 }
@@ -286,7 +262,7 @@ void TestLayerOnUpdate(LinceLayer* layer, float dt) {
     }
 
     if(next_anim != data->current_anim){
-        ResetAnim(data->player_anims[data->current_anim]);
+        LinceResetTileAnim(data->player_anims[data->current_anim]);
     }
     data->current_anim = next_anim;
 
@@ -328,23 +304,24 @@ void TestLayerOnUpdate(LinceLayer* layer, float dt) {
     });
 
     // Chicken
+    LinceUpdateTileAnim(data->chicken_anim, dt);
     LinceDrawQuad((LinceQuadProps){
         .x=5.0f, .y=3.0f,
         .w=1.0f, .h=1.0f,
         .color={1,1,1,1},
-        .tile = &data->tiles[TILE_CHICKEN],
+        .tile = data->chicken_anim->current_tile,
         .zorder = 0.5
     });
 
     // PLAYER
-    SpriteAnim* anim = data->player_anims[data->current_anim];
-    UpdateAnim(anim, dt);
+    LinceTileAnim* anim = data->player_anims[data->current_anim];
+    LinceUpdateTileAnim(anim, dt);
     LinceDrawQuad((LinceQuadProps){
         .x=data->cam->pos[0],
         .y=data->cam->pos[1],
         .w=1.5f, .h=1.5f,
         .color={1,1,1,1},
-        .tile = &anim->frames[anim->current_frame],
+        .tile = anim->current_tile,
         .zorder = 0.6
     });
     
@@ -358,7 +335,6 @@ void TestLayerOnEvent(LinceLayer* layer, LinceEvent* event){
         data->cam->zoom *= powf(0.80, scroll->yoff); // * 0.5 * dt;
     }
 }
-
 
 LinceLayer* TestLayerInit(char* name) {
 

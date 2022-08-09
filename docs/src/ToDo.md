@@ -9,6 +9,10 @@
 |   🔷   | Planned   |
 
 
+## Tile System
+1. Integrate tile animations into the engine
+2. Add tilemap system
+
 ## 2D Renderer
 1. ✅ **Add basic 2D renderer using immediate-mode scenes and quads**
 2. ✅ **Add batching to 2D renderer**
