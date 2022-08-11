@@ -76,15 +76,6 @@ Internal data
 	- Indicates whether animation has finished running
 
 
-// Sorts out the user-defined animation settings and initialises the animation
-
-// Animates by time dt
-
-// Resets clock and frames to initial conditions
-
-// Frees animation data
-
-
 ## LinceCreateTileAnim
 ```c
 LinceTileAnim* LinceCreateTileAnim(const LinceTileAnim* anim)
