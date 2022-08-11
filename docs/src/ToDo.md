@@ -9,9 +9,28 @@
 |   🔷   | Planned   |
 
 
+## Roadmap
+1. Basic 2D Renderer ✅
+	1. Vertex Arrays ✅
+	2. Shaders ✅
+	3. Textures ✅
+	4. Cameras ✅
+	5. Renderer2D API ✅
+2. Renderer Improvements ✅
+	1. Batch renderer ✅
+3. Tiles 💛
+	1. Tilesets and texture atlases ✅
+	2. Tile animations 💛
+	3. Tilemaps 💛
+4. Audio 🔷
+	1. Integrate OpenAL
+	2. Build audio API
+
+
 ## Tile System
-1. Integrate tile animations into the engine
-2. Add tilemap system
+1. ✅Develip tile-based sprite animations
+2. 💛 Improve tile animations with callbacks and custom tile order
+2. 🔷 Add tilemap system
 
 ## 2D Renderer
 1. ✅ **Add basic 2D renderer using immediate-mode scenes and quads**
@@ -30,6 +49,9 @@
 
 ## API ease of use
 1. 💛 Add more user settings prior to calling `LinceRun`
+
+## Bugs
+1. Missile Command: some quads persist on the screen
 
 ## Next goals
 1. 💛 Add UI library: [Nuklear](https://github.com/Immediate-Mode-UI/Nuklear/)

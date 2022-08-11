@@ -75,7 +75,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded affix "><a href="HomePage.html">Home Page</a></li><li class="chapter-item expanded "><a href="App.html"><strong aria-hidden="true">1.</strong> App</a></li><li class="chapter-item expanded "><a href="Events.html"><strong aria-hidden="true">2.</strong> Events</a></li><li class="chapter-item expanded "><a href="Layers.html"><strong aria-hidden="true">3.</strong> Layers</a></li><li class="chapter-item expanded "><a href="Input.html"><strong aria-hidden="true">4.</strong> Input</a></li><li class="chapter-item expanded "><a href="Rendering.html"><strong aria-hidden="true">5.</strong> Rendering</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="Buffers.html"><strong aria-hidden="true">5.1.</strong> Buffers</a></li><li class="chapter-item expanded "><a href="VertexArrays.html"><strong aria-hidden="true">5.2.</strong> Vertex Arrays</a></li><li class="chapter-item expanded "><a href="Shaders.html"><strong aria-hidden="true">5.3.</strong> Shaders</a></li><li class="chapter-item expanded "><a href="Textures.html"><strong aria-hidden="true">5.4.</strong> Textures</a></li><li class="chapter-item expanded "><a href="Renderer.html"><strong aria-hidden="true">5.5.</strong> Renderer</a></li><li class="chapter-item expanded "><a href="Cameras.html"><strong aria-hidden="true">5.6.</strong> Cameras</a></li></ol></li><li class="chapter-item expanded "><a href="UI.html"><strong aria-hidden="true">6.</strong> UI</a></li><li class="chapter-item expanded "><div><strong aria-hidden="true">7.</strong> Development Diary</div></li><li><ol class="section"><li class="chapter-item expanded "><a href="ToDo.html" class="active"><strong aria-hidden="true">7.1.</strong> ToDo</a></li><li class="chapter-item expanded "><a href="Versions.html"><strong aria-hidden="true">7.2.</strong> Version History</a></li></ol></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded affix "><a href="HomePage.html">Home Page</a></li><li class="chapter-item expanded "><a href="App.html"><strong aria-hidden="true">1.</strong> App</a></li><li class="chapter-item expanded "><a href="Events.html"><strong aria-hidden="true">2.</strong> Events</a></li><li class="chapter-item expanded "><a href="Layers.html"><strong aria-hidden="true">3.</strong> Layers</a></li><li class="chapter-item expanded "><a href="Input.html"><strong aria-hidden="true">4.</strong> Input</a></li><li class="chapter-item expanded "><a href="Rendering.html"><strong aria-hidden="true">5.</strong> Rendering</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="Buffers.html"><strong aria-hidden="true">5.1.</strong> Buffers</a></li><li class="chapter-item expanded "><a href="VertexArrays.html"><strong aria-hidden="true">5.2.</strong> Vertex Arrays</a></li><li class="chapter-item expanded "><a href="Shaders.html"><strong aria-hidden="true">5.3.</strong> Shaders</a></li><li class="chapter-item expanded "><a href="Textures.html"><strong aria-hidden="true">5.4.</strong> Textures</a></li><li class="chapter-item expanded "><a href="Renderer.html"><strong aria-hidden="true">5.5.</strong> Renderer</a></li><li class="chapter-item expanded "><a href="Cameras.html"><strong aria-hidden="true">5.6.</strong> Cameras</a></li></ol></li><li class="chapter-item expanded "><a href="UI.html"><strong aria-hidden="true">6.</strong> UI</a></li><li class="chapter-item expanded "><a href="Tiles.html"><strong aria-hidden="true">7.</strong> Tiles</a></li><li class="chapter-item expanded "><a href="DevDiary.html"><strong aria-hidden="true">8.</strong> Development Diary</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="ToDo.html" class="active"><strong aria-hidden="true">8.1.</strong> ToDo</a></li><li class="chapter-item expanded "><a href="Versions.html"><strong aria-hidden="true">8.2.</strong> Version History</a></li></ol></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -142,10 +142,41 @@
 <tr><td>🟠</td><td>Delayed</td></tr>
 <tr><td>🔷</td><td>Planned</td></tr>
 </tbody></table>
+<h2 id="roadmap"><a class="header" href="#roadmap">Roadmap</a></h2>
+<ol>
+<li>Basic 2D Renderer ✅
+<ol>
+<li>Vertex Arrays ✅</li>
+<li>Shaders ✅</li>
+<li>Textures ✅</li>
+<li>Cameras ✅</li>
+<li>Renderer2D API ✅</li>
+</ol>
+</li>
+<li>Renderer Improvements ✅
+<ol>
+<li>Batch renderer ✅</li>
+</ol>
+</li>
+<li>Tiles 💛
+<ol>
+<li>Tilesets and texture atlases ✅</li>
+<li>Tile animations 💛</li>
+<li>Tilemaps 💛</li>
+</ol>
+</li>
+<li>Audio 🔷
+<ol>
+<li>Integrate OpenAL</li>
+<li>Build audio API</li>
+</ol>
+</li>
+</ol>
 <h2 id="tile-system"><a class="header" href="#tile-system">Tile System</a></h2>
 <ol>
-<li>Integrate tile animations into the engine</li>
-<li>Add tilemap system</li>
+<li>✅Develip tile-based sprite animations</li>
+<li>💛 Improve tile animations with callbacks and custom tile order</li>
+<li>🔷 Add tilemap system</li>
 </ol>
 <h2 id="2d-renderer"><a class="header" href="#2d-renderer">2D Renderer</a></h2>
 <ol>
@@ -168,6 +199,10 @@
 <ol>
 <li>💛 Add more user settings prior to calling <code>LinceRun</code></li>
 </ol>
+<h2 id="bugs"><a class="header" href="#bugs">Bugs</a></h2>
+<ol>
+<li>Missile Command: some quads persist on the screen</li>
+</ol>
 <h2 id="next-goals"><a class="header" href="#next-goals">Next goals</a></h2>
 <ol>
 <li>💛 Add UI library: <a href="https://github.com/Immediate-Mode-UI/Nuklear/">Nuklear</a></li>
@@ -188,7 +223,7 @@
 
                     <nav class="nav-wrapper" aria-label="Page navigation">
                         <!-- Mobile navigation buttons -->
-                            <a rel="prev" href="UI.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                            <a rel="prev" href="DevDiary.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                                 <i class="fa fa-angle-left"></i>
                             </a>
                             <a rel="next" href="Versions.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
@@ -200,7 +235,7 @@
             </div>
 
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
-                    <a rel="prev" href="UI.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                    <a rel="prev" href="DevDiary.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                         <i class="fa fa-angle-left"></i>
                     </a>
                     <a rel="next" href="Versions.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">

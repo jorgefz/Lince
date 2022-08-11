@@ -1,26 +1,11 @@
 # Development Diary
 
+## 10 Aug 2022
+After a three-month long hiatus, and developing the 2D renderer as well as two simple games on the engine (Pong and Missile Command), I am now developing tile-based sprite animations. The way it works is you take an array of tiles, and you loop through them, with a countdown in between. The chosen 'frame' at any given time is provided as a quad texture and rendered.
 
-## To-Do
+Perhaps the most common example of sprite animations is a character walking, which is why I decied to implement it and why I found out that my implementation is too simple, not flexible enough. Walking in a 2D ground requires a total of eight animations: both walking and idle for left, right, front, and back directions. Using the simple tile-looping model, I had to create eight different animations off the same spritesheet, which is wasteful and resulted in too much boilerplate. But this could be simpler. I have been toying with the idea of providing the animation data with additional logic: the order in with the tiles are animated. This way, I wouldn't need eight separate animations, but only one. I can give it the entire spritesheet, and then make it use a subset of the tiles in a specific order for each of the character animations. Then, I would switch this subset of indices for another when the character's direction changes.
 
-* Make user application a separate project that links to lince static library.
-* Test vertex arrays and buffer layouts
-* BUG: smaller windows have shorter delta-time
-* Add application settings and window flags
-
-
-## Roadmap
-
-1. Basic 2D Renderer
-	1. Vertex Arrays - DONE
-	2. Shaders
-	3. Textures
-	4. Cameras
-	5. Renderer2D API
-2. Renderer Improvements
-	1. Batch renderer
-	2. Tilemaps
-3. Audio
+**Update**: it worked! It's easiest when all the animations have the same number of frames. If not, you'll have to reallocate the order array for more/less space, which is slower.
 
 
 ## 29 Apr 2022

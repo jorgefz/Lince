@@ -103,14 +103,16 @@ typedef struct TestLayer {
     LinceTexture* walking_tileset;
 
     LinceTile tiles[TILE_COUNT];
-    LinceTileAnim* player_anims[ANIM_COUNT];
     uint8_t current_anim;
 
+    uint32_t test_order[ANIM_COUNT*2];
+    LinceTileAnim* player_anim;
     LinceTileAnim* chicken_anim;
 
     vec4 color;
     LinceCamera* cam;
 } TestLayer;
+
 
 void TestLayerOnAttach(LinceLayer* layer) {
     TestLayer* data = LinceGetLayerData(layer);
@@ -173,29 +175,51 @@ void TestLayerOnAttach(LinceLayer* layer) {
         LinceGetTile(data->walking_tileset, (vec2){1,1}, (vec2){24,24}, (vec2){1,1}),
     };
 
-    data->player_anims[ANIM_FRONT     ] = LinceCreateTileAnim(&(LinceTileAnim){.frames=player_tiles   , .frame_count=2, .frame_time=300.0f});
-    data->player_anims[ANIM_BACK      ] = LinceCreateTileAnim(&(LinceTileAnim){.frames=player_tiles+2 , .frame_count=2, .frame_time=300.0f});
-    data->player_anims[ANIM_LEFT      ] = LinceCreateTileAnim(&(LinceTileAnim){.frames=player_tiles+4 , .frame_count=2, .frame_time=300.0f});
-    data->player_anims[ANIM_RIGHT     ] = LinceCreateTileAnim(&(LinceTileAnim){.frames=player_tiles+6 , .frame_count=2, .frame_time=300.0f});
-    data->player_anims[ANIM_FRONT_IDLE] = LinceCreateTileAnim(&(LinceTileAnim){.frames=player_tiles+8 , .frame_count=1, .frame_time=300.0f});
-    data->player_anims[ANIM_BACK_IDLE ] = LinceCreateTileAnim(&(LinceTileAnim){.frames=player_tiles+9 , .frame_count=1, .frame_time=300.0f});
-    data->player_anims[ANIM_LEFT_IDLE ] = LinceCreateTileAnim(&(LinceTileAnim){.frames=player_tiles+10, .frame_count=1, .frame_time=300.0f});
-    data->player_anims[ANIM_RIGHT_IDLE] = LinceCreateTileAnim(&(LinceTileAnim){.frames=player_tiles+11, .frame_count=1, .frame_time=300.0f});
-
     data->current_anim = ANIM_BACK_IDLE;
+
+    // single-anim test
+    uint32_t order_indices[] = {
+        0,  1,   // walk forward
+        2,  3,   // walk backwards
+        4,  5,   // walk left
+        6,  7,   // walk right
+        8,  8,   // idle forward
+        9,  9,   // idle backward
+        10, 10,  // idle left
+        11, 11   // idle right
+    };
+    memmove(data->test_order, order_indices, sizeof(uint32_t)*ANIM_COUNT*2);
+    data->current_anim = ANIM_FRONT_IDLE;
+
+    data->player_anim = LinceCreateTileAnim(&(LinceTileAnim){
+        .frames = player_tiles,
+        .frame_count = sizeof(player_tiles)/sizeof(LinceTile),
+        .frame_time = 300.0f,
+        .order = order_indices + ANIM_FRONT_IDLE*2,
+        .order_count = 2
+    });
 
     // chicken idle animation
     LinceTile chicken_tiles[] = {
         LinceGetTile(data->tileset, (vec2){0,1}, (vec2){16,16}, (vec2){1, 1}),
-        LinceGetTile(data->tileset, (vec2){0,0}, (vec2){16,16}, (vec2){1, 1})
+        LinceGetTile(data->tileset, (vec2){1,1}, (vec2){16,16}, (vec2){1, 1}),
+        LinceGetTile(data->tileset, (vec2){2,1}, (vec2){16,16}, (vec2){1, 1}),
+        LinceGetTile(data->tileset, (vec2){3,1}, (vec2){16,16}, (vec2){1, 1}),
+        LinceGetTile(data->tileset, (vec2){0,0}, (vec2){16,16}, (vec2){1, 1}),
+        LinceGetTile(data->tileset, (vec2){1,0}, (vec2){16,16}, (vec2){1, 1}),
+        LinceGetTile(data->tileset, (vec2){2,0}, (vec2){16,16}, (vec2){1, 1}),
+        LinceGetTile(data->tileset, (vec2){3,0}, (vec2){16,16}, (vec2){1, 1}),
     };
     data->chicken_anim = LinceCreateTileAnim(&(LinceTileAnim){
         .frames = chicken_tiles,
-        .frame_count = 2,
-        .frame_time = 1000.0f,
+        .frame_count = 8,
+        .frame_time = 400.0f,
         .on_repeat = ChickenLoops,
         .on_finish = ChickenEnds,
-        .repeats = 4
+        .repeats = 5,
+        .start = 1,
+        .order = (uint32_t[]){0,1,4,5},
+        .order_count = 4
     });
 
 }
@@ -209,11 +233,7 @@ void TestLayerOnDetach(LinceLayer* layer) {
     LinceDeleteTexture(data->walking_tileset);
     LinceDeleteCamera(data->cam);
 
-    for(int i = 0; i != ANIM_COUNT; ++i){
-        LinceDeleteTileAnim(data->player_anims[i]);
-        data->player_anims[i] = NULL;
-    }
-
+    LinceDeleteTileAnim(data->player_anim);
     LinceDeleteTileAnim(data->chicken_anim);
 
     free(data);
@@ -234,7 +254,7 @@ void TestLayerOnUpdate(LinceLayer* layer, float dt) {
     const float dr = cam_speed * dt * zoom;
 
     // camera & player movement
-    uint8_t next_anim = data->current_anim;
+    uint32_t next_anim = data->current_anim;
 
     if (LinceIsKeyPressed(LinceKey_w)){
         data->cam->pos[1] += dr;
@@ -267,10 +287,13 @@ void TestLayerOnUpdate(LinceLayer* layer, float dt) {
         };
     }
 
-    if(next_anim != data->current_anim){
-        LinceResetTileAnim(data->player_anims[data->current_anim]);
+    data->player_anim->order[0] = data->test_order[next_anim*2];
+    data->player_anim->order[1] = data->test_order[next_anim*2+1];
+
+    if(next_anim != data->current_anim){        
+        LinceResetTileAnim(data->player_anim);
+        data->current_anim = next_anim;
     }
-    data->current_anim = next_anim;
 
     LinceUIText(ui, "DebugFPS", 20, 20, LinceFont_Droid30, 10, "FPS: %.0f", 1000.0/dt);
     LinceUIText(ui, "DebugDT",  20, 42, LinceFont_Droid30, 15, "dt: %.1f ms", dt);
@@ -320,14 +343,13 @@ void TestLayerOnUpdate(LinceLayer* layer, float dt) {
     });
 
     // PLAYER
-    LinceTileAnim* anim = data->player_anims[data->current_anim];
-    LinceUpdateTileAnim(anim, dt);
+    LinceUpdateTileAnim(data->player_anim, dt);
     LinceDrawQuad((LinceQuadProps){
         .x=data->cam->pos[0],
         .y=data->cam->pos[1],
         .w=1.5f, .h=1.5f,
         .color={1,1,1,1},
-        .tile = anim->current_tile,
+        .tile =  data->player_anim->current_tile,
         .zorder = 0.6
     });
     

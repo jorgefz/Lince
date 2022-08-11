@@ -60,12 +60,12 @@ typedef struct LinceTileAnim {
 							// if set to zero, it will repeat forever
 	
 	uint32_t* order;		// Array if indices - order in which to render the tiles
+                            // If set, start index refers to an element of the order array
     uint32_t order_count;	// Number of indices in the order array
 
     LinceTileAnimFn* on_finish;		// Called when animation has finished
     LinceTileAnimFn* on_repeat;		// Called when animation loops over
-	// LinceTileAnimFn* on_frame 	// Called when frame changes
-    void* callback_args;			// Arguments to pass onto callbacks
+	void* callback_args;			// Arguments to pass onto callbacks
 
     LinceTileAnimFlags flags;
 

@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>Vertex Arrays - Lince Documentation Website</title>
+        <title>Development Diary - Lince Documentation Website</title>
         <!-- Custom HTML head -->
         <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
         <meta name="description" content="">
@@ -75,7 +75,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded affix "><a href="HomePage.html">Home Page</a></li><li class="chapter-item expanded "><a href="App.html"><strong aria-hidden="true">1.</strong> App</a></li><li class="chapter-item expanded "><a href="Events.html"><strong aria-hidden="true">2.</strong> Events</a></li><li class="chapter-item expanded "><a href="Layers.html"><strong aria-hidden="true">3.</strong> Layers</a></li><li class="chapter-item expanded "><a href="Input.html"><strong aria-hidden="true">4.</strong> Input</a></li><li class="chapter-item expanded "><a href="Rendering.html"><strong aria-hidden="true">5.</strong> Rendering</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="Buffers.html"><strong aria-hidden="true">5.1.</strong> Buffers</a></li><li class="chapter-item expanded "><a href="VertexArrays.html" class="active"><strong aria-hidden="true">5.2.</strong> Vertex Arrays</a></li><li class="chapter-item expanded "><a href="Shaders.html"><strong aria-hidden="true">5.3.</strong> Shaders</a></li><li class="chapter-item expanded "><a href="Textures.html"><strong aria-hidden="true">5.4.</strong> Textures</a></li><li class="chapter-item expanded "><a href="Renderer.html"><strong aria-hidden="true">5.5.</strong> Renderer</a></li><li class="chapter-item expanded "><a href="Cameras.html"><strong aria-hidden="true">5.6.</strong> Cameras</a></li></ol></li><li class="chapter-item expanded "><a href="UI.html"><strong aria-hidden="true">6.</strong> UI</a></li><li class="chapter-item expanded "><a href="Tiles.html"><strong aria-hidden="true">7.</strong> Tiles</a></li><li class="chapter-item expanded "><a href="DevDiary.html"><strong aria-hidden="true">8.</strong> Development Diary</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="ToDo.html"><strong aria-hidden="true">8.1.</strong> ToDo</a></li><li class="chapter-item expanded "><a href="Versions.html"><strong aria-hidden="true">8.2.</strong> Version History</a></li></ol></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded affix "><a href="HomePage.html">Home Page</a></li><li class="chapter-item expanded "><a href="App.html"><strong aria-hidden="true">1.</strong> App</a></li><li class="chapter-item expanded "><a href="Events.html"><strong aria-hidden="true">2.</strong> Events</a></li><li class="chapter-item expanded "><a href="Layers.html"><strong aria-hidden="true">3.</strong> Layers</a></li><li class="chapter-item expanded "><a href="Input.html"><strong aria-hidden="true">4.</strong> Input</a></li><li class="chapter-item expanded "><a href="Rendering.html"><strong aria-hidden="true">5.</strong> Rendering</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="Buffers.html"><strong aria-hidden="true">5.1.</strong> Buffers</a></li><li class="chapter-item expanded "><a href="VertexArrays.html"><strong aria-hidden="true">5.2.</strong> Vertex Arrays</a></li><li class="chapter-item expanded "><a href="Shaders.html"><strong aria-hidden="true">5.3.</strong> Shaders</a></li><li class="chapter-item expanded "><a href="Textures.html"><strong aria-hidden="true">5.4.</strong> Textures</a></li><li class="chapter-item expanded "><a href="Renderer.html"><strong aria-hidden="true">5.5.</strong> Renderer</a></li><li class="chapter-item expanded "><a href="Cameras.html"><strong aria-hidden="true">5.6.</strong> Cameras</a></li></ol></li><li class="chapter-item expanded "><a href="UI.html"><strong aria-hidden="true">6.</strong> UI</a></li><li class="chapter-item expanded "><a href="Tiles.html"><strong aria-hidden="true">7.</strong> Tiles</a></li><li class="chapter-item expanded "><a href="DevDiary.html" class="active"><strong aria-hidden="true">8.</strong> Development Diary</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="ToDo.html"><strong aria-hidden="true">8.1.</strong> ToDo</a></li><li class="chapter-item expanded "><a href="Versions.html"><strong aria-hidden="true">8.2.</strong> Version History</a></li></ol></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -134,43 +134,31 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1 id="vertex-arrays"><a class="header" href="#vertex-arrays">Vertex Arrays</a></h1>
-<h2 id="lincevertexarray"><a class="header" href="#lincevertexarray">LinceVertexArray</a></h2>
+                        <h1 id="development-diary"><a class="header" href="#development-diary">Development Diary</a></h1>
+<h2 id="10-aug-2022"><a class="header" href="#10-aug-2022">10 Aug 2022</a></h2>
+<p>After a three-month long hiatus, and developing the 2D renderer as well as two simple games on the engine (Pong and Missile Command), I am now developing tile-based sprite animations. The way it works is you take an array of tiles, and you loop through them, with a countdown in between. The chosen 'frame' at any given time is provided as a quad texture and rendered.</p>
+<p>Perhaps the most common example of sprite animations is a character walking, which is why I decied to implement it and why I found out that my implementation is too simple, not flexible enough. Walking in a 2D ground requires a total of eight animations: both walking and idle for left, right, front, and back directions. Using the simple tile-looping model, I had to create eight different animations off the same spritesheet, which is wasteful and resulted in too much boilerplate. But this could be simpler. I have been toying with the idea of providing the animation data with additional logic: the order in with the tiles are animated. This way, I wouldn't need eight separate animations, but only one. I can give it the entire spritesheet, and then make it use a subset of the tiles in a specific order for each of the character animations. Then, I would switch this subset of indices for another when the character's direction changes.</p>
+<p><strong>Update</strong>: it worked! It's easiest when all the animations have the same number of frames. If not, you'll have to reallocate the order array for more/less space, which is slower.</p>
+<h2 id="29-apr-2022"><a class="header" href="#29-apr-2022">29 Apr 2022</a></h2>
+<p>Planning the shader API. I'm not sure what data structure to use for shader uniforms, which hold a string name and an OpenGL location integer ID. On the C++ code, an object like <code>std::unordered_map&lt;std::string, int&gt;</code> was used, and an equivalent C implementation is not so simple to implement. A simple implementation would store a list of string names (the shader uniform variable names) as well as another list of the same length with the location IDs. When an uniform set, the function searches for the uniform name in the list (either with string comparison or by hashing and comparing integer values); then it either changes its value if it exists, or creates a new uniform if it doesn't. I think I might just implement a string comparison for value searching, and then implement a more advanced algorithm later on.</p>
+<h2 id="27-apr-2022"><a class="header" href="#27-apr-2022">27 Apr 2022</a></h2>
+<p>Having updated the API to be more C-like, I have now moved to expanding it. The best course of action is to get a simple share rendered on the screen to check that the system is indeed working as expected. After solving a couple of headache-inducing bugs, I got a multi-coloured square on screen, and followed that up with an API for managing vertex arrays and buffer layouts. Next steps are the the shader and renderer2D API, and perhaps, a camera API, which will include matrix math.</p>
+<h2 id="23-apr-2022"><a class="header" href="#23-apr-2022">23 Apr 2022</a></h2>
+<p>So far, this project has been an attemt at recreating the C++ game engine built by TheCherno on his youtube series, but in C. Natuarlly, many of the features C++ has don't exist in C. This ended up making this C code look more OOP-like than procedural. My now goal is to build a simple game engine using procedural programming.</p>
+<p>This migration will be carried out by following these steps:</p>
 <ul>
-<li><code>unsigned int id</code></li>
-<li><code>LinceIndexBuffer index_buffer</code></li>
-<li><code>LinceVertexBuffer vb_list</code></li>
-<li><code>unsigned int vb_count</code></li>
+<li>Renaming API functions, e.g. &quot;LinceApp_OnEvent&quot;, which refers to an object &quot;App&quot;, to &quot;LinceOnEvent&quot;, since there it's a general function called when any event takes place during runtime.</li>
+<li>Simplify event and callback systems</li>
 </ul>
-<h2 id="lincecreatevertexarray"><a class="header" href="#lincecreatevertexarray">LinceCreateVertexArray</a></h2>
-<pre><code class="language-c">LinceVertexArray* LinceCreateVertexArray(LinceIndexBuffer index_buffer)
-</code></pre>
-<h2 id="lincebindvertexarray"><a class="header" href="#lincebindvertexarray">LinceBindVertexArray</a></h2>
-<pre><code class="language-c">void LinceBindVertexArray(LinceVertexArray* vertex_array)
-</code></pre>
-<h2 id="linceunbindvertexarray"><a class="header" href="#linceunbindvertexarray">LinceUnbindVertexArray</a></h2>
-<pre><code class="language-c">void LinceUnbindVertexArray(void)
-</code></pre>
-<h2 id="linceaddvertexarrayattributes"><a class="header" href="#linceaddvertexarrayattributes">LinceAddVertexArrayAttributes</a></h2>
-<pre><code class="language-c">void LinceAddVertexArrayAttributes(
-	LinceVertexArray* vertex_array,
-	LinceVertexBuffer vertex_buffer,
-	LinceBufferElement* layout,
-	unsigned int layout_elements
-)
-</code></pre>
-<h2 id="lincedeletevertexarray"><a class="header" href="#lincedeletevertexarray">LinceDeleteVertexArray</a></h2>
-<pre><code class="language-c">void LinceDeleteVertexArray(LinceVertexArray* vertex_array)
-</code></pre>
 
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">
                         <!-- Mobile navigation buttons -->
-                            <a rel="prev" href="Buffers.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                            <a rel="prev" href="Tiles.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                                 <i class="fa fa-angle-left"></i>
                             </a>
-                            <a rel="next" href="Shaders.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                            <a rel="next" href="ToDo.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                                 <i class="fa fa-angle-right"></i>
                             </a>
                         <div style="clear: both"></div>
@@ -179,10 +167,10 @@
             </div>
 
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
-                    <a rel="prev" href="Buffers.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                    <a rel="prev" href="Tiles.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                         <i class="fa fa-angle-left"></i>
                     </a>
-                    <a rel="next" href="Shaders.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                    <a rel="next" href="ToDo.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                         <i class="fa fa-angle-right"></i>
                     </a>
             </nav>

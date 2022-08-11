@@ -2,6 +2,10 @@
 
 Version codes follow [Semantic Versioning](https://semver.org/).
 
+## v0.2.2
+- Improved tile animations with custom animation orders.
+- Improved documentation on tile animations
+
 ## v0.2.1
 - Renamed `LinceDeleteAnim` to `LinceDeleteTileAnim`
 - LinceTileAnim: added optional maximum number of repeats

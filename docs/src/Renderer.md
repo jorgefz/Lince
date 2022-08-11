@@ -34,6 +34,8 @@ This struct contains the information to render a "quad" (rectangle) on screen, s
 	- RGBA color as floats with values between 0 and 1.
 - `LinceTexture* texture`
 	- Texture to apply on the quad. If `NULL`, a default white texture is used instead.
+- `LinceTile* tile`
+	- Renders only part of a texture. Overrides the `texture` parameter. See (Tiles)[./Tiles.md].
 
 Note that for ease of use one may use a designated initialiser list, where an struct is initialised enclosed in curly brakets where specific fields are given values `{.x = 1, .y = 2}`.
 

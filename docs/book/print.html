@@ -76,7 +76,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded affix "><a href="HomePage.html">Home Page</a></li><li class="chapter-item expanded "><a href="App.html"><strong aria-hidden="true">1.</strong> App</a></li><li class="chapter-item expanded "><a href="Events.html"><strong aria-hidden="true">2.</strong> Events</a></li><li class="chapter-item expanded "><a href="Layers.html"><strong aria-hidden="true">3.</strong> Layers</a></li><li class="chapter-item expanded "><a href="Input.html"><strong aria-hidden="true">4.</strong> Input</a></li><li class="chapter-item expanded "><a href="Rendering.html"><strong aria-hidden="true">5.</strong> Rendering</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="Buffers.html"><strong aria-hidden="true">5.1.</strong> Buffers</a></li><li class="chapter-item expanded "><a href="VertexArrays.html"><strong aria-hidden="true">5.2.</strong> Vertex Arrays</a></li><li class="chapter-item expanded "><a href="Shaders.html"><strong aria-hidden="true">5.3.</strong> Shaders</a></li><li class="chapter-item expanded "><a href="Textures.html"><strong aria-hidden="true">5.4.</strong> Textures</a></li><li class="chapter-item expanded "><a href="Renderer.html"><strong aria-hidden="true">5.5.</strong> Renderer</a></li><li class="chapter-item expanded "><a href="Cameras.html"><strong aria-hidden="true">5.6.</strong> Cameras</a></li></ol></li><li class="chapter-item expanded "><a href="UI.html"><strong aria-hidden="true">6.</strong> UI</a></li><li class="chapter-item expanded "><div><strong aria-hidden="true">7.</strong> Development Diary</div></li><li><ol class="section"><li class="chapter-item expanded "><a href="ToDo.html"><strong aria-hidden="true">7.1.</strong> ToDo</a></li><li class="chapter-item expanded "><a href="Versions.html"><strong aria-hidden="true">7.2.</strong> Version History</a></li></ol></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded affix "><a href="HomePage.html">Home Page</a></li><li class="chapter-item expanded "><a href="App.html"><strong aria-hidden="true">1.</strong> App</a></li><li class="chapter-item expanded "><a href="Events.html"><strong aria-hidden="true">2.</strong> Events</a></li><li class="chapter-item expanded "><a href="Layers.html"><strong aria-hidden="true">3.</strong> Layers</a></li><li class="chapter-item expanded "><a href="Input.html"><strong aria-hidden="true">4.</strong> Input</a></li><li class="chapter-item expanded "><a href="Rendering.html"><strong aria-hidden="true">5.</strong> Rendering</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="Buffers.html"><strong aria-hidden="true">5.1.</strong> Buffers</a></li><li class="chapter-item expanded "><a href="VertexArrays.html"><strong aria-hidden="true">5.2.</strong> Vertex Arrays</a></li><li class="chapter-item expanded "><a href="Shaders.html"><strong aria-hidden="true">5.3.</strong> Shaders</a></li><li class="chapter-item expanded "><a href="Textures.html"><strong aria-hidden="true">5.4.</strong> Textures</a></li><li class="chapter-item expanded "><a href="Renderer.html"><strong aria-hidden="true">5.5.</strong> Renderer</a></li><li class="chapter-item expanded "><a href="Cameras.html"><strong aria-hidden="true">5.6.</strong> Cameras</a></li></ol></li><li class="chapter-item expanded "><a href="UI.html"><strong aria-hidden="true">6.</strong> UI</a></li><li class="chapter-item expanded "><a href="Tiles.html"><strong aria-hidden="true">7.</strong> Tiles</a></li><li class="chapter-item expanded "><a href="DevDiary.html"><strong aria-hidden="true">8.</strong> Development Diary</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="ToDo.html"><strong aria-hidden="true">8.1.</strong> ToDo</a></li><li class="chapter-item expanded "><a href="Versions.html"><strong aria-hidden="true">8.2.</strong> Version History</a></li></ol></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -1137,6 +1137,11 @@ This should be called only once. </p>
 <li>Texture to apply on the quad. If <code>NULL</code>, a default white texture is used instead.</li>
 </ul>
 </li>
+<li><code>LinceTile* tile</code>
+<ul>
+<li>Renders only part of a texture. Overrides the <code>texture</code> parameter. See (Tiles)[./Tiles.md].</li>
+</ul>
+</li>
 </ul>
 <p>Note that for ease of use one may use a designated initialiser list, where an struct is initialised enclosed in curly brakets where specific fields are given values <code>{.x = 1, .y = 2}</code>.</p>
 <p>Note that any field that is left uninitialised will be set to zero of the appropriate type. For instance, defining only the x position <code>{.x=1.0}</code> will make <code>y = 0</code> and the texture <code>NULL</code>, however it will also make the color completely transparent (<code>color = {0, 0, 0, 0}</code>, where alpha is zero) as well as the size (width and height) zero.</p>
@@ -1367,6 +1372,207 @@ Parameters:</p>
     LinceUIText(ui, &quot;DT_indicator&quot;,  10, 40, LinceFont_Droid30, 10,  &quot;%.2f ms&quot;,  dt);
 }
 </code></pre>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="tiles"><a class="header" href="#tiles">Tiles</a></h1>
+<h2 id="lincetile"><a class="header" href="#lincetile">LinceTile</a></h2>
+<ul>
+<li><code>LinceTexture* texture</code>
+<ul>
+<li>Preloaded texture object (see <a href="./Textures.html">Textures</a>)</li>
+</ul>
+</li>
+<li><code>vec2 pos</code>
+<ul>
+<li>Location of the tile in units of cells</li>
+</ul>
+</li>
+<li><code>vec2 cellsize</code>
+<ul>
+<li>Size of a cell in pixels</li>
+</ul>
+</li>
+<li><code>vec2 tilesize</code>
+<ul>
+<li>Size of tile in units of cells</li>
+</ul>
+</li>
+<li><code>float coords[8]</code>
+<ul>
+<li>Texture coordinates</li>
+</ul>
+</li>
+</ul>
+<h2 id="lincegettile"><a class="header" href="#lincegettile">LinceGetTile</a></h2>
+<pre><code class="language-c">LinceTile LinceGetTile(LinceTexture* texture, vec2 pos, vec2 cellsize, vec2 tilesize)
+</code></pre>
+<p>This function calculates the texture coordinates of a tile within a texture,
+and returns the results packaged in a <code>LinceTile</code> structure along with the input parameters used to calculate it (see above).
+This object may later be passed to the <code>tile</code> argument of <code>LinceQuadProps</code> on the 2D renderer to render the desired tile only (see <a href="./Renderer.html">Renderer</a>).</p>
+<p>Example code:</p>
+<pre><code class="language-c">
+LinceTexture* atlas = LinceCreateTexture(&quot;atlas&quot;, &quot;outdoors.png&quot;);
+
+LinceTile tile_grass = LinceGetTile(
+	atlas,
+	(vec2){0,0},	// location 0,0 from lower left corner
+	(vec2){16,16},	// a tile/cell is 16x16 pixels
+	(vec2){1,1}		// the tile is 1x1 cells in size (16x16)
+)
+</code></pre>
+<h2 id="lincetileanim"><a class="header" href="#lincetileanim">LinceTileAnim</a></h2>
+<p>Stores the data to run tile-based sprite animations.</p>
+<p>Required input data</p>
+<ul>
+<li><code>LinceTile* frames</code>
+<ul>
+<li>Buffer than contains tile array</li>
+</ul>
+</li>
+<li><code>uint32_t frame_count</code>
+<ul>
+<li>Number of tiles in the buffer</li>
+</ul>
+</li>
+<li><code>float frame_time</code>
+<ul>
+<li>Time in ms between frames</li>
+</ul>
+</li>
+</ul>
+<p>Optional parameters</p>
+<ul>
+<li><code>uint32_t start</code>
+<ul>
+<li>Tile index at which to start the animation</li>
+</ul>
+</li>
+<li><code>uint32_t repeats</code>
+<ul>
+<li>Number of repeats to animate. If set to zero, it will repeat forever</li>
+</ul>
+</li>
+<li><code>uint32_t* order</code>
+<ul>
+<li>Array if indices - order in which to render the tiles. If set, <code>start</code> index refers to an element of the order array</li>
+</ul>
+</li>
+<li><code>uint32_t order_count</code>
+<ul>
+<li>Number of indices in the order array</li>
+</ul>
+</li>
+<li><code>LinceTileAnimFn* on_finish</code>
+<ul>
+<li>Called when animation has finished. Signature <code>void callback(LinceTileAnim* anim, void* args)</code>.</li>
+</ul>
+</li>
+<li><code>LinceTileAnimFn* on_repeat</code>
+<ul>
+<li>Called when animation loops over. Signature <code>void callback(LinceTileAnim* anim, void* args)</code>.</li>
+</ul>
+</li>
+<li><code>void* callback_args</code>
+<ul>
+<li>Arguments to pass onto callbacks</li>
+</ul>
+</li>
+<li><code>LinceTileAnimFlags flags</code>
+<ul>
+<li>Further settings as bit flags. Unused parameter.</li>
+</ul>
+</li>
+</ul>
+<p>Internal data</p>
+<ul>
+<li><code>float time</code>
+<ul>
+<li>Countdown until next frame</li>
+</ul>
+</li>
+<li><code>uint32_t current_frame</code>
+<ul>
+<li>Index of current frame</li>
+</ul>
+</li>
+<li><code>LinceTile* current_tile</code>
+<ul>
+<li>Pointer to current tile in the buffer</li>
+</ul>
+</li>
+<li><code>uint32_t repeat_count</code>
+<ul>
+<li>Number of times the animation has been looped</li>
+</ul>
+</li>
+<li><code>LinceBool finished</code>
+<ul>
+<li>Indicates whether animation has finished running</li>
+</ul>
+</li>
+</ul>
+<p>// Sorts out the user-defined animation settings and initialises the animation</p>
+<p>// Animates by time dt</p>
+<p>// Resets clock and frames to initial conditions</p>
+<p>// Frees animation data</p>
+<h2 id="lincecreatetileanim"><a class="header" href="#lincecreatetileanim">LinceCreateTileAnim</a></h2>
+<pre><code class="language-c">LinceTileAnim* LinceCreateTileAnim(const LinceTileAnim* anim)
+</code></pre>
+<p>Initialises the animation. The user-defined settings and data are passed as a <code>LinceTileAnim</code> struct itself, which is then copied over to heap-allocated memory and returned to the user.</p>
+<h2 id="linceupdatetileanim"><a class="header" href="#linceupdatetileanim">LinceUpdateTileAnim</a></h2>
+<pre><code class="language-c">void LinceUpdateTileAnim(LinceTileAnim* anim, float dt)
+</code></pre>
+<p>Advaces the animation by time <code>dt</code> in milliseconds.</p>
+<h2 id="linceresettileanim"><a class="header" href="#linceresettileanim">LinceResetTileAnim</a></h2>
+<pre><code class="language-c">void LinceResetTileAnim(LinceTileAnim* anim)
+</code></pre>
+<p>Resets the animation back to its original point.</p>
+<h2 id="lincedeletetileanim"><a class="header" href="#lincedeletetileanim">LinceDeleteTileAnim</a></h2>
+<pre><code class="language-c">void LinceDeleteTileAnim(LinceTileAnim* anim)
+</code></pre>
+<p>Frees allocated animation data.</p>
+<p>Code example:</p>
+<pre><code class="language-c">
+/* OnLayerCreate */
+uint32_t count;
+LinceTile* tiles = LoadTilesFromTexture(&quot;player-movement.png&quot;, &amp;count);
+// the function above is an example
+
+LinceTileAnim* anim = LinceCreateTileAnim(&amp;(LinceTileAnim){
+	.frames = tiles,
+	.frame_count = count,
+	.frame_time = 100.0f // milliseconds
+});
+
+
+/* OnLayerUpdate */
+LinceBeginScene(camera);
+LinceUpdateAnim(anim);
+LinceDrawQuad((LinceQuadProps){
+	.w = 1.0, .h = 1.0,
+	.color = {0.0, 0.0, 0.0, 1.0},
+	.tile = anim-&gt;current_tile;
+});
+LinceEndScene();
+
+/* OnLayerDestroy */
+LinceDeleteAnim(anim);
+
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="development-diary"><a class="header" href="#development-diary">Development Diary</a></h1>
+<h2 id="10-aug-2022"><a class="header" href="#10-aug-2022">10 Aug 2022</a></h2>
+<p>After a three-month long hiatus, and developing the 2D renderer as well as two simple games on the engine (Pong and Missile Command), I am now developing tile-based sprite animations. The way it works is you take an array of tiles, and you loop through them, with a countdown in between. The chosen 'frame' at any given time is provided as a quad texture and rendered.</p>
+<p>Perhaps the most common example of sprite animations is a character walking, which is why I decied to implement it and why I found out that my implementation is too simple, not flexible enough. Walking in a 2D ground requires a total of eight animations: both walking and idle for left, right, front, and back directions. Using the simple tile-looping model, I had to create eight different animations off the same spritesheet, which is wasteful and resulted in too much boilerplate. But this could be simpler. I have been toying with the idea of providing the animation data with additional logic: the order in with the tiles are animated. This way, I wouldn't need eight separate animations, but only one. I can give it the entire spritesheet, and then make it use a subset of the tiles in a specific order for each of the character animations. Then, I would switch this subset of indices for another when the character's direction changes.</p>
+<p><strong>Update</strong>: it worked! It's easiest when all the animations have the same number of frames. If not, you'll have to reallocate the order array for more/less space, which is slower.</p>
+<h2 id="29-apr-2022"><a class="header" href="#29-apr-2022">29 Apr 2022</a></h2>
+<p>Planning the shader API. I'm not sure what data structure to use for shader uniforms, which hold a string name and an OpenGL location integer ID. On the C++ code, an object like <code>std::unordered_map&lt;std::string, int&gt;</code> was used, and an equivalent C implementation is not so simple to implement. A simple implementation would store a list of string names (the shader uniform variable names) as well as another list of the same length with the location IDs. When an uniform set, the function searches for the uniform name in the list (either with string comparison or by hashing and comparing integer values); then it either changes its value if it exists, or creates a new uniform if it doesn't. I think I might just implement a string comparison for value searching, and then implement a more advanced algorithm later on.</p>
+<h2 id="27-apr-2022"><a class="header" href="#27-apr-2022">27 Apr 2022</a></h2>
+<p>Having updated the API to be more C-like, I have now moved to expanding it. The best course of action is to get a simple share rendered on the screen to check that the system is indeed working as expected. After solving a couple of headache-inducing bugs, I got a multi-coloured square on screen, and followed that up with an API for managing vertex arrays and buffer layouts. Next steps are the the shader and renderer2D API, and perhaps, a camera API, which will include matrix math.</p>
+<h2 id="23-apr-2022"><a class="header" href="#23-apr-2022">23 Apr 2022</a></h2>
+<p>So far, this project has been an attemt at recreating the C++ game engine built by TheCherno on his youtube series, but in C. Natuarlly, many of the features C++ has don't exist in C. This ended up making this C code look more OOP-like than procedural. My now goal is to build a simple game engine using procedural programming.</p>
+<p>This migration will be carried out by following these steps:</p>
+<ul>
+<li>Renaming API functions, e.g. &quot;LinceApp_OnEvent&quot;, which refers to an object &quot;App&quot;, to &quot;LinceOnEvent&quot;, since there it's a general function called when any event takes place during runtime.</li>
+<li>Simplify event and callback systems</li>
+</ul>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="to-do"><a class="header" href="#to-do">To Do</a></h1>
 <h2 id="symbol-legend"><a class="header" href="#symbol-legend">Symbol legend</a></h2>
 <table><thead><tr><th>Symbol</th><th>Meaning</th></tr></thead><tbody>
@@ -1375,10 +1581,41 @@ Parameters:</p>
 <tr><td>🟠</td><td>Delayed</td></tr>
 <tr><td>🔷</td><td>Planned</td></tr>
 </tbody></table>
+<h2 id="roadmap"><a class="header" href="#roadmap">Roadmap</a></h2>
+<ol>
+<li>Basic 2D Renderer ✅
+<ol>
+<li>Vertex Arrays ✅</li>
+<li>Shaders ✅</li>
+<li>Textures ✅</li>
+<li>Cameras ✅</li>
+<li>Renderer2D API ✅</li>
+</ol>
+</li>
+<li>Renderer Improvements ✅
+<ol>
+<li>Batch renderer ✅</li>
+</ol>
+</li>
+<li>Tiles 💛
+<ol>
+<li>Tilesets and texture atlases ✅</li>
+<li>Tile animations 💛</li>
+<li>Tilemaps 💛</li>
+</ol>
+</li>
+<li>Audio 🔷
+<ol>
+<li>Integrate OpenAL</li>
+<li>Build audio API</li>
+</ol>
+</li>
+</ol>
 <h2 id="tile-system"><a class="header" href="#tile-system">Tile System</a></h2>
 <ol>
-<li>Integrate tile animations into the engine</li>
-<li>Add tilemap system</li>
+<li>✅Develip tile-based sprite animations</li>
+<li>💛 Improve tile animations with callbacks and custom tile order</li>
+<li>🔷 Add tilemap system</li>
 </ol>
 <h2 id="2d-renderer"><a class="header" href="#2d-renderer">2D Renderer</a></h2>
 <ol>
@@ -1401,6 +1638,10 @@ Parameters:</p>
 <ol>
 <li>💛 Add more user settings prior to calling <code>LinceRun</code></li>
 </ol>
+<h2 id="bugs"><a class="header" href="#bugs">Bugs</a></h2>
+<ol>
+<li>Missile Command: some quads persist on the screen</li>
+</ol>
 <h2 id="next-goals"><a class="header" href="#next-goals">Next goals</a></h2>
 <ol>
 <li>💛 Add UI library: <a href="https://github.com/Immediate-Mode-UI/Nuklear/">Nuklear</a></li>
@@ -1418,6 +1659,11 @@ Parameters:</p>
 </ol>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="version-history"><a class="header" href="#version-history">Version History</a></h1>
 <p>Version codes follow <a href="https://semver.org/">Semantic Versioning</a>.</p>
+<h2 id="v022"><a class="header" href="#v022">v0.2.2</a></h2>
+<ul>
+<li>Improved tile animations with custom animation orders.</li>
+<li>Improved documentation on tile animations</li>
+</ul>
 <h2 id="v021"><a class="header" href="#v021">v0.2.1</a></h2>
 <ul>
 <li>Renamed <code>LinceDeleteAnim</code> to <code>LinceDeleteTileAnim</code></li>
