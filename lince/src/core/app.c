@@ -111,6 +111,26 @@ float LinceGetAspectRatio(){
     return (float)app.window->width / (float)app.window->height;
 }
 
+void LinceGetScreenSize(vec2 size){
+    size[0] = (float)LinceGetAppState()->window->width;
+    size[1] = (float)LinceGetAppState()->window->height;
+}
+
+void LinceTransformToWorld(vec2 screen_coords, vec2 screen_size, mat4 vp_inv){
+	float sx = screen_coords[0], sy = screen_coords[1];
+	const float w = screen_size[0];
+	const float h = screen_size[1];
+
+	// normalise screen coordinates to range (-1,1)
+	sx = 2.0f*sx/w - 1.0f;
+	sy = 1.0f - 2.0f*sy/h;
+	vec4 svec = {sx, sy, 0.0f, 1.0f};
+	vec4 wvec;
+    glm_mat4_mulv(vp_inv, svec, wvec);
+	screen_coords[0] = wvec[0] / wvec[3];
+	screen_coords[1] = wvec[1] / wvec[3];
+}
+
 LinceLayer* LinceGetCurrentLayer(){
     if (app.current_layer < 0) return NULL;
     return app.layer_stack->layers[app.current_layer];

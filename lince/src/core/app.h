@@ -9,6 +9,7 @@
 
 #include "core/layer.h"
 #include "gui/ui_layer.h"
+#include "cglm/mat4.h"
 
 /* Function pointer typedefs for user callbacks */
 typedef void (*LinceGameInitFn)();
@@ -68,6 +69,16 @@ LinceApp* LinceGetAppState();
 
 /* Returns current aspect ratio of the window */
 float LinceGetAspectRatio();
+
+/* Returns the current screen width and height in pixels */
+void LinceGetScreenSize(vec2 size);
+
+/* Transforms coordinates from screen to world coodinates */
+void LinceTransformToWorld(vec2 screen_coords, vec2 screen_size, mat4 vp_inv);
+
+/* Transforms coordinates from world to screen coodinates */
+// void LinceTransformToScreen();
+
 
 /*
 Returns current layer being handled or updated
