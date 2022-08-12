@@ -18,6 +18,34 @@
 #include "renderer/tile_anim.h"
 
 
+float NormZ(float y, vec2 ylim, vec2 zlim){
+    float z = (zlim[1] - zlim[0]) * (y - ylim[0]) / (ylim[1]-ylim[0]) + zlim[0];
+    return 1.0f - z;
+}
+
+
+LinceTile* LoadTilesFromTexture(const char* texture_file, size_t* length, float px){
+    LinceTexture* tex = LinceCreateTexture("tileset", texture_file);
+    size_t xtiles = tex->width / (uint32_t)px;
+    size_t ytiles = tex->height / (uint32_t)px;
+    LinceTile tile;
+
+    LinceTile* tiles = malloc(sizeof(LinceTile)*xtiles*ytiles);
+    LINCE_ASSERT_ALLOC(tiles, sizeof(LinceTile)*xtiles*ytiles);
+
+    for(size_t y = 0; y != ytiles; ++y){
+        for(size_t x = 0; x != xtiles; ++x){
+            tile = LinceGetTile(tex, (vec2){x,y}, (vec2){px,px}, (vec2){1,1});
+            memmove(tiles + y*xtiles + x, &tile, sizeof(LinceTile));
+        }
+    }
+
+    *length = xtiles * ytiles;
+    return tiles;
+}
+
+
+
 
 enum TileNames {
     // Ground
@@ -46,7 +74,7 @@ enum TileNames {
 };
 
 const uint32_t tm_width = 16, tm_height = 10;
-int tilemap[] = {
+uint32_t tilemap_data[] = {
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
     4, 4, 4, 4,11, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
     1, 1, 1, 1, 7,11, 0, 0, 0, 0,13, 4, 4, 4, 4, 4, 
@@ -60,8 +88,75 @@ int tilemap[] = {
 };
 
 
-// WALKING 
+typedef struct LinceTilemap{
+    LinceTile* tileset;
+    size_t tileset_count;
 
+    size_t width, height;
+    uint32_t* tiledata;
+    uint8_t* collision_data;
+
+    LinceTile* overlay_tiles;
+    size_t overlay_count;
+    
+} LinceTilemap;
+
+
+LinceTilemap* LinceCreateTilemap(LinceTilemap* props){
+
+    LinceTilemap* tm = malloc(sizeof(LinceTilemap));
+    LINCE_ASSERT_ALLOC(tm, sizeof(LinceTilemap));
+    memmove(tm, props, sizeof(LinceTilemap));
+
+    return tm;
+}
+
+
+void LinceDrawTilemap(LinceTilemap* tm, vec2 offset){
+    if(!tm) return;
+
+    for(size_t j = 0; j != tm->height; ++j){
+        for(size_t i = 0; i != tm->width; ++i){
+            LinceDrawQuad((LinceQuadProps){
+                .x = (float)i - offset[0],
+                .y = (float)j - offset[1],
+                .w = 1.001f, .h = 1.001f,
+                .color = {1,1,1,1},
+                .tile = &tm->tileset[tm->tiledata[j*tm->width + i]],
+                .zorder = 0.0
+            });
+        }
+    }
+}
+
+void LinceDeleteTilemap(LinceTilemap* tm){
+    if(tm) free(tm);
+}
+
+/*
+Returns the tile of a tilemap over which the mouse pointer is hovering.
+If no tile is present, it returns NULL.
+*/
+LinceTile* GetTileAtMouse(LinceTilemap* tm, LinceCamera* cam, vec2 tm_offset){
+
+    vec2 mouse_pos;
+    LinceGetMousePosWorld(mouse_pos, cam);
+
+    int tm_x = (int)(mouse_pos[0] + tm_offset[0]);
+    int tm_y = (int)(mouse_pos[1] + tm_offset[1]);
+
+    if(tm_x >= 0 && tm_x < (int)tm->width &&
+       tm_y >= 0 && tm_y < (int)tm->height) {
+        size_t idx = tm->tiledata[tm_y * tm->width + tm_x];
+        return &tm->tileset[idx];
+    }
+    return NULL;
+}
+
+
+
+
+// WALKING
 enum WalkingAnims {
     ANIM_FRONT = 0,
     ANIM_BACK,
@@ -76,10 +171,14 @@ enum WalkingAnims {
 
 
 void ChickenLoops(LinceTileAnim* anim, void* args){
+    LINCE_UNUSED(anim);
+    LINCE_UNUSED(args);
     printf("Chicken repeats\n");
 }
 
 void ChickenEnds(LinceTileAnim* anim, void* args){
+    LINCE_UNUSED(anim);
+    LINCE_UNUSED(args);
     printf("Chicken stopped moving!\n");
 }
 
@@ -99,19 +198,52 @@ typedef struct TestLayer {
     LinceShader* shader;
     LinceTexture* tex_front;
     LinceTexture* tex_back;
-    LinceTexture* tileset;
+    
     LinceTexture* walking_tileset;
 
     LinceTile tiles[TILE_COUNT];
     uint8_t current_anim;
 
-    uint32_t test_order[ANIM_COUNT*2];
+    uint32_t player_anim_order[ANIM_COUNT*2];
     LinceTileAnim* player_anim;
     LinceTileAnim* chicken_anim;
 
-    vec4 color;
+    LinceTexture* tileset;
+    LinceTilemap* tilemap;
+
     LinceCamera* cam;
 } TestLayer;
+
+
+void DrawHoverTile(TestLayer* data, float tm_offset){
+    
+    LinceTile* hover_tile = GetTileAtMouse(data->tilemap, data->cam, (vec2){tm_offset,tm_offset});
+    LinceDrawQuad((LinceQuadProps){
+        .x = data->cam->pos[0] - 0.5f,
+        .y = data->cam->pos[1],
+        .w = 0.35f, .h = 0.35f,
+        .color = {0,0,0,1},
+        .zorder = 0.85
+    });
+    if(hover_tile) {
+        LinceDrawQuad((LinceQuadProps){
+            .x = data->cam->pos[0]- 0.5f,
+            .y = data->cam->pos[1],
+            .w = 0.3f, .h = 0.3f,
+            .color = {1,1,1,1},
+            .tile = hover_tile,
+            .zorder = 0.9
+        });
+    } else {
+        LinceDrawQuad((LinceQuadProps){
+            .x = data->cam->pos[0] - 0.5f,
+            .y = data->cam->pos[1],
+            .w = 0.3f, .h = 0.3f,
+            .color = {1,0,0,1},
+            .zorder = 0.9
+        });
+    }
+}
 
 
 void TestLayerOnAttach(LinceLayer* layer) {
@@ -131,6 +263,7 @@ void TestLayerOnAttach(LinceLayer* layer) {
     data->tileset = LinceCreateTexture("Tileset", "game/assets/textures/shubibubi-cozy-farm.png");
     data->walking_tileset = LinceCreateTexture("Walking", "game/assets/textures/elv-games-movement.png");
 
+    // TILEMAP
     data->tiles[TILE_GRASS]   = LinceGetTile(data->tileset, (vec2){1,8}, (vec2){16,16}, (vec2){1, 1});
     data->tiles[TILE_DIRT]    = LinceGetTile(data->tileset, (vec2){5,9}, (vec2){16,16}, (vec2){1, 1});
     
@@ -152,6 +285,15 @@ void TestLayerOnAttach(LinceLayer* layer) {
     data->tiles[TILE_TREE]    = LinceGetTile(data->tileset, (vec2){9,5}, (vec2){16,16}, (vec2){2, 2});
     data->tiles[TILE_CHICKEN] = LinceGetTile(data->tileset, (vec2){0,1}, (vec2){16,16}, (vec2){1, 1});
 
+    data->tilemap = LinceCreateTilemap(&(LinceTilemap){
+        .tiledata = tilemap_data,
+        .width = tm_width,
+        .height = tm_height,
+        .tileset = data->tiles,
+        .tileset_count = TILE_COUNT
+    });
+
+    // PLAYER MOVEMENT
     LinceTile player_tiles[] = {
         // Walking Forward
         LinceGetTile(data->walking_tileset, (vec2){0,0}, (vec2){24,24}, (vec2){1,1}),
@@ -174,10 +316,6 @@ void TestLayerOnAttach(LinceLayer* layer) {
         // Idle Right
         LinceGetTile(data->walking_tileset, (vec2){1,1}, (vec2){24,24}, (vec2){1,1}),
     };
-
-    data->current_anim = ANIM_BACK_IDLE;
-
-    // single-anim test
     uint32_t order_indices[] = {
         0,  1,   // walk forward
         2,  3,   // walk backwards
@@ -188,9 +326,8 @@ void TestLayerOnAttach(LinceLayer* layer) {
         10, 10,  // idle left
         11, 11   // idle right
     };
-    memmove(data->test_order, order_indices, sizeof(uint32_t)*ANIM_COUNT*2);
+    memmove(data->player_anim_order, order_indices, sizeof(uint32_t)*ANIM_COUNT*2);
     data->current_anim = ANIM_FRONT_IDLE;
-
     data->player_anim = LinceCreateTileAnim(&(LinceTileAnim){
         .frames = player_tiles,
         .frame_count = sizeof(player_tiles)/sizeof(LinceTile),
@@ -199,7 +336,7 @@ void TestLayerOnAttach(LinceLayer* layer) {
         .order_count = 2
     });
 
-    // chicken idle animation
+    // CHICKEN ANIMATION
     LinceTile chicken_tiles[] = {
         LinceGetTile(data->tileset, (vec2){0,1}, (vec2){16,16}, (vec2){1, 1}),
         LinceGetTile(data->tileset, (vec2){1,1}, (vec2){16,16}, (vec2){1, 1}),
@@ -216,7 +353,7 @@ void TestLayerOnAttach(LinceLayer* layer) {
         .frame_time = 400.0f,
         .on_repeat = ChickenLoops,
         .on_finish = ChickenEnds,
-        .repeats = 5,
+        .repeats = 0,
         .start = 1,
         .order = (uint32_t[]){0,1,4,5},
         .order_count = 4
@@ -235,6 +372,8 @@ void TestLayerOnDetach(LinceLayer* layer) {
 
     LinceDeleteTileAnim(data->player_anim);
     LinceDeleteTileAnim(data->chicken_anim);
+
+    LinceDeleteTilemap(data->tilemap);
 
     free(data);
 }
@@ -256,28 +395,30 @@ void TestLayerOnUpdate(LinceLayer* layer, float dt) {
     // camera & player movement
     uint32_t next_anim = data->current_anim;
 
-    if (LinceIsKeyPressed(LinceKey_w)){
+    enum {IDLE=0x0, UP=0x1, DOWN=0x2, LEFT=0x4, RIGHT=0x8};
+    uint8_t direction = IDLE;
+    direction |= LinceIsKeyPressed(LinceKey_w) * UP;
+    direction |= LinceIsKeyPressed(LinceKey_s) * DOWN;
+    direction |= LinceIsKeyPressed(LinceKey_a) * LEFT;
+    direction |= LinceIsKeyPressed(LinceKey_d) * RIGHT;
+
+    if (direction & UP){
         data->cam->pos[1] += dr;
         next_anim = ANIM_FRONT;
     }
-    if (LinceIsKeyPressed(LinceKey_s)){
+    if (direction & DOWN){
         data->cam->pos[1] -= dr;
         next_anim = ANIM_BACK;
     }
-    if (LinceIsKeyPressed(LinceKey_d)){
+    if (direction & RIGHT){
         data->cam->pos[0] += dr;
         next_anim = ANIM_RIGHT;
     }
-    if (LinceIsKeyPressed(LinceKey_a)){
+    if (direction & LEFT){
         data->cam->pos[0] -= dr;
         next_anim = ANIM_LEFT;
     }
-    if(
-        !LinceIsKeyPressed(LinceKey_w) && 
-        !LinceIsKeyPressed(LinceKey_s) &&
-        !LinceIsKeyPressed(LinceKey_d) &&
-        !LinceIsKeyPressed(LinceKey_a)
-    ){
+    if(direction == IDLE){
         switch(data->current_anim){
         case ANIM_FRONT: next_anim = ANIM_FRONT_IDLE; break;
         case ANIM_BACK:  next_anim = ANIM_BACK_IDLE;  break;
@@ -287,8 +428,8 @@ void TestLayerOnUpdate(LinceLayer* layer, float dt) {
         };
     }
 
-    data->player_anim->order[0] = data->test_order[next_anim*2];
-    data->player_anim->order[1] = data->test_order[next_anim*2+1];
+    data->player_anim->order[0] = data->player_anim_order[next_anim*2];
+    data->player_anim->order[1] = data->player_anim_order[next_anim*2+1];
 
     if(next_anim != data->current_anim){        
         LinceResetTileAnim(data->player_anim);
@@ -297,24 +438,12 @@ void TestLayerOnUpdate(LinceLayer* layer, float dt) {
 
     LinceUIText(ui, "DebugFPS", 20, 20, LinceFont_Droid30, 10, "FPS: %.0f", 1000.0/dt);
     LinceUIText(ui, "DebugDT",  20, 42, LinceFont_Droid30, 15, "dt: %.1f ms", dt);
-
+    
     LinceBeginScene(data->cam);
 
     // Tilemap
-    for(uint32_t i = 0; i != tm_width; ++i){
-        for(uint32_t j = 0; j != tm_height; ++j){
-            uint32_t index = j * tm_width + i;
-            int tile = tilemap[index];
-            LinceDrawQuad((LinceQuadProps){
-                .x = (float)i - (float)tm_width / 2.0f,
-                .y = (float)j - (float)tm_height / 2.0f,
-                .w=1.001f, .h=1.001f, // must slightly overlap to avoid black lines
-                .color={1,1,1,1},
-                .tile = &data->tiles[tile],
-                .zorder = 0.1
-            });
-        }
-    }
+    float tm_offset = 5.0f;
+    LinceDrawTilemap(data->tilemap, (vec2){tm_offset,tm_offset});
 
     // Trees
     LinceDrawQuad((LinceQuadProps){
@@ -322,14 +451,14 @@ void TestLayerOnUpdate(LinceLayer* layer, float dt) {
         .w=2.0f, .h=2.0f,
         .color={1,1,1,1},
         .tile = &data->tiles[TILE_TREE],
-        .zorder = 0.5
+        .zorder = NormZ(4.0f-1.0f, (vec2){-100.0f,100.0f}, (vec2){0.1f,1.0f})
     });
     LinceDrawQuad((LinceQuadProps){
         .x=-2.0f, .y=-2.0f,
         .w=2.0f, .h=2.0f,
         .color={1,1,1,1},
         .tile = &data->tiles[TILE_TREE],
-        .zorder = 0.5
+        .zorder = NormZ(-2.0f-1.0f, (vec2){-100.0f,100.0f}, (vec2){0.1f,1.0f})
     });
 
     // Chicken
@@ -339,7 +468,7 @@ void TestLayerOnUpdate(LinceLayer* layer, float dt) {
         .w=1.0f, .h=1.0f,
         .color={1,1,1,1},
         .tile = data->chicken_anim->current_tile,
-        .zorder = 0.5
+        .zorder = NormZ(3.0f-0.5f, (vec2){-100.0f,100.0f}, (vec2){0.1f,1.0f})
     });
 
     // PLAYER
@@ -350,8 +479,12 @@ void TestLayerOnUpdate(LinceLayer* layer, float dt) {
         .w=1.5f, .h=1.5f,
         .color={1,1,1,1},
         .tile =  data->player_anim->current_tile,
-        .zorder = 0.6
+        .zorder = NormZ(data->cam->pos[1]-0.75f, (vec2){-100.0f,100.0f}, (vec2){0.1f,1.0f})
     });
+
+    // Selected tile
+    DrawHoverTile(data, tm_offset);
+
     
     LinceEndScene();
 }

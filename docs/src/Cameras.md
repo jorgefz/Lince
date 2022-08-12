@@ -20,6 +20,8 @@ These fields are internal and are automatically updated with the functions provi
 	- View matrix that translates the camera's eye to a flat screen view.
 - `mat4 view_proj`
 	- View-projection matrix, calculated by multiplying the view and projection.
+- `mat4 view_proj_inv`
+	- Inverse view-projection matrix.
 - `float aspect_ratio`
 	- Aspect ratio of the window. Using an incorrect value will result in a distorted view of the world.
 
