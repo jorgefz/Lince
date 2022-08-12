@@ -2,12 +2,12 @@
 #define LINCE_APP_H
 
 #include "core/window.h"
+#include "core/layer.h"
 #include "event/event.h"
 #include "event/key_event.h"
 #include "event/mouse_event.h"
 #include "event/window_event.h"
-
-#include "core/layer.h"
+#include "renderer/camera.h"
 #include "gui/ui_layer.h"
 #include "cglm/mat4.h"
 
@@ -75,6 +75,9 @@ void LinceGetScreenSize(vec2 size);
 
 /* Transforms coordinates from screen to world coodinates */
 void LinceTransformToWorld(vec2 screen_coords, vec2 screen_size, mat4 vp_inv);
+
+/* Returns the position of the mouse pointer in the world */
+void LinceGetMousePosWorld(vec2 pos, LinceCamera* cam);
 
 /* Transforms coordinates from world to screen coodinates */
 // void LinceTransformToScreen();

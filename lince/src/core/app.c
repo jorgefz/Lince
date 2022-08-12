@@ -6,8 +6,8 @@
 
 #include "core/app.h"
 #include "renderer/renderer.h"
-
 #include "gui/ui_layer.h"
+#include "core/input.h"
 
 /* Private application state - stack allocated */
 static LinceApp app = {0};
@@ -129,6 +129,13 @@ void LinceTransformToWorld(vec2 screen_coords, vec2 screen_size, mat4 vp_inv){
     glm_mat4_mulv(vp_inv, svec, wvec);
 	screen_coords[0] = wvec[0] / wvec[3];
 	screen_coords[1] = wvec[1] / wvec[3];
+}
+
+void LinceGetMousePosWorld(vec2 pos, LinceCamera* cam){
+    vec2 screen_size;
+    LinceGetMousePos(&pos[0], &pos[1]);
+    LinceGetScreenSize(screen_size);
+    LinceTransformToWorld(pos, screen_size, cam->view_proj_inv);
 }
 
 LinceLayer* LinceGetCurrentLayer(){
