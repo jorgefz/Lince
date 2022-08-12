@@ -65,7 +65,8 @@ typedef struct LinceTileAnim {
 
     LinceTileAnimFn* on_finish;		// Called when animation has finished
     LinceTileAnimFn* on_repeat;		// Called when animation loops over
-	void* callback_args;			// Arguments to pass onto callbacks
+    // LinceTileAnimFn* on_frame 	// Called when frame changes
+    void* callback_args;			// Arguments to pass onto callbacks
 
     LinceTileAnimFlags flags;
 

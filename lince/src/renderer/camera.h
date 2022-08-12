@@ -11,6 +11,7 @@ typedef struct LinceCamera {
 	mat4 proj;      // projection matrix
 	mat4 view;      // view matrix
 	mat4 view_proj; // view-projection matrix
+	mat4 view_proj_inv; // inverted view-projection matrix
 
 	float aspect_ratio;
 } LinceCamera;

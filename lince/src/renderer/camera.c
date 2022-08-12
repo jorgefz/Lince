@@ -64,6 +64,7 @@ void LinceUpdateCamera(LinceCamera* cam) {
 	glm_rotate(result, glm_rad(cam->rotation), rot_axis);
 	glm_mat4_inv(result, cam->view);
 	glm_mat4_mul(cam->proj, cam->view, cam->view_proj);
+	glm_mat4_inv(cam->view_proj, cam->view_proj_inv);
 }
 
 void LinceResizeCameraView(LinceCamera* cam, float aspect_ratio){
