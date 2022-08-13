@@ -6,8 +6,8 @@
 #include "cglm/vec4.h"
 #include "cglm/affine.h"
 
-#include "gui/nuklear_flags.h"
-#include "gui/nuklear.h"
+#include "lince/gui/nuklear_flags.h"
+#include "lince/gui/nuklear.h"
 
 #include "pong.h"
 #include "missile_command.h"
@@ -488,22 +488,7 @@ void DrawGUI(TestLayer* data){
         NK_WINDOW_BORDER|NK_WINDOW_MOVABLE|NK_WINDOW_SCALABLE|
         NK_WINDOW_MINIMIZABLE|NK_WINDOW_TITLE
     )) {
-        
-        /*
-        size_t cols, rows;
-        for(size_t i = 0; i != rows; ++i){
-            nk_layout_row_dynamic(ui->ctx, 200, cols);
-            for(size_t j = 0; j != cols; ++j){
-                // get tile subimage
-                if(nk_button_image(ui->ctx, subimage)){
-                    // tile pressed callback
-                }
-            }
-
-        }
-        */
-
-
+    
        for(size_t i = 0; i != 4; ++i){
             nk_layout_row_dynamic(ui->ctx, 70, 4);
             for(size_t j = 0; j != 4; ++j){

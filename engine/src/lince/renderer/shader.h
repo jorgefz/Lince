@@ -2,7 +2,7 @@
 #ifndef LINCE_SHADER_H
 #define LINCE_SHADER_H
 
-#include "core/core.h"
+#include "lince/core/core.h"
 #include "cglm/types.h"
 
 typedef struct LinceShader {

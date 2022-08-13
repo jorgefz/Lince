@@ -1,7 +1,7 @@
 #ifndef LINCE_VERTEX_ARRAY_H
 #define LINCE_VERTEX_ARRAY_H
 
-#include "renderer/buffer.h"
+#include "lince/renderer/buffer.h"
 
 typedef struct LinceVertexArray {
 	unsigned int id; // OpenGL renderer ID

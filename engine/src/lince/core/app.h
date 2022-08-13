@@ -1,14 +1,14 @@
 #ifndef LINCE_APP_H
 #define LINCE_APP_H
 
-#include "core/window.h"
-#include "core/layer.h"
-#include "event/event.h"
-#include "event/key_event.h"
-#include "event/mouse_event.h"
-#include "event/window_event.h"
-#include "renderer/camera.h"
-#include "gui/ui_layer.h"
+#include "lince/core/window.h"
+#include "lince/core/layer.h"
+#include "lince/event/event.h"
+#include "lince/event/key_event.h"
+#include "lince/event/mouse_event.h"
+#include "lince/event/window_event.h"
+#include "lince/renderer/camera.h"
+#include "lince/gui/ui_layer.h"
 #include "cglm/mat4.h"
 
 /* Function pointer typedefs for user callbacks */

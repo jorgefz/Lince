@@ -1,7 +1,7 @@
 #ifndef LINCE_BUFFER_H
 #define LINCE_BUFFER_H
 
-#include "core/core.h"
+#include "lince/core/core.h"
 
 /* --- Buffer Element ---*/
 

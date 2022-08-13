@@ -1,7 +1,7 @@
 #ifndef LINCE_INPUT_H
 #define LINCE_INPUT_H
 
-#include "core/core.h"
+#include "lince/core/core.h"
 
 /* Returns true if given LinceKey is held */
 LinceBool LinceIsKeyPressed(int key);

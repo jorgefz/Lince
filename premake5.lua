@@ -44,6 +44,7 @@ project "lince"
     includedirs {
         "engine",
 		"engine/src",
+        "engine/src/lince",
         "%{IncludeDir.glfw}",
         "%{IncludeDir.glad}",
         "%{IncludeDir.cglm}"

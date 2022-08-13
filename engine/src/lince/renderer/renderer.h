@@ -1,13 +1,13 @@
 #ifndef LINCE_RENDERER_H
 #define LINCE_RENDERER_H
 
-#include "renderer/buffer.h"
-#include "renderer/vertex_array.h"
-#include "renderer/shader.h"
-#include "renderer/texture.h"
-#include "renderer/camera.h"
-#include "core/window.h"
-#include "tiles/tileset.h"
+#include "lince/renderer/buffer.h"
+#include "lince/renderer/vertex_array.h"
+#include "lince/renderer/shader.h"
+#include "lince/renderer/texture.h"
+#include "lince/renderer/camera.h"
+#include "lince/core/window.h"
+#include "lince/tiles/tileset.h"
 
 /* Quad properties, serves as argument for LinceRenderQuad */
 typedef struct LinceQuadProps{

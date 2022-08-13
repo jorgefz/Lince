@@ -1,7 +1,7 @@
 #ifndef LINCE_WINDOW_EVENT_H
 #define LINCE_WINDOW_EVENT_H
 
-#include "event/event.h"
+#include "lince/event/event.h"
 
 typedef struct LinceWindowCloseEvent {
     int dummy;

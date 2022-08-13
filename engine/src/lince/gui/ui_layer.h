@@ -1,9 +1,9 @@
 #ifndef LINCE_UI_LAYER_H
 #define LINCE_UI_LAYER_H
 
-#include "core/layer.h"
-#include "gui/nuklear_flags.h"
-#include "gui/nuklear.h"
+#include "lince/core/layer.h"
+#include "lince/gui/nuklear_flags.h"
+#include "lince/gui/nuklear.h"
 
 typedef enum LinceFonts {
     LinceFont_Droid15 = 0,

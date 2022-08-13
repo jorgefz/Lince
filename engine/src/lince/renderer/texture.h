@@ -1,7 +1,7 @@
 #ifndef LINCE_TEXTURE_H
 #define LINCE_TEXTURE_H
 
-#include "core/core.h"
+#include "lince/core/core.h"
 
 typedef struct LinceTexture {
 	uint32_t id;               // OpenGL ID

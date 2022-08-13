@@ -21,8 +21,8 @@
 #define PONG_H
 
 #include "lince.h"
-#include "gui/nuklear_flags.h"
-#include "gui/nuklear.h"
+#include "lince/gui/nuklear_flags.h"
+#include "lince/gui/nuklear.h"
 
 /* Layer */
 LinceLayer* PongLayerInit();

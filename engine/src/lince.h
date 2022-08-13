@@ -2,28 +2,24 @@
 #ifndef LINCE_H
 #define LINCE_H
 
-#include "core/core.h"
-
-#include "event/event.h"
-#include "event/key_event.h"
-#include "event/mouse_event.h"
-#include "event/window_event.h"
-
-#include "renderer/renderer.h"
-#include "renderer/buffer.h"
-#include "renderer/vertex_array.h"
-#include "renderer/shader.h"
-#include "renderer/texture.h"
-#include "renderer/camera.h"
-
-#include "tiles/tileset.h"
-#include "tiles/tile_anim.h"
-
-#include "core/window.h"
-#include "core/input.h"
-#include "core/keycodes.h"
-#include "core/mousecodes.h"
-#include "core/layer.h"
-#include "core/app.h"
+#include "lince/core/core.h"
+#include "lince/event/event.h"
+#include "lince/event/key_event.h"
+#include "lince/event/mouse_event.h"
+#include "lince/event/window_event.h"
+#include "lince/renderer/renderer.h"
+#include "lince/renderer/buffer.h"
+#include "lince/renderer/vertex_array.h"
+#include "lince/renderer/shader.h"
+#include "lince/renderer/texture.h"
+#include "lince/renderer/camera.h"
+#include "lince/tiles/tileset.h"
+#include "lince/tiles/tile_anim.h"
+#include "lince/core/window.h"
+#include "lince/core/input.h"
+#include "lince/core/keycodes.h"
+#include "lince/core/mousecodes.h"
+#include "lince/core/layer.h"
+#include "lince/core/app.h"
 
 #endif //LINCE_H

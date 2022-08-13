@@ -1,7 +1,7 @@
 #ifndef LINCE_KEY_EVENT_H
 #define LINCE_KEY_EVENT_H
 
-#include "event/event.h"
+#include "lince/event/event.h"
 
 typedef struct LinceKeyPressedEvent {
     int keycode, repeats;

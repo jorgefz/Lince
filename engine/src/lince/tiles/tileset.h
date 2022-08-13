@@ -1,7 +1,7 @@
 #ifndef LINCE_TILESET_H
 #define LINCE_TILESET_H
 
-#include "renderer/texture.h"
+#include "lince/renderer/texture.h"
 #include "cglm/vec2.h"
 
 

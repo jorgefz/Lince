@@ -1,7 +1,7 @@
 #ifndef LINCE_MOUSE_EVENT_H
 #define LINCE_MOUSE_EVENT_H
 
-#include "event/event.h"
+#include "lince/event/event.h"
 
 typedef struct LinceMouseButtonPressedEvent {
     int button;

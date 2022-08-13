@@ -1,7 +1,7 @@
 #ifndef LINCE_EVENT_H
 #define LINCE_EVENT_H
 
-#include "core/core.h"
+#include "lince/core/core.h"
 
 typedef enum LinceEventType {
     LinceEventType_None = 0,
