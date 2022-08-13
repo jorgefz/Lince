@@ -16,6 +16,9 @@
 #include "renderer/texture.h"
 #include "renderer/camera.h"
 
+#include "tiles/tileset.h"
+#include "tiles/tile_anim.h"
+
 #include "core/window.h"
 #include "core/input.h"
 #include "core/keycodes.h"

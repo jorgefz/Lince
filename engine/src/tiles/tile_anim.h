@@ -1,7 +1,7 @@
 #ifndef LINCE_TILE_ANIM_H
 #define LINCE_TILE_ANIM_H
 
-#include "renderer/tileset.h"
+#include "tiles/tileset.h"
 
 /*
 === LinceTileAnim ===

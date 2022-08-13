@@ -1,4 +1,4 @@
-#include "renderer/tileset.h"
+#include "tiles/tileset.h"
 
 LinceTile LinceGetTile(LinceTexture* texture, vec2 xy, vec2 cellsize, vec2 tilesize){
 	

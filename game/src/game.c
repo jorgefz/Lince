@@ -14,8 +14,8 @@
 #include "nk_test.h"
 #include <assert.h>
 
-#include "renderer/tileset.h"
-#include "renderer/tile_anim.h"
+//#include "renderer/tileset.h"
+//#include "renderer/tile_anim.h"
 
 
 float NormZ(float y, vec2 ylim, vec2 zlim){
@@ -93,33 +93,67 @@ typedef struct LinceTilemap{
     size_t tileset_count;
 
     size_t width, height;
+    vec2 offset;
     uint32_t* tiledata;
     uint8_t* collision_data;
 
     LinceTile* overlay_tiles;
+    vec2* overlay_positions;
     size_t overlay_count;
+
+    /*
+    CallbackFn on_teleport(this, target-tilemap, trigger, ...)
+
+    */
     
 } LinceTilemap;
 
 
+
 LinceTilemap* LinceCreateTilemap(LinceTilemap* props){
 
+    LINCE_ASSERT(props, "Tilemap missing");
+    LINCE_ASSERT(props->tileset, "Tileset missing");
+    LINCE_ASSERT(props->tileset_count > 0, "Tileset must have more than zero tiles");
+    LINCE_ASSERT(props->tiledata, "Tile data missing");
+    LINCE_ASSERT(props->width > 0 && props->height > 0,
+        "Tilemap size must be greater than zero");
+
+    size_t tm_size = props->width * props->height;
+
+    // Ensure no index in tile data is greater than the tileset size
+    for(size_t i = 0; i != tm_size; ++i){
+        LINCE_ASSERT(props->tiledata[i] < props->tileset_count,
+            "Invalid value in tilemap data "
+            "(tile index %d but there are only %d tiles)",
+            (int)props->tiledata[i], (int)props->tileset_count);
+    }
+
+    // Allocate main data and copy settings
     LinceTilemap* tm = malloc(sizeof(LinceTilemap));
     LINCE_ASSERT_ALLOC(tm, sizeof(LinceTilemap));
     memmove(tm, props, sizeof(LinceTilemap));
+
+    // Copy tile data
+    tm->tiledata = malloc(sizeof(uint32_t) * tm_size);
+    LINCE_ASSERT_ALLOC(tm->tiledata, sizeof(uint32_t) * tm_size);
+    memmove(tm->tiledata, props->tiledata, sizeof(uint32_t) * tm_size);
+
+    // NOTE: tileset is not copied!!
 
     return tm;
 }
 
 
-void LinceDrawTilemap(LinceTilemap* tm, vec2 offset){
+void LinceDrawTilemap(LinceTilemap* tm){
     if(!tm) return;
 
+    // Draw ground tiles
     for(size_t j = 0; j != tm->height; ++j){
         for(size_t i = 0; i != tm->width; ++i){
             LinceDrawQuad((LinceQuadProps){
-                .x = (float)i - offset[0],
-                .y = (float)j - offset[1],
+                .x = (float)i - tm->offset[0],
+                .y = (float)j - tm->offset[1],
                 .w = 1.001f, .h = 1.001f,
                 .color = {1,1,1,1},
                 .tile = &tm->tileset[tm->tiledata[j*tm->width + i]],
@@ -127,23 +161,63 @@ void LinceDrawTilemap(LinceTilemap* tm, vec2 offset){
             });
         }
     }
+
+    if(!tm->overlay_tiles|| !tm->overlay_positions) return;
+
+    // Draw overlay tiles
+    for(size_t i = 0; i != tm->overlay_count; ++i){
+        LinceTile* tile = &tm->overlay_tiles[i];
+        LinceDrawQuad((LinceQuadProps){
+            .x = tm->overlay_positions[i][0] - tm->offset[0],
+            .y = tm->overlay_positions[i][1] - tm->offset[1],
+            .w = tile->tilesize[0],
+            .h = tile->tilesize[1],
+            .color = {1,1,1,1},
+            .tile = tile,
+            .zorder = NormZ(
+                tm->overlay_positions[i][1] - tm->offset[1] - tile->tilesize[1]/2.0f,
+                (vec2){-100.0f, 100.0f},
+                (vec2){0.1f, 1.0f}
+            )
+        });
+    }
+
 }
 
 void LinceDeleteTilemap(LinceTilemap* tm){
-    if(tm) free(tm);
+    if(!tm) return;
+    if(tm->tiledata) free(tm->tiledata);
+    free(tm);
+}
+
+int GetTilemapIndexAtMouse(LinceTilemap* tm, LinceCamera* cam, vec2 xy_ind){
+    vec2 mouse_pos;
+    LinceGetMousePosWorld(mouse_pos, cam);
+
+    int tm_x = floorf(mouse_pos[0] + tm->offset[0] + 0.5f);
+    int tm_y = floorf(mouse_pos[1] + tm->offset[1] + 0.5f);
+
+    xy_ind[0] = (float)tm_x;
+    xy_ind[1] = (float)tm_y;
+
+    if(tm_x >= 0 && tm_x < (int)tm->width &&
+       tm_y >= 0 && tm_y < (int)tm->height) {
+        return (int)(tm_y * tm->width + tm_x);
+    }
+    return -1;
 }
 
 /*
 Returns the tile of a tilemap over which the mouse pointer is hovering.
 If no tile is present, it returns NULL.
 */
-LinceTile* GetTileAtMouse(LinceTilemap* tm, LinceCamera* cam, vec2 tm_offset){
+LinceTile* GetTileAtMouse(LinceTilemap* tm, LinceCamera* cam){
 
     vec2 mouse_pos;
     LinceGetMousePosWorld(mouse_pos, cam);
 
-    int tm_x = (int)(mouse_pos[0] + tm_offset[0]);
-    int tm_y = (int)(mouse_pos[1] + tm_offset[1]);
+    int tm_x = (int)(mouse_pos[0] + tm->offset[0]);
+    int tm_y = (int)(mouse_pos[1] + tm->offset[1]);
 
     if(tm_x >= 0 && tm_x < (int)tm->width &&
        tm_y >= 0 && tm_y < (int)tm->height) {
@@ -188,10 +262,10 @@ void ChickenEnds(LinceTileAnim* anim, void* args){
 
 typedef struct TestLayer {
     char name[LINCE_NAME_MAX];
-    float red, vel;
     float dt;
-    float cam_speed, color_step;
+    float cam_speed;
 
+    LinceCamera* cam;
     LinceVertexArray* va;
     LinceVertexBuffer vb;
     LinceIndexBuffer ib;
@@ -211,13 +285,14 @@ typedef struct TestLayer {
     LinceTexture* tileset;
     LinceTilemap* tilemap;
 
-    LinceCamera* cam;
+    int chosen_menu_tile;
+
 } TestLayer;
 
 
-void DrawHoverTile(TestLayer* data, float tm_offset){
+void DrawHoverTile(TestLayer* data){
     
-    LinceTile* hover_tile = GetTileAtMouse(data->tilemap, data->cam, (vec2){tm_offset,tm_offset});
+    LinceTile* hover_tile = GetTileAtMouse(data->tilemap, data->cam);
     LinceDrawQuad((LinceQuadProps){
         .x = data->cam->pos[0] - 0.5f,
         .y = data->cam->pos[1],
@@ -243,23 +318,33 @@ void DrawHoverTile(TestLayer* data, float tm_offset){
             .zorder = 0.9
         });
     }
+
+    // Highlight hovered tile
+    vec2 xy_ind;
+    int chosen_tile = GetTilemapIndexAtMouse(data->tilemap, data->cam, xy_ind);
+    if(chosen_tile == -1) return;
+
+    LinceDrawQuad((LinceQuadProps){
+        .x = xy_ind[0] - data->tilemap->offset[0],
+        .y = xy_ind[1] - data->tilemap->offset[1],
+        .w = 1.001f, .h = 1.001f,
+        .color = {1,0,0,0.2},
+        .zorder = 0.9
+    });
+
 }
 
 
 void TestLayerOnAttach(LinceLayer* layer) {
     TestLayer* data = LinceGetLayerData(layer);
     LINCE_INFO(" Layer '%s' attached", data->name);
-
-    data->red = 0.0f;
-    data->vel = 5e-4f;
-    data->color_step = 0.003f;
     
     data->cam = LinceCreateCamera(LinceGetAspectRatio());
     data->cam_speed = 9e-4f;
     data->cam->zoom = 4.0;
 
-    data->tex_front = LinceCreateTexture("PatrickF", "lince/assets/front.png");
-    data->tex_back  = LinceCreateTexture("PatrickB", "lince/assets/back.png");
+    data->tex_front = LinceCreateTexture("PatrickF", "game/assets/textures/front.png");
+    data->tex_back  = LinceCreateTexture("PatrickB", "game/assets/textures/back.png");
     data->tileset = LinceCreateTexture("Tileset", "game/assets/textures/shubibubi-cozy-farm.png");
     data->walking_tileset = LinceCreateTexture("Walking", "game/assets/textures/elv-games-movement.png");
 
@@ -290,9 +375,24 @@ void TestLayerOnAttach(LinceLayer* layer) {
         .width = tm_width,
         .height = tm_height,
         .tileset = data->tiles,
-        .tileset_count = TILE_COUNT
+        .tileset_count = TILE_COUNT,
+        .offset = {5.0f, 5.0f}
     });
 
+    data->tilemap->overlay_count = 2;
+    
+    data->tilemap->overlay_tiles = malloc(sizeof(LinceTile)*2);
+    memmove(
+        data->tilemap->overlay_tiles,
+        (LinceTile[]){data->tiles[TILE_TREE],data->tiles[TILE_TREE]},
+        sizeof(LinceTile)*2
+    );
+    
+    data->tilemap->overlay_positions = calloc(2, sizeof(vec2));
+    memmove(data->tilemap->overlay_positions,
+        (vec2[]){{8,7},{3,3}}, sizeof(vec2)*2
+    );
+    
     // PLAYER MOVEMENT
     LinceTile player_tiles[] = {
         // Walking Forward
@@ -359,6 +459,7 @@ void TestLayerOnAttach(LinceLayer* layer) {
         .order_count = 4
     });
 
+    data->chosen_menu_tile = -1;
 }
 
 void TestLayerOnDetach(LinceLayer* layer) {
@@ -378,11 +479,66 @@ void TestLayerOnDetach(LinceLayer* layer) {
     free(data);
 }
 
+void DrawGUI(TestLayer* data){
+    LinceUILayer* ui = LinceGetAppState()->ui;
+    
+    nk_style_set_font(ui->ctx, &ui->fonts[LinceFont_Droid15]->handle);
+    
+    if (nk_begin(ui->ctx, "Demo", nk_rect(10, 10, 300, 600),
+        NK_WINDOW_BORDER|NK_WINDOW_MOVABLE|NK_WINDOW_SCALABLE|
+        NK_WINDOW_MINIMIZABLE|NK_WINDOW_TITLE
+    )) {
+        
+        /*
+        size_t cols, rows;
+        for(size_t i = 0; i != rows; ++i){
+            nk_layout_row_dynamic(ui->ctx, 200, cols);
+            for(size_t j = 0; j != cols; ++j){
+                // get tile subimage
+                if(nk_button_image(ui->ctx, subimage)){
+                    // tile pressed callback
+                }
+            }
+
+        }
+        */
+
+
+       for(size_t i = 0; i != 4; ++i){
+            nk_layout_row_dynamic(ui->ctx, 70, 4);
+            for(size_t j = 0; j != 4; ++j){
+                LinceTile* tile = &data->tiles[i*4 + j];
+                struct nk_rect rect = {
+                    .x = tile->pos[0]      * tile->cellsize[0],
+                    .y = tile->pos[1]      * tile->cellsize[1],
+                    .w = tile->tilesize[0] * tile->cellsize[0],
+                    .h = tile->tilesize[1] * tile->cellsize[1]        
+                };
+                struct nk_image img = nk_subimage_id(
+                    data->tileset->id,
+                    data->tileset->width,
+                    data->tileset->height,
+                    rect
+                );
+                if( nk_button_image(ui->ctx, img) ){
+                    data->chosen_menu_tile = i*4 + j;
+                }
+            }
+       }
+
+    }
+    nk_end(ui->ctx);
+
+}
+
 
 void TestLayerOnUpdate(LinceLayer* layer, float dt) {
     TestLayer* data = LinceGetLayerData(layer);
     data->dt = dt;
     LinceUILayer* ui = LinceGetAppState()->ui;
+
+    // UI
+    DrawGUI(data);
 
     LinceResizeCameraView(data->cam, LinceGetAspectRatio());
 	LinceUpdateCamera(data->cam);
@@ -442,24 +598,7 @@ void TestLayerOnUpdate(LinceLayer* layer, float dt) {
     LinceBeginScene(data->cam);
 
     // Tilemap
-    float tm_offset = 5.0f;
-    LinceDrawTilemap(data->tilemap, (vec2){tm_offset,tm_offset});
-
-    // Trees
-    LinceDrawQuad((LinceQuadProps){
-        .x=4.0f, .y=4.0f,
-        .w=2.0f, .h=2.0f,
-        .color={1,1,1,1},
-        .tile = &data->tiles[TILE_TREE],
-        .zorder = NormZ(4.0f-1.0f, (vec2){-100.0f,100.0f}, (vec2){0.1f,1.0f})
-    });
-    LinceDrawQuad((LinceQuadProps){
-        .x=-2.0f, .y=-2.0f,
-        .w=2.0f, .h=2.0f,
-        .color={1,1,1,1},
-        .tile = &data->tiles[TILE_TREE],
-        .zorder = NormZ(-2.0f-1.0f, (vec2){-100.0f,100.0f}, (vec2){0.1f,1.0f})
-    });
+    LinceDrawTilemap(data->tilemap);
 
     // Chicken
     LinceUpdateTileAnim(data->chicken_anim, dt);
@@ -483,17 +622,29 @@ void TestLayerOnUpdate(LinceLayer* layer, float dt) {
     });
 
     // Selected tile
-    DrawHoverTile(data, tm_offset);
+    DrawHoverTile(data);
 
     
     LinceEndScene();
 }
 
 void TestLayerOnEvent(LinceLayer* layer, LinceEvent* event){
+    TestLayer* data = LinceGetLayerData(layer);
+
     if(event->type == LinceEventType_MouseScrolled){
-        LinceMouseScrolledEvent* scroll = event->data.MouseScrolled;
-        TestLayer* data = LinceGetLayerData(layer);
+        LinceMouseScrolledEvent* scroll = event->data.MouseScrolled;    
         data->cam->zoom *= powf(0.80, scroll->yoff); // * 0.5 * dt;
+        return;
+    }
+
+    if(event->type == LinceEventType_MouseButtonPressed){
+        LinceMouseButtonPressedEvent* press = event->data.MouseButtonPressed;
+        if(press->button != LinceMouseButton_1) return;
+        
+        vec2 xy_ind;
+        int change_tile = GetTilemapIndexAtMouse(data->tilemap, data->cam, xy_ind);
+        if(change_tile == -1 || data->chosen_menu_tile == -1) return;
+        data->tilemap->tiledata[change_tile] = data->chosen_menu_tile;
     }
 }
 
@@ -547,7 +698,7 @@ int main(int argc, const char* argv[]) {
     // app->user_data = NULL;
     app->screen_width = 900;
     app->screen_height = 600;
-    app->title = "The Legend of Cheesus Christ";
+    app->title = "Sandbox";
     // app->options = LINCE_FULLSCREEN | LINCE_VSYNC | LINCE_RESIZEABLE | ...
 
     app->game_init = GameInit;

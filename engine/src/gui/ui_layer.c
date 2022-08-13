@@ -29,20 +29,23 @@ LinceUILayer* LinceInitUI(void* glfw_window){
         ui->glfw_window,
         NK_GLFW3_DEFAULT
     );
+    LINCE_ASSERT(ui->ctx, "Nuklear context failed to initialise");
 
 	// Initialise Font
     struct nk_font_atlas *atlas;
     nk_glfw3_font_stash_begin(ui->glfw, &atlas);
 
-    ui->fonts[LinceFont_Droid15] = nk_font_atlas_add_from_file(atlas, "lince/assets/fonts/DroidSans.ttf", 15, 0);
-    ui->fonts[LinceFont_Droid20] = nk_font_atlas_add_from_file(atlas, "lince/assets/fonts/DroidSans.ttf", 20, 0);
-    ui->fonts[LinceFont_Droid30] = nk_font_atlas_add_from_file(atlas, "lince/assets/fonts/DroidSans.ttf", 30, 0);
-    ui->fonts[LinceFont_Droid50] = nk_font_atlas_add_from_file(atlas, "lince/assets/fonts/DroidSans.ttf", 50, 0);
-    
+    ui->fonts[LinceFont_Droid15] = nk_font_atlas_add_from_file(atlas, "engine/assets/fonts/DroidSans.ttf", 15, 0);
+    ui->fonts[LinceFont_Droid20] = nk_font_atlas_add_from_file(atlas, "engine/assets/fonts/DroidSans.ttf", 20, 0);
+    ui->fonts[LinceFont_Droid30] = nk_font_atlas_add_from_file(atlas, "engine/assets/fonts/DroidSans.ttf", 30, 0);
+    ui->fonts[LinceFont_Droid50] = nk_font_atlas_add_from_file(atlas, "engine/assets/fonts/DroidSans.ttf", 50, 0);
+
+    LINCE_ASSERT(ui->fonts[LinceFont_Droid15], "Failed to load font 'Droid'");
+
     nk_glfw3_font_stash_end(ui->glfw);
     
     //nk_style_load_all_cursors(data->ctx, atlas->cursors);
-    //nk_style_set_font(ui->ctx, &droid_20->handle);
+    //nk_style_set_font(ui->ctx, ui->fonts[LinceFont_Droid20]);
 
 	LINCE_INFO(" UI Initialised");
 	return ui;

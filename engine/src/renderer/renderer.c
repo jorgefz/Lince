@@ -137,8 +137,8 @@ void LinceInitRenderer() {
 	// create shader
 	renderer_state.shader = LinceCreateShader(
 		"RendererShader",
-        "lince/assets/test.vert.glsl",
-		"lince/assets/test.frag.glsl"
+        "engine/assets/test.vert.glsl",
+		"engine/assets/test.frag.glsl"
 	);
     LinceBindShader(renderer_state.shader);
 

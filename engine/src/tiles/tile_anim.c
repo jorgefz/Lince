@@ -1,4 +1,4 @@
-#include "renderer/tile_anim.h"
+#include "tiles/tile_anim.h"
 
 /*
 Returns a pointer to the current tile in the animation

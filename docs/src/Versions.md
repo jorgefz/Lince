@@ -2,6 +2,18 @@
 
 Version codes follow [Semantic Versioning](https://semver.org/).
 
+## v0.3.0
+- Added basic tilemaps
+- Added calculation of inverse view-projection matrix on camera update.
+- Added transform from screen to world coordinates.
+- Added function to retrieve screen size directly.
+- Added function to retrieve mouse position in world coordinates.
+- Solved bug where Nuklear UI events were not being flagged as handled
+- Moved tile animation and tileset headers to 'tiles' folder
+- Added tile animation and tileset headers to lince.h
+- Renamed 'lince' folder to 'engine'.
+- Added assertion to ensure fonts are correctly loaded from file.
+
 ## v0.2.2
 - Improved tile animations with custom animation orders.
 - Improved documentation on tile animations

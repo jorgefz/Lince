@@ -7,7 +7,7 @@
 #include "renderer/texture.h"
 #include "renderer/camera.h"
 #include "core/window.h"
-#include "renderer/tileset.h"
+#include "tiles/tileset.h"
 
 /* Quad properties, serves as argument for LinceRenderQuad */
 typedef struct LinceQuadProps{

@@ -24,7 +24,7 @@ include "vendor/glad"
 include "vendor/cglm"
 
 project "lince"
-    location "lince"
+    location "engine"
     kind "StaticLib"
     language "C"
     staticruntime "on"
@@ -37,13 +37,13 @@ project "lince"
     }
 
     files {
-        "%{prj.name}/src/**.c",
-        "%{prj.name}/src/**.h",
+        "engine/src/**.c",
+        "engine/src/**.h",
     }
     
     includedirs {
-        "%{prj.name}",
-		"%{prj.name}/src",
+        "engine",
+		"engine/src",
         "%{IncludeDir.glfw}",
         "%{IncludeDir.glad}",
         "%{IncludeDir.cglm}"
@@ -117,8 +117,8 @@ project "game"
     includedirs {
         "%{prj.name}",
 		"%{prj.name}/src",
-        "lince",
-        "lince/src",
+        "engine",
+        "engine/src",
         "%{IncludeDir.glfw}",
         "%{IncludeDir.glad}",
         "%{IncludeDir.cglm}"
