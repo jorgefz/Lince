@@ -1,4 +1,4 @@
-# Lince v0.2.1 Documentation
+# Lince v0.3.0 Documentation
 
 [Home Page](./HomePage.md)
 
