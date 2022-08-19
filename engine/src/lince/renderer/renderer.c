@@ -183,6 +183,9 @@ void LinceBeginScene(LinceCamera* cam) {
 	renderer_state.quad_count = 0;
 	renderer_state.texture_slots[0] = renderer_state.white_texture;
 	renderer_state.texture_slot_count = 1;
+
+	size_t size = (MAX_VERTICES * sizeof(LinceQuadVertex));
+	memset(renderer_state.vertex_batch, 0, size);
 }
 
 void LinceFlushScene(){
@@ -195,7 +198,8 @@ void LinceFlushScene(){
 }
 
 void LinceEndScene() {
-	uint32_t size = (uint32_t)(renderer_state.quad_count * sizeof(LinceQuadVertex) * QUAD_VERTEX_COUNT);
+	// uint32_t size = (uint32_t)(renderer_state.quad_count * sizeof(LinceQuadVertex) * QUAD_VERTEX_COUNT);
+	uint32_t size = (uint32_t)(MAX_VERTICES * sizeof(LinceQuadVertex));
 	LinceSetVertexBufferData(renderer_state.vb, renderer_state.vertex_batch, size);
 	LinceFlushScene();
 }

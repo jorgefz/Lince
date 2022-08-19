@@ -3,7 +3,6 @@
 Version codes follow [Semantic Versioning](https://semver.org/).
 
 ## v0.3.0
-- Added basic tilemaps
 - Added calculation of inverse view-projection matrix on camera update.
 - Added transform from screen to world coordinates.
 - Added function to retrieve screen size directly.
@@ -14,6 +13,7 @@ Version codes follow [Semantic Versioning](https://semver.org/).
 - Renamed 'lince' folder to 'engine'.
 - Added assertion to ensure fonts are correctly loaded from file.
 - Moved engine source to 'lince' folder within 'engine/src'.
+- Fixed bug in 2D renderer where quads that were no longer being rendered persisted in the scene.
 
 ## v0.2.2
 - Improved tile animations with custom animation orders.

@@ -136,6 +136,20 @@
                     <main>
                         <h1 id="version-history"><a class="header" href="#version-history">Version History</a></h1>
 <p>Version codes follow <a href="https://semver.org/">Semantic Versioning</a>.</p>
+<h2 id="v030"><a class="header" href="#v030">v0.3.0</a></h2>
+<ul>
+<li>Added calculation of inverse view-projection matrix on camera update.</li>
+<li>Added transform from screen to world coordinates.</li>
+<li>Added function to retrieve screen size directly.</li>
+<li>Added function to retrieve mouse position in world coordinates.</li>
+<li>Solved bug where Nuklear UI events were not being flagged as handled.</li>
+<li>Moved tile animation and tileset headers to 'tiles' folder.</li>
+<li>Added tile animation and tileset headers to <code>lince.h</code>.</li>
+<li>Renamed 'lince' folder to 'engine'.</li>
+<li>Added assertion to ensure fonts are correctly loaded from file.</li>
+<li>Moved engine source to 'lince' folder within 'engine/src'.</li>
+<li>Fixed bug in 2D renderer where quads that were no longer being rendered persisted in the scene.</li>
+</ul>
 <h2 id="v022"><a class="header" href="#v022">v0.2.2</a></h2>
 <ul>
 <li>Improved tile animations with custom animation orders.</li>
