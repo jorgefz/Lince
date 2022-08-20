@@ -16,6 +16,8 @@ LinceShader* LinceCreateShader(
 	const char* fragment_path
 )
 ```
+Creates a shader object from vertex and fragment shader files and a string ID 'name'.
+
 ## LinceCreateShaderFromSrc
 ```c
 LinceShader* LinceCreateShaderFromSrc(
@@ -24,18 +26,26 @@ LinceShader* LinceCreateShaderFromSrc(
 	const char* fragment_src
 )
 ```
+Creates a texture by providing the shader sources directly instead of loading them from files.
+
 ## LinceBindShader
 ```c
 void LinceBindShader(LinceShader* shader)
 ```
+Uses the provided shader for rendering.
+
 ## LinceUnbindShader
 ```c
 void LinceUnbindShader(void)
 ```
+Removes the shader currently bound (if any).
+
 ## LinceDeleteShader
 ```c
 void LinceDeleteShader(LinceShader* shader)
 ```
+Frees the shader data.
+
 ## LinceGetShaderUniformID
 ```c
 int LinceGetShaderUniformID(LinceShader* shader, const char* name)

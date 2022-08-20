@@ -63,7 +63,8 @@ void LinceUIOnEvent(LinceUILayer* ui, LinceEvent* event){
     void* win = ui->glfw_window;
     if(event->handled == LinceTrue) return;
 
-    event->handled = (LinceBool)nk_window_is_any_hovered(ui->ctx);
+    //event->handled = (LinceBool)nk_window_is_any_hovered(ui->ctx);
+    event->handled = (LinceBool)nk_item_is_any_active(ui->ctx);
 
     // Since the nuklear API makes use of the glfw user pointer,
     // we must temporarily change it, and then set it back to the LinceWindow object.

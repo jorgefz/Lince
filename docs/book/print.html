@@ -999,6 +999,7 @@ These are usually integers or floats, and arrays of these with fixed sizes, incl
 	const char* fragment_path
 )
 </code></pre>
+<p>Creates a shader object from vertex and fragment shader files and a string ID 'name'.</p>
 <h2 id="lincecreateshaderfromsrc"><a class="header" href="#lincecreateshaderfromsrc">LinceCreateShaderFromSrc</a></h2>
 <pre><code class="language-c">LinceShader* LinceCreateShaderFromSrc(
 	const char* name,
@@ -1006,15 +1007,19 @@ These are usually integers or floats, and arrays of these with fixed sizes, incl
 	const char* fragment_src
 )
 </code></pre>
+<p>Creates a texture by providing the shader sources directly instead of loading them from files.</p>
 <h2 id="lincebindshader"><a class="header" href="#lincebindshader">LinceBindShader</a></h2>
 <pre><code class="language-c">void LinceBindShader(LinceShader* shader)
 </code></pre>
+<p>Uses the provided shader for rendering.</p>
 <h2 id="linceunbindshader"><a class="header" href="#linceunbindshader">LinceUnbindShader</a></h2>
 <pre><code class="language-c">void LinceUnbindShader(void)
 </code></pre>
+<p>Removes the shader currently bound (if any).</p>
 <h2 id="lincedeleteshader"><a class="header" href="#lincedeleteshader">LinceDeleteShader</a></h2>
 <pre><code class="language-c">void LinceDeleteShader(LinceShader* shader)
 </code></pre>
+<p>Frees the shader data.</p>
 <h2 id="lincegetshaderuniformid"><a class="header" href="#lincegetshaderuniformid">LinceGetShaderUniformID</a></h2>
 <pre><code class="language-c">int LinceGetShaderUniformID(LinceShader* shader, const char* name)
 </code></pre>
@@ -1068,6 +1073,7 @@ These are usually integers or floats, and arrays of these with fixed sizes, incl
 <h2 id="lincecreatetexture"><a class="header" href="#lincecreatetexture">LinceCreateTexture</a></h2>
 <pre><code class="language-c">LinceTexture* LinceCreateTexture(const char* name, const char* path)
 </code></pre>
+<p>Loads a texture from a file at 'path', using a string 'name' as ID.</p>
 <h2 id="lincecreateemptytexture"><a class="header" href="#lincecreateemptytexture">LinceCreateEmptyTexture</a></h2>
 <pre><code class="language-c">LinceTexture* LinceCreateEmptyTexture(
 	const char* name, 
@@ -1075,15 +1081,20 @@ These are usually integers or floats, and arrays of these with fixed sizes, incl
 	uint32_t height
 )
 </code></pre>
+<p>Creates an empty texture of given size.</p>
 <h2 id="lincesettexturedata"><a class="header" href="#lincesettexturedata">LinceSetTextureData</a></h2>
 <pre><code class="language-c">void LinceSetTextureData(LinceTexture* texture, unsigned char* data)
 </code></pre>
+<p>Provides byte data to a texture, useful for empty textures.</p>
 <h2 id="lincedeletetexture"><a class="header" href="#lincedeletetexture">LinceDeleteTexture</a></h2>
 <pre><code class="language-c">void LinceDeleteTexture(LinceTexture* texture)
 </code></pre>
+<p>Frees texture data and deletes corresponding OpenGL object.</p>
 <h2 id="lincebindtexture"><a class="header" href="#lincebindtexture">LinceBindTexture</a></h2>
 <pre><code class="language-c">void LinceBindTexture(LinceTexture* texture, uint32_t slot)
 </code></pre>
+<p>Binds a texture to a slot so that it may be used in rendering.
+Note that the total number of slots vary depending on platform, but is usually 32 on modern platforms.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="renderer"><a class="header" href="#renderer">Renderer</a></h1>
 <h2 id="linceinitrenderer"><a class="header" href="#linceinitrenderer">LinceInitRenderer</a></h2>
 <pre><code class="language-c">void LinceInitRenderer()
@@ -1683,6 +1694,14 @@ Further features the tilemap should have are collision data, overlay tiles that 
 </ol>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="version-history"><a class="header" href="#version-history">Version History</a></h1>
 <p>Version codes follow <a href="https://semver.org/">Semantic Versioning</a>.</p>
+<h2 id="v031"><a class="header" href="#v031">v0.3.1</a></h2>
+<ul>
+<li>Renamed and moved the 2D renderer shader files to 'engine/assets/shaders'</li>
+<li>Updated premake5 lua script</li>
+<li>Moved Pong and Missile Command to their own projects and folders</li>
+<li>Solved bug in Missile Command where texture would be freed twice</li>
+<li>Updated docs</li>
+</ul>
 <h2 id="v030"><a class="header" href="#v030">v0.3.0</a></h2>
 <ul>
 <li>Added calculation of inverse view-projection matrix on camera update.</li>

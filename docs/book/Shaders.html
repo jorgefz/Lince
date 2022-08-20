@@ -150,6 +150,7 @@
 	const char* fragment_path
 )
 </code></pre>
+<p>Creates a shader object from vertex and fragment shader files and a string ID 'name'.</p>
 <h2 id="lincecreateshaderfromsrc"><a class="header" href="#lincecreateshaderfromsrc">LinceCreateShaderFromSrc</a></h2>
 <pre><code class="language-c">LinceShader* LinceCreateShaderFromSrc(
 	const char* name,
@@ -157,15 +158,19 @@
 	const char* fragment_src
 )
 </code></pre>
+<p>Creates a texture by providing the shader sources directly instead of loading them from files.</p>
 <h2 id="lincebindshader"><a class="header" href="#lincebindshader">LinceBindShader</a></h2>
 <pre><code class="language-c">void LinceBindShader(LinceShader* shader)
 </code></pre>
+<p>Uses the provided shader for rendering.</p>
 <h2 id="linceunbindshader"><a class="header" href="#linceunbindshader">LinceUnbindShader</a></h2>
 <pre><code class="language-c">void LinceUnbindShader(void)
 </code></pre>
+<p>Removes the shader currently bound (if any).</p>
 <h2 id="lincedeleteshader"><a class="header" href="#lincedeleteshader">LinceDeleteShader</a></h2>
 <pre><code class="language-c">void LinceDeleteShader(LinceShader* shader)
 </code></pre>
+<p>Frees the shader data.</p>
 <h2 id="lincegetshaderuniformid"><a class="header" href="#lincegetshaderuniformid">LinceGetShaderUniformID</a></h2>
 <pre><code class="language-c">int LinceGetShaderUniformID(LinceShader* shader, const char* name)
 </code></pre>

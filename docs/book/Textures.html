@@ -147,6 +147,7 @@
 <h2 id="lincecreatetexture"><a class="header" href="#lincecreatetexture">LinceCreateTexture</a></h2>
 <pre><code class="language-c">LinceTexture* LinceCreateTexture(const char* name, const char* path)
 </code></pre>
+<p>Loads a texture from a file at 'path', using a string 'name' as ID.</p>
 <h2 id="lincecreateemptytexture"><a class="header" href="#lincecreateemptytexture">LinceCreateEmptyTexture</a></h2>
 <pre><code class="language-c">LinceTexture* LinceCreateEmptyTexture(
 	const char* name, 
@@ -154,15 +155,20 @@
 	uint32_t height
 )
 </code></pre>
+<p>Creates an empty texture of given size.</p>
 <h2 id="lincesettexturedata"><a class="header" href="#lincesettexturedata">LinceSetTextureData</a></h2>
 <pre><code class="language-c">void LinceSetTextureData(LinceTexture* texture, unsigned char* data)
 </code></pre>
+<p>Provides byte data to a texture, useful for empty textures.</p>
 <h2 id="lincedeletetexture"><a class="header" href="#lincedeletetexture">LinceDeleteTexture</a></h2>
 <pre><code class="language-c">void LinceDeleteTexture(LinceTexture* texture)
 </code></pre>
+<p>Frees texture data and deletes corresponding OpenGL object.</p>
 <h2 id="lincebindtexture"><a class="header" href="#lincebindtexture">LinceBindTexture</a></h2>
 <pre><code class="language-c">void LinceBindTexture(LinceTexture* texture, uint32_t slot)
 </code></pre>
+<p>Binds a texture to a slot so that it may be used in rendering.
+Note that the total number of slots vary depending on platform, but is usually 32 on modern platforms.</p>
 
                     </main>
 

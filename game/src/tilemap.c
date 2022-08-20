@@ -1,4 +1,4 @@
-#include "lince/tiles/tilemap.h"
+#include "tilemap.h"
 
 
 LinceTilemap* LinceCreateTilemap(LinceTilemap* props){

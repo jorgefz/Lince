@@ -12,6 +12,8 @@
 ```c
 LinceTexture* LinceCreateTexture(const char* name, const char* path)
 ```
+Loads a texture from a file at 'path', using a string 'name' as ID.
+
 ## LinceCreateEmptyTexture
 ```c
 LinceTexture* LinceCreateEmptyTexture(
@@ -20,15 +22,23 @@ LinceTexture* LinceCreateEmptyTexture(
 	uint32_t height
 )
 ```
+Creates an empty texture of given size.
+
 ## LinceSetTextureData
 ```c
 void LinceSetTextureData(LinceTexture* texture, unsigned char* data)
 ```
+Provides byte data to a texture, useful for empty textures.
+
 ## LinceDeleteTexture
 ```c
 void LinceDeleteTexture(LinceTexture* texture)
 ```
+Frees texture data and deletes corresponding OpenGL object.
+
 ## LinceBindTexture
 ```c
 void LinceBindTexture(LinceTexture* texture, uint32_t slot)
 ```
+Binds a texture to a slot so that it may be used in rendering.
+Note that the total number of slots vary depending on platform, but is usually 32 on modern platforms.

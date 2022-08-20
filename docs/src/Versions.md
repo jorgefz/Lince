@@ -2,6 +2,13 @@
 
 Version codes follow [Semantic Versioning](https://semver.org/).
 
+## v0.3.1
+- Renamed and moved the 2D renderer shader files to 'engine/assets/shaders'
+- Updated premake5 lua script
+- Moved Pong and Missile Command to their own projects and folders
+- Solved bug in Missile Command where texture would be freed twice
+- Updated docs
+
 ## v0.3.0
 - Added calculation of inverse view-projection matrix on camera update.
 - Added transform from screen to world coordinates.

@@ -144,8 +144,8 @@ LinceLayer* PongLayerInit(){
 void PongLayerOnAttach(LinceLayer* layer){
 	PongLayer* data = LinceGetLayerData(layer);
 	data->cam = LinceCreateCamera(LinceGetAspectRatio());
-	data->ball_tex = LinceCreateTexture("PongBall", "game/assets/textures/pong_ball.png");
-	data->pad_tex  = LinceCreateTexture("PongBall", "game/assets/textures/pong_pad.png");
+	data->ball_tex = LinceCreateTexture("PongBall", "games/pong/assets/pong_ball.png");
+	data->pad_tex  = LinceCreateTexture("PongBall", "games/pong/assets/pong_pad.png");
 
 	ball.vx = 1e-3f;
 	ball.vy = 2e-3f;

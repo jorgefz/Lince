@@ -455,24 +455,24 @@ void MCommandOnAttach(LinceLayer* layer){
 
 	data->bombs = NULL;
 	data->bomb_count = 0;
-	data->bomb_tex = LinceCreateTexture("Bomb", "game/assets/textures/bomb.png");
 
 	data->missiles = NULL;
 	data->missile_count = 0;
-	data->missile_tex = LinceCreateTexture("Missile", "game/assets/textures/missile.png");
 
 	data->markers = NULL;
 	data->marker_count = 0;
-	data->marker_tex = LinceCreateTexture("Marker", "game/assets/textures/marker.png");
 
 	data->bomb_cooldown_max = 3000.0f; // bomb every 3 seconds
 	data->bomb_cooldown = data->bomb_cooldown_max;
 
 	data->blast_count = 0;
 	data->blasts = NULL;
-	data->blast_tex = LinceCreateTexture("Blast", "game/assets/textures/pong_ball.png");
 
-	data->bkg_city = LinceCreateTexture("City", "game/assets/textures/background-city.png");
+	data->bomb_tex = LinceCreateTexture("Bomb",       "games/mcommand/assets/bomb.png");
+	data->missile_tex = LinceCreateTexture("Missile", "games/mcommand/assets/missile.png");
+	data->blast_tex = LinceCreateTexture("Blast",     "games/mcommand/assets/circle.png");
+	data->marker_tex = LinceCreateTexture("Marker",   "games/mcommand/assets/marker.png");
+	data->bkg_city = LinceCreateTexture("City",       "games/mcommand/assets/background-city.png");
 
 	srand(time(NULL));
 }
@@ -568,7 +568,6 @@ void MCommandOnDetach(LinceLayer* layer){
 	LinceDeleteTexture(data->bkg_city);
 	LinceDeleteTexture(data->marker_tex);
 	LinceDeleteTexture(data->blast_tex);
-	LinceDeleteTexture(data->bkg_city);
 	free(data);
 }
 

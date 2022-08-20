@@ -32,9 +32,7 @@ project "lince"
     targetdir ("bin/" .. outputdir .. "/%{prj.name}")
     objdir ("obj/" .. outputdir .. "/%{prj.name}")
 
-    defines {
-        "GLFW_INCLUDED_NONE"
-    }
+    defines "GLFW_INCLUDED_NONE"
 
     files {
         "engine/src/**.c",
@@ -56,38 +54,21 @@ project "lince"
         "cglm"
     }
 
-    filter "system:windows"
-        links {
-            "opengl32"
-        }
-
-    filter "system:linux"
-        links {
-            "GL",
-            "rt",
-            "m",
-            "dl",
-            "pthread",
-            "X11"
-        }
-
     libdirs {
         "vendor/glad/bin/" .. outputdir .. "/glad",
         "vendor/glfw/bin/" .. outputdir .. "/glfw",
     }
 
-    defines {
-        "GLFW_INCLUDE_NONE"
-    }
-
     filter "system:linux"
         systemversion "latest"
         defines {"LINCE_LINUX"}
+        links {"GL","rt","m","dl","pthread","X11"}
     
     filter "system:windows"
         systemversion "latest"
         defines {"LINCE_WINDOWS", "_CRT_SECURE_NO_WARNINGS"}
-    
+        links {"opengl32"}
+
     filter "configurations:Debug"
         defines "LINCE_DEBUG"
         symbols "on"
@@ -105,10 +86,6 @@ project "game"
 
     targetdir ("bin/" .. outputdir .. "/%{prj.name}")
     objdir ("obj/" .. outputdir .. "/%{prj.name}")
-
-    defines {
-        "GLFW_INCLUDED_NONE"
-    }
 
     files {
         "%{prj.name}/src/**.c",
@@ -132,20 +109,60 @@ project "game"
         "cglm",
     }
 
+    libdirs {
+        "vendor/glad/bin/" .. outputdir .. "/glad",
+        "vendor/glfw/bin/" .. outputdir .. "/glfw",
+        "bin/" .. outputdir .. "/lince"
+    }
+
     filter "system:windows"
-        links {
-            "opengl32"
-        }
+        systemversion "latest"
+        defines {"_CRT_SECURE_NO_WARNINGS"}
+        links {"opengl32"}
 
     filter "system:linux"
-        links {
-            "GL",
-            "rt",
-            "m",
-            "dl",
-            "pthread",
-            "X11"
-        }
+        systemversion "latest"    
+        links {"GL","rt","m","dl","pthread","X11"}
+        
+    filter "configurations:Debug"
+        symbols "on"
+        defines {"LINCE_DEBUG"}
+
+    filter "configurations:Release"
+        optimize "on"
+        defines {"LINCE_RELEASE"}
+
+
+project "pong"
+    location "games/pong"
+    kind "ConsoleApp"
+    language "C"
+    staticruntime "on"
+
+    targetdir ("bin/" .. outputdir .. "/%{prj.name}")
+    objdir ("obj/" .. outputdir .. "/%{prj.name}")
+
+    files {
+        "games/%{prj.name}/src/**.c",
+        "games/%{prj.name}/src/**.h",
+    }
+    
+    includedirs {
+        "games/%{prj.name}",
+        "games/%{prj.name}/src",
+        "engine",
+        "engine/src",
+        "%{IncludeDir.glfw}",
+        "%{IncludeDir.glad}",
+        "%{IncludeDir.cglm}"
+    }
+
+    links {
+        "lince",
+        "GLAD",
+        "glfw",
+        "cglm",
+    }
 
     libdirs {
         "vendor/glad/bin/" .. outputdir .. "/glad",
@@ -153,22 +170,74 @@ project "game"
         "bin/" .. outputdir .. "/lince"
     }
 
-    defines {
-        "GLFW_INCLUDE_NONE"
-    }
-
-    filter "system:linux"
-        systemversion "latest"
-        defines {"LINCE_LINUX"}
-    
     filter "system:windows"
         systemversion "latest"
-        defines {"LINCE_WINDOWS", "_CRT_SECURE_NO_WARNINGS"}
-    
+        defines {"_CRT_SECURE_NO_WARNINGS"}
+        links {"opengl32"}
+
+    filter "system:linux"
+        systemversion "latest"    
+        links {"GL","rt","m","dl","pthread","X11"}
+            
     filter "configurations:Debug"
-        defines "LINCE_DEBUG"
         symbols "on"
+        defines {"LINCE_DEBUG"}
 
     filter "configurations:Release"
-        defines "LINCE_RELEASE"
         optimize "on"
+        defines {"LINCE_RELEASE"}
+
+    
+project "mcommand"
+    location "games/mcommand"
+    kind "ConsoleApp"
+    language "C"
+    staticruntime "on"
+
+    targetdir ("bin/" .. outputdir .. "/%{prj.name}")
+    objdir ("obj/" .. outputdir .. "/%{prj.name}")
+
+    files {
+        "games/%{prj.name}/src/**.c",
+        "games/%{prj.name}/src/**.h",
+    }
+    
+    includedirs {
+        "games/%{prj.name}",
+        "games/%{prj.name}/src",
+        "engine",
+        "engine/src",
+        "%{IncludeDir.glfw}",
+        "%{IncludeDir.glad}",
+        "%{IncludeDir.cglm}"
+    }
+
+    links {
+        "lince",
+        "GLAD",
+        "glfw",
+        "cglm",
+    }
+
+    libdirs {
+        "vendor/glad/bin/" .. outputdir .. "/glad",
+        "vendor/glfw/bin/" .. outputdir .. "/glfw",
+        "bin/" .. outputdir .. "/lince"
+    }
+
+    filter "system:windows"
+        systemversion "latest"
+        defines {"_CRT_SECURE_NO_WARNINGS"}
+        links {"opengl32"}
+
+    filter "system:linux"
+        systemversion "latest"    
+        links {"GL","rt","m","dl","pthread","X11"}
+            
+    filter "configurations:Debug"
+        symbols "on"
+        defines {"LINCE_DEBUG"}
+
+    filter "configurations:Release"
+        optimize "on"
+        defines {"LINCE_RELEASE"}
