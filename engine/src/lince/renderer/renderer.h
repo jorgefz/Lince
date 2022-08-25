@@ -9,6 +9,17 @@
 #include "lince/core/window.h"
 #include "lince/tiles/tileset.h"
 
+/*
+Calculates the z-order based on the 'y' value of the position.
+    - `float y`: y coordinate
+    - `vec2 ylim`: limits on the value of 'y' (min and max)
+    - `vec2 zlim`: limits on the value of 'z' (min and max)
+
+Equation for normalising a number in a range to another range:
+    xnorm = (bmax - bmin) * (x - amin) / (amax - amin) + bmin
+*/
+float LinceYSortedZ(float y, vec2 ylim, vec2 zlim);
+
 /* Quad properties, serves as argument for LinceRenderQuad */
 typedef struct LinceQuadProps{
 	float x, y; 			// 2D position

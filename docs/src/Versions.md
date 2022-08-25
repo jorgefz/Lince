@@ -2,6 +2,15 @@
 
 Version codes follow [Semantic Versioning](https://semver.org/).
 
+## v0.4.0
+- Added simple tilemaps - `LinceTilemap`
+- Simplified premake5 script somewhat
+- Refactored Missile Command debug text as a movable and minimizable Nuklear window, as the text boxes where consuming the click events
+- Added memory management functions: LinceMalloc, LinceNewCopy, etc
+- Added allocation macros allowing for custom allocation functions - `LINCE_MALLOC`, `LINCE_CALLOC`, `LINCE_REALLOC`, and `LINCE_FREE`
+- Added `LinceForeach` macro for iterating over array items
+- Added calculation for z-order based on the y coordinate `LinceYSortedZ`
+
 ## v0.3.1
 - Renamed and moved the 2D renderer shader files to 'engine/assets/shaders'
 - Updated premake5 lua script

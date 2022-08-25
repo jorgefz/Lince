@@ -15,6 +15,13 @@
 #define MAX_INDICES (MAX_QUADS * QUAD_INDEX_COUNT)   // max number of indices in a batch
 #define MAX_TEXTURE_SLOTS 32   // max number of textures the GPU can bind simultaneously
 
+/* Calculates Z order from Y coordinate */
+float LinceYSortedZ(float y, vec2 ylim, vec2 zlim){
+    float ynorm = (y - ylim[0]) / (ylim[1]-ylim[0]);
+    float z = (zlim[0] - zlim[1]) * ynorm + zlim[1];
+    return z;
+}
+
 // stores information of one vertex
 // ensure this struct has no padding
 typedef struct LinceQuadVertex {

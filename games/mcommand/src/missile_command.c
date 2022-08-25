@@ -436,6 +436,39 @@ void DrawBombs(GameState* state){
 	}
 }
 
+void DrawText(struct nk_context *ctx, nk_flags align, const char* text, ...){
+	char buffer[100];
+	va_list args;
+
+	va_start(args, text);
+	vsnprintf(buffer, 100, text, args);
+	nk_label(ctx, buffer, align);
+	va_end(args);
+}
+
+void DrawDebugUI(GameState* data){
+	LinceUILayer* ui = LinceGetAppState()->ui;
+
+	struct nk_rect size = {.x=50, .y=50, .w=200, .h=300};
+	
+	nk_style_set_font(ui->ctx, &ui->fonts[LinceFont_Droid20]->handle);
+	if(nk_begin(ui->ctx, "Debug Info", size, 
+		NK_WINDOW_BORDER | NK_WINDOW_MINIMIZABLE | NK_WINDOW_MOVABLE )){
+		
+		nk_layout_row_dynamic(ui->ctx, 20, 1);
+		DrawText(ui->ctx, NK_TEXT_LEFT, "Angle: %.2f", data->angle);
+		DrawText(ui->ctx, NK_TEXT_LEFT, "Cooldown: %.2f", data->bomb_cooldown);
+		DrawText(ui->ctx, NK_TEXT_LEFT, "HP: %d", data->hp);
+		DrawText(ui->ctx, NK_TEXT_LEFT, "Score: %d", data->score);
+		DrawText(ui->ctx, NK_TEXT_LEFT, "Missiles: %d",  data->missile_count);
+		DrawText(ui->ctx, NK_TEXT_LEFT, "Bombs: %d",  data->bomb_count);
+		DrawText(ui->ctx, NK_TEXT_LEFT, "Markers: %d",  data->marker_count);
+		DrawText(ui->ctx, NK_TEXT_LEFT, "Blasts: %d",  data->blast_count);
+	}
+	nk_end(ui->ctx);
+
+}
+
 void MCommandOnAttach(LinceLayer* layer){
 
 	GameState* data = LinceGetLayerData(layer);
@@ -502,16 +535,7 @@ void MCommandOnUpdate(LinceLayer* layer, float dt){
 	CheckBombIntercept(data);
 	UpdateBlasts(data);
 	
-	// draw UI
-	LinceUIText(ui, "Angle",    40, 20,  LinceFont_Droid30, 20, "Angle: %.2f",  angle);
-	LinceUIText(ui, "BombCool", 40, 40,  LinceFont_Droid30, 20, "Cooldown: %.2f",  data->bomb_cooldown);
-	LinceUIText(ui, "HP",       40, 60,  LinceFont_Droid30, 20, "HP: %d",  data->hp);
-	LinceUIText(ui, "Score",    40, 80,  LinceFont_Droid30, 20, "Score: %d",  data->score);
-
-	LinceUIText(ui, "Missiles", 40, 120,  LinceFont_Droid30, 20, "Missiles: %d",  data->missile_count);
-	LinceUIText(ui, "Bombs",    40, 140,  LinceFont_Droid30, 20, "Bombs: %d",  data->bomb_count);
-	LinceUIText(ui, "Markers",  40, 160,  LinceFont_Droid30, 20, "Markers: %d",  data->marker_count);
-	LinceUIText(ui, "Blasts",   40, 180,  LinceFont_Droid30, 20, "Blasts: %d",  data->blast_count);
+	DrawDebugUI(data);
 
 	// draw objects
 	LinceBeginScene(data->cam);

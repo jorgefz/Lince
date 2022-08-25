@@ -64,7 +64,6 @@ LINCE_STR_MAX
 #endif
 
 /* Debugging */
-
 #define LINCE_UNUSED(x) (void)(x)
 
 #ifndef LINCE_LOGFILE
@@ -99,5 +98,34 @@ LINCE_STR_MAX
 #define LINCE_STR_MAX 1000 /* used for longer buffers */
 typedef enum LinceBool{ LinceFalse = 0, LinceTrue = 1 } LinceBool;
 
+
+/* Loops & utils */
+
+/*
+Loops over the items in an array.
+    item:   pointer to an element of the array. Must be declared before.
+    array:  pointer to the beginning of memory where data is stored.
+    len:    number of items in the array
+*/
+#define LinceForeach(item, array, len) for(item = array; item != array+len; ++item)
+
+
+/* Memory */
+
+#ifndef LINCE_MALLOC
+#define LINCE_MALLOC malloc
+#endif
+
+#ifndef LINCE_CALLOC
+#define LINCE_CALLOC calloc
+#endif
+
+#ifndef LINCE_REALLOC
+#define LINCE_REALLOC realloc
+#endif
+
+#ifndef LINCE_FREE
+#define LINCE_FREE free
+#endif
 
 #endif // LINCE_CORE_H

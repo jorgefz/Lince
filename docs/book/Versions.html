@@ -136,6 +136,16 @@
                     <main>
                         <h1 id="version-history"><a class="header" href="#version-history">Version History</a></h1>
 <p>Version codes follow <a href="https://semver.org/">Semantic Versioning</a>.</p>
+<h2 id="v040"><a class="header" href="#v040">v0.4.0</a></h2>
+<ul>
+<li>Added simple tilemaps - <code>LinceTilemap</code></li>
+<li>Simplified premake5 script somewhat</li>
+<li>Refactored Missile Command debug text as a movable and minimizable Nuklear window, as the text boxes where consuming the click events</li>
+<li>Added memory management functions: LinceMalloc, LinceNewCopy, etc</li>
+<li>Added allocation macros allowing for custom allocation functions - <code>LINCE_MALLOC</code>, <code>LINCE_CALLOC</code>, <code>LINCE_REALLOC</code>, and <code>LINCE_FREE</code></li>
+<li>Added <code>LinceForeach</code> macro for iterating over array items</li>
+<li>Added calculation for z-order based on the y coordinate <code>LinceYSortedZ</code></li>
+</ul>
 <h2 id="v031"><a class="header" href="#v031">v0.3.1</a></h2>
 <ul>
 <li>Renamed and moved the 2D renderer shader files to 'engine/assets/shaders'</li>

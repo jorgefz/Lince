@@ -172,11 +172,16 @@
 </ol>
 </li>
 </ol>
+<h2 id="scenes"><a class="header" href="#scenes">Scenes</a></h2>
+<ol>
+<li>🔷 Add static and parallax backgrounds</li>
+<li>🔷 Create scenes which can hold quads, and different scenes represent different screens/menus, etc. E.g. LinceScene, LinceScenePushQuad, LinceDrawScene, etc.</li>
+</ol>
 <h2 id="tile-system"><a class="header" href="#tile-system">Tile System</a></h2>
 <ol>
-<li>✅Develip tile-based sprite animations</li>
-<li>💛 Improve tile animations with callbacks and custom tile order</li>
-<li>🔷 Add tilemap system</li>
+<li>✅ <strong>Develop tile-based sprite animations</strong></li>
+<li>✅ <strong>Improve tile animations with callbacks and custom tile order</strong></li>
+<li>🔷 Add tilemaps</li>
 </ol>
 <h2 id="2d-renderer"><a class="header" href="#2d-renderer">2D Renderer</a></h2>
 <ol>
@@ -186,7 +191,7 @@
 <li>🟠 Add z-order with translucency support</li>
 <li>✅ <strong>Move renderer initialisation and termination to the engine, away from the user</strong></li>
 </ol>
-<h2 id="nuklear"><a class="header" href="#nuklear">Nuklear</a></h2>
+<h2 id="gui"><a class="header" href="#gui">GUI</a></h2>
 <ol>
 <li>✅ <strong>Add Nuklear to project with appropriate backend</strong></li>
 <li>✅ <strong>Add Nuklear layer and render GUI</strong></li>
@@ -194,14 +199,18 @@
 <li>✅ <strong>Stop Nuklear API from exposing GLFW and OpenGL API to the user</strong></li>
 <li>✅ <strong>Move Nuklear rendering layer to the engine</strong></li>
 <li>🔷 Provide UI callback to layers</li>
+<li>🟠 Improve LinceUIText</li>
 </ol>
 <h2 id="api-ease-of-use"><a class="header" href="#api-ease-of-use">API ease of use</a></h2>
 <ol>
 <li>💛 Add more user settings prior to calling <code>LinceRun</code></li>
+<li>🟠 Add <code>LinceLoadTexture</code> function with an extra argument for flags, i.e. flipping by the y axis on load.</li>
+<li>🟠 Add memory management functions, e.g. LinceMalloc, LinceNewCopy, etc</li>
 </ol>
 <h2 id="bugs"><a class="header" href="#bugs">Bugs</a></h2>
 <ol>
-<li>Missile Command: some quads persist on the screen</li>
+<li>✅ <strong>(Solved)</strong> Missile Command: some quads persist on the screen</li>
+<li>🟠 Draw text overlay without consuming click events</li>
 </ol>
 <h2 id="next-goals"><a class="header" href="#next-goals">Next goals</a></h2>
 <ol>
@@ -209,6 +218,7 @@
 <li>💛 Add tilesets</li>
 <li>🔷 Add tilemaps</li>
 <li>🔷 Make small games to test the engine</li>
+<li>🔷 Make a tilemap editor</li>
 <li>🔷 Add audio library, e.g. <a href="https://github.com/mackron/miniaudio">Miniaudio</a></li>
 </ol>
 <h2 id="extrarecurrent-goals"><a class="header" href="#extrarecurrent-goals">Extra/recurrent goals</a></h2>

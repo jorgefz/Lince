@@ -11,6 +11,23 @@ workspace "lince"
 
     warnings "Extra"
 
+    filter "system:windows"
+        systemversion "latest"
+        defines {"_CRT_SECURE_NO_WARNINGS"}
+        links {"opengl32"}
+
+    filter "system:linux"
+        systemversion "latest"    
+        links {"GL","rt","m","dl","pthread","X11"}
+        
+    filter "configurations:Debug"
+        symbols "on"
+        defines {"LINCE_DEBUG"}
+
+    filter "configurations:Release"
+        optimize "on"
+        defines {"LINCE_RELEASE"}
+
 
 outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
@@ -59,24 +76,6 @@ project "lince"
         "vendor/glfw/bin/" .. outputdir .. "/glfw",
     }
 
-    filter "system:linux"
-        systemversion "latest"
-        defines {"LINCE_LINUX"}
-        links {"GL","rt","m","dl","pthread","X11"}
-    
-    filter "system:windows"
-        systemversion "latest"
-        defines {"LINCE_WINDOWS", "_CRT_SECURE_NO_WARNINGS"}
-        links {"opengl32"}
-
-    filter "configurations:Debug"
-        defines "LINCE_DEBUG"
-        symbols "on"
-
-    filter "configurations:Release"
-        defines "LINCE_RELEASE"
-        optimize "on"
-
 
 project "game"
     location "game"
@@ -114,23 +113,6 @@ project "game"
         "vendor/glfw/bin/" .. outputdir .. "/glfw",
         "bin/" .. outputdir .. "/lince"
     }
-
-    filter "system:windows"
-        systemversion "latest"
-        defines {"_CRT_SECURE_NO_WARNINGS"}
-        links {"opengl32"}
-
-    filter "system:linux"
-        systemversion "latest"    
-        links {"GL","rt","m","dl","pthread","X11"}
-        
-    filter "configurations:Debug"
-        symbols "on"
-        defines {"LINCE_DEBUG"}
-
-    filter "configurations:Release"
-        optimize "on"
-        defines {"LINCE_RELEASE"}
 
 
 project "pong"
@@ -170,23 +152,6 @@ project "pong"
         "bin/" .. outputdir .. "/lince"
     }
 
-    filter "system:windows"
-        systemversion "latest"
-        defines {"_CRT_SECURE_NO_WARNINGS"}
-        links {"opengl32"}
-
-    filter "system:linux"
-        systemversion "latest"    
-        links {"GL","rt","m","dl","pthread","X11"}
-            
-    filter "configurations:Debug"
-        symbols "on"
-        defines {"LINCE_DEBUG"}
-
-    filter "configurations:Release"
-        optimize "on"
-        defines {"LINCE_RELEASE"}
-
     
 project "mcommand"
     location "games/mcommand"
@@ -224,20 +189,3 @@ project "mcommand"
         "vendor/glfw/bin/" .. outputdir .. "/glfw",
         "bin/" .. outputdir .. "/lince"
     }
-
-    filter "system:windows"
-        systemversion "latest"
-        defines {"_CRT_SECURE_NO_WARNINGS"}
-        links {"opengl32"}
-
-    filter "system:linux"
-        systemversion "latest"    
-        links {"GL","rt","m","dl","pthread","X11"}
-            
-    filter "configurations:Debug"
-        symbols "on"
-        defines {"LINCE_DEBUG"}
-
-    filter "configurations:Release"
-        optimize "on"
-        defines {"LINCE_RELEASE"}
