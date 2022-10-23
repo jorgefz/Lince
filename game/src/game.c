@@ -11,6 +11,8 @@
 
 #include "nk_test.h"
 
+#include "collider.h"
+
 
 enum { BLOCK_FREE = 0, BLOCK_SOLID = 1 };
 
@@ -79,7 +81,7 @@ LinceTile* LoadTilesFromTexture(const char* texture_file, size_t* length, float 
     return tiles;
 }
 
-const uint32_t tm_width = 16, tm_height = 10;
+const uint32_t tm_width = 16, tm_height = 20;
 uint32_t tilemap_data[] = {
 105, 105, 105, 105, 105, 105, 105, 105, 105, 105, 105, 105, 105, 105, 105, 105, 
 112, 112, 110, 105, 105, 105, 105, 105, 105, 105, 105, 105, 105, 105, 105, 105, 
@@ -90,6 +92,16 @@ uint32_t tilemap_data[] = {
 124, 122, 122, 122, 122, 122, 104, 105, 105, 105, 106, 122, 122, 122, 122, 124, 
 124, 122, 122, 122, 122, 122, 114, 105, 105, 105, 107, 102, 122, 122, 122, 124, 
 100, 100, 100, 100, 100, 100, 113, 105, 105, 105, 111,  99, 122, 122, 122, 124, 
+105, 105, 105, 105, 105, 105, 105, 105, 105,  94,  99, 122, 122, 122, 122, 122, 
+105, 105, 105, 105, 105, 105, 105, 105, 105, 106, 122, 122, 122, 122, 122, 122, 
+105, 105, 105, 105, 105, 105, 105, 105, 105, 106, 122, 122, 122, 122, 122, 122, 
+105, 105, 105, 105, 105, 105, 105, 105, 105, 106, 122, 122, 122, 122, 122, 122, 
+105, 105, 105, 105, 105, 105, 105, 105, 105, 106, 122, 122, 123, 122, 122, 122, 
+105, 105, 105, 105, 105, 105, 105, 105, 105, 106, 122, 122, 122, 122, 122, 124, 
+105, 105, 105, 105, 105, 105, 105, 105, 105, 107, 102, 122, 122, 122, 122, 124, 
+105, 105, 105, 105, 105, 105, 105, 105, 105, 105, 106, 122, 122, 122, 122, 124, 
+105, 105, 105, 105, 105, 105, 105, 105, 105, 105, 107, 102, 122, 122, 122, 124, 
+105, 105, 105, 105, 105, 105, 105, 105, 105, 105, 111,  99, 122, 122, 122, 124, 
 105, 105, 105, 105, 105, 105, 105, 105, 105,  94,  99, 122, 122, 122, 122, 122, 
 };
 
@@ -102,51 +114,66 @@ uint32_t tilemap_bkg[] = {
  12,   6,   6,   6,   6,  12,  12,  12,  12,  12,  43,  44,  45,  46,  47,  12, 
  12,   6,   6,   6,   6,  12,  12,  12,  12,  12,  56,  57,  58,  59,  60,  12, 
  12,   6,   6,   6,   6,  12,  12,  12,  12,  12,  69,  70,  71,  72,  73,  12, 
- 12,  12,  12,  12,  12,  12,  12,  12,  12,  12,  12,  83,  84,  85,  12,  12, 
- 12,  12,  12,  12,  12,  12,  12,  12,  12,  12,  12,  12,  12,  12,  12,  12,
+ 12,  12,  12,  12,  12,  12,  12,  12,  12, 129, 129,  83,  84,  85,  12,  12, 
+ 12,  12,  12,  12,  12,  12,  12,  12,  12, 129, 129,  12,  12,  12,  12,  12, 
+ 12,  12,  12,  12,  12,  12,  12,  12, 109, 129, 129, 129, 129, 129, 129, 129, 
+ 12,  12, 128,  12,  12, 128,  12, 109, 109, 129, 129,  10,  10,  10,  10, 129, 
+ 12,  12, 128, 109,  12, 128, 105,  12,  12, 129, 129,  10,  10,  10,  10, 129, 
+ 12,  17, 128,  12,  12, 128,  12,  12,  12, 129, 129,  10,  10,  10,  10, 129, 
+ 12,  17,  26,  27,  28,  29,  12, 105, 109, 129, 129,  10,  10,  10,  10, 129, 
+ 12, 129,  39,  40,  41,  42,  12,  12,  12,  12, 129, 129, 129, 129, 129, 129, 
+ 12, 129,  52,  53,  54,  55,  12,  12,  12,  12, 129, 129,  22,  22,  22, 129, 
+ 12, 129,  65,  66,  67,  68,  12,  12,  12,  12, 129, 129,  22,  22,  22, 129, 
+ 12,  12,  12,  79,  80,  81,  12,  12,  12,  12, 129, 129,  22,  22,  22, 129, 
+ 12,  12,  12,  12,  12,  12,  12,  12,  12,  12, 129, 129, 129, 129, 129, 129,
 };
 
 uint8_t tilemap_solid[] = {
     1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 
     1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 
-    1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 
     1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 
     1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 
-    1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 
-    1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 
+    1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 1, 1, 1, 1, 1, 
+    1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 
     1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 
     1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 
-    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 
+    1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 
+    1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 
+    1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 
+    1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 
+    1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 
+    1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 
+    1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 
+    1, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 
+    1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 
+    1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 
+    1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 
+    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
 };
 
 
 void DrawCollisionTiles(LinceTilemap* tm){
     if(!tm || !tm->logic_grid) return;
 
+    LinceDrawTilemap(tm);
+
     for(size_t j = 0; j != tm->height; ++j){
         for(size_t i = 0; i != tm->width; ++i){
             size_t idx = j*tm->width + i;
-            LinceTile* tile = &tm->tileset[tm->base_grid[idx]];
-
+            if(tm->logic_grid[idx] != BLOCK_SOLID){
+                continue;
+            }
             LinceQuadProps quad = {
                 .x = (float)i - tm->offset[0],
                 .y = (float)j - tm->offset[1],
                 .w = 1.001f, .h = 1.001f,
-                .zorder = 0.0,
-                .color = {1,1,1,0.3},
-                .tile = tile,
+                .zorder = 0.9,
+                .color = {1,0,0,0.3},
             };
-            if(tm->logic_grid[idx] == BLOCK_SOLID){
-                quad.color[1] = 0, quad.color[2] = 0;
-            }
-            LinceDrawQuad(quad);
-            // Bkg tiles
-            quad.tile = &tm->tileset[tm->bkg_grid[idx]];
             LinceDrawQuad(quad);
         }
     }
 }
-
 
 
 
@@ -163,6 +190,7 @@ int GetTilemapIndexAtPos(LinceTilemap* tm, vec2 pos, vec2 xy_ind){
     }
     return -1;
 }
+
 
 int GetTilemapIndexAtMouse(LinceTilemap* tm, LinceCamera* cam, vec2 xy_ind){
     vec2 mouse_pos;
@@ -201,70 +229,28 @@ LinceTile* GetTileAtMouse(LinceTilemap* tm, LinceCamera* cam){
     return NULL;
 }
 
-enum {NO_COLLISION = 0, COLLISION_X, COLLISION_Y};
 
-LinceBool LinceTilemapCheckCollision(LinceTilemap* tm, vec2 pos, vec2 size){
-
-    /*
-    // Get tile at player position
-    vec2 tm_xy;
-    int tm_idx = GetTilemapIndexAtPos(tm, pos, tm_xy);
-
-    // Get indices of 9 adjacent tiles (below,above,left,right)
-    int32_t x_idx[] = {(int)tm_xy[0]-1, (int)tm_xy[0], (int)tm_xy[0]+1};
-    int32_t y_idx[] = {(int)tm_xy[1]-1, (int)tm_xy[1], (int)tm_xy[1]+1};
-    
-    // Get world positions of these tiles
-    float xp = tm_xy[0] - tm->offset[0];
-    float x_pos[] = {xp - 1.0f, xp, xp + 1.0f};
-    float yp = tm_xy[1] - tm->offset[1];
-    float y_pos[] = {yp - 1.0f, yp, yp + 1.0f};
-
-    // Assume a tile is a 1x1 square
-    vec2 tile_size = {1.0f, 1.0f};
-
-    printf("x:[%.0f %.0f %.0f] y:[%.0f %.0f %.0f]\n",
-        x_pos[0], x_pos[1], x_pos[2],
-        y_pos[0], y_pos[1], y_pos[2]
-    );
-
-    for (int i = 0; i != 3; ++i){ // loop over horizontal tiles
-        if(x_idx[i] < 0 || x_idx[i] >= tm->width) continue;
-
-        for(int j = 0; j != 3; ++j){ // loop over horizontal tiles
-            if(y_idx[j] < 0 || y_idx[j] >= tm->height) continue;
-
-            vec2 tile_pos = {x_pos[i], y_pos[j]};
-
-            if( tm->logic_grid[x_idx[i]*tm->height + y_idx[j]] == BLOCK_SOLID
-                && LinceCollision2D(pos, size, tile_pos, tile_size)){
-                
-                printf("Collision of player at %.0f %.0f with %.0f %.0f\n",
-                    tile_pos[0], tile_pos[1],
-                    pos[0], pos[1]);
-                return LinceTrue;
-            }
-        }
-    }
-    */
-
+int LinceTilemapCheckCollision(LinceTilemap* tm, LinceBoxCollider player_box){
     for(size_t i = 0; i != tm->width; ++i){
         for(size_t j = 0; j != tm->height; ++j){
-            vec2 tile_pos = {(float)i - tm->offset[0], (float)j - tm->offset[1]};
-            vec2 tile_size = {1.0f, 1.0f};
-            LinceBool is_solid = (tm->logic_grid[i*tm->height + j] == BLOCK_SOLID);
-            LinceBool collides = LinceCollision2D(pos, size, tile_pos, tile_size);
-            printf("%d %d \n", is_solid, collides);
-            if(is_solid && collides){
-                printf("-> %.0f %.0f CRASH %.0f %.0f\n",
-                    tile_pos[0], tile_pos[1],
-                    pos[0], pos[1]);
-                return LinceTrue;
-            }
+
+            size_t idx = j * tm->width + i;
+            if(tm->logic_grid[idx] != BLOCK_SOLID) continue;
+
+            LinceBoxCollider box = {
+                .pos = {
+                    (float)i - tm->offset[0],
+                    (float)j - tm->offset[1],
+                },
+                .size = {1.0f, 1.0f}
+            };
+            
+            int result = LinceCollideBox(&player_box, &box);
+            if(result != LinceBoxCollision_None) return result; 
         }
     }
 
-    return LinceFalse;
+    return LinceBoxCollision_None;
 }
 
 
@@ -323,43 +309,18 @@ typedef struct TestLayer {
     LinceTileAnim* chicken_anim;
 
     LinceTexture* tileset;
+    LinceTexture* tileset_noflip;
     LinceTilemap* tilemap;
 
     int chosen_menu_tile;
 
 } TestLayer;
 
-
+/*
+Highlights the tile where the mouse is
+*/
 void DrawHoverTile(TestLayer* data){
-    
-    LinceTile* hover_tile = GetTileAtMouse(data->tilemap, data->cam);
-    LinceDrawQuad((LinceQuadProps){
-        .x = data->cam->pos[0] - 0.5f,
-        .y = data->cam->pos[1],
-        .w = 0.35f, .h = 0.35f,
-        .color = {0,0,0,1},
-        .zorder = 0.85
-    });
-    if(hover_tile) {
-        LinceDrawQuad((LinceQuadProps){
-            .x = data->cam->pos[0]- 0.5f,
-            .y = data->cam->pos[1],
-            .w = 0.3f, .h = 0.3f,
-            .color = {1,1,1,1},
-            .tile = hover_tile,
-            .zorder = 0.9
-        });
-    } else {
-        LinceDrawQuad((LinceQuadProps){
-            .x = data->cam->pos[0] - 0.5f,
-            .y = data->cam->pos[1],
-            .w = 0.3f, .h = 0.3f,
-            .color = {1,0,0,1},
-            .zorder = 0.9
-        });
-    }
 
-    // Highlight hovered tile
     vec2 xy_ind;
     int chosen_tile = GetTilemapIndexAtMouse(data->tilemap, data->cam, xy_ind);
     if(chosen_tile == -1) return;
@@ -368,7 +329,7 @@ void DrawHoverTile(TestLayer* data){
         .x = xy_ind[0] - data->tilemap->offset[0],
         .y = xy_ind[1] - data->tilemap->offset[1],
         .w = 1.001f, .h = 1.001f,
-        .color = {1,0,0,0.2},
+        .color = {1,1,1,0.3},
         .zorder = 0.9
     });
 }
@@ -417,40 +378,41 @@ void MovePlayer(TestLayer* data){
         default: break;
         };
     }
+    
+    LinceBoxCollider player_box = {
+        .pos = {next_pos[0], next_pos[1] - 0.5f},
+        .size = {0.5f, 0.5f}
+    };
 
-    // COLLISION
-    /*
-    vec2 tm_xy;
-    vec2 tile_size = {1.0f, 1.0f};
-    vec2 tile_pos;
-    vec2 player_size = {1.0f, 1.0f};
-    int tm_idx;
+    int collision_result = LinceTilemapCheckCollision(data->tilemap, player_box);
 
-    // Current tile
-    tm_idx = GetTilemapIndexAtPos(data->tilemap, next_pos, tm_xy);
-    tile_pos[0] = tm_xy[0] - data->tilemap->offset[0];
-    tile_pos[1] = tm_xy[1] - data->tilemap->offset[1];
-
-    LinceBool is_solid = (data->tilemap->logic_grid[tm_idx] == BLOCK_SOLID);
-    LinceBool collides = LinceCollision2D(next_pos, player_size, tile_pos, tile_size);
-
-    printf("%0.f,%0.f: %d %d\n", tile_pos[0], tile_pos[1], is_solid, collides);
-
-    if(is_solid && collides){
-        printf("Collision at %.1f %.1f!\n", tm_xy[0], tm_xy[1]);
-    } else {
+    if(!(collision_result & LinceBoxCollision_X)){
         data->cam->pos[0] = next_pos[0];
+    }
+    if(!(collision_result & LinceBoxCollision_Y)){
         data->cam->pos[1] = next_pos[1];
     }
-    */
     
-    // if( !LinceTilemapCheckCollision(data->tilemap, next_pos, player_size)){
+    // if( !LinceTilemapCheckCollision(data->tilemap, player_box) ){
     //     data->cam->pos[0] = next_pos[0];
     //     data->cam->pos[1] = next_pos[1];
     // }
-    
-    data->cam->pos[0] = next_pos[0];
-    data->cam->pos[1] = next_pos[1];
+
+    // Player box
+    /*
+	LinceDrawQuad((LinceQuadProps){
+        .x = player_box.pos[0],
+        .y = player_box.pos[1],
+        .w = player_box.size[0],
+        .h = player_box.size[1],
+        .color = {0.5,0.7,1,1},
+        .zorder = 0.8
+    });
+	*/
+
+
+    // data->cam->pos[0] = next_pos[0];
+    // data->cam->pos[1] = next_pos[1];
 
     data->player_anim->order[0] = data->player_anim_order[next_anim*2];
     data->player_anim->order[1] = data->player_anim_order[next_anim*2+1];
@@ -474,6 +436,7 @@ void TestLayerOnAttach(LinceLayer* layer) {
     data->tex_front = LinceCreateTexture("PatrickF", "game/assets/textures/front.png");
     data->tex_back  = LinceCreateTexture("PatrickB", "game/assets/textures/back.png");
     data->tileset = LinceCreateTexture("Tileset", "game/assets/textures/shubibubi-cozy-farm.png");
+    data->tileset_noflip = LinceLoadTexture("Tileset", "game/assets/textures/shubibubi-cozy-farm.png", 0);
     data->walking_tileset = LinceCreateTexture("Walking", "game/assets/textures/elv-games-movement.png");
 
     // Tilemap & tileset
@@ -597,6 +560,7 @@ void DrawGUI(TestLayer* data){
     // TOP BAR
     float topbar_height = 50;
     static LinceBool show_new_tm_popup = LinceFalse;
+    LINCE_UNUSED(show_new_tm_popup);
     
     if (nk_begin(ui->ctx, "TopBar", nk_rect(0,0, width, topbar_height), 0)){
 
@@ -643,13 +607,18 @@ void DrawGUI(TestLayer* data){
                 .h = tile->tilesize[1] * tile->cellsize[1]        
             };
             struct nk_image img = nk_subimage_id(
-                data->tileset->id,
-                data->tileset->width,
-                data->tileset->height,
+                data->tileset_noflip->id,
+                data->tileset_noflip->width,
+                data->tileset_noflip->height,
                 rect
             );
             if( nk_button_image(ui->ctx, img) ){
-                data->chosen_menu_tile = i;
+                // convert unflipped to flipped coordinates
+                size_t w = data->tileset_noflip->width  / (size_t)(tile->cellsize[0]);
+                size_t h = data->tileset_noflip->height / (size_t)(tile->cellsize[1]);
+                size_t x = i % w;
+                size_t y = h - i / w - 1;
+                data->chosen_menu_tile = x + w * y;
             }
         }
     }
@@ -662,6 +631,7 @@ void TestLayerOnUpdate(LinceLayer* layer, float dt) {
     TestLayer* data = LinceGetLayerData(layer);
     data->dt = dt;
     LinceUILayer* ui = LinceGetAppState()->ui;
+    LINCE_UNUSED(ui);
 
     // UI
     DrawGUI(data);
@@ -694,7 +664,7 @@ void TestLayerOnUpdate(LinceLayer* layer, float dt) {
     LinceDrawQuad((LinceQuadProps){
         .x=5.0f, .y=3.0f,
         .w=1.0f, .h=1.0f,
-        .color={1,1,1,1},
+        .color = {1,1,1,1},
         .tile = data->chicken_anim->current_tile,
         .zorder = LinceYSortedZ(
             3.0f-0.5f,
@@ -720,6 +690,7 @@ void TestLayerOnUpdate(LinceLayer* layer, float dt) {
 
     // Selected tile
     DrawHoverTile(data);
+
     
     LinceEndScene();
 }

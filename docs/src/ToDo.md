@@ -26,14 +26,32 @@
 	1. Integrate OpenAL
 	2. Build audio API
 
+## Project Structure
+1. 💛 Embed engine resources within the code (e.g. default shaders and textures)
+2. 🟠 Create test suite for the engine
+3. 🟠 Improve documentation - perhaps move to a separate github repo.
+4. 🔷 Restructure engine to be in a separate folder, that can be included into the user's main game project.
+5. 🔷 Add benchmarking and identify slowest pieces of code that can be optimized.
+6. 🔷 Improve code speed & efficiency, e.g. place shader uniforms in a key-value map
+
+## Data
+1. 🔷 Add data structures, e.g. linked lists, hashmaps, etc. 
+
+## Audio
+1. 🔷 Integrate an audio library into the project (OpenAL or simpler library)
+
+## Physics
+1. 💛 Add simple box colliders and algorithm to check
+
 ## Scenes
 1. 🔷 Add static and parallax backgrounds
 2. 🔷 Create scenes which can hold quads, and different scenes represent different screens/menus, etc. E.g. LinceScene, LinceScenePushQuad, LinceDrawScene, etc.
+3. ✅ `LinceLoadTexture` function that takes extra flags, such as flipping on the Y axis.
 
 ## Tile System
 1. ✅ **Develop tile-based sprite animations**
 2. ✅ **Improve tile animations with callbacks and custom tile order**
-2. 🔷 Add tilemaps
+2. 💛 Add tilemaps
 
 ## 2D Renderer
 1. ✅ **Add basic 2D renderer using immediate-mode scenes and quads**

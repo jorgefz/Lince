@@ -8,6 +8,18 @@
 - `int32_t data_format`
 - `int32_t internal_format`
 
+## LinceTextureFlags
+| Enum | Value | Description |
+| ---- | ----- | ----------- |
+| LinceTexture_Default | 0x0 | No modifications applied |
+| LinceTexture_FlipY | 0x1 | Flips texture vertically on load |
+
+## LinceCreateTexture
+```c
+LinceTexture* LinceLoadTexture(const char* name, const char* path, uint32_t flags)
+```
+Loads a texture from a file at 'path', using a string 'name' as ID, and applies defined flags (see `LinceTextureFlags` above).
+
 ## LinceCreateTexture
 ```c
 LinceTexture* LinceCreateTexture(const char* name, const char* path)

@@ -3,6 +3,13 @@
 
 #include "lince/core/core.h"
 
+typedef enum LinceTextureFlags {
+	LinceTexture_Default = 0x0,
+	LinceTexture_FlipY = 0x1,   // flips texture vertically on load
+	// LinceTexture_DropAlpha, // 
+	// LinceTexture_ForceAlpha // allows to load RGB format but adds alpha of 1
+} LinceTextureFlags;
+
 typedef struct LinceTexture {
 	uint32_t id;               // OpenGL ID
 	uint32_t width, height;    // dimension of 2D texture
@@ -10,6 +17,9 @@ typedef struct LinceTexture {
 	int32_t data_format;     // format of texture file, e.g. RGBA
 	int32_t internal_format; // format of data in OpenGL buffer
 } LinceTexture;
+
+/* Loads a texture from a filename */
+LinceTexture* LinceLoadTexture(const char* name, const char* path, uint32_t flags);
 
 /* Creates texture from file */
 LinceTexture* LinceCreateTexture(const char* name, const char* path);

@@ -15,6 +15,39 @@
 #define MAX_INDICES (MAX_QUADS * QUAD_INDEX_COUNT)   // max number of indices in a batch
 #define MAX_TEXTURE_SLOTS 32   // max number of textures the GPU can bind simultaneously
 
+
+const char default_fragment_source[] =
+	"#version 450 core\n"
+	"layout(location = 0) out vec4 color;\n"
+	"in vec4 vColor;\n"
+	"in vec2 vTexCoord;\n"
+	"in float vTextureID;\n"
+	"uniform sampler2D uTextureSlots[32];\n"
+	"void main(){\n"
+	"	color = texture(uTextureSlots[int(vTextureID)], vTexCoord) * vColor;\n"
+	"	if (color.a == 0.0) discard;\n"
+	"	// temporary solution for full transparency, not translucency.\n"
+	"}\n";
+
+const char default_vertex_source[] = 
+	"#version 450 core\n"
+	"layout (location = 0) in vec3 aPos;\n"
+	"layout (location = 1) in vec2 aTexCoord;\n"
+	"layout (location = 2) in vec4 aColor;\n"
+	"layout (location = 3) in float aTextureID;\n"
+	"out vec4 vColor;\n"
+	"out vec2 vTexCoord;\n"
+	"out float vTextureID;\n"
+	"uniform mat4 u_view_proj = mat4(1.0);\n"
+	"uniform mat4 u_transform = mat4(1.0);\n"
+	"void main(){\n"
+	"   gl_Position = u_view_proj * u_transform * vec4(aPos, 1.0);\n"
+	"   vColor = aColor;\n"
+	"   vTexCoord = aTexCoord;\n"
+	"   vTextureID = aTextureID;\n"
+	"}\n";
+
+
 /* Calculates Z order from Y coordinate */
 float LinceYSortedZ(float y, vec2 ylim, vec2 zlim){
     float ynorm = (y - ylim[0]) / (ylim[1]-ylim[0]);
@@ -140,12 +173,11 @@ void LinceInitRenderer() {
 	static unsigned char white_pixel[] = {0xFF, 0xFF, 0xFF, 0xFF};
 	LinceSetTextureData(renderer_state.white_texture, white_pixel);
 	LinceBindTexture(renderer_state.white_texture, 0);
-
-	// create shader
-	renderer_state.shader = LinceCreateShader(
+	
+	renderer_state.shader = LinceCreateShaderFromSrc(
 		"RendererShader",
-        "engine/assets/shaders/renderer2d.vert.glsl",
-		"engine/assets/shaders/renderer2d.frag.glsl"
+		default_vertex_source,
+		default_fragment_source
 	);
     LinceBindShader(renderer_state.shader);
 

@@ -136,6 +136,14 @@
                     <main>
                         <h1 id="version-history"><a class="header" href="#version-history">Version History</a></h1>
 <p>Version codes follow <a href="https://semver.org/">Semantic Versioning</a>.</p>
+<h2 id="v041"><a class="header" href="#v041">v0.4.1</a></h2>
+<ul>
+<li>Added function <code>LinceLoadTexture</code>, similar to <code>LinceCreateTexture</code> but with extra <code>flags</code> argument.</li>
+<li>Added texture flag to flip texture data vertically on load <code>LinceTexture_FlipY</code>.</li>
+<li>Updated docs</li>
+<li>Fixed bug where Nuklear would respond to all scrolling events, even if no widget was active.</li>
+<li>Embedded the renderer's shader source in the code, and removed the source files.</li>
+</ul>
 <h2 id="v040"><a class="header" href="#v040">v0.4.0</a></h2>
 <ul>
 <li>Added simple tilemaps - <code>LinceTilemap</code></li>

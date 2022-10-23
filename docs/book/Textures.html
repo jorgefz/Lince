@@ -144,7 +144,16 @@
 <li><code>int32_t data_format</code></li>
 <li><code>int32_t internal_format</code></li>
 </ul>
+<h2 id="lincetextureflags"><a class="header" href="#lincetextureflags">LinceTextureFlags</a></h2>
+<table><thead><tr><th>Enum</th><th>Value</th><th>Description</th></tr></thead><tbody>
+<tr><td>LinceTexture_Default</td><td>0x0</td><td>No modifications applied</td></tr>
+<tr><td>LinceTexture_FlipY</td><td>0x1</td><td>Flips texture vertically on load</td></tr>
+</tbody></table>
 <h2 id="lincecreatetexture"><a class="header" href="#lincecreatetexture">LinceCreateTexture</a></h2>
+<pre><code class="language-c">LinceTexture* LinceLoadTexture(const char* name, const char* path, uint32_t flags)
+</code></pre>
+<p>Loads a texture from a file at 'path', using a string 'name' as ID, and applies defined flags (see <code>LinceTextureFlags</code> above).</p>
+<h2 id="lincecreatetexture-1"><a class="header" href="#lincecreatetexture-1">LinceCreateTexture</a></h2>
 <pre><code class="language-c">LinceTexture* LinceCreateTexture(const char* name, const char* path)
 </code></pre>
 <p>Loads a texture from a file at 'path', using a string 'name' as ID.</p>

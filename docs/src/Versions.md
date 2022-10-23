@@ -2,6 +2,14 @@
 
 Version codes follow [Semantic Versioning](https://semver.org/).
 
+## v0.4.1
+- Added function `LinceLoadTexture`, similar to `LinceCreateTexture` but with extra `flags` argument.
+- Added texture flag to flip texture data vertically on load `LinceTexture_FlipY`.
+- Updated docs
+- Fixed bug where Nuklear would respond to all scrolling events, even if no widget was active.
+- Embedded the renderer's shader source in the code, and removed the source files.
+
+
 ## v0.4.0
 - Added simple tilemaps - `LinceTilemap`
 - Simplified premake5 script somewhat

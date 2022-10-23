@@ -2,12 +2,11 @@
 #include "core/stb_image.h"
 #include <glad/glad.h>
 
-/* Creates texture from file */
-LinceTexture* LinceCreateTexture(const char* name, const char* path){
+LinceTexture* LinceLoadTexture(const char* name, const char* path, uint32_t flags){
 	LINCE_INFO(" Loading texture %s from '%s'", name, path);
 
 	// sets buffer to store data starting from image top-left
-	stbi_set_flip_vertically_on_load(1);
+	stbi_set_flip_vertically_on_load(flags & LinceTexture_FlipY);
 	unsigned char* data = NULL;
 	int width = 0, height = 0, channels = 0;
 	LinceTexture *tex = NULL;
@@ -25,6 +24,12 @@ LinceTexture* LinceCreateTexture(const char* name, const char* path){
 
 	LINCE_INFO(" Loaded %dx%d texture %s", width, height, name);
 	return tex;
+}
+
+/* Creates texture from file */
+LinceTexture* LinceCreateTexture(const char* name, const char* path){
+	uint32_t flags = LinceTexture_FlipY;
+	return LinceLoadTexture(name, path, flags);
 }
 
 /* Creates empty buffer with given dimensions */
