@@ -19,18 +19,23 @@ typedef void (*LinceGameTerminateFn)();
 
 /* Holds program state */
 typedef struct LinceApp{
+
     /* User settings */
-    void* user_data;
-    uint32_t screen_width, screen_height;
-    const char* title;
-    // add more settings
+    void* user_data;    // Pointer that may be freely assiged and retrieved by the user
+    uint32_t screen_width, screen_height; // Size of the window
+    const char* title;  // String of text shown on the top of the window
+
+    LinceBool enable_profiling;
+    LinceBool enable_logging;
+    char* profiler_filename;
+    char* log_filename;
 
     /* User callbacks */
     LinceGameInitFn      game_init;        /* Called on initialisation */
     LinceGameOnUpdateFn  game_on_update;   /* Called once per frame */
     LinceGameOnEventFn   game_on_event;    /* Events are passed to this */
     LinceGameTerminateFn game_terminate;   /* Called on program end */
-
+    
     /* Internal state */
     LinceWindow     *window;
     LinceLayerStack *layer_stack;
@@ -40,6 +45,10 @@ typedef struct LinceApp{
     float dt;               // timestep in ms
     int current_layer;      // index of layer baing updated/handled
     int current_overlay;    // index of layer baing updated/handled
+    
+    FILE* log_file;         // FILE object to which logging messages are written
+    FILE* profiler_file;   // FILE object to which benchmarking info is written
+    
 
     /* UI */
     LinceUILayer* ui;

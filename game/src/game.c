@@ -1,7 +1,11 @@
 
 #include <time.h>
 
+#define LINCE_PROFILE
+
 #include "lince.h"
+#include "lince/core/profiler.h"
+
 #include "cglm/types.h"
 #include "cglm/vec4.h"
 #include "cglm/affine.h"
@@ -231,6 +235,8 @@ LinceTile* GetTileAtMouse(LinceTilemap* tm, LinceCamera* cam){
 
 
 int LinceTilemapCheckCollision(LinceTilemap* tm, LinceBoxCollider player_box){
+    LINCE_PROFILER_START(timer);
+
     for(size_t i = 0; i != tm->width; ++i){
         for(size_t j = 0; j != tm->height; ++j){
 
@@ -250,6 +256,7 @@ int LinceTilemapCheckCollision(LinceTilemap* tm, LinceBoxCollider player_box){
         }
     }
 
+    LINCE_PROFILER_END(timer, LinceGetAppState()->profiler_file);
     return LinceBoxCollision_None;
 }
 
@@ -385,7 +392,6 @@ void MovePlayer(TestLayer* data){
     };
 
     int collision_result = LinceTilemapCheckCollision(data->tilemap, player_box);
-
     if(!(collision_result & LinceBoxCollision_X)){
         data->cam->pos[0] = next_pos[0];
     }
@@ -628,6 +634,8 @@ void DrawGUI(TestLayer* data){
 
 
 void TestLayerOnUpdate(LinceLayer* layer, float dt) {
+    LINCE_PROFILER_START(timer);
+
     TestLayer* data = LinceGetLayerData(layer);
     data->dt = dt;
     LinceUILayer* ui = LinceGetAppState()->ui;
@@ -693,6 +701,8 @@ void TestLayerOnUpdate(LinceLayer* layer, float dt) {
 
     
     LinceEndScene();
+
+    LINCE_PROFILER_END(timer, LinceGetAppState()->profiler_file);
 }
 
 void TestLayerOnEvent(LinceLayer* layer, LinceEvent* event){
@@ -769,12 +779,15 @@ int main(int argc, const char* argv[]) {
     app->screen_width = 900;
     app->screen_height = 600;
     app->title = "Sandbox";
-    // app->options = LINCE_FULLSCREEN | LINCE_VSYNC | LINCE_RESIZEABLE | ...
+    // app->flags = LINCE_FULLSCREEN | LINCE_VSYNC | LINCE_RESIZEABLE | ...
 
     app->game_init = GameInit;
     app->game_on_update = GameOnUpdate;
     // app->game_on_event = GameOnEvent;
     app->game_terminate = GameTerminate;
+    
+    app->enable_profiling = LinceTrue;
+    app->profiler_filename = "tests/profiling/profile.txt";
     
     LinceRun();
 

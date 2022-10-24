@@ -2,6 +2,14 @@
 
 Version codes follow [Semantic Versioning](https://semver.org/).
 
+## v0.5.0
+- Added benchmarking and profiling tools in Python
+- To-do:
+	logging
+	data structures
+	tests
+	docs
+
 ## v0.4.1
 - Added function `LinceLoadTexture`, similar to `LinceCreateTexture` but with extra `flags` argument.
 - Added texture flag to flip texture data vertically on load `LinceTexture_FlipY`.

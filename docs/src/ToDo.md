@@ -31,7 +31,7 @@
 2. 🟠 Create test suite for the engine
 3. 🟠 Improve documentation - perhaps move to a separate github repo.
 4. 🔷 Restructure engine to be in a separate folder, that can be included into the user's main game project.
-5. 🔷 Add benchmarking and identify slowest pieces of code that can be optimized.
+5. 💛 Add benchmarking and identify slowest pieces of code that can be optimized.
 6. 🔷 Improve code speed & efficiency, e.g. place shader uniforms in a key-value map
 
 ## Data

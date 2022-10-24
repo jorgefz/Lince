@@ -8,6 +8,7 @@
 #include "renderer/renderer.h"
 #include "gui/ui_layer.h"
 #include "core/input.h"
+#include "core/profiler.h"
 
 /* Private application state - stack allocated */
 static LinceApp app = {0};
@@ -82,7 +83,7 @@ void LinceCheckErrors(){
 void LinceRun(){
 
     LinceInit();
-
+    
     LINCE_INFO(" Running main loop...");
     while(app.running){
         LinceOnUpdate();
@@ -155,6 +156,13 @@ static void LinceInit(){
     if (app.screen_width == 0) app.screen_width = 500;
     if (app.screen_height == 0) app.screen_height = 500;
     if (app.title == NULL) app.title = "Lince Window";
+    if (app.enable_profiling && app.profiler_filename){
+        app.profiler_file = fopen(app.profiler_filename, "w");
+        if(!app.profiler_file){
+            LINCE_INFO("Error: unable to open profiling file '%s'\n",
+                app.profiler_filename);
+        }
+    }
     
     // Create a windowed mode window and its OpenGL context
     app.window = LinceCreateWindow(app.screen_width, app.screen_height, app.title);
@@ -173,6 +181,7 @@ static void LinceInit(){
 
 
 static void LinceOnUpdate(){
+    LINCE_PROFILER_START(timer);
     LinceClear();
 
     // Calculate delta time
@@ -205,9 +214,8 @@ static void LinceOnUpdate(){
     if (app.game_on_update) app.game_on_update(app.dt);
 
     LinceEndUIRender(app.ui);
-
-
     LinceUpdateWindow(app.window);
+    LINCE_PROFILER_END(timer, app.profiler_file);
 }
 
 static void LinceTerminate(){
@@ -229,6 +237,10 @@ static void LinceTerminate(){
     LinceDestroyWindow(app.window);
     app.window = NULL;
     app.running = 0;
+    
+    if(app.profiler_file){
+        fclose(app.profiler_file);
+    }
 }
 
 static void LinceOnEvent(LinceEvent* e){

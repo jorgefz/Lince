@@ -65,6 +65,7 @@ LINCE_STR_MAX
 
 /* Debugging */
 #define LINCE_UNUSED(x) (void)(x)
+#define LINCE_PROFILE
 
 #ifndef LINCE_LOGFILE
 #    define LINCE_LOGFILE stderr
