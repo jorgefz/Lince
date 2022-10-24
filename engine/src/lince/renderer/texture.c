@@ -1,8 +1,10 @@
+#include "core/profiler.h"
 #include "renderer/texture.h"
 #include "core/stb_image.h"
 #include <glad/glad.h>
 
 LinceTexture* LinceLoadTexture(const char* name, const char* path, uint32_t flags){
+	LINCE_PROFILER_START(timer);
 	LINCE_INFO(" Loading texture %s from '%s'", name, path);
 
 	// sets buffer to store data starting from image top-left
@@ -23,10 +25,13 @@ LinceTexture* LinceLoadTexture(const char* name, const char* path, uint32_t flag
 	stbi_image_free(data);
 
 	LINCE_INFO(" Loaded %dx%d texture %s", width, height, name);
+	LINCE_PROFILER_END(timer);
 	return tex;
 }
 
-/* Creates texture from file */
+/* DEPRECATED Use LinceLoadTexture 
+- Creates texture from file
+*/
 LinceTexture* LinceCreateTexture(const char* name, const char* path){
 	uint32_t flags = LinceTexture_FlipY;
 	return LinceLoadTexture(name, path, flags);
@@ -38,6 +43,7 @@ LinceTexture* LinceCreateEmptyTexture(
 	uint32_t width,
 	uint32_t height
 ) {
+	LINCE_PROFILER_START(timer);
 	// allocate texture data
 	LinceTexture *tex = calloc(1, sizeof(LinceTexture));
 	LINCE_ASSERT_ALLOC(tex, sizeof(LinceTexture));
@@ -63,11 +69,13 @@ LinceTexture* LinceCreateEmptyTexture(
 	glTextureParameteri(tex->id, GL_TEXTURE_WRAP_S, GL_REPEAT);
 	glTextureParameteri(tex->id, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
+	LINCE_PROFILER_END(timer);
 	return tex;
 }
 
 /* Provides custom data to an existing texture buffer */
 void LinceSetTextureData(LinceTexture* texture, unsigned char* data){
+	LINCE_PROFILER_START(timer);
 	glTextureSubImage2D(
 		texture->id,          // OpenGL ID
 		0, 0, 0,              // level, xoffset, yoffset
@@ -77,6 +85,7 @@ void LinceSetTextureData(LinceTexture* texture, unsigned char* data){
 		GL_UNSIGNED_BYTE,     // data type
 		data                  // buffer
 	);
+	LINCE_PROFILER_END(timer);
 }
 
 /* Deallocates texture memory and destroys OpenGL texture object */

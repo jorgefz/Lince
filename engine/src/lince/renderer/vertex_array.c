@@ -1,9 +1,11 @@
+#include "core/profiler.h"
 #include "renderer/vertex_array.h"
 #include <glad/glad.h>
 #include <stdlib.h>
 
 /* Allocates new vertex array and generates OpenGL ID for it */
 LinceVertexArray* LinceCreateVertexArray(LinceIndexBuffer ib){
+	LINCE_PROFILER_START(timer);
 	LINCE_INFO(" Creating Vertex Array ");
 
 	LinceVertexArray* va = calloc(1, sizeof(LinceVertexArray));
@@ -15,6 +17,7 @@ LinceVertexArray* LinceCreateVertexArray(LinceIndexBuffer ib){
 	va->vb_list = NULL;
 	glGenVertexArrays(1, &va->id);
 	glBindVertexArray(va->id);
+	LINCE_PROFILER_END(timer);
 	return va;
 }
 
@@ -33,6 +36,7 @@ void LinceAddVertexArrayAttributes(
 	LinceBufferElement* layout,
 	unsigned int layout_elements
 ){
+	LINCE_PROFILER_START(timer);
 
 	LinceBindVertexArray(va);
 	LinceBindVertexBuffer(vb);
@@ -80,6 +84,8 @@ void LinceAddVertexArrayAttributes(
 	LINCE_ASSERT(va->vb_list, "Failed to allocate memory");
 	va->vb_list[va->vb_count] = vb;
 	va->vb_count++;
+
+	LINCE_PROFILER_END(timer);
 }
 
 void LinceDeleteVertexArray(LinceVertexArray* va){

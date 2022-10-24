@@ -1,3 +1,4 @@
+#include "core/profiler.h"
 #include "renderer/renderer.h"
 #include "renderer/camera.h"
 #include <glad/glad.h>
@@ -98,10 +99,12 @@ static const unsigned int quad_indices[] = {0,1,2,2,3,0};
 void LinceDrawIndexed(
 	LinceShader* shader, LinceVertexArray* va, LinceIndexBuffer ib
 ) {
+	LINCE_PROFILER_START(timer);
 	LinceBindShader(shader);
 	LinceBindIndexBuffer(ib);
 	LinceBindVertexArray(va);
 	glDrawElements(GL_TRIANGLES, ib.count, GL_UNSIGNED_INT, 0);
+	LINCE_PROFILER_END(timer);
 }
 
 void LinceClear() {
@@ -127,6 +130,7 @@ void LinceEnableDepthTest(){
 
 
 void LinceInitRenderer() {
+	LINCE_PROFILER_START(timer);
 
 	LinceEnableAlphaBlend();
 	LinceEnableDepthTest();
@@ -184,6 +188,8 @@ void LinceInitRenderer() {
 	int samplers[MAX_TEXTURE_SLOTS] = { 0 };
 	for (int i = 0; i != MAX_TEXTURE_SLOTS; ++i) samplers[i] = i;
 	LinceSetShaderUniformIntN(renderer_state.shader, "uTextureSlots", samplers, MAX_TEXTURE_SLOTS);
+
+	LINCE_PROFILER_END(timer);
 }
 
 void LinceTerminateRenderer() {
@@ -206,6 +212,8 @@ void LinceTerminateRenderer() {
 }
 
 void LinceBeginScene(LinceCamera* cam) {
+	LINCE_PROFILER_START(timer);
+
 	/* Bind OpenGL objects */
 	LinceBindShader(renderer_state.shader);
 	LinceBindVertexArray(renderer_state.va);
@@ -225,15 +233,19 @@ void LinceBeginScene(LinceCamera* cam) {
 
 	size_t size = (MAX_VERTICES * sizeof(LinceQuadVertex));
 	memset(renderer_state.vertex_batch, 0, size);
+
+	LINCE_PROFILER_END(timer);
 }
 
 void LinceFlushScene(){
-	
+	LINCE_PROFILER_START(timer);
+
 	for (uint32_t i = 0; i != renderer_state.texture_slot_count; ++i){
 		LinceBindTexture(renderer_state.texture_slots[i], i);
 	}
 	LinceDrawIndexed(renderer_state.shader, renderer_state.va, renderer_state.ib);
 	
+	LINCE_PROFILER_END(timer);
 }
 
 void LinceEndScene() {
@@ -251,6 +263,7 @@ void LinceStartNewBatch(){
 }
 
 void LinceDrawQuad(LinceQuadProps props) {
+	LINCE_PROFILER_START(timer);
 
 	// batch size check
 	if (renderer_state.quad_count >= MAX_QUADS ||
@@ -315,5 +328,6 @@ void LinceDrawQuad(LinceQuadProps props) {
 	}
 	renderer_state.quad_count++;
 	
+	LINCE_PROFILER_END(timer);
 }
 

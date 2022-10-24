@@ -1,11 +1,17 @@
 import pandas as pd
+import numpy as np
+from tqdm import tqdm
 
 data = pd.read_csv("profile.txt", delimiter=':', names=["Function","Runtime"])
-unique_funcs = data['Function'].unique()
+funcs = np.array(data['Function'].unique())
 
 # Collect average runtime for each function
+means = np.array([data.loc[data['Function'] == f]['Runtime'].mean() for f in tqdm(funcs)])
+stds  = np.array([data.loc[data['Function'] == f]['Runtime'].std(ddof=0) for f in tqdm(funcs)])
+# indices to sort runtimes from largest to shortest
+idx = np.argsort(means)[::-1]
+
+# Print out results
 print("Function".ljust(30) + "Mean execution time")
-for func in unique_funcs:
-	mean = data.loc[data['Function'] == func]['Runtime'].mean()
-	std = data.loc[data['Function'] == func]['Runtime'].std()
-	print(func.ljust(30) + f"{float(mean):.4f} +- {float(std):.4f} ms")
+for f,m,s in zip(funcs[idx], means[idx], stds[idx]):
+	print(f.ljust(30) + f"{float(m):.4f} +- {float(s):.4f} ms")

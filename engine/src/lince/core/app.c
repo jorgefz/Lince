@@ -158,6 +158,7 @@ static void LinceInit(){
     if (app.title == NULL) app.title = "Lince Window";
     if (app.enable_profiling && app.profiler_filename){
         app.profiler_file = fopen(app.profiler_filename, "w");
+        LinceSetProfiler(app.profiler_file);
         if(!app.profiler_file){
             LINCE_INFO("Error: unable to open profiling file '%s'\n",
                 app.profiler_filename);
@@ -215,7 +216,7 @@ static void LinceOnUpdate(){
 
     LinceEndUIRender(app.ui);
     LinceUpdateWindow(app.window);
-    LINCE_PROFILER_END(timer, app.profiler_file);
+    LINCE_PROFILER_END(timer);
 }
 
 static void LinceTerminate(){
@@ -227,7 +228,7 @@ static void LinceTerminate(){
     LinceDestroyLayerStack(app.overlay_stack);
     app.layer_stack = NULL;
     app.overlay_stack = NULL;
-
+    
     if (app.game_terminate) app.game_terminate();
 
     LinceTerminateUI(app.ui);
@@ -238,9 +239,7 @@ static void LinceTerminate(){
     app.window = NULL;
     app.running = 0;
     
-    if(app.profiler_file){
-        fclose(app.profiler_file);
-    }
+    LinceSetProfiler(NULL);
 }
 
 static void LinceOnEvent(LinceEvent* e){

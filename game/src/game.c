@@ -256,7 +256,7 @@ int LinceTilemapCheckCollision(LinceTilemap* tm, LinceBoxCollider player_box){
         }
     }
 
-    LINCE_PROFILER_END(timer, LinceGetAppState()->profiler_file);
+    LINCE_PROFILER_END(timer);
     return LinceBoxCollision_None;
 }
 
@@ -432,6 +432,7 @@ void MovePlayer(TestLayer* data){
 
 
 void TestLayerOnAttach(LinceLayer* layer) {
+    LINCE_PROFILER_START(timer);
     TestLayer* data = LinceGetLayerData(layer);
     LINCE_INFO(" Layer '%s' attached", data->name);
 
@@ -536,6 +537,7 @@ void TestLayerOnAttach(LinceLayer* layer) {
     });
 
     data->chosen_menu_tile = -1;
+    LINCE_PROFILER_END(timer);
 }
 
 void TestLayerOnDetach(LinceLayer* layer) {
@@ -556,6 +558,8 @@ void TestLayerOnDetach(LinceLayer* layer) {
 }
 
 void DrawGUI(TestLayer* data){
+    LINCE_PROFILER_START(timer);
+
     LinceUILayer* ui = LinceGetAppState()->ui;
     vec2 screen_size;
     LinceGetScreenSize(screen_size);
@@ -630,6 +634,7 @@ void DrawGUI(TestLayer* data){
     }
     nk_end(ui->ctx);
 
+    LINCE_PROFILER_END(timer);
 }
 
 
@@ -702,7 +707,7 @@ void TestLayerOnUpdate(LinceLayer* layer, float dt) {
     
     LinceEndScene();
 
-    LINCE_PROFILER_END(timer, LinceGetAppState()->profiler_file);
+    LINCE_PROFILER_END(timer);
 }
 
 void TestLayerOnEvent(LinceLayer* layer, LinceEvent* event){
