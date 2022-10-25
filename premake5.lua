@@ -189,3 +189,41 @@ project "mcommand"
         "vendor/glfw/bin/" .. outputdir .. "/glfw",
         "bin/" .. outputdir .. "/lince"
     }
+
+project "tests"
+    location "tests"
+    kind "ConsoleApp"
+    language "C"
+    staticruntime "on"
+
+    targetdir ("bin/" .. outputdir .. "/%{prj.name}")
+    objdir ("obj/" .. outputdir .. "/%{prj.name}")
+
+    files {
+        "%{prj.name}/src/**.c",
+        "%{prj.name}/src/**.h",
+    }
+    
+    includedirs {
+        "%{prj.name}",
+        "%{prj.name}/src",
+        "engine",
+        "engine/src",
+        "%{IncludeDir.glfw}",
+        "%{IncludeDir.glad}",
+        "%{IncludeDir.cglm}"
+    }
+
+    links {
+        "lince",
+        "GLAD",
+        "glfw",
+        "cglm",
+    }
+
+    libdirs {
+        "vendor/glad/bin/" .. outputdir .. "/glad",
+        "vendor/glfw/bin/" .. outputdir .. "/glfw",
+        "bin/" .. outputdir .. "/lince"
+    }
+
