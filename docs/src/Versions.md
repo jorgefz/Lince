@@ -4,6 +4,8 @@ Version codes follow [Semantic Versioning](https://semver.org/).
 
 ## v0.5.0
 - Added benchmarking and profiling tools in Python
+- Added basic test framework
+- Added hashmap data structure
 - To-do:
 	logging
 	data structures
