@@ -102,6 +102,14 @@ void hashmap_free(hashmap_t* map){
     map->entries = 0;
 }
 
+/*
+Returns 1 if the hashmap contains the given key,
+and 0 otherwise.
+*/
+int hashmap_has_key(hashmap_t* map, const char* key){
+    return (hashmap_lookup(map, key) != NULL);
+}
+
 
 /* Retrieves an entry using a key. If the entry does not exist, NULL is returned */
 void* hashmap_get(hashmap_t* map, const char* key){

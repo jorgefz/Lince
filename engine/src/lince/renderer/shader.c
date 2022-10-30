@@ -6,6 +6,7 @@
 
 
 
+
 /* --- Static declarations --- */
 
 /* Reads file and returns contents
@@ -73,6 +74,12 @@ LinceShader* LinceCreateShaderFromSrc(
 	glDeleteShader(vs);
 	glDeleteShader(fs);
 
+	// start out with hashmap of 21 buckets to avoid costs of
+	// resizing often at small sizes (e.g. at sizes 2, 3, 5, 7, 11, etc).
+	hashmap_t uniforms = hashmap_create(20);
+	LINCE_ASSERT(uniforms.table, "Failed to create hashmap for shader uniforms");
+	memmove(&shader->uniforms, &uniforms, sizeof(hashmap_t));
+
 	LINCE_PROFILER_END(timer);
     return shader;
 }
@@ -95,29 +102,41 @@ void LinceDeleteShader(LinceShader* shader){
 	if(!shader) return;
 	LINCE_INFO(" Deleting Shader '%s'", shader->name);
 	if(shader->id > 0) glDeleteProgram(shader->id);
-	if(shader->uniform_names){
-		for(int i=0; i!=(int)shader->uniform_count; ++i){
-			if(!shader->uniform_names[i]) continue;
-			free(shader->uniform_names[i]);
-		}
-		free(shader->uniform_names);
-	}
-	if(shader->uniform_ids) free(shader->uniform_ids);
+	hashmap_free(&shader->uniforms);
 	free(shader);
 }
 
 int LinceGetShaderUniformID(LinceShader* shader, const char* name){
 	LINCE_PROFILER_START(timer);
 
-	/* Refactor this to cache the uniform locations in a hashmap */
 	if(!shader || !name) return -1;
-	int location =  glGetUniformLocation(shader->id, name);
+
+	/*
+	Uniform locations are saved as void* addresses in the hashmap
+	to avoid allocating memory and freein it afterwards.
+	The void* type should be 64 bits long (in 64bit systems), matching a long int.
+	*/
+
+	long location;
+
+	if(hashmap_has_key(&shader->uniforms, name)){
+		location = (long)hashmap_get(&shader->uniforms, name);
+		LINCE_PROFILER_END(timer);
+		return (int)location;
+	}
+	
+	location = glGetUniformLocation(shader->id, name);
+	hashmap_set(&shader->uniforms, name, (void*)location);
+	
+	// Implementation without hashmap - slower?
+	// int location =  glGetUniformLocation(shader->id, name);
+	
 	if(location < 0){
 		LINCE_INFO(" Uniform '%s' not found in shader '%s'", name, shader->name);
 	}
-
+	
 	LINCE_PROFILER_END(timer);
-	return location;
+	return (int)location;
 }
 
 /* Set integer uniform */
@@ -174,6 +193,7 @@ void LinceSetShaderUniformMat4(LinceShader* sh, const char* name, mat4 m){
 
 /* --- Static functions --- */
 
+// TODO: Move to a header more accessible to the whole project
 static char* LinceReadFile(const char* path){
 	LINCE_INFO(" Reading File '%s'", path);
 	FILE* handle = fopen(path, "r");

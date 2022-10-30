@@ -48,6 +48,12 @@ Note: it does not free the values
 */
 void hashmap_free(hashmap_t* map);
 
+/*
+Returns 1 if the hashmap contains the given key,
+and 0 otherwise.
+*/
+int hashmap_has_key(hashmap_t* map, const char* key);
+
 
 /* Retrieves an entry using a key. If the entry does not exist, NULL is returned */
 void* hashmap_get(hashmap_t* map, const char* key);
@@ -60,7 +66,7 @@ that lasts for the lifetime of the hashmap.
 - Note: if an existing value is overwritten (by using a key that was already in use),
 the pointer to the previous data is lost.
 */
-hashmap_t* hashmap_set(hashmap_t* map, const char* key, void* value);
+hashmap_t* hashmap_set(hashmap_t* map, const char* key, void* value); 
 
 /*
 Extends the hash table to a size equal to the next prime number

@@ -5,13 +5,17 @@
 #include "lince/core/core.h"
 #include "cglm/types.h"
 
+#include "lince/containers/hashmap.h"
+
+
 typedef struct LinceShader {
 	unsigned int id; // opengl id
 	char name[LINCE_NAME_MAX]; // name, normally based on source file
 	
-	char **uniform_names; // name in the shader code
-	int *uniform_ids; // opengl uniform id
-	unsigned int uniform_count; // length of uniform array
+	//char **uniform_names; // name in the shader code
+	//int *uniform_ids; // opengl uniform id
+	//unsigned int uniform_count; // length of uniform array
+	hashmap_t uniforms;
 } LinceShader;
 
 /* Create shader from paths to vertex and fragment shader source files */
