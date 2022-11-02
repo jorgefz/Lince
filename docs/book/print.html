@@ -346,7 +346,7 @@ int main() {
 </ul>
 <h2 id="linceeventtype"><a class="header" href="#linceeventtype">LinceEventType</a></h2>
 <p>Event types predefined by the engine.</p>
-<table><thead><tr><th>Enum</th><th>Value</th></tr></thead><tbody>
+<div class="table-wrapper"><table><thead><tr><th>Enum</th><th>Value</th></tr></thead><tbody>
 <tr><td>LinceEventType_None</td><td>0</td></tr>
 <tr><td>LinceEventType_WindowClose</td><td>1</td></tr>
 <tr><td>LinceEventType_WindowResize</td><td>2</td></tr>
@@ -359,6 +359,7 @@ int main() {
 <tr><td>LinceEventType_MouseScrolled</td><td>9</td></tr>
 <tr><td>LinceEventType_EventNum</td><td>10</td></tr>
 </tbody></table>
+</div>
 <h2 id="lincedispatchevent"><a class="header" href="#lincedispatchevent">LinceDispatchEvent</a></h2>
 <pre><code class="language-c">LinceBool LinceDispatchEvent(LinceEvent* event, LinceEventType event_type, LinceEventFn callback)
 </code></pre>
@@ -736,7 +737,7 @@ This is useful when you need to retrieve overlat data from within callbacks call
 <p>Returns the Y position of the mouse.</p>
 <h2 id="lincekey"><a class="header" href="#lincekey">LinceKey</a></h2>
 <p>Keycodes follow GLFW codes.</p>
-<table><thead><tr><th>Enum</th><th>Value</th><th>Key</th></tr></thead><tbody>
+<div class="table-wrapper"><table><thead><tr><th>Enum</th><th>Value</th><th>Key</th></tr></thead><tbody>
 <tr><td>LinceKey_Unknown</td><td>-1</td><td></td></tr>
 <tr><td>LinceKey_Space</td><td>32</td><td></td></tr>
 <tr><td>LinceKey_Apostrophe</td><td>39</td><td>'</td></tr>
@@ -860,9 +861,10 @@ This is useful when you need to retrieve overlat data from within callbacks call
 <tr><td>LinceKey_Menu</td><td>348</td><td></td></tr>
 <tr><td>LinceKey_Last</td><td>LinceKey_Menu</td><td></td></tr>
 </tbody></table>
+</div>
 <h2 id="lincemousebutton"><a class="header" href="#lincemousebutton">LinceMouseButton</a></h2>
 <p>Mouse button codes follow GLFW codes.</p>
-<table><thead><tr><th>Enum</th><th>Value</th></tr></thead><tbody>
+<div class="table-wrapper"><table><thead><tr><th>Enum</th><th>Value</th></tr></thead><tbody>
 <tr><td>LinceMouseButton_1</td><td>0</td></tr>
 <tr><td>LinceMouseButton_2</td><td>1</td></tr>
 <tr><td>LinceMouseButton_3</td><td>2</td></tr>
@@ -876,7 +878,7 @@ This is useful when you need to retrieve overlat data from within callbacks call
 <tr><td>LinceMouseButton_Right</td><td>LinceMouseButton_2</td></tr>
 <tr><td>LinceMouseButton_Middle</td><td>LinceMouseButton_3</td></tr>
 </tbody></table>
-<div style="break-before: page; page-break-before: always;"></div><h1 id="rendering"><a class="header" href="#rendering">Rendering</a></h1>
+</div><div style="break-before: page; page-break-before: always;"></div><h1 id="rendering"><a class="header" href="#rendering">Rendering</a></h1>
 <ol>
 <li><a href="./Buffers.html">Buffers</a></li>
 <li><a href="./VertexArrays.html">Vertex Arrays</a></li>
@@ -890,7 +892,7 @@ This is useful when you need to retrieve overlat data from within callbacks call
 <h2 id="lincebuffertype"><a class="header" href="#lincebuffertype">LinceBufferType</a></h2>
 <p>Describes the data type of elements in a buffer.
 These are usually integers or floats, and arrays of these with fixed sizes, including square matrices.</p>
-<table><thead><tr><th>Enum</th><th>Value</th><th>Components</th><th>Bytes</th></tr></thead><tbody>
+<div class="table-wrapper"><table><thead><tr><th>Enum</th><th>Value</th><th>Components</th><th>Bytes</th></tr></thead><tbody>
 <tr><td>LinceBufferType_None</td><td>0</td><td>0</td><td>0</td></tr>
 <tr><td>LinceBufferType_Bool</td><td>1</td><td>1</td><td>4</td></tr>
 <tr><td>LinceBufferType_Int</td><td>2</td><td>1</td><td>4</td></tr>
@@ -905,6 +907,7 @@ These are usually integers or floats, and arrays of these with fixed sizes, incl
 <tr><td>LinceBufferType_Mat4</td><td>11</td><td>16</td><td>64</td></tr>
 <tr><td>LinceBufferType_Count</td><td>12</td><td>--</td><td>--</td></tr>
 </tbody></table>
+</div>
 <h2 id="lincebufferelement"><a class="header" href="#lincebufferelement">LinceBufferElement</a></h2>
 <ul>
 <li><code>LinceBufferType type</code></li>
@@ -1071,10 +1074,11 @@ These are usually integers or floats, and arrays of these with fixed sizes, incl
 <li><code>int32_t internal_format</code></li>
 </ul>
 <h2 id="lincetextureflags"><a class="header" href="#lincetextureflags">LinceTextureFlags</a></h2>
-<table><thead><tr><th>Enum</th><th>Value</th><th>Description</th></tr></thead><tbody>
+<div class="table-wrapper"><table><thead><tr><th>Enum</th><th>Value</th><th>Description</th></tr></thead><tbody>
 <tr><td>LinceTexture_Default</td><td>0x0</td><td>No modifications applied</td></tr>
 <tr><td>LinceTexture_FlipY</td><td>0x1</td><td>Flips texture vertically on load</td></tr>
 </tbody></table>
+</div>
 <h2 id="lincecreatetexture"><a class="header" href="#lincecreatetexture">LinceCreateTexture</a></h2>
 <pre><code class="language-c">LinceTexture* LinceLoadTexture(const char* name, const char* path, uint32_t flags)
 </code></pre>
@@ -1322,13 +1326,14 @@ LinceEndScene();
 <p>Enum that offers a handy way to obtain a preloaded Nuklear font.
 The values serve as an index for the array <code>app-&gt;ui-&gt;fonts</code> which holds pointers to all preloaded fonts.
 The number next to the enum name indicates the font size, e.g. <code>LinceFont_Droid20</code> indexes the Droid font with font size 20.</p>
-<table><thead><tr><th>Enum</th><th>Value</th></tr></thead><tbody>
+<div class="table-wrapper"><table><thead><tr><th>Enum</th><th>Value</th></tr></thead><tbody>
 <tr><td>LinceFont_Droid15</td><td>0</td></tr>
 <tr><td>LinceFont_Droid20</td><td>1</td></tr>
 <tr><td>LinceFont_Droid30</td><td>2</td></tr>
 <tr><td>LinceFont_Droid50</td><td>3</td></tr>
 <tr><td>LinceFont_Count</td><td>4</td></tr>
 </tbody></table>
+</div>
 <p>Example on how to retrieve a preloaded font:</p>
 <pre><code class="language-c">void MyLayerOnUpdate(LinceLayer* layer, float dt){
 	LinceApp* app = LinceGetAppState();
@@ -1619,12 +1624,13 @@ Further features the tilemap should have are collision data, overlay tiles that 
 </ul>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="to-do"><a class="header" href="#to-do">To Do</a></h1>
 <h2 id="symbol-legend"><a class="header" href="#symbol-legend">Symbol legend</a></h2>
-<table><thead><tr><th>Symbol</th><th>Meaning</th></tr></thead><tbody>
+<div class="table-wrapper"><table><thead><tr><th>Symbol</th><th>Meaning</th></tr></thead><tbody>
 <tr><td>✅</td><td>Completed</td></tr>
 <tr><td>💛</td><td>In-dev</td></tr>
 <tr><td>🟠</td><td>Delayed</td></tr>
 <tr><td>🔷</td><td>Planned</td></tr>
 </tbody></table>
+</div>
 <h2 id="roadmap"><a class="header" href="#roadmap">Roadmap</a></h2>
 <ol>
 <li>Basic 2D Renderer ✅
@@ -1661,7 +1667,7 @@ Further features the tilemap should have are collision data, overlay tiles that 
 <li>🟠 Create test suite for the engine</li>
 <li>🟠 Improve documentation - perhaps move to a separate github repo.</li>
 <li>🔷 Restructure engine to be in a separate folder, that can be included into the user's main game project.</li>
-<li>🔷 Add benchmarking and identify slowest pieces of code that can be optimized.</li>
+<li>💛 Add benchmarking and identify slowest pieces of code that can be optimized.</li>
 <li>🔷 Improve code speed &amp; efficiency, e.g. place shader uniforms in a key-value map</li>
 </ol>
 <h2 id="data"><a class="header" href="#data">Data</a></h2>
@@ -1735,6 +1741,20 @@ Further features the tilemap should have are collision data, overlay tiles that 
 </ol>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="version-history"><a class="header" href="#version-history">Version History</a></h1>
 <p>Version codes follow <a href="https://semver.org/">Semantic Versioning</a>.</p>
+<ul>
+<li>To-do:
+logging
+data structures
+tests
+docs</li>
+</ul>
+<h2 id="v042"><a class="header" href="#v042">v0.4.2</a></h2>
+<ul>
+<li>Added benchmarking and profiling tools in Python</li>
+<li>Added basic test framework</li>
+<li>Added hashmap, array, and linked list containers</li>
+<li>Added caching of shader uniform locations with hashmap</li>
+</ul>
 <h2 id="v041"><a class="header" href="#v041">v0.4.1</a></h2>
 <ul>
 <li>Added function <code>LinceLoadTexture</code>, similar to <code>LinceCreateTexture</code> but with extra <code>flags</code> argument.</li>

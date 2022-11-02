@@ -165,13 +165,14 @@
 <p>Enum that offers a handy way to obtain a preloaded Nuklear font.
 The values serve as an index for the array <code>app-&gt;ui-&gt;fonts</code> which holds pointers to all preloaded fonts.
 The number next to the enum name indicates the font size, e.g. <code>LinceFont_Droid20</code> indexes the Droid font with font size 20.</p>
-<table><thead><tr><th>Enum</th><th>Value</th></tr></thead><tbody>
+<div class="table-wrapper"><table><thead><tr><th>Enum</th><th>Value</th></tr></thead><tbody>
 <tr><td>LinceFont_Droid15</td><td>0</td></tr>
 <tr><td>LinceFont_Droid20</td><td>1</td></tr>
 <tr><td>LinceFont_Droid30</td><td>2</td></tr>
 <tr><td>LinceFont_Droid50</td><td>3</td></tr>
 <tr><td>LinceFont_Count</td><td>4</td></tr>
 </tbody></table>
+</div>
 <p>Example on how to retrieve a preloaded font:</p>
 <pre><code class="language-c">void MyLayerOnUpdate(LinceLayer* layer, float dt){
 	LinceApp* app = LinceGetAppState();
