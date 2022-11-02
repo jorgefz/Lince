@@ -2,15 +2,18 @@
 
 Version codes follow [Semantic Versioning](https://semver.org/).
 
-## v0.5.0
-- Added benchmarking and profiling tools in Python
-- Added basic test framework
-- Added hashmap data structure
 - To-do:
 	logging
 	data structures
 	tests
 	docs
+
+## v0.4.2
+- Added benchmarking and profiling tools in Python
+- Added basic test framework
+- Added hashmap, array, and linked list containers
+- Added caching of shader uniform locations with hashmap
+
 
 ## v0.4.1
 - Added function `LinceLoadTexture`, similar to `LinceCreateTexture` but with extra `flags` argument.

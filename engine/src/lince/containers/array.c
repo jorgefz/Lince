@@ -6,7 +6,7 @@
 
 #define ARRAY_INITIAL_CAPACITY 1
 
- // Generic pointer type that allows for pointer arithmetic
+// Generic pointer type that allows for pointer arithmetic
 typedef char* addr_t;
 
 /*
@@ -23,7 +23,7 @@ static uint32_t nearest_pow2(uint32_t n){
 /*
 Increments capacity of the array to the next power of two.
 */
-static struct array_t* extend_capacity(struct array_t* array){
+static array_t* extend_capacity(array_t* array){
 	if(!array) return NULL;
 
 	uint32_t capacity = array->capacity;
@@ -43,23 +43,19 @@ static struct array_t* extend_capacity(struct array_t* array){
 
 // -- INITIALIZATIONS
 /* Creates a new array of size zero */
-struct array_t* array_create(uint32_t element_size){
-	if(element_size == 0) return NULL;
-	struct array_t* array;
-
-	array = LinceCalloc(sizeof(struct array_t));
-	if(!array) return NULL;
-
-	array->element_size = element_size;
+array_t array_create(uint32_t element_size){
+	array_t array = {0};
+	array.element_size = element_size;
+	// initial capacity?
 	return array;
 }
 
 /* Pre-allocates a given number of elements but does not initialise them */
-struct array_t* array_resize(struct array_t* array, uint32_t size){
-	if(!array) return NULL;
+array_t* array_resize(array_t* array, uint32_t size){
+	if(!array || array->element_size == 0) return NULL;
 
-	if(size <= array->size || size == 0){
-		// Shrinking.
+	if(size <= array->size){
+		// Shrinking
 		// No need to delete anything. Old data will eventually be overwritten.
 		array->size = size;
 		return array;
@@ -67,7 +63,6 @@ struct array_t* array_resize(struct array_t* array, uint32_t size){
 	
 	// Round up new capacity to the highest power of two closest to the size
 	uint32_t capacity = nearest_pow2(size);
-
 	if(capacity > array->capacity){
 		void* data = LinceRealloc(array->data, capacity * array->element_size);
 		if(!data) return NULL;
@@ -81,8 +76,8 @@ struct array_t* array_resize(struct array_t* array, uint32_t size){
 
 // -- SETTERS
 /* Overwrites an element at the given index with the given data */
-void* array_set(struct array_t* array, void* element, uint32_t index){
-	if(!array || index >= array->size) return NULL;
+void* array_set(array_t* array, void* element, uint32_t index){
+	if(!array || array->element_size == 0 || index >= array->size) return NULL;
 	addr_t addr = array->data + index * array->element_size;
 	if(!element){
 		memset(addr, 0, array->element_size);
@@ -94,27 +89,27 @@ void* array_set(struct array_t* array, void* element, uint32_t index){
 
 // -- RETRIEVALS
 /* Returns a pointer to the element at the specified index */
-void* array_get(struct array_t* array, uint32_t index){
-	if(!array || index >= array->size) return NULL;
+void* array_get(array_t* array, uint32_t index){
+	if(!array || array->element_size == 0 || index >= array->size) return NULL;
 	addr_t addr = array->data + index * array->element_size;
 	return addr;
 }
 
 /* Returns a pointer to the first element */
-void* array_front(struct array_t* array){
+void* array_front(array_t* array){
 	if(!array || array->size == 0) return NULL;
 	return array->data;
 }
 
 /* Returns a pointer to the last element */
-void* array_back(struct array_t* array){
+void* array_back(array_t* array){
 	if(!array || array->size == 0) return NULL;
 	return array_get(array, array->size-1);
 }
 
 /* Returns a pointer to first byte after the end of the array */
-void* array_end(struct array_t* array){
-	if(!array || !array->data) return NULL;
+void* array_end(array_t* array){
+	if(!array || !array->data || array->element_size == 0) return NULL;
 	if(array->size == 0){
 		return array_back(array);
 	} else {
@@ -124,23 +119,26 @@ void* array_end(struct array_t* array){
 
 // -- INSERTING
 /* Inserts an element at the given index */
-struct array_t* array_insert(struct array_t* array, void* element, uint32_t index){
-	if(!array || index > array->size){
+array_t* array_insert(array_t* array, void* element, uint32_t index){
+	if(!array || array->element_size == 0 || index > array->size){
 		return NULL;
 	}
-	
-	addr_t addr = array->data + index;
-	uint32_t move_size = array->size - index;
 
-	if(array->size + 1 == array->capacity){
-		extend_capacity(array);
+	if(array->size >= array->capacity || !array->data){
+		array_t* r = extend_capacity(array);
+		if(!r) return NULL;
 	}
-
-	if(move_size > 0){
+	
+	addr_t addr = array->data + index * array->element_size;
+	uint32_t move_bytes = (array->size - index) * array->element_size;
+	
+	if(move_bytes > 0){
 		// displace elements to make space for new one
 		// this operation is invalid if you want to insert at the end of the array
-		memmove(addr + array->element_size, addr, move_size * array->element_size);
+		memmove(addr + array->element_size, addr, move_bytes);
 	}
+
+	// setting value
 	if(!element){
 		memset(addr, 0, array->element_size);
 	} else {
@@ -151,28 +149,63 @@ struct array_t* array_insert(struct array_t* array, void* element, uint32_t inde
 }
 
 /* Inserts the element to the end of the array */
-struct array_t* array_push_back(struct array_t* array, void* element);
+array_t* array_push_back(array_t* array, void* element){
+	return array_insert(array, element, array->size);
+}
 
 /* Inserts the element to the beginning of the array */
-struct array_t* array_push_front(struct array_t* array, void* element);
+array_t* array_push_front(array_t* array, void* element){
+	return array_insert(array, element, 0);
+}
 
 // -- DELETING
 /* Removes the element at the given index */
-struct array_t* array_delete(struct array_t* array, uint32_t index);
+array_t* array_remove(array_t* array, uint32_t index){
+	if(!array || !array->data || index >= array->size){
+		return NULL;
+	}
+
+	if (index == array->size - 1){
+		// pop back, no need to shuffle data around
+		array->size--;
+		return array;
+	}
+	
+	addr_t dest = array->data + index * array->element_size;
+	addr_t orig = dest + array->element_size;
+	uint32_t move_bytes = (array->size - index) * array->element_size;
+
+	memmove(dest, orig, move_bytes);
+
+	array->size--;
+	return array;
+}
 
 /* Removes the element last element of the array */
-struct array_t* array_pop_back(struct array_t* array);
+array_t* array_pop_back(array_t* array){
+	if(array->size == 0) return NULL;
+	return array_remove(array, array->size-1);
+}
 
 /* Removes the element first element of the array */
-struct array_t* array_pop_front(struct array_t* array);
+array_t* array_pop_front(array_t* array){
+	return array_remove(array, 0);
+}
 
 /* Removes all elements on the array */
-struct array_t* array_clear(struct array_t* array);
+array_t* array_clear(array_t* array){
+	if(!array) return NULL;
+	array->size = 0;
+	return array;
+}
 
 // -- FREEING
-/* Frees an array and all of its elements */
-void array_destroy(struct array_t* array){
+/* Frees all the elements of an array */
+void array_destroy(array_t* array){
 	if(!array) return;
-	if(array->data) LinceFree(array->data);
-	LinceFree(array);
+	if(array->data) free(array->data);
+	array->capacity = 0;
+	array->size = 0;
+	array->element_size = 0;
+	array->data = NULL;
 }

@@ -61,7 +61,7 @@ static hm_entry_t* hashmap_lookup(hashmap_t* map, const char* key){
 
 uint32_t hashmap_hash(const char* key, uint32_t size) {
     // Using 'one-at-a-time' hashing function by Bob Jenkins
-    // http://www.burtleburtle.net/bob/hash/doobs.html
+    // https://en.wikipedia.org/wiki/Jenkins_hash_function
     size_t i = 0;
     uint32_t hash = 0;
     size_t length = strlen(key);

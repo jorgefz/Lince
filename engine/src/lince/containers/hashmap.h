@@ -19,13 +19,13 @@ Supported features:
 #include <inttypes.h>
 
 
-typedef struct hm_entry {
+typedef struct hm_entry_container {
 	char* key;
 	void* value;
-	struct hm_entry* next;
+	struct hm_entry_container* next;
 } hm_entry_t;
 
-typedef struct hashmap {
+typedef struct hashmap_container {
 	uint32_t size;      // total number of buckets
     uint32_t entries;   // number of filled buckets
 	hm_entry_t **table;
