@@ -8,6 +8,13 @@ Version codes follow [Semantic Versioning](https://semver.org/).
 	tests
 	docs
 
+## v0.4.3 - WIP
+- Restructured build scripts to output binaries to common top-level folders `bin` and `obj`.
+- Moved output build files to `build` folder.
+- Separated nuklear and stb\_image to their own projects that build to a static library.
+- Separated `game` project into `editor` and `sandbox` projects.
+- Refactored ...
+
 ## v0.4.2
 - Added benchmarking and profiling tools in Python
 - Added basic test framework

@@ -5,7 +5,7 @@
 | ------ | ------- |
 |   ✅   | Completed |
 |   💛   | In-dev    |
-|   🟠   | Delayed   |
+|   🟠   | Next up   |
 |   🔷   | Planned   |
 
 
