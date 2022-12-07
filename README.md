@@ -27,7 +27,7 @@ On Windows, Windows SDK is required.
 On the root folder (where this README.md file is located), run `premake5` to output the building tool appropriate to your OS:
 
 * For Unix: `premake5 gmake2`, then run `make`.
-* For Windows: `premake5 vs2019`, then load the Visual Studio solution and compile.
+* For Windows: `premake5 vs2020`, then load the Visual Studio solution and compile.
 
 The game executable will be located at `bin/{configuration}-{system}-{architecture}/lince`, e.g. `bin/Debug-Linux-x86_64/lince`. Currently, this project is being tested on Windows 10 (x64) and GNU/Linux Ubuntu-20.04 (x64).
 

@@ -8,6 +8,7 @@ IncludeDir["glad"]    = "deps/glad/include"
 IncludeDir["cglm"]    = "deps/cglm/include"
 IncludeDir["nuklear"] = "deps/nuklear/include"
 IncludeDir["stb"]     = "deps/stb/include"
+IncludeDir["miniaudio"] = "deps/miniaudio/include"
 IncludeDir["lince"]   = "lince/src"
 
 
@@ -191,6 +192,35 @@ project "nuklear"
     }
 
 
+project "miniaudio"
+    kind "StaticLib"
+    language "C"
+    staticruntime "on"
+    location "build/miniaudio"
+
+    objdir ("obj/" .. OutputDir .. "/%{prj.name}" )
+    targetdir ("bin/" .. OutputDir .. "/%{prj.name}" )
+    
+    files {
+        "deps/miniaudio/src/**.c",
+        "deps/miniaudio/include/**.h",
+    }
+    
+    includedirs {
+        "deps/miniaudio/include",
+    }
+
+    links {
+        "GLAD",
+        "glfw",
+    }
+
+    libdirs {
+        "bin/" .. OutputDir .. "/glad",
+        "bin/" .. OutputDir .. "/glfw",
+    }
+
+
 project "lince"
     kind "StaticLib"
     language "C"
@@ -215,7 +245,8 @@ project "lince"
         "%{IncludeDir.glad}",
         "%{IncludeDir.cglm}",
         "%{IncludeDir.nuklear}",
-        "%{IncludeDir.stb}"
+        "%{IncludeDir.stb}",
+        "%{IncludeDir.miniaudio}"
     }
 
     links {
@@ -223,7 +254,8 @@ project "lince"
         "glfw",
         "cglm",
         "nuklear",
-        "stb"
+        "stb",
+        "miniaudio"
     }
 
     libdirs {
@@ -231,7 +263,8 @@ project "lince"
         "bin/" .. OutputDir .. "/glfw",
         "bin/" .. OutputDir .. "/nuklear",
         "bin/" .. OutputDir .. "/cglm",
-        "bin/" .. OutputDir .. "/stb"
+        "bin/" .. OutputDir .. "/stb",
+        "bin/" .. OutputDir .. "/miniaudio",
     }
 
 
@@ -329,7 +362,8 @@ project "sandbox"
         "%{IncludeDir.glad}",
         "%{IncludeDir.cglm}",
         "%{IncludeDir.nuklear}",
-        "%{IncludeDir.stb}"
+        "%{IncludeDir.stb}",
+        "%{IncludeDir.miniaudio}"
     }
 
     links {
@@ -338,7 +372,8 @@ project "sandbox"
         "glfw",
         "cglm",
         "stb",
-        "nuklear"
+        "nuklear",
+        "miniaudio"
     }
 
     libdirs {"bin/" .. OutputDir .. "/lince"}

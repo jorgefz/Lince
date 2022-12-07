@@ -1,9 +1,11 @@
+#include "editor.h"
+
 
 #include <time.h>
 
 #define LINCE_PROFILE
 
-#include "lince.h"
+#include <lince.h>
 #include "lince/core/profiler.h"
 
 #include "cglm/types.h"
@@ -291,7 +293,7 @@ void ChickenEnds(LinceTileAnim* anim, void* args){
 
 // TEST LAYER
 
-typedef struct TestLayer {
+typedef struct EditorLayer {
     char name[LINCE_NAME_MAX];
     float dt;
     float cam_speed;
@@ -321,12 +323,12 @@ typedef struct TestLayer {
 
     int chosen_menu_tile;
 
-} TestLayer;
+} EditorLayer;
 
 /*
 Highlights the tile where the mouse is
 */
-void DrawHoverTile(TestLayer* data){
+void DrawHoverTile(EditorLayer* data){
 
     vec2 xy_ind;
     int chosen_tile = GetTilemapIndexAtMouse(data->tilemap, data->cam, xy_ind);
@@ -342,7 +344,7 @@ void DrawHoverTile(TestLayer* data){
 }
 
 
-void MovePlayer(TestLayer* data){
+void MovePlayer(EditorLayer* data){
 
     const float cam_speed = data->cam_speed;
     const float zoom      = data->cam->zoom;
@@ -431,9 +433,9 @@ void MovePlayer(TestLayer* data){
 }
 
 
-void TestLayerOnAttach(LinceLayer* layer) {
+void EditorLayerOnAttach(LinceLayer* layer) {
     LINCE_PROFILER_START(timer);
-    TestLayer* data = LinceGetLayerData(layer);
+    EditorLayer* data = LinceGetLayerData(layer);
     LINCE_INFO(" Layer '%s' attached", data->name);
 
     data->cam = LinceCreateCamera(LinceGetAspectRatio());
@@ -540,8 +542,8 @@ void TestLayerOnAttach(LinceLayer* layer) {
     LINCE_PROFILER_END(timer);
 }
 
-void TestLayerOnDetach(LinceLayer* layer) {
-    TestLayer* data = LinceGetLayerData(layer);
+void EditorLayerOnDetach(LinceLayer* layer) {
+    EditorLayer* data = LinceGetLayerData(layer);
     LINCE_INFO(" Layer '%s' detached", data->name);
 
     LinceDeleteTexture(data->tex_front);
@@ -557,7 +559,7 @@ void TestLayerOnDetach(LinceLayer* layer) {
     LinceFree(data);
 }
 
-void DrawGUI(TestLayer* data){
+void DrawGUI(EditorLayer* data){
     LINCE_PROFILER_START(timer);
 
     LinceUILayer* ui = LinceGetAppState()->ui;
@@ -638,10 +640,10 @@ void DrawGUI(TestLayer* data){
 }
 
 
-void TestLayerOnUpdate(LinceLayer* layer, float dt) {
+void EditorLayerOnUpdate(LinceLayer* layer, float dt) {
     LINCE_PROFILER_START(timer);
 
-    TestLayer* data = LinceGetLayerData(layer);
+    EditorLayer* data = LinceGetLayerData(layer);
     data->dt = dt;
     LinceUILayer* ui = LinceGetAppState()->ui;
     LINCE_UNUSED(ui);
@@ -710,8 +712,8 @@ void TestLayerOnUpdate(LinceLayer* layer, float dt) {
     LINCE_PROFILER_END(timer);
 }
 
-void TestLayerOnEvent(LinceLayer* layer, LinceEvent* event){
-    TestLayer* data = LinceGetLayerData(layer);
+void EditorLayerOnEvent(LinceLayer* layer, LinceEvent* event){
+    EditorLayer* data = LinceGetLayerData(layer);
 
     if(event->type == LinceEventType_MouseScrolled){
         LinceMouseScrolledEvent* scroll = event->data.MouseScrolled;    
@@ -735,19 +737,19 @@ void TestLayerOnEvent(LinceLayer* layer, LinceEvent* event){
     }
 }
 
-LinceLayer* TestLayerInit(char* name) {
+LinceLayer* EditorLayerInit(char* name) {
 
-    TestLayer* my_layer = LinceCalloc(sizeof(TestLayer));
+    EditorLayer* my_layer = LinceCalloc(sizeof(EditorLayer));
 
     size_t len_orig = strlen(name);
     size_t len = len_orig < LINCE_NAME_MAX ? len_orig : LINCE_NAME_MAX;
     memmove(my_layer->name, name, len);
 
     LinceLayer* layer = LinceCreateLayer(my_layer);
-    layer->OnAttach = TestLayerOnAttach;
-    layer->OnDetach = TestLayerOnDetach;
-    layer->OnEvent  = TestLayerOnEvent;
-    layer->OnUpdate = TestLayerOnUpdate;
+    layer->OnAttach = EditorLayerOnAttach;
+    layer->OnDetach = EditorLayerOnDetach;
+    layer->OnEvent  = EditorLayerOnEvent;
+    layer->OnUpdate = EditorLayerOnUpdate;
 
     return layer;
 }
@@ -755,48 +757,19 @@ LinceLayer* TestLayerInit(char* name) {
 
 // =============================================================
 
-
-void GameInit() {
+void EditorInit() {
 	LINCE_INFO("\n User App Initialised");
     
-    LincePushLayer(TestLayerInit("Test"));
+    LincePushLayer(EditorLayerInit("Test"));
     //LincePushLayer(NKLayerInit());
 }
 
-void GameOnUpdate(float dt) {
+void EditorOnUpdate(float dt) {
     LinceCheckErrors();
     LINCE_UNUSED(dt);
 }
 
-void GameTerminate() {
+void EditorTerminate() {
     LINCE_INFO(" User App Terminated");
 }
 
-int main(int argc, const char* argv[]) {
-
-    #ifdef LINCE_DEBUG
-    LINCE_INFO(" --- DEBUG MODE --- ");
-    #endif
-
-    LinceApp* app = LinceGetAppState();
-
-    // app->user_data = NULL;
-    app->screen_width = 900;
-    app->screen_height = 600;
-    app->title = "Sandbox";
-    // app->flags = LINCE_FULLSCREEN | LINCE_VSYNC | LINCE_RESIZEABLE | ...
-
-    app->game_init = GameInit;
-    app->game_on_update = GameOnUpdate;
-    // app->game_on_event = GameOnEvent;
-    app->game_terminate = GameTerminate;
-    
-    app->enable_profiling = LinceTrue;
-    app->profiler_filename = "tests/profiling/profile.txt";
-    
-    LinceRun();
-
-    LINCE_UNUSED(argc);
-    LINCE_UNUSED(argv);
-    return 0;
-}

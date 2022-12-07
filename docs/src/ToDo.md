@@ -22,8 +22,8 @@
 	1. Tilesets and texture atlases ✅
 	2. Tile animations 💛
 	3. Tilemaps 💛
-4. Audio 🔷
-	1. Integrate OpenAL
+4. Audio 💛
+	1. Integrate Miniaudio
 	2. Build audio API
 
 ## Project Structure
