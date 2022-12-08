@@ -404,7 +404,8 @@ project "pong"
         "%{IncludeDir.glfw}",
         "%{IncludeDir.glad}",
         "%{IncludeDir.cglm}",
-        "%{IncludeDir.nuklear}"
+        "%{IncludeDir.nuklear}",
+        "%{IncludeDir.miniaudio}",
     }
 
     links {
@@ -413,7 +414,8 @@ project "pong"
         "glfw",
         "cglm",
         "nuklear",
-        "stb"
+        "stb",
+        "miniaudio"
     }
 
     libdirs {"bin/" .. OutputDir .. "/lince"}
@@ -424,7 +426,7 @@ project "mcommand"
     language "C"
     staticruntime "on"
     location "build/mcommand"
-
+    
     targetdir ("bin/" .. OutputDir .. "/%{prj.name}")
     objdir ("obj/" .. OutputDir .. "/%{prj.name}")
 
