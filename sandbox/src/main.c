@@ -2,7 +2,7 @@
 #include <lince.h>
 #include "audio.h"
 
-#define TIMER_MAX 1500.0f
+#define TIMER_MAX 1000.0f
 float counter_ms = TIMER_MAX; // milliseconds
 char* audio_file = NULL;
 LinceAudioManager audio;
