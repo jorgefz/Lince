@@ -12,12 +12,5 @@ typedef struct Collider {
 LinceBool CollidersOverlap(Collider* a, Collider* b);
 
 
-typedef struct GameObject{
-	Collider* collider_comp;
-	LinceQuadProps* sprite_comp;
-	// Timer* timer_comp;
-} GameObject;
-
-
 
 #endif /* MCOMMAND_COLLIDER_H */

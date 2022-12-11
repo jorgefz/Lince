@@ -7,8 +7,9 @@
 #include <cglm/affine.h>
 
 #include "timer.h"
-#include "blast.h"
 #include "collider.h"
+#include "gameobject.h"
+#include "blast.h"
 #include "marker.h"
 
 /*
@@ -27,7 +28,7 @@ Notes:
 
 #define MISSILE_WIDTH 0.04f
 #define MISSILE_HEIGHT 0.10f
-#define MISSILE_COOLDOWN 1000.0f // launch min every 1 sec
+#define MISSILE_COOLDOWN 100.0f // launch min every 1 sec
 
 #define BOMB_WIDTH 0.1f
 #define BOMB_HEIGHT 0.1f
@@ -35,6 +36,7 @@ Notes:
 
 #define BKG_WIDTH 3.5f
 #define BKG_HEIGHT 2.0f
+
 
 
 typedef struct GameState{
@@ -85,6 +87,9 @@ float CalculateCannonAngle(LinceCamera* cam){
 float FindDistance2D(float x1, float y1, float x2, float y2){
 	return sqrtf( powf(x2-x1,2) + powf(y2-y1,2) );
 }
+
+
+
 
 // ---------------------------
 
@@ -175,7 +180,7 @@ void DeleteMissile(GameState* state, int index){
 	array_remove(&state->missile_list, index);
 	m = NULL;
 
-	DeleteMarker(&state->marker_list, index);
+	DeleteEntityItem(&state->marker_list, index);
 	CreateBlast(&state->blast_list, (vec2){x,y}, state->blast_tex);
 	
 	// search and delete bombs within radius
@@ -190,7 +195,6 @@ void DeleteMissile(GameState* state, int index){
 			break;
 		}
 	}
-	
 }
 
 
@@ -205,8 +209,9 @@ void UpdateMissiles(GameState* state){
 	int stray_missile = -1;
 	for(uint32_t i = 0; i != state->missile_list.size; ++i){
 		Collider* ms = array_get(&state->missile_list, i);
-		float marker_y = ((Marker*)array_get(&state->marker_list,i))->y;
-		
+		GameObject* marker = array_get(&state->marker_list, i);
+		float marker_y = marker->sprite->y;
+
 		// out of bounds missiles
 		if (ms->x > state->xmax || ms->x < state->xmin ||
 			ms->y > state->ymax || ms->y < state->ymin
@@ -324,8 +329,8 @@ void MCommandOnAttach(LinceLayer* layer){
 
 	data->bomb_list = array_create(sizeof(Collider));
 	data->missile_list = array_create(sizeof(Collider));
-	data->marker_list = array_create(sizeof(Marker));
-	data->blast_list = array_create(sizeof(Blast));
+	data->marker_list = array_create(sizeof(GameObject));
+	data->blast_list = array_create(sizeof(GameObject));
 
 	data->bomb_timer = (Timer){.start = BOMB_COOLDOWN, .tick = -1.0f, .end = 0.0f};
 	ResetTimer(&data->bomb_timer);
@@ -397,9 +402,9 @@ void MCommandOnUpdate(LinceLayer* layer, float dt){
 	
 	DrawMissiles(data);
 	DrawBombs(data);
-	DrawMarkers(&data->marker_list);
-	DrawBlasts(&data->blast_list);
-	
+	DrawEntityList(&data->marker_list);
+	DrawEntityList(&data->blast_list);
+
 	LinceEndScene();
 	LinceSetClearColor(0.0, 0.0, 0.0, 1.0);
 }
@@ -423,8 +428,11 @@ void MCommandOnDetach(LinceLayer* layer){
 
 	array_destroy(&data->missile_list);
 	array_destroy(&data->bomb_list);
-	array_destroy(&data->marker_list);
-	array_destroy(&data->blast_list);
+	
+	// DeleteEntityList(&data->missile_list);
+	// DeleteEntityList(&data->bomb_list);
+	DeleteEntityList(&data->marker_list);
+	DeleteEntityList(&data->blast_list);
 	
 	LinceDeleteCamera(data->cam);
 	LinceDeleteTexture(data->missile_tex);
