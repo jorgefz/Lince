@@ -42,4 +42,6 @@ The project contains the source code for the following packages, which are built
 The project makes use of `mdbook` to generate the documentation website (https://github.com/rust-lang/mdBook)
 
 
+## Credit
 
+This repository contains audio files obtained from freesound.org, which are licensed under the Creative Commons Attribution 4.0 license (https://creativecommons.org/licenses/by/4.0/)

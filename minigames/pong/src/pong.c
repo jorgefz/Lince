@@ -101,7 +101,7 @@ void MoveBall(GameObject* ball, float dt, float xmin, float xmax, float ymin, fl
 	}
 	else if (ydir == UP) {
 		if (ball->y + ball->h/2.0f + dy > ymax){
-			ball->vy *= -1.0f;
+			ball->vy *= -1.0f;w
 			PlayBallBounceSound(data);
 		}
 		ball->y += dy;

@@ -2,7 +2,13 @@
 #include "math.h"
 #include "time.h"
 
+#include <lince/containers/array.h>
+
 #include <cglm/affine.h>
+
+#include "blast.h"
+#include "collider.h"
+#include "marker.h"
 
 /*
 TO-DO:
@@ -18,11 +24,6 @@ Notes:
 
 #define BOMB_HP_DAMAGE 10
 
-#define BLAST_RADIUS 0.12f
-#define BLAST_LIFETIME_MS 1000.0f
-#define BLAST_LIFELOSS 0.5f
-#define BLAST_COLOR_INIT {1.0f, 1.0f, 0.0, 1.0f}
-
 #define MISSILE_WIDTH 0.04f
 #define MISSILE_HEIGHT 0.10f
 #define BOMB_WIDTH 0.1f
@@ -31,16 +32,6 @@ Notes:
 #define BKG_WIDTH 3.5f
 #define BKG_HEIGHT 2.0f
 
-typedef struct Collider {
-	float x, y, vx, vy, w, h, angle;
-} Collider;
-
-typedef struct Blast {
-	float x, y;      // position
-	float color[4];  // color of the blast
-	float lifetime;  // time left
-	float life_loss; // loss rate of lifetime
-} Blast;
 
 typedef struct Marker {
 	float x, y;
@@ -65,13 +56,11 @@ typedef struct GameState{
 
 	LinceBool missile_cooldown;
 	float bomb_cooldown, bomb_cooldown_max;
-
-	Blast* blasts;				// kill radius generated when missile detonates
-	int blast_count;
+		
+	array_t blast_list; // kill radius generated when missile detonates
 	LinceTexture* blast_tex;	// texture of a blast - circle
-
-	Marker* markers;
-	int marker_count;
+	
+	array_t marker_list;
 	LinceTexture* marker_tex;
 
 	LinceTexture* bkg_city;
@@ -87,34 +76,13 @@ float GetRandomFloat(float a, float b) {
     return a + r;
 }
 
-void ToWorldCoords(float *x, float *y, LinceCamera* cam){
-	float sx = *x, sy = *y;
-	const float w = (float)LinceGetAppState()->window->width;
-	const float h = (float)LinceGetAppState()->window->height;
-	// normalise screen coordinates to range (-1,1)
-	sx = 2.0f*sx/w - 1.0f;
-	sy = 1.0f - 2.0f*sy/h;
-	vec4 svec = {sx, sy, 0.0f, 1.0f};
-	mat4 vp_inv;
-	vec4 wvec;
-	glm_mat4_inv(cam->view_proj, vp_inv);
-	glm_mat4_mulv(vp_inv, svec, wvec);
-	*x = wvec[0] / wvec[3];
-	*y = wvec[1] / wvec[3];
-}
-
-void GetMousePosWorld(float *x, float *y, LinceCamera* cam){
-	LinceGetMousePos(x, y);
-	ToWorldCoords(x, y, cam);
-}
-
 // Calculates the angle between the Y axis (centered on the screen)
 // and the line connecting the cannon and the mouse pointer.
 float CalculateCannonAngle(LinceCamera* cam){
-	float mouse_x, mouse_y;
-	GetMousePosWorld(&mouse_x, &mouse_y, cam);
-	const float cannon_x = 0.0f, cannon_y = -1.0f;
-	return 90.0f - atan2f(mouse_y-cannon_y, mouse_x-cannon_x) * 180.0f / M_PI;
+	vec2 mouse;
+	LinceGetMousePosWorld(mouse, cam);
+	static const float cannon_x = 0.0f, cannon_y = -1.0f;
+	return 90.0f - atan2f(mouse[1]-cannon_y, mouse[0]-cannon_x) * 180.0f / M_PI;
 }
 
 void DeleteListItem(void** list_address, size_t* items, size_t item_size, size_t index){
@@ -147,87 +115,25 @@ float FindDistance2D(float x1, float y1, float x2, float y2){
 
 // ---------------------------
 
-void CreateBlast(GameState* state, float x, float y){
-	state->blast_count++;
-	Blast* new_list = realloc(state->blasts, state->blast_count * sizeof(Blast));
-	LINCE_ASSERT_ALLOC(new_list, state->blast_count * sizeof(Blast));
-	state->blasts = new_list;
-
-	Blast* b = &state->blasts[state->blast_count - 1];
-	b->x = x;
-	b->y = y;
-	b->color[0] = 1.0f; b->color[1] = 1.0f;
-	b->color[2] = 0.0f; b->color[3] = 1.0f;
-	b->lifetime = BLAST_LIFETIME_MS;
-	b->life_loss = BLAST_LIFELOSS;
-}
-
-void DeleteBlast(GameState* state, int index){
-	size_t count = state->blast_count;
-	DeleteListItem((void**)&state->blasts, &count, sizeof(Blast), (size_t)index);
-	state->blast_count = (int)count;
-}
-
-void UpdateBlasts(GameState* state){
-	Blast* b;
-	for(int i=0; i!=state->blast_count; ++i){
-		b = &state->blasts[i];
-		if(b->lifetime <= 0.0f) continue;
-		b->lifetime -= b->life_loss * state->dt;
-		b->color[1] -= BLAST_LIFELOSS/BLAST_LIFETIME_MS * state->dt; // make redder
-		b->color[3] -= BLAST_LIFELOSS/BLAST_LIFETIME_MS * state->dt;
-		// update alpha, color, etc
-	}
-
-	// delete one old one
-	for(int i=0; i!=state->blast_count; ++i){
-		b = &state->blasts[i];
-		if (b->lifetime <= 0.0f){
-			DeleteBlast(state, i);
-			break;
-		}
-	}
-	
-}
-
-void DrawBlasts(GameState* state){
-	Blast* b;
-	for(int i=0; i!=state->blast_count; ++i){
-		b = &state->blasts[i];
-		LinceDrawQuad((LinceQuadProps){
-			.x = b->x,
-			.y = b->y,
-			.w = BLAST_RADIUS*2.0f,
-			.h = BLAST_RADIUS*2.0f,
-			.color = {b->color[0], b->color[1], b->color[2], b->color[3]},
-			.zorder = 0.5f,
-			.texture = state->blast_tex
-		});
-	}
-}
-
-
 
 void PlaceMarker(GameState* state){
-	float x, y;
-	GetMousePosWorld(&x, &y, state->cam);
-	state->marker_count++;
-	state->markers = realloc(state->markers, state->marker_count * sizeof(Marker));
-	LINCE_ASSERT_ALLOC(state->markers, state->marker_count * sizeof(Marker));
-	Marker* m = &state->markers[state->marker_count-1];
-	m->x = x;
-	m->y = y;
+	vec2 mouse;
+	LinceGetMousePosWorld(mouse, state->cam);
+	array_push_back(&state->marker_list, NULL);
+	Marker* m = array_back(&state->marker_list);
+	m->x = mouse[0];
+	m->y = mouse[1];
 }
 
 void DeleteMarker(GameState* state, int index){
-	size_t count = state->marker_count;
-	DeleteListItem((void**)&state->markers, &count, sizeof(Marker), (size_t)index);
-	state->marker_count = (int)count;
+	array_remove(&state->marker_list, index);
 }
 
 void DrawMarkers(GameState* state){
-	for(int i=0; i!=state->marker_count; ++i){
-		Marker* m = &state->markers[i];
+	
+	for(uint32_t i=0; i!=state->marker_list.size; ++i){
+		Marker* m = array_get(&state->marker_list, i);
+	
 		LinceDrawQuad((LinceQuadProps){
 			.x = m->x, .y = m->y,
 			.w = 0.05f, .h = 0.05f,
@@ -235,17 +141,6 @@ void DrawMarkers(GameState* state){
 			.texture = state->marker_tex
 		});
 	}
-}
-
-// Check if two non-rotatde rectangles overlap
-LinceBool CollidersOverlap(Collider* a, Collider* b){
-	LinceBool overlap =
-	a->x + a->w / 2.0f > b->x - b->w / 2.0f &&
-    a->x - a->w / 2.0f < b->x + b->w / 2.0f &&
-    a->y + a->h / 2.0f > b->y - b->h / 2.0f &&
-    a->y - a->h / 2.0f < b->y + b->h / 2.0f;
-
-	return overlap;
 }
 
 
@@ -291,15 +186,13 @@ void DeleteMissile(GameState* state, int index){
 		Collider* bomb = &state->bombs[i];
 		distance = FindDistance2D(x, y, bomb->x, bomb->y);
 		if(distance < BLAST_RADIUS){
-			CreateBlast(state, bomb->x, bomb->y);
+			CreateBlast(&state->blast_list, bomb->x, bomb->y);
 			DeleteBomb(state, i);
 			break;
 		}
 	}
 
-	// create blast
-	CreateBlast(state, x, y);
-
+	CreateBlast(&state->blast_list, x, y);
 }
 
 
@@ -315,7 +208,8 @@ void UpdateMissiles(GameState* state){
 	int stray_missile = -1;
 	for(int i=0; i!=state->missile_count; ++i){
 		Collider* ms = &state->missiles[i];
-		float marker_y = state->markers[i].y;
+		float marker_y = ((Marker*)array_get(&state->marker_list,i))->y;
+		
 		// out of bounds missiles
 		if (ms->x > state->xmax || ms->x < state->xmin ||
 			ms->y > state->ymax || ms->y < state->ymin
@@ -387,7 +281,7 @@ void UpdateBombs(GameState* state){
 		}
 	}
 	if(dead_bomb > -1){
-		CreateBlast(state, state->bombs[dead_bomb].x, state->bombs[dead_bomb].y);
+		CreateBlast(&state->blast_list, state->bombs[dead_bomb].x, state->bombs[dead_bomb].y);
 		DeleteBomb(state, dead_bomb);
 	}
 }
@@ -462,8 +356,8 @@ void DrawDebugUI(GameState* data){
 		DrawText(ui->ctx, NK_TEXT_LEFT, "Score: %d", data->score);
 		DrawText(ui->ctx, NK_TEXT_LEFT, "Missiles: %d",  data->missile_count);
 		DrawText(ui->ctx, NK_TEXT_LEFT, "Bombs: %d",  data->bomb_count);
-		DrawText(ui->ctx, NK_TEXT_LEFT, "Markers: %d",  data->marker_count);
-		DrawText(ui->ctx, NK_TEXT_LEFT, "Blasts: %d",  data->blast_count);
+		DrawText(ui->ctx, NK_TEXT_LEFT, "Markers: %d",  data->marker_list.size);
+		DrawText(ui->ctx, NK_TEXT_LEFT, "Blasts: %d",  data->blast_list.size);
 	}
 	nk_end(ui->ctx);
 
@@ -492,14 +386,12 @@ void MCommandOnAttach(LinceLayer* layer){
 	data->missiles = NULL;
 	data->missile_count = 0;
 
-	data->markers = NULL;
-	data->marker_count = 0;
+	data->marker_list = array_create(sizeof(Marker));
+	data->blast_list = array_create(sizeof(Blast));
+
 
 	data->bomb_cooldown_max = 3000.0f; // bomb every 3 seconds
 	data->bomb_cooldown = data->bomb_cooldown_max;
-
-	data->blast_count = 0;
-	data->blasts = NULL;
 
 	data->bomb_tex = LinceCreateTexture("Bomb",       "minigames/mcommand/assets/bomb.png");
 	data->missile_tex = LinceCreateTexture("Missile", "minigames/mcommand/assets/missile.png");
@@ -533,7 +425,7 @@ void MCommandOnUpdate(LinceLayer* layer, float dt){
 	}
 	UpdateBombs(data);
 	CheckBombIntercept(data);
-	UpdateBlasts(data);
+	UpdateBlasts(&data->blast_list, dt);
 	
 	DrawDebugUI(data);
 
@@ -564,7 +456,7 @@ void MCommandOnUpdate(LinceLayer* layer, float dt){
 	DrawMissiles(data);
 	DrawBombs(data);
 	DrawMarkers(data);
-	DrawBlasts(data);
+	DrawBlasts(&data->blast_list, data->blast_tex);
 	LinceEndScene();
 	LinceSetClearColor(0.0, 0.0, 0.0, 1.0);
 }
@@ -583,8 +475,9 @@ void MCommandOnDetach(LinceLayer* layer){
 
 	if(data->missiles) free(data->missiles);
 	if(data->bombs) free(data->bombs);
-	if(data->markers) free(data->markers);
-	if(data->blasts) free(data->blasts);
+
+	array_destroy(&data->marker_list);
+	array_destroy(&data->blast_list);
 
 	LinceDeleteCamera(data->cam);
 	LinceDeleteTexture(data->missile_tex);

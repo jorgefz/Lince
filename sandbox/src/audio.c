@@ -20,10 +20,15 @@ void LinceInitAudioManager(LinceAudioManager* audio){
 void LinceDeleteAudioManager(LinceAudioManager* audio){
     ma_engine_uninit(&audio->engine);
 
+    /*
+    // Sounds get automatically destroyed when the engine is deleted
     for(uint32_t i = 0; i != audio->sounds->size; ++i){
         ma_sound* sound = array_get(audio->sounds, i);
-        ma_sound_uninit(sound);
+        ma_sound_stop(sound);
+        ma_sound_uninit(sound);    
     }
+    */
+    
     array_destroy(audio->sounds);
     LinceFree(audio->sounds);
     audio->sounds = NULL;
@@ -34,7 +39,6 @@ void LincePlaySound(LinceAudioManager* audio, const char* filename){
 }
 
 
-/*
 void LinceStreamSound(LinceAudioManager* audio, const char* filename){
     
     ma_sound *s;
@@ -45,4 +49,4 @@ void LinceStreamSound(LinceAudioManager* audio, const char* filename){
     ma_sound_init_from_file(&audio->engine, filename, MA_SOUND_FLAG_STREAM, NULL, NULL, s);
     ma_sound_start(s);
 }
-*/
+
