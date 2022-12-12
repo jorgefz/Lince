@@ -94,14 +94,27 @@ float FindDistance2D(float x1, float y1, float x2, float y2){
 // ---------------------------
 
 
-void CreateBomb(array_t* bomb_list){
-	Collider bomb = {
+void CreateBomb(array_t* bomb_list, LinceTexture* texture){
+	Collider collider = {
 		.x = GetRandomFloat(-1.3f, 1.3f),
 		.y = 1.0f,
 		.vx = 0.0f,
 		.vy = -5e-4f,
 		.w = BOMB_WIDTH,
 		.h = BOMB_HEIGHT
+	};
+	Sprite sprite = {
+		.x = collider.x,
+		.y = collider.y,
+		.w = collider.w,
+		.h = collider.h,
+		.color = {1.0f, 1.0f, 1.0f, 1.0f},
+		.rotation = 0.0f,
+		.texture = texture
+	};
+	GameObject bomb = {
+		.collider = LinceNewCopy(&collider, sizeof(Collider)),
+		.sprite   = LinceNewCopy(&sprite, sizeof(Sprite)),
 	};
 	array_push_back(bomb_list, &bomb);
 }
@@ -114,16 +127,26 @@ void DeleteBomb(array_t* bomb_list, int index){
 
 void UpdateBombs(GameState* state){
 
+	Collider *b;
+	Sprite *s;
+	GameObject *obj;
+
 	// Move one time step
 	for(uint32_t i=0; i!=state->bomb_list.size; ++i){
-		Collider* bomb = array_get(&state->bomb_list, i);
-		bomb->x += bomb->vx;
-		bomb->y += bomb->vy;
+		// Collider* bomb = array_get(&state->bomb_list, i);
+		obj = array_get(&state->bomb_list, i);
+		b = obj->collider;
+		s = obj->sprite;
+		b->x += b->vx;
+		b->y += b->vy;
+		s->x = b->x;
+		s->y = b->y;
 	}
 
 	int dead_bomb = -1;
 	for(uint32_t i=0; i!=state->bomb_list.size; ++i){
-		Collider* b = array_get(&state->bomb_list, i);
+		obj = array_get(&state->bomb_list, i);
+		b = obj->collider;
 		// find crashed bomb
 		if (b->y <= state->ymin){
 			dead_bomb = (int)i;
@@ -132,15 +155,17 @@ void UpdateBombs(GameState* state){
 		}
 	}
 	if(dead_bomb > -1){
-		Collider *b = array_get(&state->bomb_list, dead_bomb);
+		obj = array_get(&state->bomb_list, dead_bomb);
+		b = obj->collider;
 		vec2 pos = {b->x, b->y};
 		CreateBlast(&state->blast_list, pos, state->blast_tex);
-		DeleteBomb(&state->bomb_list, dead_bomb);
+		DeleteEntityItem(&state->bomb_list, dead_bomb);
 	}
 }
 
 
 void DrawBombs(GameState* state){
+	return;
 	for(uint32_t i=0; i!=state->bomb_list.size; ++i){
 		Collider* bomb = array_get(&state->bomb_list, i);
 		LinceDrawQuad((LinceQuadProps){
@@ -185,13 +210,16 @@ void DeleteMissile(GameState* state, int index){
 	
 	// search and delete bombs within radius
 	float distance;
+	GameObject* obj;
+	Collider *b;
 	for(uint32_t i=0; i!=state->bomb_list.size; ++i){
-		Collider* bomb = array_get(&state->bomb_list, i);
-		distance = FindDistance2D(x, y, bomb->x, bomb->y);
+		obj = array_get(&state->bomb_list, i);
+		b = obj->collider;
+		distance = FindDistance2D(x, y, b->x, b->y);
 		if(distance < BLAST_RADIUS){
-			vec2 pos = {bomb->x, bomb->y};
+			vec2 pos = {b->x, b->y};
 			CreateBlast(&state->blast_list, pos, state->blast_tex);
-			DeleteBomb(&state->bomb_list, i);
+			DeleteEntityItem(&state->bomb_list, i);
 			break;
 		}
 	}
@@ -253,9 +281,12 @@ void CheckBombIntercept(GameState* state){
 
 	int dead_bomb = -1;
 	int dead_missile = -1;
+	GameObject* obj;
+	Collider* b;
 
 	for(uint32_t i=0; i!=state->bomb_list.size; ++i){
-		Collider* b = array_get(&state->bomb_list, i);
+		obj = array_get(&state->bomb_list, i);
+		b = obj->collider;
 
 		for(uint32_t j = 0; j != state->missile_list.size; ++j){
 			
@@ -271,7 +302,7 @@ void CheckBombIntercept(GameState* state){
 	}
 
 	if(dead_bomb != -1){
-		DeleteBomb(&state->bomb_list, dead_bomb);
+		DeleteEntityItem(&state->bomb_list, dead_bomb);
 		DeleteMissile(state, dead_missile);
 	}
 }
@@ -327,8 +358,8 @@ void MCommandOnAttach(LinceLayer* layer){
 	data->xmax = 1.5f;
 	data->dt = 0.0f;
 
-	data->bomb_list = array_create(sizeof(Collider));
 	data->missile_list = array_create(sizeof(Collider));
+	data->bomb_list = array_create(sizeof(GameObject));
 	data->marker_list = array_create(sizeof(GameObject));
 	data->blast_list = array_create(sizeof(GameObject));
 
@@ -368,7 +399,7 @@ void MCommandOnUpdate(LinceLayer* layer, float dt){
 	UpdateTimer(&data->bomb_timer, dt);
 	if(data->bomb_timer.finished){
 		ResetTimer(&data->bomb_timer);
-		CreateBomb(&data->bomb_list);
+		CreateBomb(&data->bomb_list, data->bomb_tex);
 	}
 	UpdateBombs(data);
 	CheckBombIntercept(data);
@@ -401,7 +432,8 @@ void MCommandOnUpdate(LinceLayer* layer, float dt){
 	});
 	
 	DrawMissiles(data);
-	DrawBombs(data);
+	// DrawBombs(data);
+	DrawEntityList(&data->bomb_list);
 	DrawEntityList(&data->marker_list);
 	DrawEntityList(&data->blast_list);
 
@@ -427,10 +459,8 @@ void MCommandOnDetach(LinceLayer* layer){
 	GameState* data = LinceGetLayerData(layer);
 
 	array_destroy(&data->missile_list);
-	array_destroy(&data->bomb_list);
 	
-	// DeleteEntityList(&data->missile_list);
-	// DeleteEntityList(&data->bomb_list);
+	DeleteEntityList(&data->bomb_list);
 	DeleteEntityList(&data->marker_list);
 	DeleteEntityList(&data->blast_list);
 	
