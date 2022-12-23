@@ -25244,7 +25244,7 @@ nk_slider_float(struct nk_context *ctx, float min_value, float *value, float max
     float value_step)
 {
     struct nk_window *win;
-    struct nk_panel *layout;
+   struct nk_panel *layout;
     struct nk_input *in;
     const struct nk_style *style;
 

@@ -25,7 +25,7 @@ void* LinceRealloc(void* ptr, size_t nbytes){
 }
 
 /* Copies `nbytes` from `ptr` into heap-allocated memory */
-void* LinceNewCopy(void* ptr, size_t nbytes){
+void* LinceNewCopy(const void* ptr, size_t nbytes){
 	void* dest = LinceMalloc(nbytes);
 	if(!dest) return NULL;
 	memmove(dest, ptr, nbytes);

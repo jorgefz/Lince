@@ -2,56 +2,57 @@
 #define LINCE_AUDIO_H
 
 #include <miniaudio.h>
+#include <lince/core/core.h>
 #include <lince/containers/array.h>
+
+typedef enum LinceSoundType {
+    LinceSound_Buffer, LinceSound_Stream
+} LinceSoundType;
+
+// Sound instance that plays an audio file
+typedef struct LinceSound{
+    ma_sound* handle;
+    char* filename;
+    enum LinceSoundType type;
+    float volume;
+    LinceBool loop;
+} LinceSound;
+
+// Stores sound objects from the same sound file for simultaneous playing
+typedef struct LinceSoundCollection{
+    array_t sounds; // array<LinceSound>
+    char* filename;
+
+    enum LinceSoundType type;
+} LinceSoundCollection;
 
 typedef struct LinceAudioManager {
     ma_engine engine;
-    array_t* sounds;
+    array_t sounds; // unused
 } LinceAudioManager;
 
+// Creates ma_sound handle from filename and config passed through provided object
+int LinceCreateSoundInstance(LinceAudioManager* audio, LinceSound* s);
+
+// Uninitialises provided sound object
+void LinceDeleteSoundInstance(LinceSound* s);
+
+void LinceUpdateSoundInstance(LinceSound* s);
+void LincePlaySoundInstance(LinceSound* s);
+void LinceStopSoundInstance(LinceSound* s);
+void LinceRewindSoundInstance(LinceSound* s);
+
+LinceBool LinceIsSoundStopped(LinceSound* s);
+LinceBool LinceIsSoundFinished(LinceSound* s);
+LinceBool LinceIsSoundPlaying(LinceSound* s);
+
+LinceSoundCollection* LinceInitSoundCollection(LinceSoundType type, const char* filename);
+void LinceDeleteSoundCollection(LinceSoundCollection* sc);
+
+void LinceSpawnSound(LinceAudioManager* audio, LinceSoundCollection* sc, LinceSound* config);
+
 void LinceInitAudioManager(LinceAudioManager* audio);
+void LinceTerminateAudioManager(LinceAudioManager* audio);
 
-void LinceDeleteAudioManager(LinceAudioManager* audio);
-
-void LincePlaySound(LinceAudioManager* audio, const char* filename);
-
-void LinceStreamSound(LinceAudioManager* audio, const char* filename);
-
-// void LinceLoadSound(LinceAudioManager* audio, const char* name, const char* filename);
 
 #endif /* LINCE_AUDIO_H */
-
-
-/*========== API Design =========*/
-#if 0
-
-struct LinceSound {
-    ma_sound* handle;
-    char* filename;
-}
-
-void LinceLoadSound(manager, name, filename, mode){
-    // Create LinceSound object
-    // Store filename
-    // Create ma_sound from filename with given mode
-    // Store ma_sound handle in LinceSound object.
-    // Store LinceSound object in hashmap using given name as key
-}
-
-void LincePlaySound(manager, name){
-    // Find key in hashmap and retrieve LinceSound object
-    // ma_sound_start
-}
-
-void LinceStopSound(manager, name){
-    // Find key in hashmap and retrieve LinceSound object
-    // ma_sound_stop
-}
-
-void LinceRestartSound(manager, name){
-    // Find key in hashmap and retrieve LinceSound object
-    // ma_sound_seek_pc_frames(0)
-    // ma_sound_start
-}
-
-#endif

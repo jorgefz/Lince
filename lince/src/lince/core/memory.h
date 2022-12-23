@@ -16,6 +16,6 @@ void* LinceRealloc(void* ptr, size_t nbytes);
 #define LinceFree(p) do{ if(p) LINCE_FREE(p); (p) = NULL; } while(0)
 
 /* Copies `nbytes` from `ptr` into heap-allocated memory */
-void* LinceNewCopy(void* ptr, size_t nbytes);
+void* LinceNewCopy(const void* ptr, size_t nbytes);
 
 #endif /* LINCE_MEMORY_H */

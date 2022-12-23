@@ -7,8 +7,24 @@
 key-value pairs, using a hashmap.
 Hash collisions are handled using linked lists on each bucket.
 
-Supported features:
-    - 
+
+Example code:
+
+    hashmap_t map = hashmap_create(5); // initial expected size
+
+    int x = 10;
+    float y = 0.016;
+
+    hashmap_set(&map, "integer", &x);
+    hashmap_set(&map, "floating", &y);
+
+    int a = *(int*)hashmap_get(&map, "integer");
+    float b = *(floating*)hashmap_get(&map, "floating");
+
+    assert(x == a);
+    assert(y == b);
+
+    hashmap_free(&map); // does not free stored values
 
 */
 
