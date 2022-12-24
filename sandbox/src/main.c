@@ -2,75 +2,89 @@
 #include <lince.h>
 #include "audio.h"
 
-#define TIMER_MAX 3000.0f
+
 
 const char* audio_file = "sandbox/assets/cat.wav";
 const char* music_file = "sandbox/assets/game-town-music.wav";
 
-LinceSoundCollection* sound_bundle = NULL;
-LinceSound music = {
-    .type = LinceSound_Stream,
-    .filename = "sandbox/assets/game-town-music.wav",
-    .volume = 0.5f
-};
+LinceSoundManager* sound_manager = NULL;
+LinceSound* music = NULL;
 
-
-LinceAudioManager audio;
+LinceAudioEngine* audio;
 
 
 void DrawUI(){
 
     LinceUILayer* ui = LinceGetAppState()->ui;
     struct nk_context *ctx = ui->ctx;
+    static LinceSoundConfig config = {.volume = 0.1f};
     
     nk_style_set_font(ui->ctx, &ui->fonts[LinceFont_Droid15]->handle);
-    if (nk_begin(ctx, "Demo", nk_rect(50, 50, 230, 250),
+    if (nk_begin(ctx, "Demo", nk_rect(20, 20, 300, 450),
         NK_WINDOW_BORDER|NK_WINDOW_MOVABLE|NK_WINDOW_SCALABLE|
         NK_WINDOW_MINIMIZABLE|NK_WINDOW_TITLE
     )) {
         nk_layout_row_static(ctx, 30, 80, 1);
+        nk_label(ctx, "MUSIC", NK_TEXT_ALIGN_CENTERED);
         if (nk_button_label(ctx, "Start")){
-            LincePlaySoundInstance(&music);
+            LincePlaySound(music);
         }
         if (nk_button_label(ctx, "Stop")){
-            LinceStopSoundInstance(&music);
+            LinceStopSound(music);
         }
         if (nk_button_label(ctx, "Reset")){
-            LinceRewindSoundInstance(&music);
+            LinceRewindSound(music);
         }
+        nk_label(ctx, "Volume", NK_TEXT_ALIGN_LEFT);
+        nk_slider_float(ctx, 0.0f, &music->config.volume, 5.0f, 0.01f);
+        
+        nk_label(ctx, "Pitch", NK_TEXT_ALIGN_LEFT);
+        nk_slider_float(ctx, 0.5f, &music->config.pitch, 2.5f, 0.01f);
+        
+        nk_label(ctx, "Pan", NK_TEXT_ALIGN_LEFT);
+        nk_slider_float(ctx, -1.0f, &music->config.pan, 1.0f, 0.01f);
 
         nk_layout_row_static(ctx, 30, 80, 1);
+        nk_label(ctx, "SOUNDS", NK_TEXT_ALIGN_CENTERED);
+        nk_labelf(ctx, NK_TEXT_ALIGN_CENTERED, "Instances: %u", sound_manager->sound_cache.size);
         if (nk_button_label(ctx, "Meow")){
-            LinceSound config = {.volume = 0.1f};
-            LinceSpawnSound(&audio, sound_bundle, &config);
+            LinceSpawnSound(audio, sound_manager, &config);
         }
+        if (nk_button_label(ctx, "Stop All")){
+            LinceStopAllManagerSounds(sound_manager);
+        }
+        nk_label(ctx, "Volume", NK_TEXT_ALIGN_LEFT);
+        nk_slider_float(ctx, 0.0f, &config.volume, 2.0f, 0.01f);
 
-        nk_layout_row_dynamic(ctx,30,2);
-        nk_slider_float(ctx, 0.0f, &music.volume, 5.0f, 0.1f);
-    } 
+    }
     nk_end(ctx);
-    
-    LinceUpdateSoundInstance(&music);
+    LinceUpdateSound(music);
 }
 
 void OnUpdate(float dt){
     DrawUI();
+    LINCE_UNUSED(dt);
 }
 
-int main(int argc, char** argv) {
+int main(void) {
 
     LinceApp* app = LinceGetAppState();
     app->game_on_update = OnUpdate;
 
-    LinceInitAudioManager(&audio);
-    sound_bundle = LinceInitSoundCollection(LinceSound_Buffer, audio_file);
-    LinceCreateSoundInstance(&audio, &music);
-    LincePlaySoundInstance(&music);
+    audio = LinceCreateAudioEngine();
+    
+    sound_manager = LinceCreateSoundManager(audio, LinceSound_Buffer, audio_file);
+    
+    LinceSoundConfig config = LinceGetDefaultSoundConfig();
+    config.loop = LinceTrue;
+    music = LinceLoadStream(audio, music_file, &config);
+    LincePlaySound(music);
 
     LinceRun();
 
-    LinceDeleteSoundCollection(sound_bundle);
-    LinceTerminateAudioManager(&audio);
+    LinceDeleteSound(music);
+    LinceDeleteSoundManager(sound_manager);
+    LinceDeleteAudioEngine(audio);
 
     return 0;
 }
