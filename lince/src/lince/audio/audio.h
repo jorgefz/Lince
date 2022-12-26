@@ -6,33 +6,37 @@
 
 Example Program:
 
+    // On Init
 
-    LinceAudioEngine audio_engine;
+    LinceAudioEngine* audio_engine;
     LinceSoundManager* sound_manager;
-    LinceSoundConfig sound_config = {.volume = 0.5f};
     LinceSound *music;
 
-    LinceInitAudioEngine(&audio_engine);
-    sound_manager = LinceCreateSoundManager(&audio_engine, "meow.wav");
+    LinceSoundConfig sound_config = LinceGetDefaultSoundConfig();
+    sound_config.volume = 0.5f;
 
-    // Play background music
-    music = LinceLoadStream(&audio_engine, "music.wav");
+    audio_engine = LinceCreateAudioEngine();
+    sound_manager = LinceCreateSoundManager(audio_engine, "meow.wav");
+    music = LinceLoadStream(audio_engine, "music.wav");
+
+    // -- play background music
+    
     music->config.volume = 0.3f;
     LinceUpdateSound(music);
     LincePlaySound(music);
 
     // On Update
 
-    if(button_press){
+    if( nk_button(...) ){
         // Play a sound
-        LinceSpawnSound(&audio_engine, sound_manager, &sound_config);
+        LinceSpawnSound(audio_engine, sound_manager, &sound_config);
     }
 
     // On Terminate
 
     LinceDeleteSoundManager(sound_manager);
     LinceDeleteSound(music);
-    LinceTerminateAudioEngine(&audio_engine);
+    LinceTerminateAudioEngine(audio_engine);
 
 */
 
@@ -66,7 +70,7 @@ To play the same sound simultaneously, create several LinceSound objects,
 or use the LinceSoundManager.
 */
 typedef struct LinceSound{
-    void* handle;
+    void* handle;    // ma_sound
     char* filename;
     enum LinceSoundType type;
     LinceSoundConfig config;
@@ -115,7 +119,7 @@ Uninitialises and deallocates a sound object.
 void LinceDeleteSound(LinceSound* s);
 
 /*
-Controls the sound cursos to start, stop, and rewind a sound.
+Controls the sound cursor to start, stop, and rewind a sound.
 */
 void LincePlaySound(LinceSound* s);
 void LinceStopSound(LinceSound* s);
@@ -123,6 +127,7 @@ void LinceRewindSound(LinceSound* s);
 
 /*
 Returns the status of a sound.
+Note: sound is 'stopped' when it is not playing but not finished either.
 */
 LinceBool LinceIsSoundStopped(LinceSound* s);
 LinceBool LinceIsSoundFinished(LinceSound* s);

@@ -1,17 +1,13 @@
 #include <stdio.h>
 #include <lince.h>
-#include "audio.h"
-
-
+#include <lince/audio/audio.h>
 
 const char* audio_file = "sandbox/assets/cat.wav";
 const char* music_file = "sandbox/assets/game-town-music.wav";
 
 LinceSoundManager* sound_manager = NULL;
 LinceSound* music = NULL;
-
 LinceAudioEngine* audio;
-
 
 void DrawUI(){
 
@@ -101,6 +97,7 @@ struct Timer;
 
 component_number = 3;
 enum ComponentIDs { SPRITE_COMP, COLLIDER_COMP, TIMER_COMP };
+
 LinceEntityRegistry* reg = LinceEntityRegistryInit(
     component_number,
     sizeof(Sprite),
@@ -114,7 +111,7 @@ ecs_add(e, SPRITE_COMP, LoadSprite("player.png"));
 while (1) {
     // Draw entities that have 'Sprite' component
     LinceEntityQuery* query = LinceQueryEntities(2, SPRITE_COMP, COLLIDER_COMP);
-    for(i in query->size){
+    for(int i = 0; i != query->size; ++i){
         Sprite* sprite = LinceGetComp(query, i, SPRITE_COMP);
         Collider* collider =  LinceGetComp(query, i, COLLIDER_COMP);
         

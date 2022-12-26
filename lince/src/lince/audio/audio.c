@@ -8,7 +8,10 @@
 
 
 static const LinceSoundConfig default_sound_config = {
-    .volume = 1.0f, .pitch = 1.0f, .pan = 0.0f, .loop = LinceFalse
+    .volume = 1.0f,
+    .pitch  = 1.0f,
+    .pan    = 0.0f,
+    .loop   = LinceFalse
 };
 
 
