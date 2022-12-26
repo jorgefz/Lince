@@ -22,26 +22,32 @@
 	1. Tilesets and texture atlases ✅
 	2. Tile animations 💛
 	3. Tilemaps 💛
-4. Audio 💛
-	1. Integrate Miniaudio
-	2. Build audio API
+4. Audio ✅
+	1. Integrate Miniaudio ✅
+	2. Build audio API ✅
+5. ECS
+	1. Develop ECS API
+	2. Add pre-defined components (.e.g Sprite to draw)
 
 ## Project Structure
 1. 💛 Embed engine resources within the code (e.g. default shaders and textures)
 2. 🟠 Create test suite for the engine
 3. 🟠 Improve documentation - perhaps move to a separate github repo.
-4. 🔷 Restructure engine to be in a separate folder, that can be included into the user's main game project.
+4. 💛 Restructure engine to be in a separate folder, that can be included into the user's main game project.
 5. 💛 Add benchmarking and identify slowest pieces of code that can be optimized.
-6. 🔷 Improve code speed & efficiency, e.g. place shader uniforms in a key-value map
+6. 💛 Improve code speed & efficiency
 
-## Data
-1. 🔷 Add data structures, e.g. linked lists, hashmaps, etc. 
+## Data structures
+1. ✅ **Add array (contiguous memory)**
+2. ✅ **Add hashmap**
+3. 💛 Add linked lists 
 
 ## Audio
-1. 🔷 Integrate an audio library into the project (OpenAL or simpler library)
+1. ✅ **Integrate Miniaudio library into the project**
+2. ✅ **Develop API layer for Miniaudio**
 
 ## Physics
-1. 💛 Add simple box colliders and algorithm to check
+1. 💛 Add simple rectangle colliders and algorithm to check for collision
 
 ## Scenes
 1. 🔷 Add static and parallax backgrounds
@@ -66,25 +72,17 @@
 3. ✅ **Sort out issues with event callbacks and GLFW user pointer**
 4. ✅ **Stop Nuklear API from exposing GLFW and OpenGL API to the user**
 5. ✅ **Move Nuklear rendering layer to the engine**
-6. 🔷 Provide UI callback to layers
-7. 🟠 Improve LinceUIText
+6. 🟠 Develop documentation for nuklear
+7. 🔷 Provide UI callback to layers
 
 ## API ease of use
 1. 💛 Add more user settings prior to calling `LinceRun`
-2. 🟠 Add `LinceLoadTexture` function with an extra argument for flags, i.e. flipping by the y axis on load.
-3. 🟠 Add memory management functions, e.g. LinceMalloc, LinceNewCopy, etc
+2. ✅ **Add `LinceLoadTexture` function with an extra argument for flags, i.e. flipping by the y axis on load.**
+3. ✅ **Add memory management functions (e.g. LinceMalloc, LinceNewCopy)**
 
 ## Bugs
-1. ✅ **(Solved)** Missile Command: some quads persist on the screen
+1. ✅ **(Solved) Missile Command: some quads persist on the screen**
 2. 🟠 Draw text overlay without consuming click events
-
-## Next goals
-1. 💛 Add UI library: [Nuklear](https://github.com/Immediate-Mode-UI/Nuklear/)
-2. 💛 Add tilesets
-3. 🔷 Add tilemaps
-4. 🔷 Make small games to test the engine
-5. 🔷 Make a tilemap editor
-6. 🔷 Add audio library, e.g. [Miniaudio](https://github.com/mackron/miniaudio)
 
 ## Extra/recurrent goals
 1. 🟠 Improve documentation

@@ -8,16 +8,19 @@ Version codes follow [Semantic Versioning](https://semver.org/).
 	tests
 	docs
 
+### To-Do
+- Refactored minigames and editor
+- Move documentation and minigames to separate github repositories?
+
+
 ## v0.5.0
-- Added miniaudio and basic audio API
+- Added basic audio API
+- Integrated miniaudio into the engine
 - Restructured build scripts to output binaries to common top-level folders `bin` and `obj`.
 - Moved output build files to `build` folder.
 - Separated nuklear and stb\_image to their own projects that build to a static library.
 - Separated `game` project into `editor` and `sandbox` projects.
 
-### To-Do
-- Refactored minigames and editor
-- Move documentation and minigames to separate github repositories?
 
 ## v0.4.2
 - Added benchmarking and profiling tools in Python
