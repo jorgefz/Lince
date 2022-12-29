@@ -76,14 +76,20 @@ uint32_t hashmap_hash(const char* key, uint32_t size) {
     return hash % size;
 }
 
-hashmap_t hashmap_create(uint32_t size_hint){
-    hashmap_t map = {.entries = 0, .size = next_prime(size_hint)};
-    map.table = calloc(map.size, sizeof(hm_entry_t*));
-    if(!map.table) return (hashmap_t){0};
-    return map;
+/*
+Initialises hashmap via passed pointer.
+Should be deleted using `hashmap_uninit`.
+*/
+int hashmap_init(hashmap_t* map, uint32_t size_hint){
+    *map = (hashmap_t){0};
+    map->size = next_prime(size_hint);
+    map->table = calloc(map->size, sizeof(hm_entry_t*));
+    if(!map->table) return 1;
+    return 0;
 }
 
-void hashmap_free(hashmap_t* map){
+/* Clears and deallocates a hashmap */
+void hashmap_uninit(hashmap_t* map){
     if(!map || !map->table) return;
 
     for(uint32_t i=0; i!=map->size; ++i){
@@ -95,11 +101,21 @@ void hashmap_free(hashmap_t* map){
             entry = next;
         }
     }
-    
     free(map->table);
-    map->table = NULL;
-    map->size = 0;
-    map->entries = 0;
+    *map = (hashmap_t){0};
+}
+
+hashmap_t* hashmap_create(uint32_t size_hint){
+    hashmap_t* map = malloc(sizeof(hashmap_t));
+    if(!map) return NULL;
+    hashmap_init(map, size_hint);
+    return map;
+}
+
+void hashmap_destroy(hashmap_t* map){
+    if(!map) return;
+    hashmap_uninit(map);
+    free(map);
 }
 
 /*
@@ -155,7 +171,8 @@ hashmap_t* hashmap_resize(hashmap_t* map){
     if(!map) return NULL;
 
     uint32_t new_size = map->entries * HASHMAP_LOADING_FACTOR;
-    hashmap_t new_map = hashmap_create(new_size);
+    hashmap_t new_map;
+    hashmap_init(&new_map, new_size);
     hm_entry_t* entry;
     uint32_t i;
 
@@ -167,8 +184,8 @@ hashmap_t* hashmap_resize(hashmap_t* map){
             entry = entry->next;
         }
     }
-
-    hashmap_free(map);
+    
+    hashmap_uninit(map);
     memmove(map, &new_map, sizeof(hashmap_t));
     return map;
 }

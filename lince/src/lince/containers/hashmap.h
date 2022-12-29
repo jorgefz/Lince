@@ -10,7 +10,8 @@ Hash collisions are handled using linked lists on each bucket.
 
 Example code:
 
-    hashmap_t map = hashmap_create(5); // initial expected size
+    hashmap_t map;
+    hashmap_init(&map, 5); // initial expected size
 
     int x = 10;
     float y = 0.016;
@@ -20,11 +21,11 @@ Example code:
 
     int a = *(int*)hashmap_get(&map, "integer");
     float b = *(floating*)hashmap_get(&map, "floating");
-
+    
     assert(x == a);
     assert(y == b);
 
-    hashmap_free(&map); // does not free stored values
+    hashmap_uninit(&map); // does not free stored values
 
 */
 
@@ -55,14 +56,34 @@ as it will be mod (%) with the hash result.
 */
 uint32_t hashmap_hash(const char* key, uint32_t size);
 
-/* Initialises an empty hashmap on the stack */
-hashmap_t hashmap_create(uint32_t size_hint);
+/*
+Initialises hashmap via passed pointer.
+Should be deleted using `hashmap_uninit`.
+Returns 0 on success, and 1 on fail.
+*/
+int hashmap_init(hashmap_t* map, uint32_t size_hint);
 
 /*
-Frees the hashmap table, entries, and keys
-Note: it does not free the values
+Clears a hashmap and removes all stored data.
+It does not free the pointers to values.
+You must free the values yourself before uninitialising the hashmap.
+You can do this by iterating over the keys and freeing each value in turn.
 */
-void hashmap_free(hashmap_t* map);
+void hashmap_uninit(hashmap_t* map);
+
+/*
+Allocates and initialises a hashmap.
+Destroy with `hashmap_destroy`.
+*/
+hashmap_t* hashmap_create(uint32_t size_hint);
+
+/*
+Deallocates a hashmap.
+It does not free the pointers to values.
+You must free the values yourself before destroying the hashmap.
+You can do this by iterating over the keys and freeing each value in turn.
+*/
+void hashmap_destroy(hashmap_t* map);
 
 /*
 Returns 1 if the hashmap contains the given key,
@@ -100,7 +121,7 @@ To get the first key, input NULL.
 The list of keys ends when the functions returns NULL.
 Example:
     char* key = NULL;
-    while((key = hashmap_keys(map, key))){
+    while((key = hashmap_iter_keys(map, key))){
         printf("%s\n", key);
     }
 */

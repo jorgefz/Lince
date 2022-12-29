@@ -76,9 +76,8 @@ LinceShader* LinceCreateShaderFromSrc(
 
 	// start out with hashmap of 21 buckets to avoid costs of
 	// resizing often at small sizes (e.g. at sizes 2, 3, 5, 7, 11, etc).
-	hashmap_t uniforms = hashmap_create(20);
-	LINCE_ASSERT(uniforms.table, "Failed to create hashmap for shader uniforms");
-	memmove(&shader->uniforms, &uniforms, sizeof(hashmap_t));
+	int ret = hashmap_init(&shader->uniforms, 20);
+	LINCE_ASSERT(ret == 0, "Failed to create hashmap for shader uniforms");
 
 	LINCE_PROFILER_END(timer);
     return shader;
@@ -102,7 +101,7 @@ void LinceDeleteShader(LinceShader* shader){
 	if(!shader) return;
 	LINCE_INFO(" Deleting Shader '%s'", shader->name);
 	if(shader->id > 0) glDeleteProgram(shader->id);
-	hashmap_free(&shader->uniforms);
+	hashmap_uninit(&shader->uniforms);
 	free(shader);
 }
 

@@ -128,9 +128,9 @@ LinceSoundManager* LinceCreateSoundManager(LinceAudioEngine* audio, LinceSoundTy
     LinceSoundManager manager = {
         .type = type,
         .filename = LinceNewCopy(filename, strlen(filename) + 1),
-        .sound_cache = array_create(sizeof(LinceSound))
     };
-    
+    array_init(&manager.sound_cache, sizeof(LinceSound));
+
     // Pre-load sound file
     LinceSound first = {
         .handle = LinceMalloc(sizeof(ma_sound)),
@@ -158,7 +158,7 @@ void LinceDeleteSoundManager(LinceSoundManager* manager){
             LinceFree(s->handle);
         }
     }
-    array_destroy(&manager->sound_cache);
+    array_uninit(&manager->sound_cache);
     LinceFree(manager); 
 }
 

@@ -14,9 +14,27 @@ typedef struct array_container {
 	uint32_t element_size;	// size of an element
 } array_t;
 
-// -- INITIALIZATIONS
-/* Creates a new array of size zero */
-array_t array_create(uint32_t element_size);
+// -- CONSTRUCTORS / DESTRUCTORS
+
+/*
+Initialises an array via a given pointer.
+Should be later freed using `array_uninit`.
+*/
+void array_init(array_t* array, uint32_t element_size);
+
+/*
+Resets the array data without freeing the array object itself.
+*/
+void array_uninit(array_t* array);
+
+/*
+Allocates a new array of size zero.
+Should be later freed with `array_destroy`.
+*/
+array_t* array_create(uint32_t element_size);
+
+/* Frees an allocated array */
+void array_destroy(array_t* array); // should also free array_t itself
 
 /*
 Initialises an array from existing data
@@ -80,9 +98,5 @@ array_t* array_pop_front(array_t* array);
 
 /* Removes all elements on the array */
 array_t* array_clear(array_t* array);
-
-// -- FREEING
-/* Frees all the elements of an array */
-void array_destroy(array_t* array);
 
 #endif /* ARRAY_H */

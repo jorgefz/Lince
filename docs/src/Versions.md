@@ -12,6 +12,8 @@ Version codes follow [Semantic Versioning](https://semver.org/).
 - Refactored minigames and editor
 - Move documentation and minigames to separate github repositories?
 
+## v0.5.1
+- Improved array and hashmap initialisation API 
 
 ## v0.5.0
 - Added basic audio API

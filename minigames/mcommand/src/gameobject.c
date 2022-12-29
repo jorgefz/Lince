@@ -34,5 +34,5 @@ void DeleteEntityList(array_t* list){
 		item = array_get(list, i);
         DeleteEntity(item);
 	}
-	array_destroy(list);
+	array_uninit(list);
 }

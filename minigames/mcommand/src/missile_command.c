@@ -348,10 +348,10 @@ void MCommandOnAttach(LinceLayer* layer){
 	data->xmax = 1.5f;
 	data->dt = 0.0f;
 
-	data->missile_list = array_create(sizeof(GameObject));
-	data->bomb_list    = array_create(sizeof(GameObject));
-	data->marker_list  = array_create(sizeof(GameObject));
-	data->blast_list   = array_create(sizeof(GameObject));
+	array_init(&data->missile_list, sizeof(GameObject));
+	array_init(&data->bomb_list, sizeof(GameObject));
+	array_init(&data->marker_list, sizeof(GameObject));
+	array_init(&data->blast_list, sizeof(GameObject));
 
 	data->bomb_timer = (Timer){.start = BOMB_COOLDOWN, .tick = -1.0f, .end = 0.0f};
 	ResetTimer(&data->bomb_timer);
