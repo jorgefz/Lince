@@ -1,10 +1,11 @@
 
 #include "test.h"
-#include "tests.h"
+#include "targets.h"
+
 
 int main(int argc, const char* argv[]){
 
-	containers_test();
+	run_all_tests();
 
 	return 0;
 }

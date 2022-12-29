@@ -24,6 +24,9 @@ listnode_t* list_create(void* data);
 /* Deletes all the nodes in a list */
 void list_destroy(listnode_t* head);
 
+/* Returns the number of elements in the list */
+uint32_t list_size(listnode_t* node);
+
 /* Returns the node at the given index from the given node */
 listnode_t* list_node_at(listnode_t* node, uint32_t index);
 
@@ -49,7 +52,7 @@ listnode_t* list_push_front(listnode_t* node, void* data);
 listnode_t* list_push_back(listnode_t* node, void* data);
 
 /* Discards a node from the list */
-listnode_t* list_remove(listnode_t* node);
+void list_remove(listnode_t* node);
 
 
 #endif /* LINKED_LIST_H */

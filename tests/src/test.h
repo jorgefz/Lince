@@ -1,3 +1,7 @@
+
+#ifndef LINCE_TEST_H
+#define LINCE_TEST_H
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -8,7 +12,7 @@ typedef int (*test_fn_t)(void);
 
 enum {TEST_PASS, TEST_FAIL};
 
-#define TEST_ASSERT(x, msg) if(!(x)){ printf("%s\n",msg); return TEST_FAIL; }
+#define TEST_ASSERT(x, msg) if(!(x)){ printf("%s, line %d - %s\n",__FILE__,__LINE__,(msg)); return TEST_FAIL; }
 
 #define TEST_CLOCK_START(time_name) clock_t time_name = clock()
 
@@ -31,3 +35,6 @@ void run_tests(struct test_t* tests, uint32_t count, const char* batch_name);
 #define GREEN "\e[1;32m"
 #define RED "\e[1;31m"
 #define NOCOLOR "\e[0m"
+
+
+#endif /* LINCE_TEST_H */

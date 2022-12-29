@@ -1,2 +1,0 @@
-
-void containers_test();
