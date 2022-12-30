@@ -44,8 +44,10 @@ LinceWindow* LinceCreateWindow(unsigned int width, unsigned int height, const ch
     
     /* Using OpenGL 4.0 */
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+
+    glfwSetErrorCallback(GLFWErrorCallback);
     
     GLFWwindow* handle = glfwCreateWindow(width, height, title, NULL, NULL);
     if (!handle) {
@@ -75,7 +77,6 @@ LinceWindow* LinceCreateWindow(unsigned int width, unsigned int height, const ch
     };
 
     glfwSetWindowUserPointer((GLFWwindow*)window->handle, window);
-    glfwSetErrorCallback(GLFWErrorCallback);
 
     SetGLFWCallbacks(window);
 

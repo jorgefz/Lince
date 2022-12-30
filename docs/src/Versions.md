@@ -13,7 +13,11 @@ Version codes follow [Semantic Versioning](https://semver.org/).
 - Move documentation and minigames to separate github repositories?
 
 ## v0.5.1
-- Improved array and hashmap initialisation API 
+- Improved array and hashmap initialisation API
+- Added OpenGL version requirement to README
+- Moved glfw error callback before window creation.
+- Added printing Miniaudio debug info in debug configuration
+- Updated README with instructions for audio playing on WSLg and required OpenGL version
 
 ## v0.5.0
 - Added basic audio API
