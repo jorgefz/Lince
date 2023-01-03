@@ -2,6 +2,136 @@
 #include <lince.h>
 #include <lince/audio/audio.h>
 
+#include "ecs.h"
+
+void TestECS(){
+
+    LinceEntityRegistry* reg;
+
+    // These should cause an error in debug mode
+    // reg = LinceCreateEntityRegistry(0); // error: zero components
+    // reg = LinceCreateEntityRegistry(65); // error: too many components (max 64)
+    // reg = LinceCreateEntityRegistry(3, /*sizes:*/ 1, 2, 0); // error: component is zero-sized
+
+    struct Position { float x, y; };
+    struct Velocity { float vx, vy; };
+    struct Sprite   { LinceQuadProps data; };
+
+    typedef enum {CompPosition, CompVelocity, CompSprite} Components;
+
+    uint32_t comp_sizes[] = {sizeof(struct Position), sizeof(struct Velocity), sizeof(struct Sprite)};
+    uint32_t comp_offsets[] = {0, comp_sizes[0], comp_sizes[0]+comp_sizes[1]}; 
+    uint32_t comp_num = 3;
+
+    // Create Registry
+    reg = LinceCreateEntityRegistry(comp_num, comp_sizes[0], comp_sizes[1], comp_sizes[2]);
+
+    LINCE_ASSERT(reg->component_count == comp_num && reg->component_sizes.size == comp_num,
+        "Component count is not three");
+    LINCE_ASSERT( comp_sizes[0] == *(uint32_t*)array_get(&reg->component_sizes, 0), "1st component size is wrong");
+    LINCE_ASSERT( comp_sizes[1] == *(uint32_t*)array_get(&reg->component_sizes, 1), "2nd component size is wrong");
+    LINCE_ASSERT( comp_sizes[2] == *(uint32_t*)array_get(&reg->component_sizes, 2), "3rd component size is wrong");
+
+    LINCE_ASSERT( comp_offsets[0] == *(uint32_t*)array_get(&reg->component_offsets, 0), "1st component offset is wrong");
+    LINCE_ASSERT( comp_offsets[1] == *(uint32_t*)array_get(&reg->component_offsets, 1), "2nd component offset is wrong");
+    LINCE_ASSERT( comp_offsets[2] == *(uint32_t*)array_get(&reg->component_offsets, 2), "3rd component offset is wrong");
+
+    printf("Component offsets: %u %u %u\n", comp_offsets[0], comp_offsets[1], comp_offsets[2]);
+
+    // Create Entity
+    uint32_t id = LinceCreateEntity(reg);
+    LINCE_ASSERT(
+        id == 0 && reg->entity_count == 1
+        && reg->entity_masks.size == 1 && reg->entity_flags.size == 1
+        && reg->entity_data.size == 1,
+        "Failed to create entity"
+    );
+    uint64_t* mask = array_get(&reg->entity_masks, id);
+    LinceEntityState* flag = array_get(&reg->entity_flags, id);
+    LINCE_ASSERT(*flag & LinceEntityState_Alive, "Failed to setup entity flags");
+    LINCE_ASSERT(*mask == 0, "Failed to setup entity mask");
+
+    // Create second entity
+    uint32_t id2 = LinceCreateEntity(reg);
+    LINCE_ASSERT(
+        id2 == 1 
+        && reg->entity_count == 2      && reg->entity_masks.size == 2
+        && reg->entity_flags.size == 2 && reg->entity_data.size == 2,
+        "Failed to create second entity"
+    );
+
+    // Delete entity
+    LinceDeleteEntity(reg, id);
+    LINCE_ASSERT(
+        *flag == 0 && *mask == 0 && reg->entity_pool.size == 1
+        && *(uint32_t*)array_get(&reg->entity_pool, 0) == id,
+        "Failed to delete entity"
+    );
+
+    // Create third entity - should recycle first entity (with id 0)
+    uint32_t id3 = LinceCreateEntity(reg);
+    printf("1st: %u, 2nd: %u, 3rd: %u\n", id, id2, id3);
+    LINCE_ASSERT(
+        id3 == id
+        && reg->entity_count == 2      && reg->entity_masks.size == 2 
+        && reg->entity_flags.size == 2 && reg->entity_data.size == 2,
+        "Failed to create third entity"
+    );
+
+    // Add components to entity id = 0
+    LinceAddEntityComponent(reg, id3, CompPosition, &(struct Position){1.0, 2.0});
+    LinceAddEntityComponent(reg, id3, CompSprite,   &(struct Sprite){0});
+
+    LINCE_ASSERT(LinceHasEntityComponent(reg, id3, CompPosition),
+        "Failed to add component %d to entity %u", CompPosition, id3);
+    LINCE_ASSERT(LinceHasEntityComponent(reg, id3, CompSprite),
+        "Failed to add component %d to entity %u", CompSprite, id3);
+    LINCE_ASSERT(LinceHasEntityComponent(reg, id3, CompVelocity) == LinceFalse,
+        "Added wrong component %d to entity %u", CompVelocity, id3);
+
+    struct Position* pos = LinceGetEntityComponent(reg, id3, CompPosition);
+    LINCE_ASSERT(pos && pos->x==1.0 && pos->y==2.0, "Failed to retrieve position component");
+    struct Velocity* vel = LinceGetEntityComponent(reg, id3, CompVelocity);
+    LINCE_ASSERT(!vel, "Retrieved uninitialised velocity component");
+    struct Sprite* sprite = LinceGetEntityComponent(reg, id3, CompSprite);
+    LINCE_ASSERT(sprite, "Failed to retrieve sprite component");
+
+    // Add components to entity id = 1
+    LinceAddEntityComponent(reg, id2, CompPosition, &(struct Position){1.0, 2.0});
+    LinceAddEntityComponent(reg, id2, CompVelocity, &(struct Velocity){-1.0, 5.0});
+
+    LINCE_ASSERT(LinceHasEntityComponent(reg, id2, CompPosition),
+        "Failed to add component %d to entity %u", CompPosition, id3);
+    LINCE_ASSERT(LinceHasEntityComponent(reg, id2, CompVelocity),
+        "Failed to add component %d to entity %u", CompVelocity, id3);
+    LINCE_ASSERT(LinceHasEntityComponent(reg, id2, CompSprite) == LinceFalse,
+        "Added wrong component %d to entity %u", CompSprite, id3);
+
+    pos = LinceGetEntityComponent(reg, id2, CompPosition);
+    LINCE_ASSERT(pos && pos->x==1.0 && pos->y==2.0, "Failed to retrieve position component");
+    sprite = LinceGetEntityComponent(reg, id2, CompSprite);
+    LINCE_ASSERT(!sprite, "Retrieved uninitialised sprite component");
+    vel = LinceGetEntityComponent(reg, id2, CompVelocity);
+    LINCE_ASSERT(vel, "Failed to retrieve velocity component");
+    
+    // Delete components
+    LinceDeleteEntityComponent(reg, id2, CompVelocity);
+    LINCE_ASSERT(LinceHasEntityComponent(reg, id2, CompVelocity) == LinceFalse,
+        "Failed to delete component %d from entity %u", CompVelocity, id2);
+
+    // Query entities
+    array_t query_result;
+    array_init(&query_result, sizeof(uint32_t));
+    uint32_t count = LinceQueryEntities(reg, &query_result, 1, CompSprite);
+    printf("query count %u\n", count);
+
+    // Destroy
+    LinceDestroyEntityRegistry(reg);
+
+    printf("ALL OK!\n");
+    exit(0);
+}
+
 const char* audio_file = "sandbox/assets/cat.wav";
 const char* music_file = "sandbox/assets/game-town-music.wav";
 
@@ -63,6 +193,8 @@ void OnUpdate(float dt){
 }
 
 int main(void) {
+
+    TestECS();
 
     LinceApp* app = LinceGetAppState();
     app->game_on_update = OnUpdate;
