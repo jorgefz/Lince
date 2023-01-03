@@ -74,7 +74,7 @@ LinceBool LinceHasEntityComponent(LinceEntityRegistry* reg, uint32_t entity_id, 
 void* LinceGetEntityComponent(LinceEntityRegistry* reg, uint32_t entity_id, uint32_t component_id);
 
 /* Removes a component from an entity */
-void LinceDeleteEntityComponent(LinceEntityRegistry* reg, uint32_t entity_id, uint32_t component_id);
+void LinceRemoveEntityComponent(LinceEntityRegistry* reg, uint32_t entity_id, uint32_t component_id);
 
 /*
 Searches for entities that have the given components.

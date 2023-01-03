@@ -14,3 +14,8 @@ int test_linkedlist();
 int test_hashmap_performance();
 int test_linkedlist_performance();
 int test_array_performance();
+
+/* ECS */
+void batch_test_entity();
+int test_entity();
+int test_entity_performance();

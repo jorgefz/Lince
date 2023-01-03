@@ -1,4 +1,4 @@
-#include "ecs.h"
+#include "entity.h"
 
 #include <stdarg.h>
 
@@ -145,7 +145,7 @@ void* LinceGetEntityComponent(LinceEntityRegistry* reg, uint32_t entity_id, uint
     return comp_data;
 }
 
-void LinceDeleteEntityComponent(LinceEntityRegistry* reg, uint32_t entity_id, uint32_t component_id){
+void LinceRemoveEntityComponent(LinceEntityRegistry* reg, uint32_t entity_id, uint32_t component_id){
     CheckEntityArgs(reg, entity_id, component_id);
     uint64_t* mask = array_get(&reg->entity_masks, entity_id);
     uint32_t i   = component_id / 64; // index in the array
@@ -170,8 +170,6 @@ uint32_t LinceQueryEntities(LinceEntityRegistry* reg, array_t* query, uint32_t c
     }
     va_end(args);
 
-    printf("Query mask: %d %d %d\n", !!(query_mask[0]&(1<<0)), !!(query_mask[0]&(1<<1)), !!(query_mask[0]&(1<<2)));
-    
     // Query entities that match bits in search mask
     for(uint32_t id = 0; id != reg->entity_count; ++id){
         uint32_t active = *(uint32_t*)array_get(&reg->entity_flags, id) & LinceEntityState_Active;

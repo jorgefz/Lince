@@ -53,7 +53,7 @@ int test_hashmap(){
 	// init, size_hint = 0
 	hashmap_t map0;
 	hashmap_init(&map0, 0);
-	TEST_ASSERT(map.table && map.size == 2, "Failed to create hashmap");
+	TEST_ASSERT(map0.table && map0.size == 2, "Failed to create hashmap");
 	hashmap_uninit(&map0);
 
 	// set

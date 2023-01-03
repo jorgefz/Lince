@@ -19,7 +19,7 @@ enum {TEST_PASS, TEST_FAIL};
 #define TEST_CLOCK_END(time_name, opnum) do{ 						\
 	time_name = clock() - time_name; 								\
 	printf("%s: time taken: %ld ms for %ld ops (%f ops/ms)\n", 		\
-		__FUNCTION__, time_name * 1000 / CLOCKS_PER_SEC, n_op,		\
+		__FUNCTION__, time_name * 1000 / CLOCKS_PER_SEC, opnum,		\
 		(float)opnum/(float)(time_name * 1000 / CLOCKS_PER_SEC)); 	\
 } while(0) 															\
 
