@@ -2,6 +2,8 @@
 #include <lince.h>
 #include <lince/audio/audio.h>
 
+#define LINCE_MAX_ENTITY_COMPONENTS_U64_COUNT 2
+
 #include "ecs.h"
 
 void TestECS(){
@@ -36,8 +38,6 @@ void TestECS(){
     LINCE_ASSERT( comp_offsets[1] == *(uint32_t*)array_get(&reg->component_offsets, 1), "2nd component offset is wrong");
     LINCE_ASSERT( comp_offsets[2] == *(uint32_t*)array_get(&reg->component_offsets, 2), "3rd component offset is wrong");
 
-    printf("Component offsets: %u %u %u\n", comp_offsets[0], comp_offsets[1], comp_offsets[2]);
-
     // Create Entity
     uint32_t id = LinceCreateEntity(reg);
     LINCE_ASSERT(
@@ -48,7 +48,7 @@ void TestECS(){
     );
     uint64_t* mask = array_get(&reg->entity_masks, id);
     LinceEntityState* flag = array_get(&reg->entity_flags, id);
-    LINCE_ASSERT(*flag & LinceEntityState_Alive, "Failed to setup entity flags");
+    LINCE_ASSERT(*flag & LinceEntityState_Active, "Failed to setup entity flags");
     LINCE_ASSERT(*mask == 0, "Failed to setup entity mask");
 
     // Create second entity
@@ -70,7 +70,6 @@ void TestECS(){
 
     // Create third entity - should recycle first entity (with id 0)
     uint32_t id3 = LinceCreateEntity(reg);
-    printf("1st: %u, 2nd: %u, 3rd: %u\n", id, id2, id3);
     LINCE_ASSERT(
         id3 == id
         && reg->entity_count == 2      && reg->entity_masks.size == 2 
@@ -120,15 +119,52 @@ void TestECS(){
         "Failed to delete component %d from entity %u", CompVelocity, id2);
 
     // Query entities
-    array_t query_result;
-    array_init(&query_result, sizeof(uint32_t));
-    uint32_t count = LinceQueryEntities(reg, &query_result, 1, CompSprite);
-    printf("query count %u\n", count);
+    // -- query sprite component
+    array_t query_result_sprite;
+    array_init(&query_result_sprite, sizeof(uint32_t));
+    uint32_t count_sprite = LinceQueryEntities(reg, &query_result_sprite, 1, CompSprite);
+    LINCE_ASSERT(
+        count_sprite == 1 && query_result_sprite.size == 1
+        && *(uint32_t*)array_get(&query_result_sprite, 0) == id3,
+        "Failed to query entities with Sprite component"
+    );
+    array_uninit(&query_result_sprite);
+    
+    // -- query position component
+    array_t query_result_pos;
+    array_init(&query_result_pos, sizeof(uint32_t));
+    uint32_t count_pos = LinceQueryEntities(reg, &query_result_pos, 1, CompPosition);
+    LINCE_ASSERT(
+        count_pos == 2 && query_result_pos.size == 2
+        && *(uint32_t*)array_get(&query_result_pos, 0) == id3
+        && *(uint32_t*)array_get(&query_result_pos, 1) == id2,
+        "Failed to query entities with Position component"
+    );
+    array_uninit(&query_result_pos);
+    
+    // -- query sprite and position components
+    array_t query_result_sprite_vel;
+    array_init(&query_result_sprite_vel, sizeof(uint32_t));
+    uint32_t count_sprite_vel = LinceQueryEntities(reg, &query_result_sprite_vel, 2, CompSprite, CompPosition);
+    LINCE_ASSERT(
+        count_sprite_vel == 1 && query_result_sprite_vel.size == 1,
+        "Failed to query entities with Sprite and Position components"
+    );
+    array_uninit(&query_result_sprite_vel);
+
+    // -- query velocity and position components
+    array_t query_result_pos_vel;
+    array_init(&query_result_pos_vel, sizeof(uint32_t));
+    uint32_t count_pos_vel = LinceQueryEntities(reg, &query_result_pos_vel, 2, CompVelocity, CompPosition);
+    LINCE_ASSERT(
+        count_pos_vel == 0 && query_result_pos_vel.size == 0,
+        "Failed to query entities with Velocity and Position components"
+    );
+    array_uninit(&query_result_pos_vel);
 
     // Destroy
     LinceDestroyEntityRegistry(reg);
 
-    printf("ALL OK!\n");
     exit(0);
 }
 

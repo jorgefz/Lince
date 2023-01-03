@@ -19,7 +19,7 @@ e.g.:
 typedef uint64_t LinceEntityMask[LINCE_MAX_ENTITY_COMPONENTS_U64_COUNT];
 
 typedef enum LinceEntityState {
-    LinceEntityState_Alive = 0x1, // better active
+    LinceEntityState_Active = 0x1, // better active
 } LinceEntityState;
 
 typedef struct LinceEntityRegistry {

@@ -2,16 +2,6 @@
 
 #include <stdarg.h>
 
-static LinceBool LinceMemEq(void* const ptr1, void* const ptr2, size_t bytes){
-    uint8_t *p1 = ptr1, *p2 = ptr2;
-    while(p1 != (uint8_t*)ptr1 + bytes){
-        if(*p1 != *p2) return LinceFalse;
-        p1++; p2++;
-    }
-    return LinceTrue;
-}
-
-static LinceBool MaskHasFlags(uint64_t* mask, )
 
 /* Creates a registry that will be used to spawn entities */
 LinceEntityRegistry* LinceCreateEntityRegistry(uint32_t component_count, ...){
@@ -85,14 +75,14 @@ uint32_t LinceCreateEntity(LinceEntityRegistry* reg){
         array_pop_back(&reg->entity_pool);
         // Set alive flag
         uint32_t* flag = array_get(&reg->entity_flags, id);
-        *flag = LinceEntityState_Alive;
+        *flag = LinceEntityState_Active;
         return id;
     }
 
     // Allocate new entity
     id = reg->entity_count++;
     // LinceEntityMask mask = {0};
-    LinceEntityState state = LinceEntityState_Alive;
+    LinceEntityState state = LinceEntityState_Active;
     array_push_back(&reg->entity_data,  NULL);
     array_push_back(&reg->entity_flags, &state);
     array_push_back(&reg->entity_masks, NULL);
@@ -100,13 +90,13 @@ uint32_t LinceCreateEntity(LinceEntityRegistry* reg){
     return id;
 }
 
-static void CheckEntityArgs(LinceEntityRegistry* reg, uint32_t entity_id, uint32_t component_id){
-    LINCE_ASSERT(reg, "NULL pointer");
-    LINCE_ASSERT(entity_id < reg->entity_count, "Invalid entity ID");
-    LINCE_ASSERT(component_id < reg->component_count, "Invalid component ID");
-    uint32_t* flag = array_get(&reg->entity_flags, entity_id);
-    LINCE_ASSERT(*flag & LinceEntityState_Alive, "Entity is inactive");
-}
+#define CheckEntityArgs(reg, entity_id, component_id) do{ \
+    LINCE_ASSERT(reg, "NULL pointer"); \
+    LINCE_ASSERT(entity_id < reg->entity_count, "Invalid entity ID"); \
+    LINCE_ASSERT(component_id < reg->component_count, "Invalid component ID"); \
+    LINCE_ASSERT(*(uint32_t*)array_get(&reg->entity_flags, entity_id) & LinceEntityState_Active, \
+        "Entity is inactive"); \
+} while(0) \
 
 void LinceDeleteEntity(LinceEntityRegistry* reg, uint32_t entity_id){
     LINCE_ASSERT(reg, "NULL pointer");
@@ -168,7 +158,7 @@ void LinceDeleteEntityComponent(LinceEntityRegistry* reg, uint32_t entity_id, ui
 uint32_t LinceQueryEntities(LinceEntityRegistry* reg, array_t* query, uint32_t component_count, ...){
     LINCE_ASSERT(reg && query, "NULL pointer");
     uint32_t query_count = 0;
-    LinceEntityMask mask = {0};
+    LinceEntityMask query_mask = {0};
     va_list args;
 
     // Build component mask
@@ -177,22 +167,28 @@ uint32_t LinceQueryEntities(LinceEntityRegistry* reg, array_t* query, uint32_t c
         uint32_t comp_id = va_arg(args, uint32_t);
         uint32_t ind = comp_id / 64; // index in the array
         uint32_t pos = comp_id % 64; // bit position within the array element
-        mask[ind] |= (1 << pos);
+        query_mask[ind] |= (1 << pos);
     }
     va_end(args);
 
-    printf("Mask: %lu %lu %lu %lu\n", mask[0] & (1<<0), mask[0] & (1<<1), mask[0] & (1<<2), mask[0] & (1<<3));
-
-    // Query entities that match mask
+    printf("Query mask: %d %d %d\n", !!(query_mask[0]&(1<<0)), !!(query_mask[0]&(1<<1)), !!(query_mask[0]&(1<<2)));
+    
+    // Query entities that match bits in search mask
     for(uint32_t id = 0; id != reg->entity_count; ++id){
-        uint32_t active = *(uint32_t*)array_get(&reg->entity_flags, id) & LinceEntityState_Alive;
+        uint32_t active = *(uint32_t*)array_get(&reg->entity_flags, id) & LinceEntityState_Active;
         uint64_t* entity_mask = array_get(&reg->entity_masks, id);
         
-        if(active && LinceMemEq(mask, entity_mask, sizeof(LinceEntityMask))){
+        int masks_match = 1;
+        for(uint32_t i = 0; i != LINCE_MAX_ENTITY_COMPONENTS_U64_COUNT; ++i){
+            masks_match = masks_match && query_mask[i] == (query_mask[i] & entity_mask[i]); 
+        }
+        
+        if(active && masks_match){
             array_push_back(query, &id);
             query_count++;
         }
     }
+
 
     return query_count;
 }
