@@ -1,6 +1,7 @@
 #ifndef LINCE_ECS_H
 #define LINCE_ECS_H
 
+
 #include <lince/core/core.h>
 #include <lince/core/memory.h>
 #include <lince/containers/array.h>

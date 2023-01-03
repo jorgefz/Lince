@@ -2,7 +2,6 @@
 
 #include <stdarg.h>
 
-
 /* Creates a registry that will be used to spawn entities */
 LinceEntityRegistry* LinceCreateEntityRegistry(uint32_t component_count, ...){
     LINCE_ASSERT(component_count > 0, "Component count must be greater than zero");
@@ -182,7 +181,7 @@ uint32_t LinceQueryEntities(LinceEntityRegistry* reg, array_t* query, uint32_t c
         for(uint32_t i = 0; i != LINCE_MAX_ENTITY_COMPONENTS_U64_COUNT; ++i){
             masks_match = masks_match && query_mask[i] == (query_mask[i] & entity_mask[i]); 
         }
-        
+
         if(active && masks_match){
             array_push_back(query, &id);
             query_count++;

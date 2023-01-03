@@ -4,7 +4,7 @@
 
 #define LINCE_MAX_ENTITY_COMPONENTS_U64_COUNT 2
 
-#include "ecs.h"
+#include <lince/ecs/ecs.h>
 
 void TestECS(){
 
@@ -60,7 +60,7 @@ void TestECS(){
         "Failed to create second entity"
     );
 
-    // Delete entity
+    // Delete first entity
     LinceDeleteEntity(reg, id);
     LINCE_ASSERT(
         *flag == 0 && *mask == 0 && reg->entity_pool.size == 1
@@ -77,7 +77,7 @@ void TestECS(){
         "Failed to create third entity"
     );
 
-    // Add components to entity id = 0
+    // Add components to entity third entity
     LinceAddEntityComponent(reg, id3, CompPosition, &(struct Position){1.0, 2.0});
     LinceAddEntityComponent(reg, id3, CompSprite,   &(struct Sprite){0});
 
@@ -95,7 +95,7 @@ void TestECS(){
     struct Sprite* sprite = LinceGetEntityComponent(reg, id3, CompSprite);
     LINCE_ASSERT(sprite, "Failed to retrieve sprite component");
 
-    // Add components to entity id = 1
+    // Add components to second entity
     LinceAddEntityComponent(reg, id2, CompPosition, &(struct Position){1.0, 2.0});
     LinceAddEntityComponent(reg, id2, CompVelocity, &(struct Velocity){-1.0, 5.0});
 
@@ -113,7 +113,7 @@ void TestECS(){
     vel = LinceGetEntityComponent(reg, id2, CompVelocity);
     LINCE_ASSERT(vel, "Failed to retrieve velocity component");
     
-    // Delete components
+    // Delete component from second entity
     LinceDeleteEntityComponent(reg, id2, CompVelocity);
     LINCE_ASSERT(LinceHasEntityComponent(reg, id2, CompVelocity) == LinceFalse,
         "Failed to delete component %d from entity %u", CompVelocity, id2);
