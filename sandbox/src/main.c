@@ -9,9 +9,13 @@
 
 
 #define QUADTREE_CHILDREN 4
+#define QUADTREE_NODE_CAPACITY 16 // max objects in node before it splits into children
+#define QUADTREE_MAX_DEPTH 8 // max node depth for quadtree
+
 typedef struct quadtree_container {
     struct quadtree_container* parent;
     struct quadtree_container* children[QUADTREE_CHILDREN];
+    vec2 key;
     array_t objects;
 } quadtree_t;
 
@@ -92,13 +96,30 @@ typedef struct LinceBoxCollider {
     LinceBoxColliderFlags flags; // mode for collision reflection, flag for just collided, etc.
 } LinceBoxCollider;
 
+LinceBool LLinceBoxColliderContains(LinceBoxCollider* box1, LinceBoxCollider* box2) {
+    return(
+        box1->x - box1->w/2.0f <= box2->x - box2->w/2.0f &&
+        box2->x + box2->w/2.0f <= box1->x + box1->w/2.0f &&
+        box1->y + box1->h/2.0f <= box2->y + box2->h/2.0f &&
+        box2->y - box2->h/2.0f <= box1->y - box1->h/2.0f
+    );
+}
+
+LinceBool LinceBoxColliderIntersects(LinceBoxCollider* box1, LinceBoxCollider* box2){
+    return !(
+        box1->x - box1->w/2.0f >= box2->x + box2->w/2.0f ||
+        box1->x + box1->w/2.0f <= box2->x - box2->w/2.0f ||
+        box1->y + box1->h/2.0f >= box2->y - box2->h/2.0f ||
+        box1->y - box1->h/2.0f <= box2->y + box2->h/2.0f
+    );
+}
 
 int BoxCollides(LinceBoxCollider* rect1, LinceBoxCollider* rect2){
     return (
-        rect1->x - rect1->w/2.0f < rect2->x + rect2->w/2.0f &&
-        rect1->x + rect1->w/2.0f > rect2->x - rect2->w/2.0f &&
-        rect1->y - rect1->h/2.0f < rect2->y + rect2->h/2.0f &&
-        rect1->y + rect1->h/2.0f > rect2->y - rect2->h/2.0f
+        rect1->x - rect1->w/2.0f <= rect2->x + rect2->w/2.0f &&
+        rect1->x + rect1->w/2.0f >= rect2->x - rect2->w/2.0f &&
+        rect1->y - rect1->h/2.0f <= rect2->y + rect2->h/2.0f &&
+        rect1->y + rect1->h/2.0f >= rect2->y - rect2->h/2.0f
     );
 }
 
@@ -209,7 +230,7 @@ void LayerOnAttach(LinceLayer* layer){
     // -- player
     Sprite sprite = (Sprite){
         .x = 0.0, .y = 0.0,
-        .w = 0.2, .h = 0.2,
+        .w = 0.1, .h = 0.1,
         .color = {0.0, 0.0, 1.0, 1.0}
     };
     LinceBoxCollider box = {.x=sprite.x, .y=sprite.y, .w=sprite.w, .h=sprite.h, .dx=0, .dy=0 };
@@ -220,7 +241,7 @@ void LayerOnAttach(LinceLayer* layer){
     // -- static blocks
     sprite.color[0] = 1.0;
     sprite.color[2] = 0.0;
-    sprite.w *= 2.0f;
+    sprite.w *= 4.0f;
     float pos_x[] = {0.6,  0.8, -0.6, -0.6};
     float pos_y[] = {0.6,  0.4, -0.6,  0.6};
     for(int i = 0; i != 4; ++i){
