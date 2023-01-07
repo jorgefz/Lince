@@ -1,4 +1,4 @@
-# Lince 0.5.0
+# Lince 0.6.0
 
 A 2D OpenGL game engine written in C, currently in development.
 
@@ -12,6 +12,7 @@ It uses GLFW for the windowing system, GLAD for the OpenGL loader, Premake5 as t
 * Audio system (Miniaudio)
 * Event system for user input
 * Tilemaps and sprite animations
+* Lightweight Entity Component System (ECS) with unlimited entities and components
 
 ## Documentation
 

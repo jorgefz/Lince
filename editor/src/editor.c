@@ -236,7 +236,7 @@ LinceTile* GetTileAtMouse(LinceTilemap* tm, LinceCamera* cam){
 }
 
 
-int LinceTilemapCheckCollision(LinceTilemap* tm, LinceBoxCollider player_box){
+int LinceTilemapCheckCollision(LinceTilemap* tm, LinceCollider player_box){
     LINCE_PROFILER_START(timer);
 
     for(size_t i = 0; i != tm->width; ++i){
@@ -245,7 +245,7 @@ int LinceTilemapCheckCollision(LinceTilemap* tm, LinceBoxCollider player_box){
             size_t idx = j * tm->width + i;
             if(tm->logic_grid[idx] != BLOCK_SOLID) continue;
 
-            LinceBoxCollider box = {
+            LinceCollider box = {
                 .pos = {
                     (float)i - tm->offset[0],
                     (float)j - tm->offset[1],
@@ -254,12 +254,12 @@ int LinceTilemapCheckCollision(LinceTilemap* tm, LinceBoxCollider player_box){
             };
             
             int result = LinceCollideBox(&player_box, &box);
-            if(result != LinceBoxCollision_None) return result; 
+            if(result != LinceCollision_None) return result; 
         }
     }
 
     LINCE_PROFILER_END(timer);
-    return LinceBoxCollision_None;
+    return LinceCollision_None;
 }
 
 
@@ -388,16 +388,16 @@ void MovePlayer(EditorLayer* data){
         };
     }
     
-    LinceBoxCollider player_box = {
+    LinceCollider player_box = {
         .pos = {next_pos[0], next_pos[1] - 0.5f},
         .size = {0.5f, 0.5f}
     };
 
     int collision_result = LinceTilemapCheckCollision(data->tilemap, player_box);
-    if(!(collision_result & LinceBoxCollision_X)){
+    if(!(collision_result & LinceCollision_X)){
         data->cam->pos[0] = next_pos[0];
     }
-    if(!(collision_result & LinceBoxCollision_Y)){
+    if(!(collision_result & LinceCollision_Y)){
         data->cam->pos[1] = next_pos[1];
     }
     

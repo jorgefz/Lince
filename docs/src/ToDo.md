@@ -26,21 +26,24 @@
 	1. Integrate Miniaudio ✅
 	2. Build audio API ✅
 5. ECS
-	1. Develop ECS API
-	2. Add pre-defined components (.e.g Sprite to draw)
+	1. Develop ECS API ✅
+	2. Add pre-defined components (.e.g Sprite to draw, Collider using physics engine)
+5. Physics
+
 
 ## Project Structure
 1. 💛 Embed engine resources within the code (e.g. default shaders and textures)
 2. 🟠 Create test suite for the engine
 3. 🟠 Improve documentation - perhaps move to a separate github repo.
 4. 💛 Restructure engine to be in a separate folder, that can be included into the user's main game project.
+	* Feasible, but requires user to copy settings on premake5 file into their own build script, and fix issue with path to font files used by the engine's UI manager.
 5. 💛 Add benchmarking and identify slowest pieces of code that can be optimized.
 6. 💛 Improve code speed & efficiency
 
 ## Data structures
 1. ✅ **Add array (contiguous memory)**
 2. ✅ **Add hashmap**
-3. 💛 Add linked lists 
+3. ✅ **Add linked lists** 
 
 ## Audio
 1. ✅ **Integrate Miniaudio library into the project**

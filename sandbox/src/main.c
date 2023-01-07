@@ -1,19 +1,309 @@
 #include <stdio.h>
-#include <lince.h>
-#include <lince/audio/audio.h>
 
 #define LINCE_MAX_ENTITY_COMPONENTS_U64_COUNT 2
 
-#include <lince/entity/entity.h>
+#include <lince.h>
+#include <lince/audio/audio.h>
 
-const char* audio_file = "sandbox/assets/cat.wav";
-const char* music_file = "sandbox/assets/game-town-music.wav";
+#include <time.h>
 
-LinceSoundManager* sound_manager = NULL;
-LinceSound* music = NULL;
-LinceAudioEngine* audio;
 
-void DrawUI(){
+#define QUADTREE_CHILDREN 4
+typedef struct quadtree_container {
+    struct quadtree_container* parent;
+    struct quadtree_container* children[QUADTREE_CHILDREN];
+    array_t objects;
+} quadtree_t;
+
+/*
+QueryEntities(registry, mode, result, ncomp, ...)
+
+Change 1: mode.
+    any  -> any of these components
+    all  -> all of these comps
+    none -> none of these comps
+
+Change 2: results.
+    Results array can provide list of entity IDs.
+    The input query will run only on these entities.
+*/ 
+
+#define MOVERS_SIZE 0.01f
+#define MOVERS_COUNT 100
+
+typedef struct GameData {
+    // Audio
+    LinceSoundManager* sound_manager;
+    LinceSound* music;
+    LinceAudioEngine* audio;
+    const char* audio_file;
+    const char* music_file;
+
+    // Rendering
+    LinceCamera* camera;
+
+    // Entities
+    LinceEntityRegistry* reg;
+    uint32_t player;
+    uint32_t obstacles[4];
+    uint32_t movers[MOVERS_COUNT];
+    
+} GameData;
+
+static GameData game_data = {
+    .audio_file = "sandbox/assets/cat.wav",
+    .music_file = "sandbox/assets/game-town-music.wav"
+};
+
+
+typedef enum Component { Component_BoxCollider, Component_Sprite } Component;
+
+typedef LinceQuadProps Sprite;
+
+void LinceDrawSpriteComponents(LinceEntityRegistry* reg){
+    static array_t result;
+    array_init(&result, sizeof(uint32_t));
+    uint32_t num = LinceQueryEntities(reg, &result, 1, Component_Sprite);
+
+    for(uint32_t i = 0; i != num; ++i){
+        uint32_t id = *(uint32_t*)array_get(&result, i);
+        Sprite* sprite = LinceGetEntityComponent(reg, id, Component_Sprite);
+        LinceDrawQuad(*sprite);
+    }
+
+    array_uninit(&result);
+}
+
+static const float vel = 8e-4;
+
+typedef enum LinceBoxColliderFlags {
+    // Settings
+    LinceBoxCollider_Bounce = 0x1, // flips direction on collision
+    // State
+    LinceBoxCollider_CollisionX = 0x2,
+    LinceBoxCollider_CollisionY = 0x4,
+    LinceBoxCollider_Collision = LinceBoxCollider_CollisionX | LinceBoxCollider_CollisionY,
+} LinceBoxColliderFlags;
+
+typedef struct LinceBoxCollider {
+    float x, y;    // position
+    float w, h;    // size
+    float dx, dy;  // displacement when moving, update as needed before computing collisions
+    LinceBoxColliderFlags flags; // mode for collision reflection, flag for just collided, etc.
+} LinceBoxCollider;
+
+
+int BoxCollides(LinceBoxCollider* rect1, LinceBoxCollider* rect2){
+    return (
+        rect1->x - rect1->w/2.0f < rect2->x + rect2->w/2.0f &&
+        rect1->x + rect1->w/2.0f > rect2->x - rect2->w/2.0f &&
+        rect1->y - rect1->h/2.0f < rect2->y + rect2->h/2.0f &&
+        rect1->y + rect1->h/2.0f > rect2->y - rect2->h/2.0f
+    );
+}
+
+// LinceUpdateBoxCollider
+/// TODO: Improve neighbour search algorithm
+void CalculateEntityCollisions(){
+    array_t entities;
+    array_init(&entities, sizeof(uint32_t));
+    uint32_t query_num;
+    query_num = LinceQueryEntities(game_data.reg, &entities, 1, Component_BoxCollider);
+
+    for(uint32_t i = 0; i != query_num; ++i){
+        uint32_t id = *(uint32_t*)array_get(&entities, i);
+        LinceBoxCollider* box1 = LinceGetEntityComponent(game_data.reg, id, Component_BoxCollider);
+        if( fabs(box1->dx) == 0.0f && fabs(box1->dy) == 0.0f ) continue;
+        LinceBoxCollider xb = *box1, yb = *box1;
+        xb.x += box1->dx;
+        yb.y += box1->dy;
+        LinceBool move_x = 1, move_y = 1;
+        
+        for(uint32_t j = 0; j != query_num; ++j){
+            if(i == j) continue;
+            uint32_t id2 = *(uint32_t*)array_get(&entities, j);
+            LinceBoxCollider* box2 = LinceGetEntityComponent(game_data.reg, id2, Component_BoxCollider);
+            if(move_x) move_x = !BoxCollides(&xb, box2);
+            if(move_y) move_y = !BoxCollides(&yb, box2);
+            if(!move_x && !move_y) break;
+        }
+        
+        if(move_x){
+            box1->x = xb.x;
+            box1->flags &= ~LinceBoxCollider_CollisionX;
+        } else {
+            box1->flags |= LinceBoxCollider_CollisionX;
+            if(box1->flags & LinceBoxCollider_Bounce){
+                box1->dx = -box1->dx;     
+            }       
+        }
+
+        if(move_y){
+            box1->y = yb.y;
+            box1->flags &= ~LinceBoxCollider_CollisionY;
+        } else {
+            box1->flags |= LinceBoxCollider_CollisionY;
+            if(box1->flags & LinceBoxCollider_Bounce){
+                box1->dy = -box1->dy;
+            }           
+        }
+    }
+
+    array_uninit(&entities);
+}
+
+
+void UpdateSpritePositions(LinceEntityRegistry* reg){
+    static array_t result;
+    array_init(&result, sizeof(uint32_t));
+    uint32_t num = LinceQueryEntities(reg, &result, 2, Component_Sprite, Component_BoxCollider);
+
+    for(uint32_t i = 0; i != num; ++i){
+        uint32_t id = *(uint32_t*)array_get(&result, i);
+        Sprite* sprite = LinceGetEntityComponent(game_data.reg, id, Component_Sprite);
+        LinceBoxCollider* box = LinceGetEntityComponent(game_data.reg, id, Component_BoxCollider);
+        sprite->x = box->x;
+        sprite->y = box->y;
+    }
+    array_uninit(&result);
+}
+
+void MovePlayer(float dt){
+
+    LinceBoxCollider* pbox;
+    pbox = LinceGetEntityComponent(game_data.reg, game_data.player, Component_BoxCollider);
+    pbox->dx = 0.0f;
+    pbox->dy = 0.0f;
+    if(LinceIsKeyPressed(LinceKey_d)) pbox->dx =  vel * dt;
+    if(LinceIsKeyPressed(LinceKey_a)) pbox->dx = -vel * dt;
+    if(LinceIsKeyPressed(LinceKey_w)) pbox->dy =  vel * dt;
+    if(LinceIsKeyPressed(LinceKey_s)) pbox->dy = -vel * dt;
+
+}
+
+void LayerOnAttach(LinceLayer* layer){
+    LINCE_UNUSED(layer);
+
+    // Rendering
+    game_data.camera = LinceCreateCamera(LinceGetAspectRatio());
+
+    // Entities
+    game_data.reg = LinceCreateEntityRegistry(2, sizeof(LinceBoxCollider), sizeof(Sprite));
+
+    // -- walls
+    uint32_t walls[4];
+    LinceBoxCollider wall_boxes[4] = {
+        {.x =  0.0f, .y =  1.0f, .w =  2.0f, .h = 0.01f, .dx = 0.0f, .dy = 0.0f},
+        {.x = -1.0f, .y =  0.0f, .w = 0.01f, .h =  2.0f, .dx = 0.0f, .dy = 0.0f},
+        {.x =  0.0f, .y = -1.0f, .w =  2.0f, .h = 0.01f, .dx = 0.0f, .dy = 0.0f},
+        {.x =  1.0f, .y =  0.0f, .w = 0.01f, .h =  2.0f, .dx = 0.0f, .dy = 0.0f},
+    };
+    for(uint32_t i = 0; i != 4; ++i){
+        walls[i] = LinceCreateEntity(game_data.reg);
+        LinceAddEntityComponent(game_data.reg, walls[i], Component_BoxCollider, &wall_boxes[i]);
+        Sprite wall_sprite = {.x=wall_boxes[i].x, .y=wall_boxes[i].y,
+            .w=wall_boxes[i].w, .h=wall_boxes[i].h, .color={0,1,1,1}};
+        LinceAddEntityComponent(game_data.reg, walls[i], Component_Sprite, &wall_sprite);   
+    }
+
+    // -- player
+    Sprite sprite = (Sprite){
+        .x = 0.0, .y = 0.0,
+        .w = 0.2, .h = 0.2,
+        .color = {0.0, 0.0, 1.0, 1.0}
+    };
+    LinceBoxCollider box = {.x=sprite.x, .y=sprite.y, .w=sprite.w, .h=sprite.h, .dx=0, .dy=0 };
+    game_data.player = LinceCreateEntity(game_data.reg);
+    LinceAddEntityComponent(game_data.reg, game_data.player, Component_Sprite, &sprite);
+    LinceAddEntityComponent(game_data.reg, game_data.player, Component_BoxCollider, &box);
+
+    // -- static blocks
+    sprite.color[0] = 1.0;
+    sprite.color[2] = 0.0;
+    sprite.w *= 2.0f;
+    float pos_x[] = {0.6,  0.8, -0.6, -0.6};
+    float pos_y[] = {0.6,  0.4, -0.6,  0.6};
+    for(int i = 0; i != 4; ++i){
+        game_data.obstacles[i] = LinceCreateEntity(game_data.reg);
+        sprite.x = pos_x[i];
+        sprite.y = pos_y[i];
+        LinceBoxCollider obox = {.x=sprite.x, .y=sprite.y, .w=sprite.w, .h=sprite.h, .dx=0, .dy=0};
+        LinceAddEntityComponent(game_data.reg, game_data.obstacles[i], Component_Sprite, &sprite);
+        LinceAddEntityComponent(game_data.reg, game_data.obstacles[i], Component_BoxCollider, &obox);
+    }
+
+    // -- movers
+    srand(time(NULL));
+    sprite.color[0] = 0.0;
+    sprite.color[1] = 1.0;
+    sprite.w = MOVERS_SIZE;
+    sprite.h = MOVERS_SIZE;
+    for(int i = 0; i != MOVERS_COUNT; ++i){
+        game_data.movers[i] = LinceCreateEntity(game_data.reg);
+        float min = -1.0f, max = 1.0f;
+        sprite.x = min + rand()/(float)RAND_MAX * (max - min);
+        sprite.y = min + rand()/(float)RAND_MAX * (max - min);
+        min = -8e-4;
+        max =  8e-4;
+        float dx = min + rand()/(float)RAND_MAX * (max - min);
+        float dy = min + rand()/(float)RAND_MAX * (max - min);
+        LinceBoxCollider mbox = {.x=sprite.x, .y=sprite.y, .w=sprite.w, .h=sprite.h, .dx=dx, .dy=dy,
+            .flags = LinceBoxCollider_Bounce };
+        LinceAddEntityComponent(game_data.reg, game_data.movers[i], Component_Sprite, &sprite);
+        LinceAddEntityComponent(game_data.reg, game_data.movers[i], Component_BoxCollider, &mbox);
+    }
+}
+
+void LayerOnUpdate(LinceLayer* layer, float dt){
+    LINCE_UNUSED(layer);
+
+    // Rendering
+    LinceResizeCameraView(game_data.camera, LinceGetAspectRatio());
+	LinceUpdateCamera(game_data.camera);
+    CalculateEntityCollisions();
+
+    LinceBeginScene(game_data.camera);
+    UpdateSpritePositions(game_data.reg);
+    LinceDrawSpriteComponents(game_data.reg);
+    LinceEndScene();
+
+    // Move
+    MovePlayer(dt);
+
+    // Draw UI text
+    LinceUILayer* ui = LinceGetAppState()->ui;
+    struct nk_context *ctx = ui->ctx;
+    nk_style_set_font(ctx, &ui->fonts[LinceFont_Droid15]->handle);
+    if (nk_begin(ctx, "Demo", nk_rect(20, 20, 100, 50), 0)) {
+        nk_layout_row_static(ctx, 30, 40, 1);
+        nk_labelf(
+            ctx, NK_TEXT_ALIGN_CENTERED,
+            "FPS: %.1f", 1000.0f/dt
+        );
+    }
+    nk_end(ctx);
+}
+
+void LayerOnDetach(LinceLayer* layer){
+    LINCE_UNUSED(layer);
+    LinceDestroyEntityRegistry(game_data.reg);
+    LinceDeleteCamera(game_data.camera);
+}
+
+LinceLayer* LayerInit(){
+	LinceLayer* layer = LinceCreateLayer(NULL);
+
+	layer->OnAttach = LayerOnAttach;
+	layer->OnUpdate = LayerOnUpdate;
+	layer->OnEvent  = NULL;
+	layer->OnDetach = LayerOnDetach;
+	layer->data = NULL;
+
+	return layer;
+}
+
+
+void DrawSoundUI(){
 
     LinceUILayer* ui = LinceGetAppState()->ui;
     struct nk_context *ctx = ui->ctx;
@@ -27,64 +317,81 @@ void DrawUI(){
         nk_layout_row_static(ctx, 30, 80, 1);
         nk_label(ctx, "MUSIC", NK_TEXT_ALIGN_CENTERED);
         if (nk_button_label(ctx, "Start")){
-            LincePlaySound(music);
+            LincePlaySound(game_data.music);
         }
         if (nk_button_label(ctx, "Stop")){
-            LinceStopSound(music);
+            LinceStopSound(game_data.music);
         }
         if (nk_button_label(ctx, "Reset")){
-            LinceRewindSound(music);
+            LinceRewindSound(game_data.music);
         }
         nk_label(ctx, "Volume", NK_TEXT_ALIGN_LEFT);
-        nk_slider_float(ctx, 0.0f, &music->config.volume, 5.0f, 0.01f);
+        nk_slider_float(ctx, 0.0f, &game_data.music->config.volume, 5.0f, 0.01f);
         
         nk_label(ctx, "Pitch", NK_TEXT_ALIGN_LEFT);
-        nk_slider_float(ctx, 0.5f, &music->config.pitch, 2.5f, 0.01f);
+        nk_slider_float(ctx, 0.5f, &game_data.music->config.pitch, 2.5f, 0.01f);
         
         nk_label(ctx, "Pan", NK_TEXT_ALIGN_LEFT);
-        nk_slider_float(ctx, -1.0f, &music->config.pan, 1.0f, 0.01f);
+        nk_slider_float(ctx, -1.0f, &game_data.music->config.pan, 1.0f, 0.01f);
 
         nk_layout_row_static(ctx, 30, 80, 1);
         nk_label(ctx, "SOUNDS", NK_TEXT_ALIGN_CENTERED);
-        nk_labelf(ctx, NK_TEXT_ALIGN_CENTERED, "Instances: %u", sound_manager->sound_cache.size);
+        nk_labelf(ctx, NK_TEXT_ALIGN_CENTERED, "Instances: %u", game_data.sound_manager->sound_cache.size);
         if (nk_button_label(ctx, "Meow")){
-            LinceSpawnSound(audio, sound_manager, &config);
+            LinceSpawnSound(game_data.audio, game_data.sound_manager, &config);
         }
         if (nk_button_label(ctx, "Stop All")){
-            LinceStopAllManagerSounds(sound_manager);
+            LinceStopAllManagerSounds(game_data.sound_manager);
         }
         nk_label(ctx, "Volume", NK_TEXT_ALIGN_LEFT);
         nk_slider_float(ctx, 0.0f, &config.volume, 2.0f, 0.01f);
 
     }
     nk_end(ctx);
-    LinceUpdateSound(music);
+    LinceUpdateSound(game_data.music);
 }
 
-void OnUpdate(float dt){
-    DrawUI();
+void GameInit(){
+    game_data.audio = LinceCreateAudioEngine();
+    game_data.sound_manager = LinceCreateSoundManager(
+        game_data.audio, LinceSound_Buffer, game_data.audio_file);
+
+    LinceSoundConfig config = LinceGetDefaultSoundConfig();
+    config.loop = LinceTrue;
+    game_data.music = LinceLoadStream(game_data.audio, game_data.music_file, &config);
+
+    LincePushLayer(LayerInit());
+}
+
+void GameTerminate(){
+    LinceDeleteSound(game_data.music);
+    LinceDeleteSoundManager(game_data.sound_manager);
+    LinceDeleteAudioEngine(game_data.audio);
+}
+
+void GameOnUpdate(float dt){
+    LinceCheckErrors();
+    // DrawSoundUI();
     LINCE_UNUSED(dt);
+}
+
+void SetupApplication(){
+    LinceApp* app = LinceGetAppState();
+    
+    app->screen_width = 900;
+    app->screen_height = 600;
+    app->title = "Sandbox";
+    
+    app->game_init = GameInit;
+    app->game_on_update = GameOnUpdate;
+    app->game_terminate = GameTerminate;
 }
 
 int main(void) {
 
-    LinceApp* app = LinceGetAppState();
-    app->game_on_update = OnUpdate;
-
-    audio = LinceCreateAudioEngine();
-    
-    sound_manager = LinceCreateSoundManager(audio, LinceSound_Buffer, audio_file);
-    
-    LinceSoundConfig config = LinceGetDefaultSoundConfig();
-    config.loop = LinceTrue;
-    music = LinceLoadStream(audio, music_file, &config);
-    LincePlaySound(music);
+    SetupApplication();
 
     LinceRun();
-
-    LinceDeleteSound(music);
-    LinceDeleteSoundManager(sound_manager);
-    LinceDeleteAudioEngine(audio);
 
     return 0;
 }

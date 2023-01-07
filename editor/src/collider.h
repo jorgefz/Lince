@@ -3,25 +3,24 @@
 
 #include "cglm/vec2.h"
 
-typedef enum LinceBoxColliderFlags{
-    LinceBoxCollision_None  = 0x0,
-    LinceBoxCollision_Right = 0x1,
-    LinceBoxCollision_Left  = 0x2,
-    LinceBoxCollision_Top   = 0x4,
-    LinceBoxCollision_Bot   = 0x8,
+typedef enum LinceColliderFlags{
+    LinceCollision_None  = 0x0,
+    LinceCollision_Right = 0x1,
+    LinceCollision_Left  = 0x2,
+    LinceCollision_Top   = 0x4,
+    LinceCollision_Bot   = 0x8,
+    LinceCollision_X = LinceCollision_Right | LinceCollision_Left,
+    LinceCollision_Y = LinceCollision_Top   | LinceCollision_Bot,
 
-    LinceBoxCollision_X = LinceBoxCollision_Right | LinceBoxCollision_Left,
-    LinceBoxCollision_Y = LinceBoxCollision_Top   | LinceBoxCollision_Bot,
-
-} LinceBoxColliderFlags;
+} LinceColliderFlags;
 
 
-typedef struct LinceBoxCollider{
+typedef struct LinceCollider{
 	vec2 pos;  // center x,y
     vec2 size; // width, height
-} LinceBoxCollider;
+} LinceCollider;
 
 
-int LinceCollideBox(LinceBoxCollider* a, LinceBoxCollider* b);
+int LinceCollideBox(LinceCollider* a, LinceCollider* b);
 
 #endif /* LINCE_COLLIDER_H */

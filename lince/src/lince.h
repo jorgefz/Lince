@@ -33,4 +33,10 @@
 #include "lince/tiles/tile_anim.h"
 #include "lince/tiles/tilemap.h"
 
+/* Audio */
+#include "lince/audio/audio.h"
+
+/* ECS */
+#include "lince/entity/entity.h"
+
 #endif //LINCE_H

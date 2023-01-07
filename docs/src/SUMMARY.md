@@ -1,4 +1,4 @@
-# Lince v0.5.0 Documentation
+# Lince v0.6.0 Documentation
 
 [Home Page](./HomePage.md)
 
@@ -16,6 +16,7 @@
 - [UI](./UI.md)
 - [Tiles](./Tiles.md)
 - [Audio](./Audio.md)
+- [Entity](./Entity.md)
 
 - [Development Diary](./DevDiary.md)
 	- [ToDo](./ToDo.md)

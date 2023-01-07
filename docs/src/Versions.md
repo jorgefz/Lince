@@ -2,17 +2,12 @@
 
 Version codes follow [Semantic Versioning](https://semver.org/).
 
-- To-do:
-	logging
-	data structures
-	tests
-	docs
-
 ### To-Do
 - Refactored minigames and editor
 - Move documentation and minigames to separate github repositories?
 
-## v0.5.1
+## v0.6.0
+- Added ECS
 - Improved array and hashmap initialisation API
 - Added OpenGL version requirement to README
 - Moved glfw error callback before window creation.
