@@ -1,12 +1,12 @@
 #include <stdio.h>
+#include <time.h>
 
 #define LINCE_MAX_ENTITY_COMPONENTS_U64_COUNT 2
 
 #include <lince.h>
 #include <lince/audio/audio.h>
 
-#include <time.h>
-
+#include "boxcollider.h"
 
 #define QUADTREE_CHILDREN 4
 #define QUADTREE_NODE_CAPACITY 16 // max objects in node before it splits into children
@@ -59,7 +59,6 @@ static GameData game_data = {
     .music_file = "sandbox/assets/game-town-music.wav"
 };
 
-
 typedef enum Component { Component_BoxCollider, Component_Sprite } Component;
 
 typedef LinceQuadProps Sprite;
@@ -79,99 +78,6 @@ void LinceDrawSpriteComponents(LinceEntityRegistry* reg){
 }
 
 static const float vel = 8e-4;
-
-typedef enum LinceBoxColliderFlags {
-    // Settings
-    LinceBoxCollider_Bounce = 0x1, // flips direction on collision
-    // State
-    LinceBoxCollider_CollisionX = 0x2,
-    LinceBoxCollider_CollisionY = 0x4,
-    LinceBoxCollider_Collision = LinceBoxCollider_CollisionX | LinceBoxCollider_CollisionY,
-} LinceBoxColliderFlags;
-
-typedef struct LinceBoxCollider {
-    float x, y;    // position
-    float w, h;    // size
-    float dx, dy;  // displacement when moving, update as needed before computing collisions
-    LinceBoxColliderFlags flags; // mode for collision reflection, flag for just collided, etc.
-} LinceBoxCollider;
-
-LinceBool LLinceBoxColliderContains(LinceBoxCollider* box1, LinceBoxCollider* box2) {
-    return(
-        box1->x - box1->w/2.0f <= box2->x - box2->w/2.0f &&
-        box2->x + box2->w/2.0f <= box1->x + box1->w/2.0f &&
-        box1->y + box1->h/2.0f <= box2->y + box2->h/2.0f &&
-        box2->y - box2->h/2.0f <= box1->y - box1->h/2.0f
-    );
-}
-
-LinceBool LinceBoxColliderIntersects(LinceBoxCollider* box1, LinceBoxCollider* box2){
-    return !(
-        box1->x - box1->w/2.0f >= box2->x + box2->w/2.0f ||
-        box1->x + box1->w/2.0f <= box2->x - box2->w/2.0f ||
-        box1->y + box1->h/2.0f >= box2->y - box2->h/2.0f ||
-        box1->y - box1->h/2.0f <= box2->y + box2->h/2.0f
-    );
-}
-
-int BoxCollides(LinceBoxCollider* rect1, LinceBoxCollider* rect2){
-    return (
-        rect1->x - rect1->w/2.0f <= rect2->x + rect2->w/2.0f &&
-        rect1->x + rect1->w/2.0f >= rect2->x - rect2->w/2.0f &&
-        rect1->y - rect1->h/2.0f <= rect2->y + rect2->h/2.0f &&
-        rect1->y + rect1->h/2.0f >= rect2->y - rect2->h/2.0f
-    );
-}
-
-// LinceUpdateBoxCollider
-/// TODO: Improve neighbour search algorithm
-void CalculateEntityCollisions(){
-    array_t entities;
-    array_init(&entities, sizeof(uint32_t));
-    uint32_t query_num;
-    query_num = LinceQueryEntities(game_data.reg, &entities, 1, Component_BoxCollider);
-
-    for(uint32_t i = 0; i != query_num; ++i){
-        uint32_t id = *(uint32_t*)array_get(&entities, i);
-        LinceBoxCollider* box1 = LinceGetEntityComponent(game_data.reg, id, Component_BoxCollider);
-        if( fabs(box1->dx) == 0.0f && fabs(box1->dy) == 0.0f ) continue;
-        LinceBoxCollider xb = *box1, yb = *box1;
-        xb.x += box1->dx;
-        yb.y += box1->dy;
-        LinceBool move_x = 1, move_y = 1;
-        
-        for(uint32_t j = 0; j != query_num; ++j){
-            if(i == j) continue;
-            uint32_t id2 = *(uint32_t*)array_get(&entities, j);
-            LinceBoxCollider* box2 = LinceGetEntityComponent(game_data.reg, id2, Component_BoxCollider);
-            if(move_x) move_x = !BoxCollides(&xb, box2);
-            if(move_y) move_y = !BoxCollides(&yb, box2);
-            if(!move_x && !move_y) break;
-        }
-        
-        if(move_x){
-            box1->x = xb.x;
-            box1->flags &= ~LinceBoxCollider_CollisionX;
-        } else {
-            box1->flags |= LinceBoxCollider_CollisionX;
-            if(box1->flags & LinceBoxCollider_Bounce){
-                box1->dx = -box1->dx;     
-            }       
-        }
-
-        if(move_y){
-            box1->y = yb.y;
-            box1->flags &= ~LinceBoxCollider_CollisionY;
-        } else {
-            box1->flags |= LinceBoxCollider_CollisionY;
-            if(box1->flags & LinceBoxCollider_Bounce){
-                box1->dy = -box1->dy;
-            }           
-        }
-    }
-
-    array_uninit(&entities);
-}
 
 
 void UpdateSpritePositions(LinceEntityRegistry* reg){
@@ -281,7 +187,6 @@ void LayerOnUpdate(LinceLayer* layer, float dt){
     // Rendering
     LinceResizeCameraView(game_data.camera, LinceGetAspectRatio());
 	LinceUpdateCamera(game_data.camera);
-    CalculateEntityCollisions();
 
     LinceBeginScene(game_data.camera);
     UpdateSpritePositions(game_data.reg);
@@ -290,6 +195,12 @@ void LayerOnUpdate(LinceLayer* layer, float dt){
 
     // Move
     MovePlayer(dt);
+
+    array_t entities;
+    array_init(&entities, sizeof(uint32_t));
+    LinceQueryEntities(game_data.reg, &entities, 1, Component_BoxCollider);
+    LinceCalculateEntityCollisions(game_data.reg, &entities, Component_BoxCollider);
+    array_uninit(&entities);
 
     // Draw UI text
     LinceUILayer* ui = LinceGetAppState()->ui;
