@@ -33,38 +33,6 @@ Change 2: results.
 */ 
 
 
-const char custom_fragment_source[] =
-	"#version 450 core\n"
-	"layout(location = 0) out vec4 color;\n"
-	"in vec4 vColor;\n"
-	"in vec2 vTexCoord;\n"
-	"in float vTextureID;\n"
-	"uniform sampler2D uTextureSlots[32];\n"
-	"void main(){\n"
-	"	color = texture(uTextureSlots[int(vTextureID)], vTexCoord) * vColor;\n"
-	"	if (color.a == 0.0) discard;\n"
-	"	// temporary solution for full transparency, not translucency.\n"
-	"}\n"; 
-
-const char custom_vertex_source[] = 
-	"#version 450 core\n"
-	"layout (location = 0) in vec3 aPos;\n"
-	"layout (location = 1) in vec2 aTexCoord;\n"
-	"layout (location = 2) in vec4 aColor;\n"
-	"layout (location = 3) in float aTextureID;\n"
-    "uniform mat4 u_view_proj = mat4(1.0);\n"
-    "uniform float uRedFactor = 1.0;\n"
-	"out vec4 vColor;\n"
-	"out vec2 vTexCoord;\n"
-	"out float vTextureID;\n"
-	"void main(){\n"
-	"   gl_Position = u_view_proj * vec4(aPos, 1.0);\n"
-	"   vColor = vec4(uRedFactor, 0.5, 0.5, 1.0);\n"
-	"   vTexCoord = aTexCoord;\n"
-	"   vTextureID = aTextureID;\n"
-	"}\n";
-
-
 #define MOVERS_SIZE 0.01f
 #define MOVERS_COUNT 100
 
@@ -136,10 +104,28 @@ void LinceDrawSpriteComponents(LinceEntityRegistry* reg){
     // and both movers above and the wall below will have the same uniform value.
     LinceStartNewBatch();
 
+    // Draw extra wall
     LinceBindShader(game_data.custom_shader);
-    LinceSetShaderUniformFloat(game_data.custom_shader, "uRedFactor", 0.5);
+    LinceSetShaderUniformFloat(game_data.custom_shader, "uRedFactor", 1.0);
+    vec2 wsize;
+    LinceGetScreenSize(wsize);
+    LinceSetShaderUniformVec2(game_data.custom_shader, "uWindowSize", wsize);
+    vec2 lightpos;
+    LinceGetMousePos(&lightpos[0], &lightpos[1]);
+    // convert to proper coords (top left in pixels, to bottom left [0,1])
+    lightpos[0] = lightpos[0]/wsize[0];
+    lightpos[1] = (1.0 - lightpos[1])/wsize[1] + 1.0;
+    LinceSetShaderUniformVec2(game_data.custom_shader, "uLightSourcePos", lightpos);
+
     Sprite* wall_sprite = LinceGetEntityComponent(reg, game_data.obstacles[0], Component_Sprite);
     LinceDrawSprite(wall_sprite, game_data.custom_shader);
+
+    // Draw test quad at origin
+    LinceDrawSprite(&(LinceSprite){
+        .x = 0.0, .y = 0.0,
+        .w = 2.0, .h = 2.0,
+        .color = {1,1,1,1}
+    }, game_data.custom_shader);
 
 
     array_uninit(&result);
@@ -181,10 +167,10 @@ void LayerOnAttach(LinceLayer* layer){
 
     // Rendering
     game_data.camera = LinceCreateCamera(LinceGetAspectRatio());
-    game_data.custom_shader = LinceCreateShaderFromSrc(
+    game_data.custom_shader = LinceCreateShader(
         "CustomShader",
-		custom_vertex_source,
-		custom_fragment_source
+		"sandbox/assets/light.vert.glsl",
+		"sandbox/assets/light.frag.glsl"
     );
     LinceBindShader(game_data.custom_shader);
     #define max_texture_slots 32
