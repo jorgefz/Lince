@@ -29,6 +29,9 @@ typedef struct LinceQuadProps{
 	float color[4]; 		// flat quad color - rgba
 	LinceTexture* texture;
 	LinceTile* tile;
+
+	// TEMP
+	LinceShader* shader; // custom shader
 } LinceQuadProps;
 
 /* Initialises renderer state and openGL rendering settings */

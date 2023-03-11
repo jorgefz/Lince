@@ -66,7 +66,7 @@ typedef struct LinceQuadVertex {
 } LinceQuadVertex;
 
 typedef struct LinceRendererState {
-	LinceShader* shader;
+	LinceShader *default_shader, *shader;
 	LinceTexture* white_texture;
 	
 	LinceVertexArray* va;
@@ -178,16 +178,17 @@ void LinceInitRenderer() {
 	LinceSetTextureData(renderer_state.white_texture, white_pixel);
 	LinceBindTexture(renderer_state.white_texture, 0);
 	
-	renderer_state.shader = LinceCreateShaderFromSrc(
+	renderer_state.default_shader = LinceCreateShaderFromSrc(
 		"RendererShader",
 		default_vertex_source,
 		default_fragment_source
 	);
-    LinceBindShader(renderer_state.shader);
+    LinceBindShader(renderer_state.default_shader);
 
 	int samplers[MAX_TEXTURE_SLOTS] = { 0 };
 	for (int i = 0; i != MAX_TEXTURE_SLOTS; ++i) samplers[i] = i;
-	LinceSetShaderUniformIntN(renderer_state.shader, "uTextureSlots", samplers, MAX_TEXTURE_SLOTS);
+	LinceSetShaderUniformIntN(renderer_state.default_shader, "uTextureSlots", samplers, MAX_TEXTURE_SLOTS);
+	renderer_state.shader = renderer_state.default_shader;
 
 	LINCE_PROFILER_END(timer);
 }
@@ -203,7 +204,7 @@ void LinceTerminateRenderer() {
 		renderer_state.index_batch = NULL;
 	}
 
-	LinceDeleteShader(renderer_state.shader);
+	LinceDeleteShader(renderer_state.default_shader);
     LinceDeleteTexture(renderer_state.white_texture);
 
 	LinceDeleteVertexBuffer(renderer_state.vb);
@@ -224,7 +225,8 @@ void LinceBeginScene(LinceCamera* cam) {
 	LinceEnableDepthTest();
 
 	/* Update camera */
-	LinceSetShaderUniformMat4(renderer_state.shader, "u_view_proj", cam->view_proj);
+	LinceSetShaderUniformMat4(renderer_state.default_shader,
+		"u_view_proj", cam->view_proj);
 	
 	/* Reset batch */
 	renderer_state.quad_count = 0;
@@ -327,6 +329,10 @@ void LinceDrawQuad(LinceQuadProps props) {
 		memcpy(renderer_state.vertex_batch + offset, &vertex, sizeof(vertex));
 	}
 	renderer_state.quad_count++;
+
+	if(props.shader){
+		renderer_state.shader = props.shader;
+	}
 	
 	LINCE_PROFILER_END(timer);
 }

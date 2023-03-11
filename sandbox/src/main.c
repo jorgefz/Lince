@@ -32,6 +32,39 @@ Change 2: results.
     The input query will run only on these entities.
 */ 
 
+
+const char custom_fragment_source[] =
+	"#version 450 core\n"
+	"layout(location = 0) out vec4 color;\n"
+	"in vec4 vColor;\n"
+	"in vec2 vTexCoord;\n"
+	"in float vTextureID;\n"
+	"uniform sampler2D uTextureSlots[32];\n"
+	"void main(){\n"
+	"	color = texture(uTextureSlots[int(vTextureID)], vTexCoord) * vColor;\n"
+	"	if (color.a == 0.0) discard;\n"
+	"	// temporary solution for full transparency, not translucency.\n"
+	"}\n";
+
+const char custom_vertex_source[] = 
+	"#version 450 core\n"
+	"layout (location = 0) in vec3 aPos;\n"
+	"layout (location = 1) in vec2 aTexCoord;\n"
+	"layout (location = 2) in vec4 aColor;\n"
+	"layout (location = 3) in float aTextureID;\n"
+	"out vec4 vColor;\n"
+	"out vec2 vTexCoord;\n"
+	"out float vTextureID;\n"
+	"uniform mat4 u_view_proj = mat4(1.0);\n"
+	"uniform mat4 u_transform = mat4(1.0);\n"
+	"void main(){\n"
+	"   gl_Position = u_view_proj * u_transform * vec4(aPos, 1.0);\n"
+	"   vColor = vec4(1-aColor.r, 1-aColor.g, 1-aColor.b, aColor.a);\n"
+	"   vTexCoord = aTexCoord;\n"
+	"   vTextureID = aTextureID;\n"
+	"}\n";
+
+
 #define MOVERS_SIZE 0.01f
 #define MOVERS_COUNT 100
 
@@ -45,6 +78,7 @@ typedef struct GameData {
 
     // Rendering
     LinceCamera* camera;
+    LinceShader* custom_shader;
 
     // Entities
     LinceEntityRegistry* reg;
@@ -71,6 +105,7 @@ void LinceDrawSpriteComponents(LinceEntityRegistry* reg){
     for(uint32_t i = 0; i != num; ++i){
         uint32_t id = *(uint32_t*)array_get(&result, i);
         Sprite* sprite = LinceGetEntityComponent(reg, id, Component_Sprite);
+        sprite->shader = game_data.custom_shader;
         LinceDrawQuad(*sprite);
     }
 
@@ -113,6 +148,16 @@ void LayerOnAttach(LinceLayer* layer){
 
     // Rendering
     game_data.camera = LinceCreateCamera(LinceGetAspectRatio());
+    game_data.custom_shader = LinceCreateShaderFromSrc(
+        "CustomShader",
+		custom_vertex_source,
+		custom_fragment_source
+    );
+    LinceBindShader(game_data.custom_shader);
+    #define max_texture_slots 32
+	int samplers[max_texture_slots] = { 0 };
+	for (int i = 0; i != max_texture_slots; ++i) samplers[i] = i;
+	LinceSetShaderUniformIntN(game_data.custom_shader, "uTextureSlots", samplers, max_texture_slots);
 
     // Entities
     game_data.reg = LinceCreateEntityRegistry(2, sizeof(LinceBoxCollider), sizeof(Sprite));
@@ -189,6 +234,9 @@ void LayerOnUpdate(LinceLayer* layer, float dt){
 	LinceUpdateCamera(game_data.camera);
 
     LinceBeginScene(game_data.camera);
+    LinceBindShader(game_data.custom_shader);
+    LinceSetShaderUniformMat4(game_data.custom_shader,
+        "u_view_proj", game_data.camera->view_proj);
     UpdateSpritePositions(game_data.reg);
     LinceDrawSpriteComponents(game_data.reg);
     LinceEndScene();
@@ -220,6 +268,7 @@ void LayerOnDetach(LinceLayer* layer){
     LINCE_UNUSED(layer);
     LinceDestroyEntityRegistry(game_data.reg);
     LinceDeleteCamera(game_data.camera);
+    LinceDeleteShader(game_data.custom_shader);
 }
 
 LinceLayer* LayerInit(){
