@@ -21,7 +21,7 @@ Equation for normalising a number in a range to another range:
 float LinceYSortedZ(float y, vec2 ylim, vec2 zlim);
 
 /* Quad properties, serves as argument for LinceRenderQuad */
-typedef struct LinceQuadProps{
+typedef struct LinceSprite{
 	float x, y; 			// 2D position
 	float w, h; 			// width, height
 	float zorder; 			// order of rendering
@@ -29,10 +29,7 @@ typedef struct LinceQuadProps{
 	float color[4]; 		// flat quad color - rgba
 	LinceTexture* texture;
 	LinceTile* tile;
-
-	// TEMP
-	LinceShader* shader; // custom shader
-} LinceQuadProps;
+} LinceSprite;
 
 /* Initialises renderer state and openGL rendering settings */
 void LinceInitRenderer();
@@ -47,12 +44,11 @@ void LinceBeginScene(LinceCamera* cam);
 void LinceEndScene();
 
 /* Submits a quad for rendering
-e.g LinceSubmitQuad({.x=1.0, .y=2.0});
 C99 standard guarantees that uninitialised members
 are set to zero if at least one has been initialised
 within the brace-enclosed list.
 */
-void LinceDrawQuad(LinceQuadProps props);
+void LinceDrawSprite(LinceSprite* props, LinceShader* shader);
 
 
 /* Draws provided vertices directly */
@@ -67,6 +63,9 @@ void LinceClear();
 
 /* Sets the default screen color */
 void LinceSetClearColor(float r, float g, float b, float a);
+
+/* Draw stored vertices and create new vertex batch */
+void LinceStartNewBatch();
 
 
 #endif // LINCE_RENDERER_H

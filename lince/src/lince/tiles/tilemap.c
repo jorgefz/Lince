@@ -85,7 +85,7 @@ static void LinceDrawTilemapGrids(LinceTilemap* tm){
     // Draw base & bkg tiles
     for(size_t j = 0; j != tm->height; ++j){
         for(size_t i = 0; i != tm->width; ++i){
-            LinceQuadProps quad = {
+            LinceSprite quad = {
                 .x = (float)i - tm->offset[0],
                 .y = (float)j - tm->offset[1],
                 .w = 1.001f, .h = 1.001f,
@@ -93,12 +93,12 @@ static void LinceDrawTilemapGrids(LinceTilemap* tm){
                 .tile = &tm->tileset[tm->base_grid[j*tm->width + i]],
                 .zorder = LINCE_TILEMAP_Z
             };
-            LinceDrawQuad(quad); // base tile
+            LinceDrawSprite(&quad, NULL); // base tile
 
             if(!tm->bkg_grid) continue;
             quad.tile = &tm->tileset[tm->bkg_grid[j*tm->width + i]];
             quad.zorder += 0.001f; // slightly above base grid
-            LinceDrawQuad(quad); // bkg tile
+            LinceDrawSprite(&quad, NULL); // bkg tile
         }
     }
 
@@ -117,7 +117,7 @@ static void LinceDrawTilemapOverlays(LinceTilemap* tm){
             (vec2){-100.0f, 100.0f},
             (vec2){0.1f, 0.9f}
         );
-        LinceDrawQuad((LinceQuadProps){
+        LinceDrawSprite(&(LinceSprite){
             .x = tm->overlay_positions[i][0] - tm->offset[0],
             .y = tm->overlay_positions[i][1] - tm->offset[1],
             .w = tile->tilesize[0],
@@ -125,7 +125,7 @@ static void LinceDrawTilemapOverlays(LinceTilemap* tm){
             .color = {1,1,1,1},
             .tile = tile,
             .zorder = z
-        });
+        }, NULL);
     }
 }
 

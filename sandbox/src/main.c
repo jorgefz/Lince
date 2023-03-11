@@ -44,7 +44,7 @@ const char custom_fragment_source[] =
 	"	color = texture(uTextureSlots[int(vTextureID)], vTexCoord) * vColor;\n"
 	"	if (color.a == 0.0) discard;\n"
 	"	// temporary solution for full transparency, not translucency.\n"
-	"}\n";
+	"}\n"; 
 
 const char custom_vertex_source[] = 
 	"#version 450 core\n"
@@ -52,14 +52,14 @@ const char custom_vertex_source[] =
 	"layout (location = 1) in vec2 aTexCoord;\n"
 	"layout (location = 2) in vec4 aColor;\n"
 	"layout (location = 3) in float aTextureID;\n"
+    "uniform mat4 u_view_proj = mat4(1.0);\n"
+    "uniform float uRedFactor = 1.0;\n"
 	"out vec4 vColor;\n"
 	"out vec2 vTexCoord;\n"
 	"out float vTextureID;\n"
-	"uniform mat4 u_view_proj = mat4(1.0);\n"
-	"uniform mat4 u_transform = mat4(1.0);\n"
 	"void main(){\n"
-	"   gl_Position = u_view_proj * u_transform * vec4(aPos, 1.0);\n"
-	"   vColor = vec4(1-aColor.r, 1-aColor.g, 1-aColor.b, aColor.a);\n"
+	"   gl_Position = u_view_proj * vec4(aPos, 1.0);\n"
+	"   vColor = vec4(uRedFactor, 0.5, 0.5, 1.0);\n"
 	"   vTexCoord = aTexCoord;\n"
 	"   vTextureID = aTextureID;\n"
 	"}\n";
@@ -79,6 +79,7 @@ typedef struct GameData {
     // Rendering
     LinceCamera* camera;
     LinceShader* custom_shader;
+    float movers_redness;
 
     // Entities
     LinceEntityRegistry* reg;
@@ -95,19 +96,51 @@ static GameData game_data = {
 
 typedef enum Component { Component_BoxCollider, Component_Sprite } Component;
 
-typedef LinceQuadProps Sprite;
+typedef LinceSprite Sprite;
 
 void LinceDrawSpriteComponents(LinceEntityRegistry* reg){
     static array_t result;
     array_init(&result, sizeof(uint32_t));
     uint32_t num = LinceQueryEntities(reg, &result, 1, Component_Sprite);
 
-    for(uint32_t i = 0; i != num; ++i){
-        uint32_t id = *(uint32_t*)array_get(&result, i);
+    // Draw all
+    // for(uint32_t i = 0; i != num; ++i){
+    //     uint32_t id = *(uint32_t*)array_get(&result, i);
+    //     Sprite* sprite = LinceGetEntityComponent(reg, id, Component_Sprite);
+    //     // LinceDrawSprite(sprite, game_data.custom_shader);
+    //     LinceDrawSprite(sprite, NULL);
+    // }
+
+    // Draw player
+    Sprite* sprite = LinceGetEntityComponent(reg, game_data.player, Component_Sprite);
+    LinceDrawSprite(sprite, NULL);
+
+    // Draw walls
+    for(uint32_t i = 1; i != 4; ++i){
+        uint32_t id = game_data.obstacles[i];
         Sprite* sprite = LinceGetEntityComponent(reg, id, Component_Sprite);
-        sprite->shader = game_data.custom_shader;
-        LinceDrawQuad(*sprite);
+        LinceDrawSprite(sprite, NULL);
     }
+
+    // Draw movers
+    LinceBindShader(game_data.custom_shader);
+    LinceSetShaderUniformFloat(game_data.custom_shader, "uRedFactor", game_data.movers_redness);
+    for(uint32_t i = 1; i != MOVERS_COUNT; ++i){
+        uint32_t id = game_data.movers[i];
+        Sprite* sprite = LinceGetEntityComponent(reg, id, Component_Sprite);
+        LinceDrawSprite(sprite, game_data.custom_shader);
+    }
+
+    // You need to start a new batch in order to change the value of an uniform
+    // Otherwise, changing the uniform will overwrite the old value
+    // and both movers above and the wall below will have the same uniform value.
+    LinceStartNewBatch();
+
+    LinceBindShader(game_data.custom_shader);
+    LinceSetShaderUniformFloat(game_data.custom_shader, "uRedFactor", 0.5);
+    Sprite* wall_sprite = LinceGetEntityComponent(reg, game_data.obstacles[0], Component_Sprite);
+    LinceDrawSprite(wall_sprite, game_data.custom_shader);
+
 
     array_uninit(&result);
 }
@@ -254,12 +287,17 @@ void LayerOnUpdate(LinceLayer* layer, float dt){
     LinceUILayer* ui = LinceGetAppState()->ui;
     struct nk_context *ctx = ui->ctx;
     nk_style_set_font(ctx, &ui->fonts[LinceFont_Droid15]->handle);
-    if (nk_begin(ctx, "Demo", nk_rect(20, 20, 100, 50), 0)) {
-        nk_layout_row_static(ctx, 30, 40, 1);
+    if (nk_begin(ctx, "Demo", nk_rect(20, 20, 100, 100), 0)) {
+        nk_layout_row_static(ctx, 25, 80, 1);
         nk_labelf(
             ctx, NK_TEXT_ALIGN_CENTERED,
             "FPS: %.1f", 1000.0f/dt
         );
+        nk_labelf(
+            ctx, NK_TEXT_ALIGN_CENTERED,
+            "Redness: %.1f", game_data.movers_redness
+        );
+        nk_slider_float(ctx, 0.0, &game_data.movers_redness, 1.0, 0.01);
     }
     nk_end(ctx);
 }
