@@ -64,49 +64,9 @@ static GameData game_data = {
 
 typedef enum Component { Component_BoxCollider, Component_Sprite } Component;
 
-typedef LinceSprite Sprite;
-
-void LinceDrawSpriteComponents(LinceEntityRegistry* reg){
-    static array_t result;
-    array_init(&result, sizeof(uint32_t));
-    uint32_t num = LinceQueryEntities(reg, &result, 1, Component_Sprite);
-
-    // Draw all
-    // for(uint32_t i = 0; i != num; ++i){
-    //     uint32_t id = *(uint32_t*)array_get(&result, i);
-    //     Sprite* sprite = LinceGetEntityComponent(reg, id, Component_Sprite);
-    //     // LinceDrawSprite(sprite, game_data.custom_shader);
-    //     LinceDrawSprite(sprite, NULL);
-    // }
-
-    // Draw player
-    Sprite* sprite = LinceGetEntityComponent(reg, game_data.player, Component_Sprite);
-    LinceDrawSprite(sprite, NULL);
-
-    // Draw walls
-    for(uint32_t i = 1; i != 4; ++i){
-        uint32_t id = game_data.obstacles[i];
-        Sprite* sprite = LinceGetEntityComponent(reg, id, Component_Sprite);
-        LinceDrawSprite(sprite, NULL);
-    }
-
-    // Draw movers
+void LinceDrawSprites(LinceEntityRegistry* reg){
+    // Setup lightning shader uniforms
     LinceBindShader(game_data.custom_shader);
-    LinceSetShaderUniformFloat(game_data.custom_shader, "uRedFactor", game_data.movers_redness);
-    for(uint32_t i = 1; i != MOVERS_COUNT; ++i){
-        uint32_t id = game_data.movers[i];
-        Sprite* sprite = LinceGetEntityComponent(reg, id, Component_Sprite);
-        LinceDrawSprite(sprite, game_data.custom_shader);
-    }
-
-    // You need to start a new batch in order to change the value of an uniform
-    // Otherwise, changing the uniform will overwrite the old value
-    // and both movers above and the wall below will have the same uniform value.
-    LinceStartNewBatch();
-
-    // Draw extra wall
-    LinceBindShader(game_data.custom_shader);
-    LinceSetShaderUniformFloat(game_data.custom_shader, "uRedFactor", 1.0);
     vec2 wsize;
     LinceGetScreenSize(wsize);
     LinceSetShaderUniformVec2(game_data.custom_shader, "uWindowSize", wsize);
@@ -115,18 +75,35 @@ void LinceDrawSpriteComponents(LinceEntityRegistry* reg){
     // convert to proper coords (top left in pixels, to bottom left [0,1])
     lightpos[0] = lightpos[0]/wsize[0];
     lightpos[1] = (1.0 - lightpos[1])/wsize[1] + 1.0;
-    LinceSetShaderUniformVec2(game_data.custom_shader, "uLightSourcePos", lightpos);
+    LinceSetShaderUniformVec2(game_data.custom_shader, "uPointLightPositions[0]", lightpos);
+    vec4 light2 = {0.5, 0.5};
+    LinceSetShaderUniformVec2(game_data.custom_shader, "uPointLightPositions[1]", light2);
+    LinceSetShaderUniformFloat(game_data.custom_shader, "uPointLightCount", 2.0);
 
-    Sprite* wall_sprite = LinceGetEntityComponent(reg, game_data.obstacles[0], Component_Sprite);
-    LinceDrawSprite(wall_sprite, game_data.custom_shader);
+    // Draw all entities
+    static array_t result;
+    array_init(&result, sizeof(uint32_t));
+    uint32_t num = LinceQueryEntities(reg, &result, 1, Component_Sprite);
+
+    for(uint32_t i = 0; i != num; ++i){
+        uint32_t id = *(uint32_t*)array_get(&result, i);
+        LinceSprite* sprite = LinceGetEntityComponent(reg, id, Component_Sprite);
+        // LinceShader* shader = LinceGetEntityComponent(reg, id, Component_Shader);
+        // BindUniformBuffer(...);
+        LinceDrawSprite(sprite, game_data.custom_shader);
+    }
+
+    // You need to start a new batch in order to change the value of an uniform
+    // Otherwise, changing the uniform will overwrite the old value.
+    // Consider using uniform buffer objects or SSBOs
+    // LinceStartNewBatch();
 
     // Draw test quad at origin
     LinceDrawSprite(&(LinceSprite){
         .x = 0.0, .y = 0.0,
-        .w = 2.0, .h = 2.0,
-        .color = {1,1,1,1}
+        .w = 3.0, .h = 2.0,
+        .color = {0.1,0.1,0.1,1}
     }, game_data.custom_shader);
-
 
     array_uninit(&result);
 }
@@ -141,7 +118,7 @@ void UpdateSpritePositions(LinceEntityRegistry* reg){
 
     for(uint32_t i = 0; i != num; ++i){
         uint32_t id = *(uint32_t*)array_get(&result, i);
-        Sprite* sprite = LinceGetEntityComponent(game_data.reg, id, Component_Sprite);
+        LinceSprite* sprite = LinceGetEntityComponent(game_data.reg, id, Component_Sprite);
         LinceBoxCollider* box = LinceGetEntityComponent(game_data.reg, id, Component_BoxCollider);
         sprite->x = box->x;
         sprite->y = box->y;
@@ -179,7 +156,7 @@ void LayerOnAttach(LinceLayer* layer){
 	LinceSetShaderUniformIntN(game_data.custom_shader, "uTextureSlots", samplers, max_texture_slots);
 
     // Entities
-    game_data.reg = LinceCreateEntityRegistry(2, sizeof(LinceBoxCollider), sizeof(Sprite));
+    game_data.reg = LinceCreateEntityRegistry(2, sizeof(LinceBoxCollider), sizeof(LinceSprite));
 
     // -- walls
     uint32_t walls[4];
@@ -192,13 +169,13 @@ void LayerOnAttach(LinceLayer* layer){
     for(uint32_t i = 0; i != 4; ++i){
         walls[i] = LinceCreateEntity(game_data.reg);
         LinceAddEntityComponent(game_data.reg, walls[i], Component_BoxCollider, &wall_boxes[i]);
-        Sprite wall_sprite = {.x=wall_boxes[i].x, .y=wall_boxes[i].y,
+        LinceSprite wall_sprite = {.x=wall_boxes[i].x, .y=wall_boxes[i].y,
             .w=wall_boxes[i].w, .h=wall_boxes[i].h, .color={0,1,1,1}};
         LinceAddEntityComponent(game_data.reg, walls[i], Component_Sprite, &wall_sprite);   
     }
 
     // -- player
-    Sprite sprite = (Sprite){
+    LinceSprite sprite = {
         .x = 0.0, .y = 0.0,
         .w = 0.1, .h = 0.1,
         .color = {0.0, 0.0, 1.0, 1.0}
@@ -257,7 +234,7 @@ void LayerOnUpdate(LinceLayer* layer, float dt){
     LinceSetShaderUniformMat4(game_data.custom_shader,
         "u_view_proj", game_data.camera->view_proj);
     UpdateSpritePositions(game_data.reg);
-    LinceDrawSpriteComponents(game_data.reg);
+    LinceDrawSprites(game_data.reg);
     LinceEndScene();
 
     // Move
