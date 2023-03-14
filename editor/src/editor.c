@@ -19,6 +19,12 @@
 
 #include "collider.h"
 
+typedef LinceSprite LinceQuadProps;
+
+void LinceDrawQuad(LinceQuadProps props){
+    LinceDrawSprite(&props, NULL);
+}
+
 
 enum { BLOCK_FREE = 0, BLOCK_SOLID = 1 };
 

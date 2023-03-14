@@ -5,8 +5,7 @@
 
 #include <lince.h>
 #include <lince/audio/audio.h>
-
-#include "boxcollider.h"
+#include <lince/physics/boxcollider.h>
 
 #define QUADTREE_CHILDREN 4
 #define QUADTREE_NODE_CAPACITY 16 // max objects in node before it splits into children
@@ -33,8 +32,8 @@ Change 2: results.
 */ 
 
 
-#define MOVERS_SIZE 0.01f
-#define MOVERS_COUNT 100
+#define MOVERS_SIZE 0.1f
+#define MOVERS_COUNT 5
 
 typedef struct GameData {
     // Audio
@@ -64,7 +63,21 @@ static GameData game_data = {
 
 typedef enum Component { Component_BoxCollider, Component_Sprite } Component;
 
+void LinceTransformToScreen(mat4 vp, vec2 world_pos, vec2 screen_pos){
+	float wx = world_pos[0], wy = world_pos[1];
+
+    // Transform by VP matrix
+    vec4 wpos = {wx, wy, 0.0, 1.0};
+    vec4 spos;
+    glm_mat4_mulv(vp, wpos, spos);
+
+    // Normalise from NDC to clip space
+    screen_pos[0] = (spos[0]/spos[3]+1.0)/2.0;
+    screen_pos[1] = (spos[1]/spos[3]+1.0)/2.0;
+}
+
 void LinceDrawSprites(LinceEntityRegistry* reg){
+
     // Setup lightning shader uniforms
     LinceBindShader(game_data.custom_shader);
     vec2 wsize;
@@ -76,8 +89,16 @@ void LinceDrawSprites(LinceEntityRegistry* reg){
     lightpos[0] = lightpos[0]/wsize[0];
     lightpos[1] = (1.0 - lightpos[1])/wsize[1] + 1.0;
     LinceSetShaderUniformVec2(game_data.custom_shader, "uPointLightPositions[0]", lightpos);
-    vec4 light2 = {0.5, 0.5};
-    LinceSetShaderUniformVec2(game_data.custom_shader, "uPointLightPositions[1]", light2);
+    
+    LinceSprite* psprite = LinceGetEntityComponent(game_data.reg, game_data.player, Component_Sprite);
+    vec2 player_pos = {psprite->x,psprite->y};
+    LinceTransformToScreen(game_data.camera->view_proj, player_pos, player_pos);
+
+    static LinceBool debug_pos = LinceTrue;
+    if(debug_pos) printf("player_pos: %.3f %.3f\n", player_pos[0], player_pos[1]);
+    debug_pos = LinceFalse;
+
+    LinceSetShaderUniformVec2(game_data.custom_shader, "uPointLightPositions[1]", player_pos);
     LinceSetShaderUniformFloat(game_data.custom_shader, "uPointLightCount", 2.0);
 
     // Draw all entities
@@ -189,9 +210,10 @@ void LayerOnAttach(LinceLayer* layer){
     sprite.color[0] = 1.0;
     sprite.color[2] = 0.0;
     sprite.w *= 4.0f;
+    int obstacle_count = 4;
     float pos_x[] = {0.6,  0.8, -0.6, -0.6};
     float pos_y[] = {0.6,  0.4, -0.6,  0.6};
-    for(int i = 0; i != 4; ++i){
+    for(int i = 0; i != obstacle_count; ++i){
         game_data.obstacles[i] = LinceCreateEntity(game_data.reg);
         sprite.x = pos_x[i];
         sprite.y = pos_y[i];
