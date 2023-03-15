@@ -41,11 +41,11 @@ LinceTexture* LinceLoadTextureWithTiles(
     uint32_t ytiles = tex->height/(uint32_t)cellsize[1];
 	array_init(tiles, sizeof(LinceTile));
 
+	/* Adds tiles from left to right, and then top to bottom */
 	for(size_t y = 0; y != ytiles; ++y){
         for(size_t x = 0; x != xtiles; ++x){
 			LinceTile tile;
-			vec2 pos = {(float)x, (float)y};
-			printf("pos x:%lu, y:%lu\n", x, y);
+			vec2 pos = {(float)x, (float)(ytiles-y+1)};
             LinceGetTileCoords(&tile, texsize, pos, cellsize, tilesize);
 			array_push_back(tiles, &tile);
         }

@@ -43,7 +43,9 @@ void LinceGetTileCoords(
 
 /*
 Loads a texture and collects all tiles within it.
-Returns the texture object, and passes
+The texture is returned, but the tiles are coped over to
+the array argument, which must not be initialised.
+The tiles are loaded from the texture from left to right, and bottom to top.
 */
 LinceTexture* LinceLoadTextureWithTiles(
 	const char* fname,	// Texture filename

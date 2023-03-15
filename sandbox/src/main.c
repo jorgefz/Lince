@@ -216,8 +216,8 @@ void SetupChickenAnimation(){
         .on_repeat = NULL, // ChickenLoops,
         .on_finish = NULL, // ChickenEnds,
         .repeats = 0, // forever
-        .start = 0,
-        //.order = (uint32_t[]){0,1,2,3,4,5,6},
+        .start = 1,
+        // .order = (uint32_t[]){0,1,4,5},
         // .order_count = 4
     });
 
