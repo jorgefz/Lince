@@ -25,10 +25,14 @@
 4. Audio ✅
 	1. Integrate Miniaudio ✅
 	2. Build audio API ✅
-5. ECS
+5. ECS 💛
 	1. Develop ECS API ✅
 	2. Add pre-defined components (.e.g Sprite to draw, Collider using physics engine)
 5. Physics
+	1. Add simple box colliders ✅
+	2. Add an efficient nearest-neighbour algorithm
+6. Editor
+	1. Program to create, modify, and delete entities during runtime.
 
 
 ## Project Structure
@@ -50,7 +54,8 @@
 2. ✅ **Develop API layer for Miniaudio**
 
 ## Physics
-1. 💛 Add simple rectangle colliders and algorithm to check for collision
+1. ✅ **Add simple rectangle colliders and algorithm to check for collision**
+2. 💛 Improve nearest-neighbour search algorith.
 
 ## Scenes
 1. 🔷 Add static and parallax backgrounds
@@ -61,6 +66,9 @@
 1. ✅ **Develop tile-based sprite animations**
 2. ✅ **Improve tile animations with callbacks and custom tile order**
 2. 💛 Add tilemaps
+
+## Editor
+1. Transition to using entities instead of bare quads.
 
 ## 2D Renderer
 1. ✅ **Add basic 2D renderer using immediate-mode scenes and quads**

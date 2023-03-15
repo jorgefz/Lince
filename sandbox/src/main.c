@@ -160,8 +160,7 @@ void MovePlayer(float dt){
 
 }
 
-void LayerOnAttach(LinceLayer* layer){
-    LINCE_UNUSED(layer);
+void GameStateInit(){
 
     // Rendering
     game_data.camera = LinceCreateCamera(LinceGetAspectRatio());
@@ -217,7 +216,12 @@ void LayerOnAttach(LinceLayer* layer){
         game_data.obstacles[i] = LinceCreateEntity(game_data.reg);
         sprite.x = pos_x[i];
         sprite.y = pos_y[i];
-        LinceBoxCollider obox = {.x=sprite.x, .y=sprite.y, .w=sprite.w, .h=sprite.h, .dx=0, .dy=0};
+        LinceBoxCollider obox = {
+            .x=sprite.x, .y=sprite.y,
+            .w=sprite.w, .h=sprite.h,
+            .dx=0, .dy=0,
+            .flags = LinceBoxCollider_Static
+        };
         LinceAddEntityComponent(game_data.reg, game_data.obstacles[i], Component_Sprite, &sprite);
         LinceAddEntityComponent(game_data.reg, game_data.obstacles[i], Component_BoxCollider, &obox);
     }
@@ -244,8 +248,7 @@ void LayerOnAttach(LinceLayer* layer){
     }
 }
 
-void LayerOnUpdate(LinceLayer* layer, float dt){
-    LINCE_UNUSED(layer);
+void GameStateUpdate(float dt){
 
     // Rendering
     LinceResizeCameraView(game_data.camera, LinceGetAspectRatio());
@@ -287,23 +290,14 @@ void LayerOnUpdate(LinceLayer* layer, float dt){
     nk_end(ctx);
 }
 
-void LayerOnDetach(LinceLayer* layer){
-    LINCE_UNUSED(layer);
+void GameTerminate(){
     LinceDestroyEntityRegistry(game_data.reg);
     LinceDeleteCamera(game_data.camera);
     LinceDeleteShader(game_data.custom_shader);
-}
-
-LinceLayer* LayerInit(){
-	LinceLayer* layer = LinceCreateLayer(NULL);
-
-	layer->OnAttach = LayerOnAttach;
-	layer->OnUpdate = LayerOnUpdate;
-	layer->OnEvent  = NULL;
-	layer->OnDetach = LayerOnDetach;
-	layer->data = NULL;
-
-	return layer;
+    
+    LinceDeleteSound(game_data.music);
+    LinceDeleteSoundManager(game_data.sound_manager);
+    LinceDeleteAudioEngine(game_data.audio);
 }
 
 
@@ -364,19 +358,13 @@ void GameInit(){
     config.loop = LinceTrue;
     game_data.music = LinceLoadStream(game_data.audio, game_data.music_file, &config);
 
-    LincePushLayer(LayerInit());
-}
-
-void GameTerminate(){
-    LinceDeleteSound(game_data.music);
-    LinceDeleteSoundManager(game_data.sound_manager);
-    LinceDeleteAudioEngine(game_data.audio);
+    GameStateInit();
 }
 
 void GameOnUpdate(float dt){
     LinceCheckErrors();
+    GameStateUpdate(dt);
     // DrawSoundUI();
-    LINCE_UNUSED(dt);
 }
 
 void SetupApplication(){

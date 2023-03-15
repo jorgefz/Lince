@@ -8,9 +8,10 @@
 typedef enum LinceBoxColliderFlags {
     // Settings
     LinceBoxCollider_Bounce = 0x1, // flips direction on collision
+    LinceBoxCollider_Static = 0x2, // Hints that collider will not move. Skips collision check.
     // State
-    LinceBoxCollider_CollisionX = 0x2,
-    LinceBoxCollider_CollisionY = 0x4,
+    LinceBoxCollider_CollisionX = 0x4,
+    LinceBoxCollider_CollisionY = 0x8,
     LinceBoxCollider_Collision = LinceBoxCollider_CollisionX | LinceBoxCollider_CollisionY,
 } LinceBoxColliderFlags;
 

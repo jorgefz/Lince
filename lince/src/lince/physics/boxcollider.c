@@ -36,7 +36,13 @@ void LinceCalculateEntityCollisions(LinceEntityRegistry* reg, array_t* entities,
     for(uint32_t i = 0; i != query_num; ++i){
         uint32_t id = *(uint32_t*)array_get(entities, i);
         LinceBoxCollider* box1 = LinceGetEntityComponent(reg, id, box_component_id);
+
+        // Ignore zero-size boxes
         if( fabs(box1->dx) == 0.0f && fabs(box1->dy) == 0.0f ) continue;
+
+        // Ignore unmoving boxes
+        if( box1->flags & LinceBoxCollider_Static) continue;
+
         LinceBoxCollider xb = *box1, yb = *box1;
         xb.x += box1->dx;
         yb.y += box1->dy;
