@@ -7,6 +7,7 @@
 #include <lince/audio/audio.h>
 #include <lince/physics/boxcollider.h>
 
+
 #define QUADTREE_CHILDREN 4
 #define QUADTREE_NODE_CAPACITY 16 // max objects in node before it splits into children
 #define QUADTREE_MAX_DEPTH 8 // max node depth for quadtree
@@ -59,18 +60,12 @@ typedef struct GameData {
     // Rendering
     LinceCamera* camera;
     LinceShader* custom_shader;
-    float movers_redness;
 
     // Entities
     LinceEntityRegistry* reg;
     uint32_t player;
-    uint32_t obstacles[4];
-    uint32_t movers[MOVERS_COUNT];
 
     // Tile animation test
-    LinceTexture* chicken_tileset;
-    LinceTileAnim* chicken_anim;
-
     uint8_t current_anim;
     uint32_t player_anim_order[ANIM_COUNT*2];
     LinceTileAnim* player_anim;
@@ -85,7 +80,11 @@ static GameData game_data = {
     .music_file = "sandbox/assets/sounds/game-town-music.wav"
 };
 
-typedef enum Component { Component_BoxCollider, Component_Sprite } Component;
+typedef enum Component {
+    Component_BoxCollider,
+    Component_Sprite,
+    Component_TileAnim
+} Component;
 
 void LinceTransformToScreen(mat4 vp, vec2 world_pos, vec2 screen_pos){
 	float wx = world_pos[0], wy = world_pos[1];
@@ -188,6 +187,7 @@ void SetupTileAnimData(){
     };
     memmove(game_data.player_anim_order, order_indices, sizeof(uint32_t)*ANIM_COUNT*2);
     game_data.current_anim = ANIM_FRONT_IDLE;
+    /*
     game_data.player_anim = LinceCreateTileAnim(&(LinceTileAnim){
         .frames = walk_tiles,
         .frame_count = sizeof(walk_tiles)/sizeof(LinceTile),
@@ -195,23 +195,30 @@ void SetupTileAnimData(){
         .order = order_indices + ANIM_FRONT_IDLE*2,
         .order_count = 2
     });
+    */
 }
 
 void SetupChickenAnimation(){
-    // CHICKEN ANIMATION
     const char* fname = "sandbox/assets/textures/chicken.png";
-    
-    // game_data.chicken_tileset = LinceCreateTexture("ChickenAnim", fname);
-    // size_t chicken_tile_count;
-    // LinceTile* chicken_tiles = LoadTilesFromTexture(fname, &chicken_tile_count, 16);
-
     array_t chicken_tiles;
     vec2 cellsize = {16,16};
-    game_data.chicken_tileset = LinceLoadTextureWithTiles(fname, &chicken_tiles, cellsize);
+    LinceTexture* chicken_tileset = LinceLoadTextureWithTiles(fname, &chicken_tiles, cellsize);
 
-    game_data.chicken_anim = LinceCreateTileAnim(&(LinceTileAnim){
-        .frames      = chicken_tiles.data,  // chicken_tiles,
-        .frame_count = chicken_tiles.size,  // chicken_tile_count,
+    uint32_t chicken_id = LinceCreateEntity(game_data.reg);
+    LinceSprite chicken_sprite = {
+        .x=0.0, .y=0.5, .w=0.2, .h=0.2,
+        .color={1,1,1,1},
+        .texture = chicken_tileset
+    };
+    LinceBoxCollider chicken_box = {
+        .x=chicken_sprite.x, .y=chicken_sprite.y,
+        .w=chicken_sprite.w, .h=chicken_sprite.h,
+        .dx=4e-3f, .dy=0.0, .flags = LinceBoxCollider_Bounce};
+    LinceAddEntityComponent(game_data.reg, chicken_id, Component_Sprite, &chicken_sprite);
+    LinceAddEntityComponent(game_data.reg, chicken_id, Component_BoxCollider, &chicken_box);
+
+    LinceTileAnim* chicken_anim = LinceCreateTileAnim(&(LinceTileAnim){
+        .frames = &chicken_tiles,
         .frame_time = 400.0f, // ms
         .on_repeat = NULL, // ChickenLoops,
         .on_finish = NULL, // ChickenEnds,
@@ -220,21 +227,30 @@ void SetupChickenAnimation(){
         // .order = (uint32_t[]){0,1,4,5},
         // .order_count = 4
     });
+    
+    LinceAddEntityComponent(game_data.reg, chicken_id,
+        Component_TileAnim, chicken_anim);
 
     array_uninit(&chicken_tiles);
 }
 
-void UpdateChickenAnimation(float dt){
-    LinceUpdateTileAnim(game_data.chicken_anim, dt);
-    LinceDrawSprite(&(LinceSprite){
-        .x=-1.2f, .y=0.0f,
-        .w=0.3f, .h=0.3f,
-        .color = {1,1,1,1},
-        .texture = game_data.chicken_tileset,
-        .tile = game_data.chicken_anim->current_tile,
-        .zorder = 1.0,
-    }, game_data.custom_shader);
+void UpdateTileAnimations(float dt){
     
+    LinceSprite* sprite;
+    LinceTileAnim* anim;
+    array_t query;
+    array_init(&query, sizeof(uint32_t));
+    LinceQueryEntities(game_data.reg, &query, 2, Component_TileAnim, Component_Sprite);
+    
+    for (uint32_t i = 0; i != query.size; ++i){
+        uint32_t id = *(uint32_t*)array_get(&query, i);
+        sprite = LinceGetEntityComponent(game_data.reg, id, Component_Sprite);
+        anim   = LinceGetEntityComponent(game_data.reg, id, Component_TileAnim);
+        LinceUpdateTileAnim(anim, dt);
+        sprite->tile = anim->current_tile;
+    }
+    array_uninit(&query);
+
 }
 
 void LinceDrawSprites(LinceEntityRegistry* reg){
@@ -254,10 +270,6 @@ void LinceDrawSprites(LinceEntityRegistry* reg){
     LinceSprite* psprite = LinceGetEntityComponent(game_data.reg, game_data.player, Component_Sprite);
     vec2 player_pos = {psprite->x,psprite->y};
     LinceTransformToScreen(game_data.camera->view_proj, player_pos, player_pos);
-
-    static LinceBool debug_pos = LinceTrue;
-    if(debug_pos) printf("player_pos: %.3f %.3f\n", player_pos[0], player_pos[1]);
-    debug_pos = LinceFalse;
 
     LinceSetShaderUniformVec2(game_data.custom_shader, "uPointLightPositions[1]", player_pos);
     LinceSetShaderUniformFloat(game_data.custom_shader, "uPointLightCount", 2.0);
@@ -323,7 +335,7 @@ void MovePlayer(float dt){
 
 void GameStateInit(){
 
-    // Rendering
+    // Resources
     game_data.camera = LinceCreateCamera(LinceGetAspectRatio());
     game_data.custom_shader = LinceCreateShader(
         "CustomShader",
@@ -337,15 +349,20 @@ void GameStateInit(){
 	LinceSetShaderUniformIntN(game_data.custom_shader, "uTextureSlots", samplers, max_texture_slots);
 
     // Entities
-    game_data.reg = LinceCreateEntityRegistry(2, sizeof(LinceBoxCollider), sizeof(LinceSprite));
+    game_data.reg = LinceCreateEntityRegistry(
+        3,
+        sizeof(LinceBoxCollider),
+        sizeof(LinceSprite),
+        sizeof(LinceTileAnim)
+    );
 
-    // -- walls
+    // --> walls
     uint32_t walls[4];
     LinceBoxCollider wall_boxes[4] = {
-        {.x =  0.0f, .y =  1.0f, .w =  2.0f, .h = 0.01f, .dx = 0.0f, .dy = 0.0f},
-        {.x = -1.0f, .y =  0.0f, .w = 0.01f, .h =  2.0f, .dx = 0.0f, .dy = 0.0f},
-        {.x =  0.0f, .y = -1.0f, .w =  2.0f, .h = 0.01f, .dx = 0.0f, .dy = 0.0f},
-        {.x =  1.0f, .y =  0.0f, .w = 0.01f, .h =  2.0f, .dx = 0.0f, .dy = 0.0f},
+        {.x =  0.0f, .y =  1.0f, .w =  2.0f, .h = 0.01f},
+        {.x = -1.0f, .y =  0.0f, .w = 0.01f, .h =  2.0f},
+        {.x =  0.0f, .y = -1.0f, .w =  2.0f, .h = 0.01f},
+        {.x =  1.0f, .y =  0.0f, .w = 0.01f, .h =  2.0f},
     };
     for(uint32_t i = 0; i != 4; ++i){
         walls[i] = LinceCreateEntity(game_data.reg);
@@ -355,7 +372,7 @@ void GameStateInit(){
         LinceAddEntityComponent(game_data.reg, walls[i], Component_Sprite, &wall_sprite);   
     }
 
-    // -- player
+    // --> player
     LinceSprite sprite = {
         .x = 0.0, .y = 0.0,
         .w = 0.1, .h = 0.1,
@@ -366,7 +383,7 @@ void GameStateInit(){
     LinceAddEntityComponent(game_data.reg, game_data.player, Component_Sprite, &sprite);
     LinceAddEntityComponent(game_data.reg, game_data.player, Component_BoxCollider, &box);
 
-    // -- static blocks
+    // --> static blocks
     sprite.color[0] = 1.0;
     sprite.color[2] = 0.0;
     sprite.w *= 4.0f;
@@ -374,7 +391,7 @@ void GameStateInit(){
     float pos_x[] = {0.6,  0.8, -0.6, -0.6};
     float pos_y[] = {0.6,  0.4, -0.6,  0.6};
     for(int i = 0; i != obstacle_count; ++i){
-        game_data.obstacles[i] = LinceCreateEntity(game_data.reg);
+        uint32_t wall_entity = LinceCreateEntity(game_data.reg);
         sprite.x = pos_x[i];
         sprite.y = pos_y[i];
         LinceBoxCollider obox = {
@@ -383,18 +400,18 @@ void GameStateInit(){
             .dx=0, .dy=0,
             .flags = LinceBoxCollider_Static
         };
-        LinceAddEntityComponent(game_data.reg, game_data.obstacles[i], Component_Sprite, &sprite);
-        LinceAddEntityComponent(game_data.reg, game_data.obstacles[i], Component_BoxCollider, &obox);
+        LinceAddEntityComponent(game_data.reg, wall_entity, Component_Sprite, &sprite);
+        LinceAddEntityComponent(game_data.reg, wall_entity, Component_BoxCollider, &obox);
     }
 
-    // -- movers
+    // --> movers
     srand(time(NULL));
     sprite.color[0] = 0.0;
     sprite.color[1] = 1.0;
     sprite.w = MOVERS_SIZE;
     sprite.h = MOVERS_SIZE;
     for(int i = 0; i != MOVERS_COUNT; ++i){
-        game_data.movers[i] = LinceCreateEntity(game_data.reg);
+        uint32_t mover_id = LinceCreateEntity(game_data.reg);
         float min = -1.0f, max = 1.0f;
         sprite.x = min + rand()/(float)RAND_MAX * (max - min);
         sprite.y = min + rand()/(float)RAND_MAX * (max - min);
@@ -402,14 +419,18 @@ void GameStateInit(){
         max =  8e-4;
         float dx = min + rand()/(float)RAND_MAX * (max - min);
         float dy = min + rand()/(float)RAND_MAX * (max - min);
-        LinceBoxCollider mbox = {.x=sprite.x, .y=sprite.y, .w=sprite.w, .h=sprite.h, .dx=dx, .dy=dy,
+        LinceBoxCollider mbox = {
+            .x=sprite.x, .y=sprite.y,
+            .w=sprite.w, .h=sprite.h,
+            .dx=dx, .dy=dy,
             .flags = LinceBoxCollider_Bounce };
-        LinceAddEntityComponent(game_data.reg, game_data.movers[i], Component_Sprite, &sprite);
-        LinceAddEntityComponent(game_data.reg, game_data.movers[i], Component_BoxCollider, &mbox);
+        LinceAddEntityComponent(game_data.reg, mover_id, Component_Sprite, &sprite);
+        LinceAddEntityComponent(game_data.reg, mover_id, Component_BoxCollider, &mbox);
     }
 
     // Tile animation test
     SetupChickenAnimation();
+  
 }
 
 void GameStateUpdate(float dt){
@@ -418,15 +439,15 @@ void GameStateUpdate(float dt){
     LinceResizeCameraView(game_data.camera, LinceGetAspectRatio());
 	LinceUpdateCamera(game_data.camera);
 
+    // Tile animation test
+    UpdateTileAnimations(dt);
+
     LinceBeginScene(game_data.camera);
     LinceBindShader(game_data.custom_shader);
     LinceSetShaderUniformMat4(game_data.custom_shader,
         "u_view_proj", game_data.camera->view_proj);
     UpdateSpritePositions(game_data.reg);
     LinceDrawSprites(game_data.reg);
-
-    // Tile animation test
-    UpdateChickenAnimation(dt);
 
     LinceEndScene();
 
@@ -449,16 +470,49 @@ void GameStateUpdate(float dt){
             ctx, NK_TEXT_ALIGN_CENTERED,
             "FPS: %.1f", 1000.0f/dt
         );
-        nk_labelf(
-            ctx, NK_TEXT_ALIGN_CENTERED,
-            "Redness: %.1f", game_data.movers_redness
-        );
-        nk_slider_float(ctx, 0.0, &game_data.movers_redness, 1.0, 0.01);
     }
     nk_end(ctx);
 }
 
 void GameTerminate(){
+
+    // Delete textures and tile animations
+    array_t query;
+    array_init(&query, sizeof(uint32_t));
+
+    // Delete textures on entities
+    
+    LinceSprite* s;
+    LinceQueryEntities(game_data.reg, &query, 1, Component_Sprite);
+    for(uint32_t i = 0; i != query.size; ++i){
+        uint32_t id = *(uint32_t*)array_get(&query, i);
+        s = LinceGetEntityComponent(game_data.reg, id, Component_Sprite);
+        LINCE_ASSERT(s, "NULL tex");
+        if(s->texture){
+            LinceDeleteTexture(s->texture);
+            s->texture = NULL;
+        }
+    }
+    
+    array_clear(&query);
+    LinceTileAnim* anim;
+    LinceQueryEntities(game_data.reg, &query, 1, Component_TileAnim);
+
+    for(uint32_t i = 0; i != query.size; ++i){
+        uint32_t id = *(uint32_t*)array_get(&query, i);
+        anim = LinceGetEntityComponent(game_data.reg, id, Component_TileAnim);
+
+        // LinceDeleteTileAnim(anim);
+        // NOTE: data is copied over to component store, including tile anim
+        // But delete function for tile anim also frees it!
+        // SOLUTION: remove free() from DeleteTileAnim
+        if(anim->frames) array_destroy(anim->frames);
+        if(anim->order)  free(anim->order);
+        // free(anim);
+    }
+    
+    array_uninit(&query);
+
     LinceDestroyEntityRegistry(game_data.reg);
     LinceDeleteCamera(game_data.camera);
     LinceDeleteShader(game_data.custom_shader);
@@ -466,10 +520,6 @@ void GameTerminate(){
     LinceDeleteSound(game_data.music);
     LinceDeleteSoundManager(game_data.sound_manager);
     LinceDeleteAudioEngine(game_data.audio);
-
-    // Tile animation test
-    LinceDeleteTileAnim(game_data.chicken_anim);
-    LinceDeleteTexture(game_data.chicken_tileset);
 }
 
 
@@ -542,8 +592,8 @@ void GameOnUpdate(float dt){
 void SetupApplication(){
     LinceApp* app = LinceGetAppState();
     
-    app->screen_width = 900;
-    app->screen_height = 600;
+    app->screen_width = 1280;
+    app->screen_height = 720;
     app->title = "Sandbox";
     
     app->game_init = GameInit;
@@ -560,61 +610,3 @@ int main(void) {
     return 0;
 }
 
-
-
-#if 0
-
-// ECS API
-
-struct Sprite;
-struct Collider;
-struct Timer;
-
-component_number = 3;
-enum ComponentIDs { SPRITE_COMP, COLLIDER_COMP, TIMER_COMP };
-
-LinceEntityRegistry* reg = LinceEntityRegistryInit(
-    component_number,
-    sizeof(Sprite),
-    sizeof(Collider),
-    sizeof(Timer)
-);
-
-Entity* e = LinceCreateEntity(reg);
-ecs_add(e, SPRITE_COMP, LoadSprite("player.png"));
-
-while (1) {
-    // Draw entities that have 'Sprite' component
-    LinceEntityQuery* query = LinceQueryEntities(2, SPRITE_COMP, COLLIDER_COMP);
-    for(int i = 0; i != query->size; ++i){
-        Sprite* sprite = LinceGetComp(query, i, SPRITE_COMP);
-        Collider* collider =  LinceGetComp(query, i, COLLIDER_COMP);
-        
-        // systems
-        DrawSprite(sprite);
-    }
-
-}
-
-
-
-// ECS Implementation
-
-struct ComponentStore{
-
-    void* data; // raw contiguous array of components - 
-}
-
-struct Entity {
-
-}
-
-struct Registry {
-    array_t(uint32_t)* component_sizes;
-    array_t(uint32_t)* entity_ids;
-
-    array_t* entity_pool; // ecs_create adds to this, 
-}
-
-
-#endif

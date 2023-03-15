@@ -1,6 +1,7 @@
 #ifndef LINCE_TILE_ANIM_H
 #define LINCE_TILE_ANIM_H
 
+#include "lince/containers/array.h"
 #include "lince/tiles/tileset.h"
 
 /*
@@ -51,9 +52,10 @@ typedef enum LinceTileAnimFlags {
 typedef void LinceTileAnimFn(struct LinceTileAnim* anim, void* params);
 
 typedef struct LinceTileAnim {
-    LinceTexture* tileset;  // source tileset
-    LinceTile* frames;		// buffer than contains tile array
-    uint32_t frame_count;	// number of tiles in the buffer
+    // LinceTexture* tileset;  // source tileset
+    // LinceTile* frames;		// buffer than contains tile array
+    // uint32_t frame_count;	// number of tiles in the buffer
+    array_t* frames;         // array<LinceTile>: list of tiles
     float frame_time;		// duration of each frame in ms
 
     uint32_t start;			// tile index at which to start the animation

@@ -36,6 +36,9 @@ array_t* array_create(uint32_t element_size);
 /* Frees an allocated array */
 void array_destroy(array_t* array); // should also free array_t itself
 
+/* Copies an existing array into an newly allocated memory block. */
+array_t* array_copy(array_t* orig);
+
 /*
 Initialises an array from existing data
 If a size of zero or empty data are provided, no elements are added to the array.

@@ -78,6 +78,20 @@ void array_destroy(array_t* array){
 	free(array);
 }
 
+array_t* array_copy(array_t* orig){
+	if(!orig) return NULL;
+	array_t* new = malloc(sizeof(array_t));
+	LINCE_ASSERT_ALLOC(new, sizeof(array_t));
+	memmove(new, orig, sizeof(array_t));
+	if(orig->data){
+		size_t bytes = orig->capacity * orig->element_size;
+		new->data = malloc(bytes);
+		LINCE_ASSERT_ALLOC(new->data, bytes);
+		memmove(new->data, orig->data, bytes);
+	}
+	return new;
+}
+
 /* Pre-allocates a given number of elements but does not initialise them */
 array_t* array_resize(array_t* array, uint32_t size){
 	if(!array || array->element_size == 0) return NULL;
