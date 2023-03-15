@@ -20,10 +20,10 @@ typedef struct LinceBufferElement {
     LinceBufferType type; /* Lince API data type */
     const char name[LINCE_NAME_MAX]; /* variable name in the shader */
 
-    unsigned int gl_type; /* OpenGL API type */
-    unsigned int comps; /* component count, e.g. Int4 has 4 components */
-    unsigned int bytes; /* size in bytes */
-    unsigned int offset; /* bytes from front of layout to this element */
+    uint32_t gl_type; /* OpenGL API type */
+    uint32_t comps; /* component count, e.g. Int4 has 4 components */
+    uint32_t bytes; /* size in bytes */
+    uint32_t offset; /* bytes from front of layout to this element */
 } LinceBufferElement;
 
 /* Returns details of a buffer type: component count, size, and OpenGL type */
@@ -36,14 +36,14 @@ void LinceSetupBufferElementData(LinceBufferElement* elem);
 /* --- Vertex Buffer --- */
 
 /* Stores OpenGL renderer ID */
-typedef unsigned int LinceVertexBuffer;
+typedef uint32_t LinceVertexBuffer;
 
 /* Stores given data in new vertex buffer and returns renderer ID,
 the supplied data may be empty (NULL) */
-LinceVertexBuffer LinceCreateVertexBuffer(void* data, unsigned int size);
+LinceVertexBuffer LinceCreateVertexBuffer(void* data, uint32_t size);
 
 /* Populates an already existing buffer with data */
-void LinceSetVertexBufferData(LinceVertexBuffer vb, void* data, unsigned int size);
+void LinceSetVertexBufferData(LinceVertexBuffer vb, void* data, uint32_t size);
 
 void LinceBindVertexBuffer(LinceVertexBuffer vb);
 void LinceUnbindVertexBuffer();
@@ -53,11 +53,11 @@ void LinceDeleteVertexBuffer(LinceVertexBuffer vb);
 /* --- Index Buffer --- */
 
 typedef struct LinceIndexBuffer {
-    unsigned int id; // OpenGL renderer ID
-    unsigned int count; // number of indices
+    uint32_t id; // OpenGL renderer ID
+    uint32_t count; // number of indices
 } LinceIndexBuffer;
 
-LinceIndexBuffer LinceCreateIndexBuffer(unsigned int* data, unsigned int count);
+LinceIndexBuffer LinceCreateIndexBuffer(uint32_t* data, uint32_t count);
 void LinceBindIndexBuffer(LinceIndexBuffer ib);
 void LinceUnbindIndexBuffer();
 void LinceDeleteIndexBuffer(LinceIndexBuffer ib);

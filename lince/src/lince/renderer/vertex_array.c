@@ -34,7 +34,7 @@ void LinceAddVertexArrayAttributes(
 	LinceVertexArray* va,
 	LinceVertexBuffer vb,
 	LinceBufferElement* layout,
-	unsigned int layout_elements
+	uint32_t layout_elements
 ){
 	LINCE_PROFILER_START(timer);
 
@@ -43,7 +43,7 @@ void LinceAddVertexArrayAttributes(
 	LinceBindIndexBuffer(va->index_buffer);
 
 	// Calculate layout offsets & stride
-	unsigned int i, stride = 0;
+	uint32_t i, stride = 0;
 	for(i =0; i != layout_elements; ++i){
 		LinceSetupBufferElementData(&layout[i]);
 		layout[i].offset = stride;

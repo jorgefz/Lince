@@ -5,11 +5,12 @@
 
 typedef void (*LinceEventCallbackFn)(LinceEvent*);
 
-typedef struct {
-    void* handle;
-    unsigned int height, width, initialised;
-    char title[LINCE_NAME_MAX];
-    LinceEventCallbackFn event_callback;
+typedef struct LinceWindow {
+    void* handle;           // glfw handle
+    uint32_t height, width; // window size in pixels
+    LinceBool initialised;  // 
+    char title[LINCE_NAME_MAX];          // String displayed at top of window
+    LinceEventCallbackFn event_callback; // Translates glfw events to LinceEvents
 } LinceWindow; 
 
 /* Initialises GLFW window */
@@ -27,8 +28,6 @@ void LinceDestroyWindow(LinceWindow* window);
 /* Set the function called every time an event occurs,
 which then propagates it to other callbacks */
 void LinceSetMainEventCallback(LinceWindow* window, LinceEventCallbackFn func);
-// LinceSetMainEventCallback
-// LinceSetEventCallback
 
 
 #endif // LINCE_WINDOW_H

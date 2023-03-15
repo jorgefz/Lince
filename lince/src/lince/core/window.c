@@ -4,6 +4,7 @@
 
 #include "core/core.h"
 #include "core/window.h"
+#include "core/memory.h"
 
 #include "event/event.h"
 #include "event/key_event.h"
@@ -64,9 +65,7 @@ LinceWindow* LinceCreateWindow(unsigned int width, unsigned int height, const ch
     glfwGetVersion(&glfw_major, &glfw_minor, &glfw_rev);
     LINCE_INFO("GLFW Version %d.%d.%d", glfw_major, glfw_minor, glfw_rev);
 
-    LinceWindow* window = malloc(sizeof(LinceWindow));
-    LINCE_ASSERT(window, "Failed to allocate memory");
-
+    LinceWindow* window = LinceMalloc(sizeof(LinceWindow));
     *window = (LinceWindow){
         .handle = handle,
         .height = height,
@@ -77,7 +76,6 @@ LinceWindow* LinceCreateWindow(unsigned int width, unsigned int height, const ch
     };
 
     glfwSetWindowUserPointer((GLFWwindow*)window->handle, window);
-
     SetGLFWCallbacks(window);
 
     return window;

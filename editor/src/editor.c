@@ -16,18 +16,20 @@ enum ECSComponents{
     Component_Shader
 };
 
+/*
 static const char* COMPNAMES[] = {
     "Tag",
     "BoxCollider",
     "Sprite",
     "Shader"
 };
+*/
 
 typedef struct EditorState {
     LinceEntityRegistry* reg;
     LinceCamera* camera;
 
-    LinceBool* mouse_drag;
+    LinceBool mouse_drag;
     vec2 mouse_drag_from;
 } EditorState;
 EditorState STATE = {0};

@@ -4,10 +4,10 @@
 #include "lince/renderer/buffer.h"
 
 typedef struct LinceVertexArray {
-	unsigned int id; // OpenGL renderer ID
+	uint32_t id; // OpenGL renderer ID
 	LinceIndexBuffer index_buffer;
 	LinceVertexBuffer* vb_list; /* associated vertex buffers */
-	unsigned int vb_count; /* number of vertex buffers */
+	uint32_t vb_count; /* number of vertex buffers */
 } LinceVertexArray;
 
 /* Allocates new vertex array and generates an OpenGL ID for it */
@@ -23,7 +23,7 @@ void LinceAddVertexArrayAttributes(
 	LinceVertexBuffer vertex_buffer, /* stores raw vertex data */
 	LinceBufferElement* layout,      /* list of buffer elements that 
 								        together constitute the data layout */
-	unsigned int layout_elements     /* Number of buffer elements */
+	uint32_t layout_elements     /* Number of buffer elements */
 );
 
 void LinceDeleteVertexArray(LinceVertexArray* vertex_array);

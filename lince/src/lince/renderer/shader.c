@@ -147,7 +147,7 @@ void LinceSetShaderUniformInt(LinceShader* sh, const char* name, int val){
 /* Set integer array uniform */
 void LinceSetShaderUniformIntN(
 	LinceShader* sh, const char* name,
-	int* arr, unsigned int count
+	int* arr, uint32_t count
 ) {
 	int loc = LinceGetShaderUniformID(sh, name);
 	glUniform1iv(loc, count, arr);

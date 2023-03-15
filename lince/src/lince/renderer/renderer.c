@@ -285,10 +285,7 @@ void LinceDrawSprite(LinceSprite* sprite, LinceShader* shader) {
 	
 	// calculate texture index
 	float texture_index = 0.0f;
-	if(sprite->tile){
-		sprite->texture = sprite->tile->texture;
-	}
-
+	
 	if(sprite->texture){
 		uint32_t slots = renderer_state.texture_slot_count;
 

@@ -1,9 +1,8 @@
 #include "tiles/tileset.h"
 
-LinceTile LinceGetTile(LinceTexture* texture, vec2 xy, vec2 cellsize, vec2 tilesize){
+void LinceGetTileCoords(LinceTile* tile, vec2 texsize, vec2 xy, vec2 cellsize, vec2 tilesize){
 	
-	const float texw = (float)texture->width;
-	const float texh = (float)texture->height;
+	const float texw = texsize[0], texh = texsize[1];
 
 	vec2 min = {
 		xy[0] * cellsize[0] / texw,
@@ -14,8 +13,8 @@ LinceTile LinceGetTile(LinceTexture* texture, vec2 xy, vec2 cellsize, vec2 tiles
 		(xy[1] + tilesize[1]) * cellsize[1] / texh
 	};
 
-	LinceTile tile = {
-		.texture  = texture,
+	*tile = (LinceTile){
+		.texsize  = {texw, texh},
 		.pos = {xy[0], xy[1]},
 		.cellsize = {cellsize[0], cellsize[1]},
 		.tilesize = {tilesize[0], tilesize[1]},
@@ -26,6 +25,4 @@ LinceTile LinceGetTile(LinceTexture* texture, vec2 xy, vec2 cellsize, vec2 tiles
 			min[0], max[1]
 		}
 	};
-
-	return tile;
 }

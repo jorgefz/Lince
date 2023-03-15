@@ -9,13 +9,9 @@
 
 
 typedef struct LinceShader {
-	unsigned int id; // opengl id
+	uint32_t id; // opengl id
 	char name[LINCE_NAME_MAX]; // name, normally based on source file
-	
-	//char **uniform_names; // name in the shader code
-	//int *uniform_ids; // opengl uniform id
-	//unsigned int uniform_count; // length of uniform array
-	hashmap_t uniforms;
+	hashmap_t uniforms;   // cache of uniforms
 } LinceShader;
 
 /* Create shader from paths to vertex and fragment shader source files */
@@ -53,7 +49,7 @@ void LinceSetShaderUniformInt(LinceShader* sh, const char* name, int val);
 
 /* Set integer array uniform */
 void LinceSetShaderUniformIntN( LinceShader* sh, const char* name,
-	int* arr, unsigned int count);
+	int* arr, uint32_t count);
 
 /* Set float uniform */
 void LinceSetShaderUniformFloat(LinceShader* sh, const char* name, float val);

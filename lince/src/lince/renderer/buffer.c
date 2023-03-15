@@ -43,9 +43,9 @@ void LinceSetupBufferElementData(LinceBufferElement* elem){
 
 /* --- Vertex Buffer --- */
 
-LinceVertexBuffer LinceCreateVertexBuffer(void* data, unsigned int size){
+LinceVertexBuffer LinceCreateVertexBuffer(void* data, uint32_t size){
 	LINCE_INFO(" Creating Vertex Buffer (%d bytes) ", (int)size);
-	unsigned int id;
+	uint32_t id;
 	glGenBuffers(1, &id);
 	glBindBuffer(GL_ARRAY_BUFFER, id);
 	int draw_mode = data ? GL_STATIC_DRAW : GL_DYNAMIC_DRAW;
@@ -53,7 +53,7 @@ LinceVertexBuffer LinceCreateVertexBuffer(void* data, unsigned int size){
 	return (LinceVertexBuffer)id;
 }
 
-void LinceSetVertexBufferData(LinceVertexBuffer vb, void* data, unsigned int size){
+void LinceSetVertexBufferData(LinceVertexBuffer vb, void* data, uint32_t size){
 	LinceBindVertexBuffer(vb);
 	glBufferSubData(GL_ARRAY_BUFFER, 0, size, data);
 }
@@ -73,7 +73,7 @@ void LinceDeleteVertexBuffer(LinceVertexBuffer vb){
 
 /* --- Index Buffer --- */
 
-LinceIndexBuffer LinceCreateIndexBuffer(unsigned int* data, unsigned int count){
+LinceIndexBuffer LinceCreateIndexBuffer(uint32_t* data, uint32_t count){
 	LINCE_INFO(" Creating Index Array (%d indices)", (int)count);
 	LinceIndexBuffer ib = {.id=0, .count=count};
 	glGenBuffers(1, &ib.id);
