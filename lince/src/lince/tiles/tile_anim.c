@@ -6,54 +6,41 @@ Returns a pointer to the current tile in the animation
 */
 static LinceTile* GetCurrentTile(LinceTileAnim* anim){
 	return array_get(anim->frames, anim->order[anim->current_frame]);
- 	// return &anim->frames[anim->order[anim->current_frame]];
 }
 
-LinceTileAnim* LinceCreateTileAnim(const LinceTileAnim* props){
+void LinceCreateTileAnim(LinceTileAnim* anim){
 	
-	LINCE_ASSERT(props && props->frames, "Animation is missing tile array");
-	LINCE_ASSERT(props->frames->size > 0, "Animation cannot have zero frames");
-	LINCE_ASSERT(props->frame_time > 0.0f,
+	LINCE_ASSERT(anim && anim->frames, "Animation is missing tile array");
+	LINCE_ASSERT(anim->frames->size > 0, "Animation cannot have zero frames");
+	LINCE_ASSERT(anim->frame_time > 0.0f,
 		"Animation cannot have a frame time of zero ms");
-	LINCE_ASSERT(props->start < props->frames->size,
+	LINCE_ASSERT(anim->start < anim->frames->size,
 		"Animation start frame is out of bounds"
 		"(start at frame index %u but there are only %u frames)",
-		props->start, props->frames->size
+		anim->start, anim->frames->size
 	);
 
-	// Allocate & copy animation properties
-	LinceTileAnim* anim = LinceNewCopy(props, sizeof(LinceTileAnim));
-	// array_t* frames = LinceNewCopy(anim->frames, sizeof(array_t));
-	// frames->data = LinceNewCopy(anim->frames->data, frames->size*frames->element_size);
-	// anim->frames = frames;
+	// Allocate own array of frames
 	anim->frames = array_copy(anim->frames);
 	LINCE_ASSERT(anim->frames, "Failed to copy frames");
 
 	// Setup tile order
-	if(props->order){
-		// Order provided
-		LINCE_ASSERT(props->order_count > 0,
+	if(anim->order){
+		LINCE_ASSERT(anim->order_count > 0,
 			"Order indices length must be greater than zero");
 
-		// check all indices are allowed
+		// Check all indices are allowed
 		for(uint32_t i = 0; i != anim->order_count; ++i){
 			LINCE_ASSERT(anim->order[i] < anim->frames->size,
 				"Order index out of bounds"
 				"(%uth index is %u but there are only %u frames)",
 				i, anim->order[i], anim->frames->size);
 		}
-
-		// copy indices over	
-		anim->order = malloc(sizeof(uint32_t) * anim->order_count);
-		LINCE_ASSERT_ALLOC(anim->order, sizeof(uint32_t) * anim->order_count);
-		memmove(anim->order, props->order, sizeof(uint32_t)*anim->order_count);
-
-	}
-	else {
-		// setup default order: 0 to frame_count
+		anim->order = LinceNewCopy(anim->order, sizeof(uint32_t)*anim->order_count);
+	} else {
+		// Setup default order: 0 to number of frames
 		anim->order_count = anim->frames->size;
-		anim->order = malloc(sizeof(uint32_t) * anim->order_count);
-		LINCE_ASSERT_ALLOC(anim->order, sizeof(uint32_t) * anim->order_count);
+		anim->order = LinceMalloc(sizeof(uint32_t) * anim->order_count);
 		for(uint32_t i = 0; i != anim->order_count; ++i){
 			anim->order[i] = i;
 		}
@@ -61,7 +48,6 @@ LinceTileAnim* LinceCreateTileAnim(const LinceTileAnim* props){
 	
 	// Setup initial conditions
 	LinceResetTileAnim(anim);
-	return anim;
 }
 
 
@@ -117,5 +103,4 @@ void LinceDeleteTileAnim(LinceTileAnim* anim){
 	if(!anim) return;
 	if(anim->frames) array_destroy(anim->frames);
 	if(anim->order)  free(anim->order);
-	free(anim);
 }

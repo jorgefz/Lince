@@ -217,7 +217,7 @@ void SetupChickenAnimation(){
     LinceAddEntityComponent(game_data.reg, chicken_id, Component_Sprite, &chicken_sprite);
     LinceAddEntityComponent(game_data.reg, chicken_id, Component_BoxCollider, &chicken_box);
 
-    LinceTileAnim* chicken_anim = LinceCreateTileAnim(&(LinceTileAnim){
+    LinceTileAnim chicken_anim = {
         .frames = &chicken_tiles,
         .frame_time = 400.0f, // ms
         .on_repeat = NULL, // ChickenLoops,
@@ -226,11 +226,10 @@ void SetupChickenAnimation(){
         .start = 1,
         // .order = (uint32_t[]){0,1,4,5},
         // .order_count = 4
-    });
-    
+    };
+    LinceCreateTileAnim(&chicken_anim);
     LinceAddEntityComponent(game_data.reg, chicken_id,
-        Component_TileAnim, chicken_anim);
-
+        Component_TileAnim, &chicken_anim);
     array_uninit(&chicken_tiles);
 }
 
@@ -501,14 +500,7 @@ void GameTerminate(){
     for(uint32_t i = 0; i != query.size; ++i){
         uint32_t id = *(uint32_t*)array_get(&query, i);
         anim = LinceGetEntityComponent(game_data.reg, id, Component_TileAnim);
-
-        // LinceDeleteTileAnim(anim);
-        // NOTE: data is copied over to component store, including tile anim
-        // But delete function for tile anim also frees it!
-        // SOLUTION: remove free() from DeleteTileAnim
-        if(anim->frames) array_destroy(anim->frames);
-        if(anim->order)  free(anim->order);
-        // free(anim);
+        LinceDeleteTileAnim(anim);
     }
     
     array_uninit(&query);

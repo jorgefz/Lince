@@ -84,7 +84,7 @@ typedef struct LinceTileAnim {
 
 
 // Sorts out the user-defined animation settings and initialises the animation
-LinceTileAnim* LinceCreateTileAnim(const LinceTileAnim* anim);
+void LinceCreateTileAnim(LinceTileAnim* anim);
 // Animates by time dt
 void LinceUpdateTileAnim(LinceTileAnim* anim, float dt);
 // Resets clock and frames to initial conditions
