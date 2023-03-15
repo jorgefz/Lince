@@ -28,17 +28,17 @@ void LinceGetTileCoords(
 	};
 }
 
-
-LinceTexture* LinceLoadTextureWithTiles(
-	const char* fname,	// Texture filename
-	array_t* tiles,		// array<LinceTile>, returns collected tiles. Must be uninitialised.
-	vec2 cellsize		// Size of a tile/cell in pixels 
+void LinceGetTilesFromTexture(
+	LinceTexture* texture,	// Texture filename
+	vec2 cellsize,			// Size of a cell in pixels 
+	array_t* tiles			// array<LinceTile>, returns collected tiles.
 ) {
-	LinceTexture* tex = LinceCreateTexture(fname, fname);
-	vec2 texsize = {(float)tex->width, (float)tex->height};
+	if(!texture || !tiles) return;
+
+	vec2 texsize = {(float)texture->width, (float)texture->height};
 	vec2 tilesize = {1,1};
-	uint32_t xtiles = tex->width/(uint32_t)cellsize[0];
-    uint32_t ytiles = tex->height/(uint32_t)cellsize[1];
+	uint32_t xtiles = texture->width/(uint32_t)cellsize[0];
+    uint32_t ytiles = texture->height/(uint32_t)cellsize[1];
 	array_init(tiles, sizeof(LinceTile));
 
 	/* Adds tiles from left to right, and then top to bottom */
@@ -50,6 +50,15 @@ LinceTexture* LinceLoadTextureWithTiles(
 			array_push_back(tiles, &tile);
         }
     }
+}
 
+
+LinceTexture* LinceLoadTextureWithTiles(
+	const char* fname,	// Texture filename
+	vec2 cellsize,		// Size of a tile/cell in pixels
+	array_t* tiles		// array<LinceTile>, returns collected tiles. Must be uninitialised.
+) {
+	LinceTexture* tex = LinceCreateTexture(fname, fname);
+	LinceGetTilesFromTexture(tex, cellsize, tiles);
 	return tex;
 }

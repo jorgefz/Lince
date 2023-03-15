@@ -61,9 +61,9 @@ void LinceUpdateTileAnim(LinceTileAnim* anim, float dt){
 
 	// Timer is finished - change of frame
 	anim->current_frame++;
-	
+	// if(anim->on_frame) anim->on_frame(anim, anim->callback_args);
+
 	// Reached end of frame list
-	// if(anim->current_frame >= anim->frame_count){
 	if(anim->current_frame >= anim->order_count){
 		anim->current_frame = 0;
 		anim->repeat_count++;

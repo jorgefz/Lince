@@ -2,57 +2,74 @@
 #define LINCE_TILEMAP_H
 
 #include "lince/tiles/tileset.h"
+#include "lince/renderer/shader.h"
+#include "cglm/vec2.h"
 
-// Z value at which to draw the base grid of tilemaps
-#ifndef LINCE_TILEMAP_Z
-#define LINCE_TILEMAP_Z 0.0f
-#endif
+/*
+Simplest tilemap:
+- array of sprites
 
-/* Flags for Tilemap logic grid */
-typedef enum LinceTilemapBlockFlags{
-    LinceTilemap_Empty   = 0x0,
-    
-    /* Flags for collision on the four corners of a tile */
-    LinceTilemap_SolidUL = 0x1, // upper left  corner
-    LinceTilemap_SolidUR = 0x2, // upper right corner
-    LinceTilemap_SolidLL = 0x4, // lower left  corner
-    LinceTilemap_SolidLR = 0x8, // lower right corner
-    LinceTilemap_SolidTop   = LinceTilemap_SolidUL | LinceTilemap_SolidUR,   // top half
-    LinceTilemap_SolidBot   = LinceTilemap_SolidLL | LinceTilemap_SolidLR,   // bottom half
-    LinceTilemap_SolidLeft  = LinceTilemap_SolidUL | LinceTilemap_SolidLL,   // left half
-    LinceTilemap_SolidRight = LinceTilemap_SolidUR | LinceTilemap_SolidLR,   // right half
-    LinceTilemap_Solid      = LinceTilemap_SolidTop | LinceTilemap_SolidBot, // fully solid
-} LinceTilemapBlockFlags;
+Generate from input parameters:
+- base texture
+- tileset cellsize (tilesize assumed [1,1] )
+- width and height in tiles
+- array of indices of size width*height,
+    corresponds to indices of tiles in teleset
+- grid offset, scale, and z-value
 
+(1) Generate LinceTiles from texture tileset
+(2) Ensure all input indices are valid
+(3) Iterate each tile index, append sprite with given offset, size, LinceTile, and zorder
+Pros: no need for custom draw function. User may just draw sprite list in a loop.
+
+-- Init function should
+    a) Pass argument list and return allocated tilemap
+        Pros: Lightweight tilemap struct, only array of sprites and mapsize
+        Cons: Long argument list. Memory is not user managed.
+    b) Pass tilemap handle, which is modified with data
+        Pros: Easier to manage long argument list
+        Cons: Large tilemap struct
+    c) Two structs: settings and tilegrid
+        Pros: bets of (a) and (b)
+        Cons: two structs??
+
+CreateTilemap(mapsize, map_indices, texture, cellsize, offset, scale, zorder)
+
+struct Tilemap {
+    // input
+    vec2 mapsize;
+    array_t<uint32_t> tile_indices;
+    LinceTexture* tileset;
+    vec2 tile_cellsize;
+    vec2 offset, scale;
+    float zorder;
+
+    // output
+    array_t<LinceSprite> sprites;
+}
+
+*/
 
 typedef struct LinceTilemap{
-    LinceTile* tileset;
-    size_t tileset_size; // number of tiles in the tileset
+    LinceTexture* texture; // texture tileset
+    vec2 cellsize;   // size in pixels of a tile in the texture
+    array_t tiles;   // array<LinceTile>: necessary for sprites
+    array_t sprites; // array<LinceSprite>: tile sprites to render
 
     vec2 offset; // position offset from world origin
-    vec2 scale; // scale of individual tiles - default is (1,1)
+    vec2 scale;  // scale of individual tiles - default is (1,1)
+    float zorder;
 
-    size_t width, height;  // dimensions of the map
-    uint32_t* base_grid;   // main tile map
-    uint8_t* logic_grid;   // collision map, etc
-    uint32_t* bkg_grid;    // background tiles without normZ on top of base_grid
+    uint32_t width, height; // dimensions of the map in tiles
+    uint32_t* grid;         // indices for tiles
 
-    // List of tile objects drawn with normalized Z
-    LinceTile* overlay_tiles;
-    vec2* overlay_positions;
-    size_t overlay_count;
-
-    /*
-    CallbackFn on_teleport(this, target-tilemap, trigger, ...)
-    */
-    
+    // CallbackFn on_teleport(this, target-tilemap, trigger, ...)
 } LinceTilemap;
 
+void LinceInitTilemap(LinceTilemap* map);
 
-LinceTilemap* LinceCreateTilemap(LinceTilemap* props);
+void LinceUninitTilemap(LinceTilemap* tm);
 
-void LinceDeleteTilemap(LinceTilemap* tm);
-
-void LinceDrawTilemap(LinceTilemap* tm);
+void LinceDrawTilemap(LinceTilemap* tm, LinceShader* shader);
 
 #endif /* LINCE_TILEMAP_H */

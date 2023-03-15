@@ -202,7 +202,7 @@ void SetupChickenAnimation(){
     const char* fname = "sandbox/assets/textures/chicken.png";
     array_t chicken_tiles;
     vec2 cellsize = {16,16};
-    LinceTexture* chicken_tileset = LinceLoadTextureWithTiles(fname, &chicken_tiles, cellsize);
+    LinceTexture* chicken_tileset = LinceLoadTextureWithTiles(fname, cellsize, &chicken_tiles);
 
     uint32_t chicken_id = LinceCreateEntity(game_data.reg);
     LinceSprite chicken_sprite = {

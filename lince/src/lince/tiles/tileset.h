@@ -42,15 +42,27 @@ void LinceGetTileCoords(
 );
 
 /*
+Calculates all tile coordinates in a texture.
+The tiles are copied over to the array argument,
+which must point to valid memory but not be initialised.
+The tiles are loaded from the texture from left to right, and bottom to top.
+*/
+void LinceGetTilesFromTexture(
+	LinceTexture* texture,	// Texture filename
+	vec2 cellsize,			// Size of a cell in pixels 
+	array_t* tiles			// array<LinceTile>, returns collected tiles.
+);
+
+/*
 Loads a texture and collects all tiles within it.
-The texture is returned, but the tiles are coped over to
+The texture is returned, but the tiles are copied over to
 the array argument, which must not be initialised.
 The tiles are loaded from the texture from left to right, and bottom to top.
 */
 LinceTexture* LinceLoadTextureWithTiles(
 	const char* fname,	// Texture filename
-	array_t* tiles,		// array<LinceTile>, returns collected tiles. Must be uninitialised.
-	vec2 cellsize		// Size of a cell in pixels 
+	vec2 cellsize,		// Size of a cell in pixels 
+	array_t* tiles		// array<LinceTile>, returns collected tiles.
 );
 
 
