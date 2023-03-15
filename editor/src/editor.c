@@ -1,3 +1,17 @@
+/*
+
+Controls
+- Camera movement:
+    Left click and drag
+    WASD keys
+- Entity interact
+    Control and left click to select
+    Right click and drag to move ??
+
+*/
+
+
+
 #include "editor.h"
 #include <math.h>
 #include <lince.h>
@@ -227,7 +241,7 @@ void MoveCamera(float dt){
     if(LinceIsKeyPressed(LinceKey_a)) STATE.camera->pos[0] -= ds;
 
     if(LinceIsMouseButtonPressed(LinceMouseButton_Left)
-        && LinceIsKeyPressed(LinceKey_LeftControl)
+        // && LinceIsKeyPressed(LinceKey_LeftControl)
     ){
         vec2 mouse_pos;
         LinceGetMousePosWorld(mouse_pos, STATE.camera);

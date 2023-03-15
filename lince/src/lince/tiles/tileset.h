@@ -1,6 +1,7 @@
 #ifndef LINCE_TILESET_H
 #define LINCE_TILESET_H
 
+#include "lince/containers/array.h"
 #include "lince/renderer/texture.h"
 #include "cglm/vec2.h"
 
@@ -38,6 +39,16 @@ void LinceGetTileCoords(
 	vec2 pos,			/* Position of the tile in cells from lower left corner. */
 	vec2 cellsize,		/* Size of a cell in pixels. */
 	vec2 tilesize		/* Size of the tile in cells. */
+);
+
+/*
+Loads a texture and collects all tiles within it.
+Returns the texture object, and passes
+*/
+LinceTexture* LinceLoadTextureWithTiles(
+	const char* fname,	// Texture filename
+	array_t* tiles,		// array<LinceTile>, returns collected tiles. Must be uninitialised.
+	vec2 cellsize		// Size of a cell in pixels 
 );
 
 

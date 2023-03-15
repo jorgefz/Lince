@@ -35,6 +35,19 @@ Change 2: results.
 #define MOVERS_SIZE 0.1f
 #define MOVERS_COUNT 5
 
+// WALKING
+enum WalkingAnims {
+    ANIM_FRONT = 0,
+    ANIM_BACK,
+    ANIM_LEFT,
+    ANIM_RIGHT,
+    ANIM_FRONT_IDLE,
+    ANIM_BACK_IDLE,
+    ANIM_LEFT_IDLE,
+    ANIM_RIGHT_IDLE,
+    ANIM_COUNT
+};
+
 typedef struct GameData {
     // Audio
     LinceSoundManager* sound_manager;
@@ -53,12 +66,23 @@ typedef struct GameData {
     uint32_t player;
     uint32_t obstacles[4];
     uint32_t movers[MOVERS_COUNT];
+
+    // Tile animation test
+    LinceTexture* chicken_tileset;
+    LinceTileAnim* chicken_anim;
+
+    uint8_t current_anim;
+    uint32_t player_anim_order[ANIM_COUNT*2];
+    LinceTileAnim* player_anim;
+    LinceTexture* walking_tileset;
+    LinceTile* tiles;
+    size_t tile_count;
     
 } GameData;
 
 static GameData game_data = {
-    .audio_file = "sandbox/assets/cat.wav",
-    .music_file = "sandbox/assets/game-town-music.wav"
+    .audio_file = "sandbox/assets/sounds/cat.wav",
+    .music_file = "sandbox/assets/sounds/game-town-music.wav"
 };
 
 typedef enum Component { Component_BoxCollider, Component_Sprite } Component;
@@ -74,6 +98,143 @@ void LinceTransformToScreen(mat4 vp, vec2 world_pos, vec2 screen_pos){
     // Normalise from NDC to clip space
     screen_pos[0] = (spos[0]/spos[3]+1.0)/2.0;
     screen_pos[1] = (spos[1]/spos[3]+1.0)/2.0;
+}
+
+
+void AnimateWalking(float dt){
+
+    // camera & player movement
+    uint32_t next_anim = game_data.current_anim;
+
+    enum {IDLE=0x0, UP=0x1, DOWN=0x2, LEFT=0x4, RIGHT=0x8};
+    uint8_t direction = IDLE;
+    direction |= LinceIsKeyPressed(LinceKey_w) * UP;
+    direction |= LinceIsKeyPressed(LinceKey_s) * DOWN;
+    direction |= LinceIsKeyPressed(LinceKey_a) * LEFT;
+    direction |= LinceIsKeyPressed(LinceKey_d) * RIGHT;
+
+    const float dr = dt * 1e-3;
+    vec2 next_pos = {game_data.camera->pos[0], game_data.camera->pos[1]};
+
+    if (direction & UP){
+        next_pos[1] += dr;
+        next_anim = ANIM_FRONT;
+    }
+    if (direction & DOWN){
+        next_pos[1] -= dr;
+        next_anim = ANIM_BACK;
+    }
+    if (direction & RIGHT){
+        next_pos[0] += dr;
+        next_anim = ANIM_RIGHT;
+    }
+    if (direction & LEFT){
+        next_pos[0] -= dr;
+        next_anim = ANIM_LEFT;
+    }
+    if(direction == IDLE){
+        switch(game_data.current_anim){
+        case ANIM_FRONT: next_anim = ANIM_FRONT_IDLE; break;
+        case ANIM_BACK:  next_anim = ANIM_BACK_IDLE;  break;
+        case ANIM_RIGHT: next_anim = ANIM_RIGHT_IDLE; break;
+        case ANIM_LEFT:  next_anim = ANIM_LEFT_IDLE;  break;
+        default: break;
+        };
+    }
+
+    game_data.player_anim->order[0] = game_data.player_anim_order[next_anim*2];
+    game_data.player_anim->order[1] = game_data.player_anim_order[next_anim*2+1];
+
+    if(next_anim != game_data.current_anim){        
+        LinceResetTileAnim(game_data.player_anim);
+        game_data.current_anim = next_anim;
+    }
+
+}
+
+void SetupTileAnimData(){
+    game_data.walking_tileset = LinceCreateTexture("Walking",
+        "sandbox/assets/textures/elv-games-movement.png");
+
+    // Set up texture coordinates for walking tile animation
+    vec2 walk_texsize = {(float)game_data.walking_tileset->width,
+                        (float)game_data.walking_tileset->height};
+    vec2 walk_tilesize = {1,1};
+    vec2 walk_cellsize = {24,24};
+    vec2 walk_tile_locs[] = {
+        {0,0}, {2,0}, // Walking forward
+        {0,3}, {2,3}, // Walking backward
+        {0,2}, {2,2}, // Walking left
+        {0,1}, {2,1}, // Walking right
+        {1,0}, // Idle forward
+        {1,3}, // Idle backward
+        {1,2}, // Idle left
+        {1,1}, // Idle right
+    };
+    LinceTile walk_tiles[sizeof(walk_tile_locs)/sizeof(vec2)];
+    for(uint32_t i = 0; i != sizeof(walk_tile_locs)/sizeof(vec2); ++i){
+        LinceGetTileCoords(&walk_tiles[i], walk_texsize, walk_tile_locs[i],
+            walk_cellsize, walk_tilesize);
+    }
+    uint32_t order_indices[] = {
+        0,  1,   // walk forward
+        2,  3,   // walk backwards
+        4,  5,   // walk left
+        6,  7,   // walk right
+        8,  8,   // idle forward
+        9,  9,   // idle backward
+        10, 10,  // idle left
+        11, 11   // idle right
+    };
+    memmove(game_data.player_anim_order, order_indices, sizeof(uint32_t)*ANIM_COUNT*2);
+    game_data.current_anim = ANIM_FRONT_IDLE;
+    game_data.player_anim = LinceCreateTileAnim(&(LinceTileAnim){
+        .frames = walk_tiles,
+        .frame_count = sizeof(walk_tiles)/sizeof(LinceTile),
+        .frame_time = 300.0f,
+        .order = order_indices + ANIM_FRONT_IDLE*2,
+        .order_count = 2
+    });
+}
+
+void SetupChickenAnimation(){
+    // CHICKEN ANIMATION
+    const char* fname = "sandbox/assets/textures/chicken.png";
+    
+    // game_data.chicken_tileset = LinceCreateTexture("ChickenAnim", fname);
+    // size_t chicken_tile_count;
+    // LinceTile* chicken_tiles = LoadTilesFromTexture(fname, &chicken_tile_count, 16);
+
+    array_t chicken_tiles;
+    vec2 cellsize = {16,16};
+    game_data.chicken_tileset = LinceLoadTextureWithTiles(fname, &chicken_tiles, cellsize);
+
+    game_data.chicken_anim = LinceCreateTileAnim(&(LinceTileAnim){
+        .frames      = chicken_tiles.data,  // chicken_tiles,
+        .frame_count = chicken_tiles.size,  // chicken_tile_count,
+        .frame_time = 400.0f, // ms
+        .on_repeat = NULL, // ChickenLoops,
+        .on_finish = NULL, // ChickenEnds,
+        .repeats = 0, // forever
+        .start = 0,
+        //.order = (uint32_t[]){0,1,2,3,4,5,6},
+        // .order_count = 4
+    });
+
+    array_uninit(&chicken_tiles);
+}
+
+void UpdateChickenAnimation(float dt){
+    LinceUpdateTileAnim(game_data.chicken_anim, dt);
+    LinceDrawSprite(&(LinceSprite){
+        .x=-1.2f, .y=0.0f,
+        .w=0.3f, .h=0.3f,
+        .color = {1,1,1,1},
+        .texture = game_data.chicken_tileset,
+        .tile = game_data.chicken_anim->current_tile,
+        .zorder = 1.0,
+    }, game_data.custom_shader);
+    
 }
 
 void LinceDrawSprites(LinceEntityRegistry* reg){
@@ -166,8 +327,8 @@ void GameStateInit(){
     game_data.camera = LinceCreateCamera(LinceGetAspectRatio());
     game_data.custom_shader = LinceCreateShader(
         "CustomShader",
-		"sandbox/assets/light.vert.glsl",
-		"sandbox/assets/light.frag.glsl"
+		"sandbox/assets/shaders/light.vert.glsl",
+		"sandbox/assets/shaders/light.frag.glsl"
     );
     LinceBindShader(game_data.custom_shader);
     #define max_texture_slots 32
@@ -246,6 +407,9 @@ void GameStateInit(){
         LinceAddEntityComponent(game_data.reg, game_data.movers[i], Component_Sprite, &sprite);
         LinceAddEntityComponent(game_data.reg, game_data.movers[i], Component_BoxCollider, &mbox);
     }
+
+    // Tile animation test
+    SetupChickenAnimation();
 }
 
 void GameStateUpdate(float dt){
@@ -260,6 +424,10 @@ void GameStateUpdate(float dt){
         "u_view_proj", game_data.camera->view_proj);
     UpdateSpritePositions(game_data.reg);
     LinceDrawSprites(game_data.reg);
+
+    // Tile animation test
+    UpdateChickenAnimation(dt);
+
     LinceEndScene();
 
     // Move
@@ -298,6 +466,10 @@ void GameTerminate(){
     LinceDeleteSound(game_data.music);
     LinceDeleteSoundManager(game_data.sound_manager);
     LinceDeleteAudioEngine(game_data.audio);
+
+    // Tile animation test
+    LinceDeleteTileAnim(game_data.chicken_anim);
+    LinceDeleteTexture(game_data.chicken_tileset);
 }
 
 

@@ -51,15 +51,16 @@ typedef enum LinceTileAnimFlags {
 typedef void LinceTileAnimFn(struct LinceTileAnim* anim, void* params);
 
 typedef struct LinceTileAnim {
+    LinceTexture* tileset;  // source tileset
     LinceTile* frames;		// buffer than contains tile array
     uint32_t frame_count;	// number of tiles in the buffer
-    float frame_time;		// time in ms between frames
+    float frame_time;		// duration of each frame in ms
 
     uint32_t start;			// tile index at which to start the animation
     uint32_t repeats;		// number of repeats to animate
 							// if set to zero, it will repeat forever
 	
-	uint32_t* order;		// Array if indices - order in which to render the tiles
+	uint32_t* order;		// Array of indices - order in which to render the tiles
                             // If set, start index refers to an element of the order array
     uint32_t order_count;	// Number of indices in the order array
 
