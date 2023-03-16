@@ -45,7 +45,7 @@ void LinceGetTilesFromTexture(
 	for(size_t y = 0; y != ytiles; ++y){
         for(size_t x = 0; x != xtiles; ++x){
 			LinceTile tile;
-			vec2 pos = {(float)x, (float)(ytiles-y+1)};
+			vec2 pos = {(float)x, (float)(ytiles-y-1)};
             LinceGetTileCoords(&tile, texsize, pos, cellsize, tilesize);
 			array_push_back(tiles, &tile);
         }

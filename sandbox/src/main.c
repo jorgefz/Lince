@@ -72,6 +72,9 @@ typedef struct GameData {
     LinceTexture* walking_tileset;
     LinceTile* tiles;
     size_t tile_count;
+
+    // Tilemap test
+    LinceTilemap mapgrid;
     
 } GameData;
 
@@ -292,11 +295,11 @@ void LinceDrawSprites(LinceEntityRegistry* reg){
     // LinceStartNewBatch();
 
     // Draw test quad at origin
-    LinceDrawSprite(&(LinceSprite){
-        .x = 0.0, .y = 0.0,
-        .w = 3.0, .h = 2.0,
-        .color = {0.1,0.1,0.1,1}
-    }, game_data.custom_shader);
+    // LinceDrawSprite(&(LinceSprite){
+    //     .x = 0.0, .y = 0.0,
+    //     .w = 3.0, .h = 2.0,
+    //     .color = {0.1,0.1,0.1,1}
+    // }, game_data.custom_shader);
 
     array_uninit(&result);
 }
@@ -429,7 +432,19 @@ void GameStateInit(){
 
     // Tile animation test
     SetupChickenAnimation();
-  
+
+    game_data.mapgrid = (LinceTilemap){
+        .texture = LinceCreateTexture("tileset",
+            "sandbox/assets/textures/hilau_tilesets/6_floors.png"),
+        .cellsize = {32,32},
+        .scale = {0.4,0.4},
+        .offset = {0.25, 0.25},
+        .width = 3,
+        .height = 3,
+        .grid = (uint32_t[]){10,10,10,10,10,10,10,10,10}
+    };
+    LinceInitTilemap(&game_data.mapgrid);
+
 }
 
 void GameStateUpdate(float dt){
@@ -447,6 +462,8 @@ void GameStateUpdate(float dt){
         "u_view_proj", game_data.camera->view_proj);
     UpdateSpritePositions(game_data.reg);
     LinceDrawSprites(game_data.reg);
+
+    LinceDrawTilemap(&game_data.mapgrid, game_data.custom_shader);
 
     LinceEndScene();
 

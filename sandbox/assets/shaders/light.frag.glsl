@@ -18,7 +18,7 @@ struct PointLight {
 };
 
 #define MAX_POINT_LIGHTS 32
-uniform vec4 uAmbientLight = vec4(0.2, 0.2, 0.2, 1.0);
+uniform vec4 uAmbientLight = vec4(0.5, 0.5, 0.5, 1.0);
 uniform vec2 uPointLightPositions[MAX_POINT_LIGHTS];
 uniform float uPointLightCount = 0;
 // uniform PointLight uPointLights[MAX_POINT_LIGHTS];

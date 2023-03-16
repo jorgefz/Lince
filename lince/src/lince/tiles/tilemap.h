@@ -53,12 +53,17 @@ struct Tilemap {
 typedef struct LinceTilemap{
     LinceTexture* texture; // texture tileset
     vec2 cellsize;   // size in pixels of a tile in the texture
-    array_t tiles;   // array<LinceTile>: necessary for sprites
+    array_t tiles;   // array<LinceTile>: tiles' coordinates on the texture
+                     // TODO: If the same tileset is used in many other places,
+                     // allow user to specify tile array instead of texture.
     array_t sprites; // array<LinceSprite>: tile sprites to render
 
-    vec2 offset; // position offset from world origin
+    vec2 offset; // position offset from world origin - RENAME to 'center'?
     vec2 scale;  // scale of individual tiles - default is (1,1)
     float zorder;
+
+    // Add '-1' index for an 'empty' tile for which to generate no sprite,
+    // useful for sparse tilemaps e.g. that contain some trees or overlays
 
     uint32_t width, height; // dimensions of the map in tiles
     uint32_t* grid;         // indices for tiles

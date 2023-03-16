@@ -15,6 +15,9 @@ void LinceInitTilemap(LinceTilemap* map){
     if(map->scale[0] < 1e-7f) map->scale[0] = 1.0f;
     if(map->scale[1] < 1e-7f) map->scale[1] = 1.0f;
 
+    // Load tiles from texture
+    LinceGetTilesFromTexture(map->texture, map->cellsize, &map->tiles);
+
     // Ensure all indices in grid are valid
     size_t map_size = map->height * map->width;
     for(size_t i = 0; i != map_size; ++i){
@@ -24,19 +27,20 @@ void LinceInitTilemap(LinceTilemap* map){
             (int)map->grid[i], (int)map->tiles.size);
     }
 
-    // Load tiles from texture
-    LinceGetTilesFromTexture(map->texture, map->cellsize, &map->tiles);
-    array_init(&map->sprites, sizeof(LinceSprite));
-    array_resize(&map->sprites, map_size);
-
     // Generate sprite grid
+    array_init(&map->sprites, sizeof(LinceSprite));
+    // array_resize(&map->sprites, map_size);
+    float sw = map->scale[0], sh = map->scale[1];
+    float w = (float)map->width, h = (float)map->height;
+
     for(size_t j = 0; j != map->height; ++j){
         for(size_t i = 0; i != map->width; ++i){
             LinceSprite sprite = {
-                .x = (float)i * map->scale[0] - map->offset[0],
-                .y = (float)j * map->scale[1] - map->offset[1],
+                .x = (float)i * map->scale[0] - w*sw/2.0f + map->offset[0],
+                .y = (float)j * map->scale[1] - h*sh/2.0f + map->offset[1],
                 .w = map->scale[0], .h = map->scale[1],
                 .color = {1,1,1,1}, .zorder = map->zorder,
+                .texture = map->texture,
                 .tile = array_get(&map->tiles, map->grid[j*map->width + i])
             };
             array_push_back(&map->sprites, &sprite);
