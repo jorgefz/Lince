@@ -49,6 +49,12 @@ LINCE_NAME_MAX
 LINCE_STR_MAX
     Maximum length of longer buffers, such as messages or text.
 
+4) Directory
+
+LINCE_DIR
+    Directory from which executable is called.
+    Necessary to load engine assets properly.
+
 */
 
 
@@ -61,6 +67,11 @@ LINCE_STR_MAX
     // MacOS
 #else
     // other
+#endif
+
+/* Directory */
+#ifndef LINCE_DIR
+    #define LINCE_DIR ""
 #endif
 
 /* Debugging */
