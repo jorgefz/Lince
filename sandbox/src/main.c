@@ -438,10 +438,10 @@ void GameStateInit(){
             "sandbox/assets/textures/hilau_tilesets/6_floors.png"),
         .cellsize = {32,32},
         .scale = {0.4,0.4},
-        .offset = {0.25, 0.25},
-        .width = 3,
-        .height = 3,
-        .grid = (uint32_t[]){10,10,10,10,10,10,10,10,10}
+        //.offset = {0.25, 0.25},
+        .width = 2,
+        .height = 1,
+        .grid = (uint32_t[]){10,11}
     };
     LinceInitTilemap(&game_data.mapgrid);
 
@@ -485,6 +485,12 @@ void GameStateUpdate(float dt){
         nk_labelf(
             ctx, NK_TEXT_ALIGN_CENTERED,
             "FPS: %.1f", 1000.0f/dt
+        );
+        vec2 mouse;
+        LinceGetMousePosWorld(mouse, game_data.camera);
+        nk_labelf(
+            ctx, NK_TEXT_ALIGN_CENTERED,
+            "%.2f %.2f", mouse[0], mouse[1]
         );
     }
     nk_end(ctx);

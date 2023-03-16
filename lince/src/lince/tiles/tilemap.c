@@ -29,15 +29,12 @@ void LinceInitTilemap(LinceTilemap* map){
 
     // Generate sprite grid
     array_init(&map->sprites, sizeof(LinceSprite));
-    // array_resize(&map->sprites, map_size);
-    float sw = map->scale[0], sh = map->scale[1];
-    float w = (float)map->width, h = (float)map->height;
-
+    
     for(size_t j = 0; j != map->height; ++j){
         for(size_t i = 0; i != map->width; ++i){
             LinceSprite sprite = {
-                .x = (float)i * map->scale[0] - w*sw/2.0f + map->offset[0],
-                .y = (float)j * map->scale[1] - h*sh/2.0f + map->offset[1],
+                .x = (float)i * map->scale[0] + map->offset[0] + map->scale[0]/2.0f,
+                .y = (float)j * map->scale[1] + map->offset[1] + map->scale[1]/2.0f,
                 .w = map->scale[0], .h = map->scale[1],
                 .color = {1,1,1,1}, .zorder = map->zorder,
                 .texture = map->texture,

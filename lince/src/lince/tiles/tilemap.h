@@ -58,7 +58,8 @@ typedef struct LinceTilemap{
                      // allow user to specify tile array instead of texture.
     array_t sprites; // array<LinceSprite>: tile sprites to render
 
-    vec2 offset; // position offset from world origin - RENAME to 'center'?
+    vec2 offset; // position offset from world origin
+                 // by default, tilemap lower left corner is the origin
     vec2 scale;  // scale of individual tiles - default is (1,1)
     float zorder;
 
