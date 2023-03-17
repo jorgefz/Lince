@@ -6,6 +6,13 @@
 #include <string.h>
 #include <stdint.h>
 
+/* Version */
+#ifdef LINCE_VERSION
+    #undef LINCE_VERSION
+#endif
+#define LINCE_VERSION "0.6.0"
+
+
 /*
 --- Macros ---
 
@@ -56,7 +63,6 @@ LINCE_DIR
     Necessary to load engine assets properly.
 
 */
-
 
 /* --- Platform --- */
 #ifdef LINCE_WINDOWS
