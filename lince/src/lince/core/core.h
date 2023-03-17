@@ -82,51 +82,29 @@ LINCE_DIR
 
 /* Debugging */
 #define LINCE_UNUSED(x) (void)(x)
-#define LINCE_PROFILE
+// #define LINCE_PROFILE
 
-#ifndef LINCE_LOGFILE
-#    define LINCE_LOGFILE stderr
-#endif
+#include "logger.h"
 
-#ifdef LINCE_DEBUG
-#   define LINCE_INFO(...) do{ \
-            fprintf(LINCE_LOGFILE, __VA_ARGS__); \
-            fprintf(LINCE_LOGFILE,"\n"); \
-        } while(0);
-#   define LINCE_ASSERT(condition, msg, ...) \
-    if(!(condition)) { \
-        do { \
-            fprintf(LINCE_LOGFILE, " --- Error: %s:%d in function '%s' ('%s' failed)\n",\
-                            __FILE__, __LINE__, __func__, #condition); \
-            fprintf(LINCE_LOGFILE, "\t"); \
-            fprintf(LINCE_LOGFILE, msg, ##__VA_ARGS__); \
-            fprintf(LINCE_LOGFILE, "\n"); \
-            exit(-1); \
-        } while(0); \
-    }
-#   define LINCE_ASSERT_ALLOC(ptr, size) LINCE_ASSERT(ptr, " Failed to allocate %d bytes", (int)(size))
-#else
-#   define LINCE_INFO
-#   define LINCE_ASSERT
-#   define LINCE_ASSERT_ALLOC
-#endif
+#define LINCE_INFO(...) LinceLoggerInfo(__VA_ARGS__)
+#define LINCE_WARN(...) LinceLoggerWarn(__VA_ARGS__)
+#define LINCE_ERROR(...) LinceLoggerError(__VA_ARGS__)
+
+#define LINCE_ASSERT(condition, msg, ...) \
+    if(!(condition)) do { \
+        LINCE_ERROR(msg, ##__VA_ARGS__); \
+        LINCE_ERROR("at %s:%d in function '%s' ('%s' failed)", \
+            __FILE__, __LINE__, __func__, #condition); \
+        exit(-1); \
+    } while(0) \
+
+#define LINCE_ASSERT_ALLOC(ptr, size) LINCE_ASSERT(ptr, " Failed to allocate %d bytes", (int)(size))
+
 
 /* Constants & typedefs */
 #define LINCE_NAME_MAX 100 /* used for shader variable names, etc*/
 #define LINCE_STR_MAX 1000 /* used for longer buffers */
 typedef enum LinceBool{ LinceFalse = 0, LinceTrue = 1 } LinceBool;
-
-
-/* Loops & utils */
-
-/*
-Loops over the items in an array.
-    item:   pointer to an element of the array. Must be declared before.
-    array:  pointer to the beginning of memory where data is stored.
-    len:    number of items in the array
-*/
-#define LinceForeach(item, array, len) for(item = array; item != array+len; ++item)
-
 
 /* Memory */
 

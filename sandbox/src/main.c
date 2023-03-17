@@ -438,10 +438,16 @@ void GameStateInit(){
             "sandbox/assets/textures/hilau_tilesets/6_floors.png"),
         .cellsize = {32,32},
         .scale = {0.4,0.4},
-        //.offset = {0.25, 0.25},
-        .width = 2,
-        .height = 1,
-        .grid = (uint32_t[]){10,11}
+        .offset = {-1, -1},
+        .width = 5,
+        .height = 5,
+        .grid = (uint32_t[]){
+            10,10,10,10,10,
+            10,10,10,10,10,
+            10,10,10,10,10,
+            10,10,10,10,10,
+            10,10,10,10,10,
+        }
     };
     LinceInitTilemap(&game_data.mapgrid);
 

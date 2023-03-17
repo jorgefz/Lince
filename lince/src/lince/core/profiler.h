@@ -32,7 +32,7 @@ double LinceGetTimeMillisec(void);
 	
 #else
 	#define LINCE_PROFILER_START(ms_counter)
-	#define LINCE_PROFILER_END(file, ms_counter)
+	#define LINCE_PROFILER_END(ms_counter)
 #endif
 
 #endif /* LINCE_PROFILER_H */
