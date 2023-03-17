@@ -1,9 +1,9 @@
 
 workspace "lince"
     architecture "x86_64"
-    startproject "game"
+    startproject "editor"
     warnings "Extra"
-
+    
     configurations {"Debug", "Release"}
     filter "system:windows"
         systemversion "latest"
@@ -22,4 +22,5 @@ workspace "lince"
         optimize "on"
         defines {"LINCE_RELEASE"}
 
+    include "deps.lua"
     include "projects.lua"
