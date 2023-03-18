@@ -10,7 +10,7 @@
 #ifdef LINCE_VERSION
     #undef LINCE_VERSION
 #endif
-#define LINCE_VERSION "0.7.0"
+#define LINCE_VERSION "0.7.0" //> Current Lince version
 
 
 /*
@@ -81,15 +81,20 @@ LINCE_DIR
 #endif
 
 /* Debugging */
-#define LINCE_UNUSED(x) (void)(x)
+#define LINCE_UNUSED(x) (void)(x)       //> Gets rid of unused variable compiler warnings
 // #define LINCE_PROFILE
 
+/* Logging */
 #include "logger.h"
+#define LINCE_INFO(...) LinceLoggerInfo(__VA_ARGS__)    //> Logs a message starting with `[INFO]`
+#define LINCE_WARN(...) LinceLoggerWarn(__VA_ARGS__)    //> Logs a message starting with `[WARNING]`
+#define LINCE_ERROR(...) LinceLoggerError(__VA_ARGS__)  //> Logs a message starting with `[ERROR]`
 
-#define LINCE_INFO(...) LinceLoggerInfo(__VA_ARGS__)
-#define LINCE_WARN(...) LinceLoggerWarn(__VA_ARGS__)
-#define LINCE_ERROR(...) LinceLoggerError(__VA_ARGS__)
-
+/** Quits the program if a given condition fails.
+*   @param condition Expression that resolves to 0 (false) or not 0 (true).
+*   @param msg  Formatted string printed if the condtion fails before quitting.
+*               It can be followed by variadic arguments for the formatted string.
+*/
 #define LINCE_ASSERT(condition, msg, ...) \
     if(!(condition)) do { \
         LINCE_ERROR(msg, ##__VA_ARGS__); \
@@ -98,16 +103,24 @@ LINCE_DIR
         exit(-1); \
     } while(0) \
 
+/** Quits the program if a given pointer is NULL. Used to check allocations.
+*   @param ptr The pointer to check
+*   @param size Size in bytes of the memory which failed to be allocated.
+*/
 #define LINCE_ASSERT_ALLOC(ptr, size) LINCE_ASSERT(ptr, " Failed to allocate %d bytes", (int)(size))
 
 
 /* Constants & typedefs */
-#define LINCE_NAME_MAX 100 /* used for shader variable names, etc*/
-#define LINCE_STR_MAX 1000 /* used for longer buffers */
+#define LINCE_NAME_MAX 100 /**> Used for shader variable names, etc*/
+#define LINCE_STR_MAX 1000 /**> Used for longer buffers */
+
+
+/** Custom boolean type
+*/
 typedef enum LinceBool{ LinceFalse = 0, LinceTrue = 1 } LinceBool;
 
-/* Memory */
 
+/* Memory */
 #ifndef LINCE_MALLOC
 #define LINCE_MALLOC malloc
 #endif

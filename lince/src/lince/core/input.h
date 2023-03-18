@@ -3,28 +3,32 @@
 
 #include "lince/core/core.h"
 
-/* Returns true if given LinceKey is held */
+/** @brief Returns true if a keyboard key is held.
+*   @param key Enum value for a key. See `LinceKey`.
+*/
 LinceBool LinceIsKeyPressed(int key);
 
-/* Returns true if given LinceMouseButton is held */
+/** @brief Returns true if a mosue button is held
+*   @brief button Enum value for a mouse button. See `LinceMouseButton`.
+*/
 LinceBool LinceIsMouseButtonPressed(int button);
 
-/*
-Provides 2D coordinates of the mouse in the screen,
-these are the xy pixel positions with origin
-on the top left of the window.
+/** @brief Provides 2D coordinates of the mouse in the screen.
+*   The coordinates are the xy pixel positions with origin
+*   on the top left of the window.
+*   @param xpos location where x position of the mouse is written to.
+*   @param ypos location where y position of the mouse is written to.
+*   @todo Change arguments to vec2
 */
 void LinceGetMousePos(float* xpos, float* ypos);
 
-/*
-Returns X position of the mouse,
-in pixel coordinates of the window, with origin on the right
+/** @brief Returns the x position of the mouse.
+* This position is in pixel coordinates of the window, with origin on the right.
 */
 float LinceGetMouseX();
 
-/*
-Returns Y position of the mouse,
-in pixel coordinates of the window, with origin on the top
+/** @brief Returns the y position of the mouse.
+* This position is in pixel coordinates of the window, with origin on the top.
 */
 float LinceGetMouseY();
 

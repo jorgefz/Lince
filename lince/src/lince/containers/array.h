@@ -4,63 +4,67 @@
 #include <inttypes.h>
 #include <stddef.h>
 
-/*
-Data structure for dynamic contiguous storage of generic data.
+/** @brief Data structure with dynamic contiguous storage of generic data.
 */
 typedef struct array_container {
-	void *data;				// main memory pool
-	uint32_t size;			// number of stored elements
-	uint32_t capacity;		// max number of elements before reallocation
-	uint32_t element_size;	// size of an element
+	void *data;				//> Main memory pool
+	uint32_t size;			//> Number of stored elements
+	uint32_t capacity;		//> Max number of elements allocated
+	uint32_t element_size;	//> Size in bytes of an element
 } array_t;
 
-// -- CONSTRUCTORS / DESTRUCTORS
-
-/*
-Initialises an array via a given pointer.
-Should be later freed using `array_uninit`.
+/** @brief Initialises an array via a given pointer.
+*   Allows the user to manage the memory of the struct itself.
+*   The memory pool will still be stored on the heap.
+*   Should be freed with `array_uninit`.
+*	@param array the return array.
+*	@param element_size size in bytes of an array element.
 */
 void array_init(array_t* array, uint32_t element_size);
 
-/*
-Resets the array data without freeing the array object itself.
+/** @brief Resets the array state and frees the memory pool.
+*	@param array the array to uninitialise.
 */
 void array_uninit(array_t* array);
 
-/*
-Allocates a new array of size zero.
-Should be later freed with `array_destroy`.
+/** @brief Returns a pointer to a new array allocated on the heap
+*   Should be later freed with `array_destroy`.
+*	@param element_size size in bytes of an array element.
 */
 array_t* array_create(uint32_t element_size);
 
-/* Frees an allocated array */
+/** @brief Frees an allocated array
+*	@param array the array to deallocate.
+*/
 void array_destroy(array_t* array); // should also free array_t itself
 
-/* Copies an existing array into an newly allocated memory block. */
+/** @brief Duplicates an array, allocating the new copy on the heap.
+*	@param array the array to copy.
+*/
 array_t* array_copy(array_t* orig);
 
-/*
-Initialises an array from existing data
+/* Initialises an array from existing data
 If a size of zero or empty data are provided, no elements are added to the array.
 */
 // array_t* array_from_data(void* data, uint32_t size, uint32_t element_size);
 
-/*
-Pre-allocates a given number of elements but does not initialise them.
-If the new size is less than the current one, leftover elements are removed.
+/** @brief Pre-allocates a given number of elements.
+* The new elements are not initialised.
+* Set the value of these elements with `array_set`.
+* If the size of an array is reduced, the extra elements are removed.
 */
 array_t* array_resize(array_t* array, uint32_t size);
 
-// -- SETTERS
-/*
-Overwrites an element at the given index with the given data.
-If the given data pointer is NULL, the specified element is zeroed.
-Returns a pointer to the element in the array.
+/** @brief Sets the value of an element.
+* Any previously data contained in the element is overwritten.
+* If the given pointer to data is NULL, the specified element is filled with zeros.
+* Returns a pointer to the element in the array.
 */
 void* array_set(array_t* array, void* data, uint32_t index);
 
-// -- RETRIEVALS
-/* Returns a pointer to the element at the specified index */
+/** @brief Returns a pointer to the element at the given index.
+* Returns NULL if the index is invalid.
+*/
 void* array_get(array_t* array, uint32_t index);
 
 /* Returns a pointer to the first element */

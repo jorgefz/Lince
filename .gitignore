@@ -1,6 +1,8 @@
 .vscode
 log.txt
 null.d
+docs/html
+docs/latex
 
 # Visual Studio files
 .vs
