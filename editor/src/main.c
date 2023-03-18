@@ -24,15 +24,9 @@ void SetupApplication(){
 
 
 int main(int argc, const char* argv[]) {
-
-    #ifdef LINCE_DEBUG
-    LINCE_INFO(" --- DEBUG MODE --- ");
-    #endif
-
     srand(time(NULL));
 
     SetupApplication();
-    
     LinceRun();
     
     LINCE_UNUSED(argc);

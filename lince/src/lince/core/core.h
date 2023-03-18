@@ -10,7 +10,7 @@
 #ifdef LINCE_VERSION
     #undef LINCE_VERSION
 #endif
-#define LINCE_VERSION "0.6.0"
+#define LINCE_VERSION "0.7.0"
 
 
 /*

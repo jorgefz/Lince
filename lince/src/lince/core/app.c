@@ -155,6 +155,14 @@ static void LinceInit(){
     // Open log file
     LinceOpenLogger(LINCE_DIR"log.txt");
 
+    //Report Lince version and debug/release configuration
+    LINCE_INFO("--- LINCE version "LINCE_VERSION" ---");
+#ifdef LINCE_DEBUG
+    LINCE_INFO("Debug configuration");
+#else
+    LINCE_INFO("Release configuration");
+#endif
+
     // Check user settings and set defaults
     if (app.screen_width == 0) app.screen_width = 500;
     if (app.screen_height == 0) app.screen_height = 500;

@@ -6,6 +6,13 @@ Version codes follow [Semantic Versioning](https://semver.org/).
 - Refactored minigames and editor
 - Move documentation and minigames to separate github repositories?
 
+## v0.7.0
+- Added support for custom shaders in renderer
+- Moved minigames to a separate github repo
+- Added logging
+- Improved tile animations and tilemaps
+- Re-made the editor
+
 ## v0.6.0
 - Added ECS
 - Improved array and hashmap initialisation API

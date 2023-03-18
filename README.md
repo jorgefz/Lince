@@ -1,4 +1,4 @@
-# Lince 0.6.0
+# Lince 0.7.0
 
 A 2D OpenGL game engine written in C, currently in development.
 
