@@ -48,125 +48,160 @@ Example Program:
 #include <lince/core/core.h>
 #include <lince/containers/array.h>
 
-/*
-Buffered sounds are entirely loaded onto memory - best for sounds < 5 sec
-Streamed sounds are simultaneously read and played- best for sounds > 5 sec
+/** @enum LinceSoundType
+* @brief Holds the type of a sound: buffered or streamed.
 */
 typedef enum LinceSoundType {
-    LinceSound_Buffer,
-    LinceSound_Stream
+    LinceSound_Buffer, //> Buffered sounds are entirely loaded onto memory - best for sounds < 5 sec
+    LinceSound_Stream  //> Streamed sounds are simultaneously read and played- best for sounds > 5 sec
 } LinceSoundType;
 
+/** @struct LinceSoundConfig
+* @brief Holds the settings on how a sound is played.
+*/
 typedef struct LinceSoundConfig {
-    float volume;    // Sound volume in dB
-    float pitch;     // Frequency offset. A higher value makes the sound higher frequency.
-    float pan;       // Which speaker dominates, from left (-1.0) to both (0.0) to right (1.0).
-    LinceBool loop;  // Switch whether sound should loop over and play continuously
+    float volume;    //> Sound volume in dB
+    float pitch;     //> Frequency offset. A higher value makes the sound higher frequency.
+    float pan;       //> Which speaker dominates, from left (-1.0) to both (0.0) to right (1.0).
+    LinceBool loop;  //> Switch whether sound should loop over and play continuously
 } LinceSoundConfig;
 
-/*
-Sound instance that plays an audio file.
-To play the same sound simultaneously, create several LinceSound objects,
-or use the LinceSoundManager.
+/** @struct LinceSound
+* @brief Sound instance that plays an audio file.
+* To play the same sound simultaneously, create several LinceSound objects,
+* or use the LinceSoundManager.
 */
 typedef struct LinceSound{
-    void* handle;    // ma_sound
-    char* filename;
-    enum LinceSoundType type;
-    LinceSoundConfig config;
+    void* handle;             //> miniaudio handle for `ma_sound`
+    char* filename;           //> File from which sound was loaded
+    LinceSoundType type;      //> Sound type: streamed or buffered 
+    LinceSoundConfig config;  //> Sound settings
 } LinceSound;
 
-/*
-Stores sound objects from the same sound file for simultaneous playing
+/** @struct LinceSoundManager
+* @brief Stores sound objects from the same sound file for simultaneous playing
 */
 typedef struct LinceSoundManager{
-    array_t sound_cache; // array<LinceSound>
-    char* filename;
-    enum LinceSoundType type;
+    array_t sound_cache;      //> array_t<LinceSound>, sound instances
+    char* filename;           //> Origin audio file
+    enum LinceSoundType type; //> Sound type: streamed or buffered
 } LinceSoundManager;
 
+/** @struct LinceAudioEngine
+* @brief Holds the underlying state for miniaudio sound management
+*/
 typedef struct LinceAudioEngine {
-    void* handle; // ma_engine
+    void* handle; // miniaudio handle for `ma_engine`
 } LinceAudioEngine;
 
-/*
-Default initialisation settings for sounds
+
+/** @brief Initialises an audio engine.
+* The audio engine is used by the Miniaudio backend to open sound files,
+* communicate with the OS, and keep track of all loaded sounds.
+* It must be created before any sound is loaded, and destroyed when all sounds have been deleted.
+*/
+LinceAudioEngine* LinceCreateAudioEngine(void);
+
+/** @brief Terminates an audio engine and all of its sounds */
+void LinceDeleteAudioEngine(LinceAudioEngine* audio);
+
+
+/**
+* Returns the default initialisation settings for sounds:
+*   volume = 1.0f,
+*   pitch  = 1.0f,
+*   pan    = 0.0f,
+*   loop   = false
 */
 LinceSoundConfig LinceGetDefaultSoundConfig(void);
 
-/*
-Initialises a given LinceSound object using the given handle.
-The filename and config must be provided through that object.
+
+/**
+* Initialises a given LinceSound object using the given handle.
+* The filename (and the config, optionally) may be defined in the sound instance.
+* @param audio Audio engine from `LinceCreateAudioEngine`.
+* @param s Sound instance to initialise. Must have a filename defined.
 */
 void LinceInitSound(LinceAudioEngine* audio, LinceSound* s);
 
-/*
-Creates a buffered sound from file and returns a heap-allocated pointer to it.
-To play it, use 'LincePlaySound'.
-Don't forget to delete it with 'LinceDeleteSound()'.
+/** @brief Allocates and returns a buffered sound from file.
+* To play it, use `LincePlaySound`.
+* Don't forget to delete it with `LinceDeleteSound`.
+* @param audio Audio engine from `LinceCreateAudioEngine`.
+* @param filename File from which to load audio
+* @param config Settings for the sound
 */
 LinceSound* LinceLoadSound(LinceAudioEngine* audio, const char* filename, LinceSoundConfig* config);
 
-/*
-Creates a streamed sound from file and returns a heap-allocated pointer to it,
-similarly to LinceLoadSound.
+/** @brief Allocates and returns a streamed sound from file.
+* Akin to `LinceLoadSound`.
+* @param audio Audio engine from `LinceCreateAudioEngine`.
+* @param filename File from which to stream audio
+* @param config Settings for the sound
 */
 LinceSound* LinceLoadStream(LinceAudioEngine* audio, const char* filename, LinceSoundConfig* config);
 
-/*
-Uninitialises and deallocates a sound object.
+/** @brief Uninitialises and deallocates a sound instance, either buffered or streamed.
 */
 void LinceDeleteSound(LinceSound* s);
 
-/*
-Controls the sound cursor to start, stop, and rewind a sound.
-*/
+/** @brief Starts or continues playing a sound */
 void LincePlaySound(LinceSound* s);
+
+/** @brief Pauses a sound */
 void LinceStopSound(LinceSound* s);
+
+/** @brief Rewinds sound to its beginning.
+* If the sound was stopped, it does not autoplay it.
+*/
 void LinceRewindSound(LinceSound* s);
 
-/*
-Returns the status of a sound.
-Note: sound is 'stopped' when it is not playing but not finished either.
+/** Returns the status of a sound.
+* Note: sound is 'stopped' when it is not playing but not finished either.
 */
+
+/** @brief Returns true if a sound has been manually stopped or hasn't started playing */
 LinceBool LinceIsSoundStopped(LinceSound* s);
+
+/** @brief Returns true if a sound has finished playing.
+* Will never return true for sounds that loop forever.
+*/
 LinceBool LinceIsSoundFinished(LinceSound* s);
+
+/** @brief Returns true if a sound is being played or streamed */
 LinceBool LinceIsSoundPlaying(LinceSound* s);
 
-/*
-The sound config can be updated on the fly via the sound object,
-e.g. sound->config.volume = 1.0f.
-This function must be called for these changes to have an effect.
+/** @brief Applies changes made to a sound's settings via `sound.config`.
+* The sound configuration can be updated on the fly via the sound object,
+* e.g. sound->config.volume = 1.0f.
+* This function must be called for these changes to have an effect.
 */
 void LinceUpdateSound(LinceSound* s);
 
-/*
-The sound manager allows for the same sound file to be played simultaneously on the fly.
-It dynamically creates and reuses sound objects each time a sound is requested.
-The manager must be uninitialised as it is heap-allocated.
+/** @brief Allocates and returns a sound manager.
+* The sound manager allows for the same sound file to be played simultaneously on the fly.
+* It dynamically creates and reuses sound objects each time a sound is requested.
+* The manager must be deleted as it is heap-allocated.
+* @param audio The audio engine
+* @param type Streamed or buffered. It works best for buffered sounds.
+* @param filename File from which to load audio.
 */
 LinceSoundManager* LinceCreateSoundManager(LinceAudioEngine* audio, LinceSoundType type, const char* filename);
+
+/** @brief Deallocates a sound manager */
 void LinceDeleteSoundManager(LinceSoundManager* manager);
 
-/*
-Used to play a sound managed by the sound manager.
-The starting configuration for the sound (e.g. volume) can be specified as well.
+/** @brief Plays a sound using a sound manager.
+* This allows the same audio to be played simultaneously.
+* @param audio The audio engine.
+* @param manager Audio manager initialised with the desired sound.
+* @param config The starting configuration for the sound (e.g. volume). This cannot be changed later.
 */
 void LinceSpawnSound(LinceAudioEngine* audio, LinceSoundManager* manager, LinceSoundConfig* config);
 
-/*
-Stops all the sounds owned by a sound manager,
-which flags them for reuse.
+/** @brief Stops all the sounds owned by a sound manager, which flags them for reuse.
 */
 void LinceStopAllManagerSounds(LinceSoundManager* manager);
-
-/*
-The audio engine is used by the Miniaudio backend to open sound files,
-communicate with the OS, and keep track of all loaded sounds.
-It must be created before any sound is loaded, and destroyed when all sounds have been deleted.
-*/
-LinceAudioEngine* LinceCreateAudioEngine(void);
-void LinceDeleteAudioEngine(LinceAudioEngine* audio);
 
 
 #endif /* LINCE_AUDIO_H */
