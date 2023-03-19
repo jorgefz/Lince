@@ -3,6 +3,45 @@
 Lince is a game engine written in C for making 2D games.
 Lince is currently in very early development.
 
+## Minimal code example - drawing a red square
+
+```c
+#include "lince.h"
+
+LinceCamera* camera;
+LinceSprite square = {
+    .x = 0, .y = 0,     // position
+    .w = 1, .h = 1,     // size
+    .color = {1, 0, 0, 1} // rgba
+};
+
+void OnInit() {
+	camera = LinceCreateCamera(LinceGetAspectRatio());
+}
+
+void OnUpdate(float dt) {
+    LinceBeginScene(camera);
+	LinceDrawSprite(&square, NULL);
+    LinceEndScene();
+}
+
+void OnTerminate() {
+	LinceDeleteCamera(camera);
+}
+
+int main() {
+
+	LinceApp* app = LinceGetAppState();
+	app->game_init = OnInit;
+	app->game_on_update = OnUpdate;
+	app->game_terminate = OnTerminate;
+
+	LinceRun();
+
+	return 0;
+}
+```
+
 ## Features
 
 * 2D graphics
@@ -12,7 +51,6 @@ Lince is currently in very early development.
 * Event system for user input
 * Tilemaps and sprite animations
 * Lightweight Entity Component System (ECS) with unlimited entities and components
-* Tilemaps and sprite animations
 * Collision system for rectangles.
 * Built-in level and scene editor
 
