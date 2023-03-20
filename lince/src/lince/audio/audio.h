@@ -52,18 +52,18 @@ Example Program:
 * @brief Holds the type of a sound: buffered or streamed.
 */
 typedef enum LinceSoundType {
-    LinceSound_Buffer, //> Buffered sounds are entirely loaded onto memory - best for sounds < 5 sec
-    LinceSound_Stream  //> Streamed sounds are simultaneously read and played- best for sounds > 5 sec
+    LinceSound_Buffer, ///< Buffered sounds are entirely loaded onto memory - best for sounds < 5 sec
+    LinceSound_Stream  ///< Streamed sounds are simultaneously read and played- best for sounds > 5 sec
 } LinceSoundType;
 
 /** @struct LinceSoundConfig
 * @brief Holds the settings on how a sound is played.
 */
 typedef struct LinceSoundConfig {
-    float volume;    //> Sound volume in dB
-    float pitch;     //> Frequency offset. A higher value makes the sound higher frequency.
-    float pan;       //> Which speaker dominates, from left (-1.0) to both (0.0) to right (1.0).
-    LinceBool loop;  //> Switch whether sound should loop over and play continuously
+    float volume;    ///< Sound volume in dB
+    float pitch;     ///< Frequency offset. A higher value makes the sound higher frequency.
+    float pan;       ///< Which speaker dominates, from left (-1.0) to both (0.0) to right (1.0).
+    LinceBool loop;  ///< Switch whether sound should loop over and play continuously
 } LinceSoundConfig;
 
 /** @struct LinceSound
@@ -72,19 +72,19 @@ typedef struct LinceSoundConfig {
 * or use the LinceSoundManager.
 */
 typedef struct LinceSound{
-    void* handle;             //> miniaudio handle for `ma_sound`
-    char* filename;           //> File from which sound was loaded
-    LinceSoundType type;      //> Sound type: streamed or buffered 
-    LinceSoundConfig config;  //> Sound settings
+    void* handle;             ///< miniaudio handle for `ma_sound`
+    char* filename;           ///< File from which sound was loaded
+    LinceSoundType type;      ///< Sound type: streamed or buffered 
+    LinceSoundConfig config;  ///< Sound settings
 } LinceSound;
 
 /** @struct LinceSoundManager
 * @brief Stores sound objects from the same sound file for simultaneous playing
 */
 typedef struct LinceSoundManager{
-    array_t sound_cache;      //> array_t<LinceSound>, sound instances
-    char* filename;           //> Origin audio file
-    enum LinceSoundType type; //> Sound type: streamed or buffered
+    array_t sound_cache;      ///< array_t<LinceSound>, sound instances
+    char* filename;           ///< Origin audio file
+    enum LinceSoundType type; ///< Sound type: streamed or buffered
 } LinceSoundManager;
 
 /** @struct LinceAudioEngine
@@ -116,8 +116,7 @@ void LinceDeleteAudioEngine(LinceAudioEngine* audio);
 LinceSoundConfig LinceGetDefaultSoundConfig(void);
 
 
-/**
-* Initialises a given LinceSound object using the given handle.
+/** @brief Initialises a given LinceSound object using the given handle.
 * The filename (and the config, optionally) may be defined in the sound instance.
 * @param audio Audio engine from `LinceCreateAudioEngine`.
 * @param s Sound instance to initialise. Must have a filename defined.
@@ -156,7 +155,7 @@ void LinceStopSound(LinceSound* s);
 */
 void LinceRewindSound(LinceSound* s);
 
-/** Returns the status of a sound.
+/** @brief Returns the status of a sound.
 * Note: sound is 'stopped' when it is not playing but not finished either.
 */
 

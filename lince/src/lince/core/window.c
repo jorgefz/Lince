@@ -38,8 +38,7 @@ static void LinceInitGLContext(GLFWwindow* handle){
 
 /* Public API */
 
-/// TODO: third argument bit flags for fullscreen, vsync, etc
-LinceWindow* LinceCreateWindow(unsigned int width, unsigned int height, const char* title){
+LinceWindow* LinceCreateWindow(uint32_t width, uint32_t height, const char* title){
 
     LINCE_ASSERT(glfwInit(), "Failed to initialise GLFW");
     
@@ -81,7 +80,7 @@ LinceWindow* LinceCreateWindow(unsigned int width, unsigned int height, const ch
     return window;
 }
 
-unsigned int LinceShouldCloseWindow(LinceWindow* window){
+uint32_t LinceShouldCloseWindow(LinceWindow* window){
     return glfwWindowShouldClose((GLFWwindow*)(window->handle));
 }
 
@@ -111,8 +110,8 @@ static void WindowResizeCallback(GLFWwindow* wptr, int width, int height){
     glViewport(0, 0, width, height);
     
     LinceWindow* w = (LinceWindow*)glfwGetWindowUserPointer(wptr);
-    w->width = (unsigned int)width;
-    w->height = (unsigned int)height;
+    w->width = (uint32_t)width;
+    w->height = (uint32_t)height;
 
     LinceEvent e = LinceNewWindowResizeEvent(width, height);
     if (w->event_callback) w->event_callback(&e);
@@ -149,7 +148,7 @@ static void KeyCallback(GLFWwindow* wptr, int key, int scancode, int action, int
     LINCE_UNUSED(mods);
 }
 
-static void CharCallback(GLFWwindow* wptr, unsigned int key_typed){
+static void CharCallback(GLFWwindow* wptr, uint32_t key_typed){
     LinceWindow* w = (LinceWindow*)glfwGetWindowUserPointer(wptr);
     LinceEvent e = LinceNewKeyTypeEvent(key_typed);
     if (w->event_callback) w->event_callback(&e);

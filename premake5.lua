@@ -7,12 +7,13 @@ workspace "lince"
     configurations {"Debug", "Release"}
     filter "system:windows"
         systemversion "latest"
-        defines {"_CRT_SECURE_NO_WARNINGS"}
+        defines {"_CRT_SECURE_NO_WARNINGS", "LINCE_WINDOWS"}
         links {"opengl32"}
 
     filter "system:linux"
         systemversion "latest"    
         links {"GL","rt","m","dl","pthread","X11"}
+        defines {"LINCE_LINUX"}
         
     filter "configurations:Debug"
         symbols "on"

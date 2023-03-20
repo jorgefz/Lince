@@ -1,6 +1,9 @@
 #ifndef LINCE_MOUSECODES_H
 #define LINCE_MOUSECODES_H
 
+/** @enum LinceMouseButton
+* Mouse button codes following the OpenGL codes
+*/
 typedef enum LinceMouseButton {
 	LinceMouseButton_1 = 0,
 	LinceMouseButton_2 = 1,

@@ -1,31 +1,31 @@
 
 #include "core/layer.h"
+#include "core/memory.h"
 
 /* Layer */
 
 LinceLayer* LinceCreateLayer(void* data) {
-	LinceLayer* layer = calloc(1, sizeof(LinceLayer));
+	LinceLayer* layer = LinceCalloc(sizeof(LinceLayer));
 	LINCE_ASSERT(layer, "Failed to allocate layer");
 	layer->data = data;
 	return layer;
 }
 
-void* LinceGetLayerData(LinceLayer* layer) {
-	return layer->data;
+void LinceDeleteLayer(LinceLayer* layer){
+	if(!layer) return;
+	LinceFree(layer);
 }
-
-/* LayerStack */
 
 LinceLayerStack* LinceCreateLayerStack() {
 	LinceLayerStack* stack;
-	stack = calloc(1, sizeof(LinceLayerStack));
+	stack = LinceCalloc(sizeof(LinceLayerStack));
 	return stack;
 }
 
 void LinceDestroyLayerStack(LinceLayerStack* stack) {
 	if (!stack) return;
 	if (!stack->layers) {
-		free(stack);
+		LinceFree(stack);
 		return;
 	}
 	unsigned int i;
@@ -34,11 +34,11 @@ void LinceDestroyLayerStack(LinceLayerStack* stack) {
 			if (stack->layers[i]->OnDetach) {
 				stack->layers[i]->OnDetach(stack->layers[i]);
 			}
-			free( stack->layers[i] );
+			LinceFree( stack->layers[i] );
 		}
 	}
-	free(stack->layers);
-	free(stack);
+	LinceFree(stack->layers);
+	LinceFree(stack);
 }
 
 void LinceLayerStackPush(LinceLayerStack* stack, LinceLayer* layer) {
@@ -78,7 +78,7 @@ void LinceLayerStackPop(LinceLayerStack* stack, LinceLayer* layer) {
 
 	// resize layer stack
 	if (stack->count == 1) {
-		free(stack->layers);
+		LinceFree(stack->layers);
 		stack->layers = NULL;
 		stack->count = 0;
 		return;

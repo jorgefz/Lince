@@ -21,44 +21,45 @@ typedef void (*LinceGameOnUpdateFn)(float dt);
 typedef void (*LinceGameOnEventFn)(LinceEvent*);
 typedef void (*LinceGameTerminateFn)();
 
-/** Holds the application's state
+/** @struct LinceApp
+* Holds the application's state.
 */
 typedef struct LinceApp{
 
     /* User callbacks */
-    LinceGameInitFn      game_init;      //> User-defined callback called once when the app is initialized.
-    LinceGameOnUpdateFn  game_on_update; //> User-defined callback called once per frame.
-    LinceGameOnEventFn   game_on_event;  //> User-defined callback called when an event is propagated.
-    LinceGameTerminateFn game_terminate; //> User-defined callback called when the app closes.
+    LinceGameInitFn      game_init;      ///< User-defined callback called once when the app is initialized.
+    LinceGameOnUpdateFn  game_on_update; ///< User-defined callback called once per frame.
+    LinceGameOnEventFn   game_on_event;  ///< User-defined callback called when an event is propagated.
+    LinceGameTerminateFn game_terminate; ///< User-defined callback called when the app closes.
 
     /* User settings */
-    void* user_data;        //> Pointer that may be freely re-assiged by the user.      
-    uint32_t screen_width;  //> Width in pixels of the window.
-    uint32_t screen_height; //> Height in pixels of the window.
-    const char* title;      //> String displayed at the top of the window.
+    void* user_data;        ///< Pointer that may be freely re-assiged by the user.      
+    uint32_t screen_width;  ///< Width in pixels of the window.
+    uint32_t screen_height; ///< Height in pixels of the window.
+    const char* title;      ///< String displayed at the top of the window.
 
     /* Internal state */
-    LinceWindow     *window;        //> Window state.
-    LinceLayerStack *layer_stack;   //> Array of rendering layers.
-    LinceLayerStack *overlay_stack; //> Array of rendering overlays (drawn after layers).
-    LinceBool        running;       //> True if the application is active.
-    float time_ms;          //> Run time in milliseconds.
-    float dt;               //> Frame time step in milliseconds.
-    int current_layer;      /**> Index of the active layer (during OnUpdate or OnEvent).
+    LinceWindow     *window;        ///< Window state.
+    LinceLayerStack *layer_stack;   ///< Array of rendering layers.
+    LinceLayerStack *overlay_stack; ///< Array of rendering overlays (drawn after layers).
+    LinceBool        running;       ///< True if the application is active.
+    float time_ms;          ///< Run time in milliseconds.
+    float dt;               ///< Frame time step in milliseconds.
+    int current_layer;      /**< Index of the active layer (during OnUpdate or OnEvent).
                             * This is `-1` if no layer is active.
                             */
-    int current_overlay;    /**> Index of the active overlay, akin to the current layer.
+    int current_overlay;    /**< Index of the active overlay, akin to the current layer.
                             */
 
     /* UI */
-    LinceUILayer* ui;   //> State of the GUI, e.g. Nuklear's context.
+    LinceUILayer* ui;   ///< State of the GUI, e.g. Nuklear's context.
 
-    LinceBool enable_profiling; //> (unused)
-    LinceBool enable_logging;   //> (unused)
-    char* profiler_filename;    //> (unused)
-    char* log_filename;         //> (unused)
-    FILE* log_file;             //> (unused)
-    FILE* profiler_file;        //> (unused)
+    LinceBool enable_profiling; ///< (unused)
+    LinceBool enable_logging;   ///< (unused)
+    char* profiler_filename;    ///< (unused)
+    char* log_filename;         ///< (unused)
+    FILE* log_file;             ///< (unused)
+    FILE* profiler_file;        ///< (unused)
 
 } LinceApp;
 
@@ -76,7 +77,7 @@ void LinceCheckErrors();
 */
 void LincePushLayer(LinceLayer* layer);
 
-/** @bried Adds a rendering overlay to the application.
+/** @brief Adds a rendering overlay to the application.
 * @param overlay Rendering overlays to push onto the application's overlay stack.
 *                Overlays are rendered after layers.
 */
