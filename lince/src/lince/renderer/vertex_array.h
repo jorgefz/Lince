@@ -3,29 +3,35 @@
 
 #include "lince/renderer/buffer.h"
 
+/** @struct LinceVertexArray
+* @brief Holds the information for a bacth of vertices to be drawn to the screen.
+*/
 typedef struct LinceVertexArray {
-	uint32_t id; // OpenGL renderer ID
-	LinceIndexBuffer index_buffer;
-	LinceVertexBuffer* vb_list; /* associated vertex buffers */
-	uint32_t vb_count; /* number of vertex buffers */
+	uint32_t id; 					///< OpenGL renderer ID
+	LinceIndexBuffer index_buffer;	///< Order in whcih vertices are drawn.
+	LinceVertexBuffer* vb_list; 	///< Data buffer with vertices
+	uint32_t vb_count; 				///< Number of vertices
 } LinceVertexArray;
 
-/* Allocates new vertex array and generates an OpenGL ID for it */
+/** @brief Allocates new vertex array and generates an OpenGL ID for it */
 LinceVertexArray* LinceCreateVertexArray(LinceIndexBuffer index_buffer);
 
+/** @brief Binds a vertex array for rendering */
 void LinceBindVertexArray(LinceVertexArray* vertex_array);
 
+/** @brief Unbinds the active vertex array (if any) */
 void LinceUnbindVertexArray(void);
 
-/* Sets up vertex buffer attributes and appends given buffer */
+/** @brief Sets up vertex buffer attributes and appends given buffer */
 void LinceAddVertexArrayAttributes(
-	LinceVertexArray* vertex_array,  /* must have been initialised already */
-	LinceVertexBuffer vertex_buffer, /* stores raw vertex data */
-	LinceBufferElement* layout,      /* list of buffer elements that 
-								        together constitute the data layout */
-	uint32_t layout_elements     /* Number of buffer elements */
+	LinceVertexArray* vertex_array,  ///< Vertex array to set up
+	LinceVertexBuffer vertex_buffer, ///< Buffer of vertices to append
+	LinceBufferElement* layout,      ///< Layout of buffer elements,
+								     ///< tells how tin interpret vertex buffer data
+	uint32_t layout_elements 		 ///< Number of buffer elements in layout
 );
 
+/** @brief Deallocates and deletes vertex array */
 void LinceDeleteVertexArray(LinceVertexArray* vertex_array);
 
 

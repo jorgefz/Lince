@@ -97,42 +97,4 @@ void LinceTerminateUI(LinceUILayer* ui){
 	LINCE_INFO(" UI Terminated");
 }
 
-void LinceUIText(
-    LinceUILayer* ui,
-    const char* window_name,
-    float x, float y,
-    LinceFonts font,
-    size_t max_size,
-    const char* text, ...
-    ) {
-    
-    struct nk_context* ctx = ui->ctx;
-    struct nk_style_item style_state = ctx->style.window.fixed_background;
-
-    // SLOW - refactor this in the future
-    char* formatted_text = malloc((max_size+1) * sizeof(char));
-    memset(formatted_text, ' ', max_size-1);
-    formatted_text[max_size-1] = (char)0;
-
-    // format given text
-    va_list args;
-    va_start(args, text);
-    size_t len = vsnprintf(formatted_text, max_size, text, args);
-    va_end(args);
-
-    // hide background
-    ctx->style.window.fixed_background = nk_style_item_hide();
-    
-    nk_style_set_font(ui->ctx, &ui->fonts[font]->handle);
-    if(nk_begin(ctx, window_name, nk_rect(x, y, 20*(float)len, 50), NK_WINDOW_NO_INPUT)){
-        nk_layout_row_static(ctx, 30, 15*(float)len, 1);
-        nk_text(ctx, formatted_text, len, NK_TEXT_LEFT); 
-    }
-    nk_end(ctx);
-
-    free(formatted_text);
-
-    // restore previous style
-    ctx->style.window.fixed_background = style_state;
-}
 

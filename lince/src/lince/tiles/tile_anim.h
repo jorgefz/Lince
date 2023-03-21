@@ -4,92 +4,72 @@
 #include "lince/containers/array.h"
 #include "lince/tiles/tileset.h"
 
-/*
-=== LinceTileAnim ===
-
-LinceTileAnim
-    - frames:   array of LinceTile tiles that define each frame of the animation
-    - frame_count: number of frames in buffer above
-    - frametime:  length of each frame in ms
-    (implement multiple frametimes?)
-
-    - order: array of frame indices that indicates order in which to show frames
-    - start_frame: initial frame, used only if order is not set. Defaults to 0.
-    - repeats: number of repeats of the animation
-
-    - on_finish: callback called when animation finished.
-                Not called when it is set to repeat forever. 
-    - on_repeat: callback called each time animation loops over.
-                Not called when it is set to run only once.
-    - callback_params: list of parameters to pass to callbacks
-
-    - flags:
-        0: once or repeat
-        1: ... 
-
-    // Internal
-    - time
-    - current_frame
-
-
-Code Example:
-
+/** @enum LinceTileAnimFlags
+* @brief Settings for LinceTileAnim
 */
+typedef enum LinceTileAnimFlags {
+    // Defaults set to zero, useless but reassuring
+    LinceTileAnimFlag_Repeat       	= 0x0,  ///< Default. Repeats tile animation.
+	LinceTileAnimFlag_EndWithFirst 	= 0x0,  ///< Default. Last frame is the first one.
+    // Non-defaults
+    LinceTileAnimFlag_Once        	= 0x1,  ///< Run animation only once
+	LinceTileAnimFlag_EndWithLast 	= 0x2,  ///< (unused) Ends animation on the last frame
+    // LinceTileAnimFlag_OneFrame // Set frametime to one frame
+} LinceTileAnimFlags;
 
 
 struct LinceTileAnim; // forward declaration
 
-typedef enum LinceTileAnimFlags {
-    // Defaults set to zero, useless but reassuring
-    LinceTileAnimFlag_Repeat       	= 0x0,
-	LinceTileAnimFlag_EndWithFirst 	= 0x0,
-    // Non-defaults
-    LinceTileAnimFlag_Once        	= 0x1,  // Run animation only once
-	LinceTileAnimFlag_EndWithLast 	= 0x2,  // Ends animation on the last frame
-    // LinceTileAnimFlag_OneFrame // Set frametime to one frame
-} LinceTileAnimFlags;
-
+/** @typedef LinceTileAnimFn
+* Function signatures for LinceTileAnim callbacks.
+*/
 typedef void LinceTileAnimFn(struct LinceTileAnim* anim, void* params);
 
+/** @struct LinceTileAnim
+* @brief Stores the state of a tile animation
+*/
 typedef struct LinceTileAnim {
-    // LinceTexture* tileset;  // source tileset
-    // LinceTile* frames;		// buffer than contains tile array
-    // uint32_t frame_count;	// number of tiles in the buffer
-    array_t* frames;         // array<LinceTile>: list of tiles
-    float frame_time;		// duration of each frame in ms
+    array_t* frames;        ///< array<LinceTile>, list of tiles or subtexture coordinates. See tileset.h
+    float frame_time;		///< Duration of each frame in millisec.
 
-    uint32_t start;			// tile index at which to start the animation
-    uint32_t repeats;		// number of repeats to animate
-							// if set to zero, it will repeat forever
-	
-	uint32_t* order;		// Array of indices - order in which to render the tiles
-                            // If set, start index refers to an element of the order array
-    uint32_t order_count;	// Number of indices in the order array
+    uint32_t start;			///< Index of frame at which to start the animation.
+    uint32_t repeats;		///< Number of repeats to animate. Repeats forever if zero.
+	uint32_t* order;		///< Array of indices - order in which to render the tiles. If set, start index refers to an element of the order array.
+    uint32_t order_count;	///< Number of indices in the order array.
 
-    LinceTileAnimFn* on_finish;		// Called when animation has finished
-    LinceTileAnimFn* on_repeat;		// Called when animation loops over
-    // LinceTileAnimFn* on_frame 	// Called when frame changes
-    void* callback_args;			// Arguments to pass onto callbacks
+    LinceTileAnimFn* on_finish;	  ///< Called when animation has finished
+    LinceTileAnimFn* on_repeat;	  ///< Called when animation loops over
+    // LinceTileAnimFn* on_frame  // Called when frame changes
+    void* callback_args;		  ///< Generic data to pass onto callbacks
 
-    LinceTileAnimFlags flags;
+    LinceTileAnimFlags flags;     ///< Settings
 
     // Internal
-    float time;					// countdown until next frame
-    uint32_t current_frame;		// index of current frame
-    LinceTile* current_tile;	// pointer to current tile in the buffer
-	uint32_t repeat_count;		// number of times the animation has been looped
-	LinceBool finished; 		// indicates whether animation has finished running
+    float time;					///< Countdown until next frame
+    uint32_t current_frame;		///< Index of current frame
+    LinceTile* current_tile;	///< Pointer to current tile in the buffer
+	uint32_t repeat_count;		///< Number of times the animation has been looped
+	LinceBool finished; 		///< Indicates whether animation has finished running
 
 } LinceTileAnim;
 
 
-// Sorts out the user-defined animation settings and initialises the animation
+/** @brief Initialises the animation.
+* Settings and options should be pre-defined on the object
+* before passing it as an argument.
+*/
 void LinceCreateTileAnim(LinceTileAnim* anim);
-// Animates by time dt
+
+/** @brief Updates animation by one timestep */
 void LinceUpdateTileAnim(LinceTileAnim* anim, float dt);
-// Resets clock and frames to initial conditions
+
+/** @brief Resets clock and frames to initial conditions */
 void LinceResetTileAnim(LinceTileAnim* anim);
-// Frees animation data
+
+/** @brief Frees allocated data within the object,
+* but the user is responsible for deallocating the object itself
+* if it was allocated.
+*/
 void LinceDeleteTileAnim(LinceTileAnim* anim);
 
 

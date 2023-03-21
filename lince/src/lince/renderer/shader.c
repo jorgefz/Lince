@@ -91,10 +91,6 @@ void LinceUnbindShader(void){
 	glUseProgram(0);
 }
 
-/* Provides string identifier of the shader */
-const char* LinceGetShaderName(LinceShader* shader){
-	return shader->name;
-}
 
 /* Destroys and deallocates given shader */
 void LinceDeleteShader(LinceShader* shader){

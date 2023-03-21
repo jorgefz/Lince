@@ -31,7 +31,7 @@
 5. Physics
 	1. Add simple box colliders ✅
 	2. Add an efficient nearest-neighbour algorithm
-6. Editor
+6. Editor 💛
 	1. Program to create, modify, and delete entities during runtime.
 
 
@@ -40,7 +40,7 @@
 2. 🟠 Create test suite for the engine
 3. 🟠 Improve documentation - perhaps move to a separate github repo.
 4. 💛 Restructure engine to be in a separate folder, that can be included into the user's main game project.
-	* Feasible, but requires user to copy settings on premake5 file into their own build script, and fix issue with path to font files used by the engine's UI manager.
+	* Feasible, but requires user to copy settings on premake5 file into their own build script, and re-define custom LINCE\_DIR.
 5. 💛 Add benchmarking and identify slowest pieces of code that can be optimized.
 6. 💛 Improve code speed & efficiency
 

@@ -32,11 +32,8 @@ typedef struct LinceMouseMovedEvent {
 * or a touchpad gesture is made.
 */
 typedef struct LinceMouseScrolledEvent {
-    float xoff; ///< New X scroll offset.
-                ///< X-axis scrolling possible with a touchpad.
-    float yoff; ///< New Y scroll offset.
-                ///< Specific values vary between machines.
-                ///< Typically, negative is down, and positive is up.
+    float xoff; ///< New X scroll offset. X-axis scrolling possible with a touchpad.
+    float yoff; ///< New Y scroll offset. Specific values vary between machines. Typically, negative is down, and positive is up.
 } LinceMouseScrolledEvent;
 
 /** @brief Initialises a mouse button press event */

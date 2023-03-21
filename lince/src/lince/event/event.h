@@ -50,8 +50,7 @@ typedef union LinceEventData {
 typedef struct LinceEvent {
     LinceEventType type;        ///< Trigger
     char name[LINCE_NAME_MAX];  ///< Event string representation
-    LinceBool handled;          ///< Set to tru if program has responded
-                                ///< and you don't want to propagate it further.
+    LinceBool handled;          ///< Set to tru if program has responded and you don't want to propagate it further.
     LinceEventData data;        ///< Specific data to the event, e.g. key code.
 } LinceEvent;
 

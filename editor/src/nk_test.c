@@ -6,12 +6,12 @@ static void NKLayerOnUpdate(LinceLayer* layer, float dt){
     LinceUILayer* ui = LinceGetAppState()->ui;
     struct nk_context *ctx = ui->ctx;
     static struct nk_colorf bg = {0.1, 0.18, 0.24, 1.0};
-    uint32_t window_width = LinceGetAppState()->window->width;
+    // uint32_t window_width = LinceGetAppState()->window->width;
     uint32_t window_height = LinceGetAppState()->window->height;
 
-    LinceUIText(ui, "Text1", 10, 10, LinceFont_Droid30, 10, "FPS %.0f", 1000.0/dt);
-    LinceUIText(ui, "Text2", 10, 40, LinceFont_Droid30, 10, "%.2f ms", dt);
-    LinceUIText(ui, "Title", (float)window_width/2-200, 50, LinceFont_Droid30, 30, "The Legend of Cheesus Christ");
+    // LinceUIText(ui, "Text1", 10, 10, LinceFont_Droid30, 10, "FPS %.0f", 1000.0/dt);
+    // LinceUIText(ui, "Text2", 10, 40, LinceFont_Droid30, 10, "%.2f ms", dt);
+    // LinceUIText(ui, "Title", (float)window_width/2-200, 50, LinceFont_Droid30, 30, "The Legend of Cheesus Christ");
 
     nk_style_set_font(ui->ctx, &ui->fonts[LinceFont_Droid15]->handle);
     if (nk_begin(ctx, "Demo", nk_rect(50, 50, 230, 250),

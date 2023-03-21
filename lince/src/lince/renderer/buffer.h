@@ -1,19 +1,19 @@
+/** @file buffer.h
+* Vertex buffers store information on the properties of vertices
+* rendered on the screen.
+* This could include its position, color, texture coordinates, etc.
+*
+* A buffer element represents one of these properties.
+* For instance, position could be represented as an array of two floats (x and y).
+* Color, an array of four floats (r, g, b, and alpha).
+* A buffer element also tells you what its place is
+* within the vertex buffer layout.
+*/
+
 #ifndef LINCE_BUFFER_H
 #define LINCE_BUFFER_H
 
 #include "lince/core/core.h"
-
-/** @file buffer.h
-    Vertex buffers store information on the properties of vertices
-    rendered on the screen.
-    This could include its position, color, texture coordinates, etc.
-
-    A buffer element represents one of these properties.
-    For instance, position could be represented as an array of two floats (x and y).
-    Color, an array of four floats (r, g, b, and alpha).
-    A buffer element also tells you what its place is
-    within the vertex buffer layout.
-*/
 
 /** @enum LinceBufferType
 * @brief Allowed data types for buffer elements
@@ -110,16 +110,16 @@ typedef struct LinceIndexBuffer {
     uint32_t count;  ///< number of indices
 } LinceIndexBuffer;
 
-/** Create an index buffer with a given set of vertex indices */
+/** @brief Create an index buffer with a given set of vertex indices */
 LinceIndexBuffer LinceCreateIndexBuffer(uint32_t* data, uint32_t count);
 
-/** Binds an index buffer for rendering */
+/** @brief Binds an index buffer for rendering */
 void LinceBindIndexBuffer(LinceIndexBuffer ib);
 
-/** Unbinds any index buffer currently bound (if any) */
+/** @brief Unbinds any index buffer currently bound (if any) */
 void LinceUnbindIndexBuffer();
 
-/** Removes an index buffer from memory */
+/** @brief Removes an index buffer from memory */
 void LinceDeleteIndexBuffer(LinceIndexBuffer ib);
 
 

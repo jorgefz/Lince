@@ -1,13 +1,16 @@
 
-/*
+/** @file audio.h
 
-    LINCE AUDIO API
+The audio library can manage two types of sounds.
 
+- Buffered sounds are entirely loaded onto memory. Best for sounds shorter than 5 sec.
+- Streamed sounds are simultaneously read and played. Best for music or sounds longer than 5 sec.
 
-Example Program:
+Example code:
 
-    // On Init
+```c
 
+void OnInit(){
     LinceAudioEngine* audio_engine;
     LinceSoundManager* sound_manager;
     LinceSound *music;
@@ -17,27 +20,26 @@ Example Program:
 
     audio_engine = LinceCreateAudioEngine();
     sound_manager = LinceCreateSoundManager(audio_engine, "meow.wav");
-    music = LinceLoadStream(audio_engine, "music.wav");
-
-    // -- play background music
     
+    // -- play background music
+    music = LinceLoadStream(audio_engine, "music.wav");
     music->config.volume = 0.3f;
     LinceUpdateSound(music);
     LincePlaySound(music);
+}
 
-    // On Update
-
-    if( nk_button(...) ){
+void OnUpdate(){
+    if( button_press(...) ){
         // Play a sound
         LinceSpawnSound(audio_engine, sound_manager, &sound_config);
     }
+}
 
-    // On Terminate
-
+void OnTerminate(){
     LinceDeleteSoundManager(sound_manager);
     LinceDeleteSound(music);
     LinceTerminateAudioEngine(audio_engine);
-
+}
 */
 
 
@@ -67,7 +69,7 @@ typedef struct LinceSoundConfig {
 } LinceSoundConfig;
 
 /** @struct LinceSound
-* @brief Sound instance that plays an audio file.
+* @brief Sound instance that plays one audio file.
 * To play the same sound simultaneously, create several LinceSound objects,
 * or use the LinceSoundManager.
 */
@@ -80,6 +82,13 @@ typedef struct LinceSound{
 
 /** @struct LinceSoundManager
 * @brief Stores sound objects from the same sound file for simultaneous playing
+*
+* Object that can spawn and play sound instances at will,
+* allowing to play the same sound simultaneously
+* without having to manually create and manage separate LinceSound instances.
+* When spawning a sound, it first checks whether another cached sound instance
+* is stopped or has finished playing and recycles it.
+* Otherwise, it creates a new instance.
 */
 typedef struct LinceSoundManager{
     array_t sound_cache;      ///< array_t<LinceSound>, sound instances
@@ -89,16 +98,18 @@ typedef struct LinceSoundManager{
 
 /** @struct LinceAudioEngine
 * @brief Holds the underlying state for miniaudio sound management
+*
+* The audio engine is used by the Miniaudio backend to open sound files,
+* communicate with the OS, and keep track of all loaded sounds.
+* It must be created before any sound is loaded, and destroyed
+* when all sounds have been deleted.
 */
 typedef struct LinceAudioEngine {
-    void* handle; // miniaudio handle for `ma_engine`
+    void* handle; ///< miniaudio handle for `ma_engine`
 } LinceAudioEngine;
 
 
 /** @brief Initialises an audio engine.
-* The audio engine is used by the Miniaudio backend to open sound files,
-* communicate with the OS, and keep track of all loaded sounds.
-* It must be created before any sound is loaded, and destroyed when all sounds have been deleted.
 */
 LinceAudioEngine* LinceCreateAudioEngine(void);
 
@@ -106,8 +117,7 @@ LinceAudioEngine* LinceCreateAudioEngine(void);
 void LinceDeleteAudioEngine(LinceAudioEngine* audio);
 
 
-/**
-* Returns the default initialisation settings for sounds:
+/** @brief Returns the default initialisation settings for sounds:
 *   volume = 1.0f,
 *   pitch  = 1.0f,
 *   pan    = 0.0f,

@@ -43,13 +43,10 @@ typedef struct LinceApp{
     LinceLayerStack *layer_stack;   ///< Array of rendering layers.
     LinceLayerStack *overlay_stack; ///< Array of rendering overlays (drawn after layers).
     LinceBool        running;       ///< True if the application is active.
-    float time_ms;          ///< Run time in milliseconds.
-    float dt;               ///< Frame time step in milliseconds.
-    int current_layer;      /**< Index of the active layer (during OnUpdate or OnEvent).
-                            * This is `-1` if no layer is active.
-                            */
-    int current_overlay;    /**< Index of the active overlay, akin to the current layer.
-                            */
+    float time_ms;       ///< Run time in milliseconds.
+    float dt;            ///< Frame time step in milliseconds.
+    int current_layer;   ///< Index of the active layer (during OnUpdate or OnEvent). This is `-1` if no layer is active.
+    int current_overlay; ///< Index of the active overlay, akin to the current layer.
 
     /* UI */
     LinceUILayer* ui;   ///< State of the GUI, e.g. Nuklear's context.

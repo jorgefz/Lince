@@ -10,6 +10,7 @@ LinceBool LinceBoxColliderContains(LinceBoxCollider* box1, LinceBoxCollider* box
     );
 }
 
+/*
 LinceBool LinceBoxColliderIntersects(LinceBoxCollider* box1, LinceBoxCollider* box2){
     return !(
         box1->x - box1->w/2.0f >= box2->x + box2->w/2.0f ||
@@ -18,6 +19,7 @@ LinceBool LinceBoxColliderIntersects(LinceBoxCollider* box1, LinceBoxCollider* b
         box1->y - box1->h/2.0f <= box2->y + box2->h/2.0f
     );
 }
+*/
 
 LinceBool LinceBoxCollides(LinceBoxCollider* rect1, LinceBoxCollider* rect2){
     return (
@@ -28,8 +30,7 @@ LinceBool LinceBoxCollides(LinceBoxCollider* rect1, LinceBoxCollider* rect2){
     );
 }
 
-// LinceUpdateBoxCollider
-/// TODO: Improve neighbour search algorithm - use Quad Tree
+
 void LinceCalculateEntityCollisions(LinceEntityRegistry* reg, array_t* entities, int box_component_id){
     uint32_t query_num = entities->size;
 

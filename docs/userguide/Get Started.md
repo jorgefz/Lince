@@ -43,7 +43,7 @@ int main(){
 ```
 
 
-## On Update
+## Update your window
 
 To start working on your game and drawing stuff to the screen,
 you should provide the application with a callback function (such as `OnUpdate`

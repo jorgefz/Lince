@@ -7,66 +7,119 @@
 
 #include "lince/containers/hashmap.h"
 
-
+/** @struct shader */
 typedef struct LinceShader {
-	uint32_t id; // opengl id
-	char name[LINCE_NAME_MAX]; // name, normally based on source file
-	hashmap_t uniforms;   // cache of uniforms
+	uint32_t id; 				///< OpenGL program id
+	char name[LINCE_NAME_MAX]; 	///< Name, normally based on the source file
+	hashmap_t uniforms;   		///< Cache of uniform names and values
 } LinceShader;
 
-/* Create shader from paths to vertex and fragment shader source files */
+/** @brief Create and compile shader from source code files */
 LinceShader* LinceCreateShader(
-	const char* name,
-	const char* vertex_path,
-	const char* fragment_path
+	const char* name,			///< Shader string identifier
+	const char* vertex_path,	///< Path to vertex shader source code
+	const char* fragment_path	///< Path to fragment shader source code
 );
 
-/* Create shader from source code of vertex and fragment shaders */
+/** @brief  Create and compile shader from source code as strings */
 LinceShader* LinceCreateShaderFromSrc(
-	const char* name,
-	const char* vertex_src,
-	const char* fragment_src
+	const char* name,			///< Shader string identifier
+	const char* vertex_src,		///< Vertex source code as a char array
+	const char* fragment_src	///< Fragment source code as a char array
 );
 
+/* Load shader from cached binary file */
+// LinceShader* LinceLoadShaderFromCache(const char* name, const char* bin_path);
+
+/* Save shader in memory to cache binary file */
+// void LinceCacheShader(LinceShader* shader, const char* bin_path);
+
+/** @brief Bind shader for use in rendering */
 void LinceBindShader(LinceShader* shader);
+
+/** @brief Unbinds the active shadern (if any) */
 void LinceUnbindShader(void);
 
-/* Provides string identifier of the shader */
-const char* LinceGetShaderName(LinceShader* shader);
-
-/* Destroys and deallocates given shader */
+/** @brief Destroys and deallocates given shader */
 void LinceDeleteShader(LinceShader* shader);
 
-/*
-Uniform functions.
-Ensure a shader is bound before using these functions
+/** @brief Returns OpenGL ID of given uniform name, and -1 if it doesn't exist.
+* Requires shader to be bound.
 */
-/* Returns OpenGL ID of given uniform name, and -1 if it doesn't exist */
-int LinceGetShaderUniformID(LinceShader* shader, const char* name);
+int LinceGetShaderUniformID(LinceShader* shader, const char* uniform_name);
 
-/* Set integer uniform */
+/** @brief Set an uniform of integer type.
+* If the uniform was already set, its value is overwritten.
+* Requires shader to be bound.
+* @param sh shader for which to modify uniform.
+* @param name Uniform string name
+* @param val Value of the uniform
+*/
 void LinceSetShaderUniformInt(LinceShader* sh, const char* name, int val);
 
-/* Set integer array uniform */
+/** @brief Set an uniform with an array of integers.
+* If the uniform was already set, its value is overwritten.
+* Requires shader to be bound.
+* @param sh shader for which to modify uniform.
+* @param name Uniform string name
+* @param arr Array of values
+* @param count Number of values in the array
+*/
 void LinceSetShaderUniformIntN( LinceShader* sh, const char* name,
 	int* arr, uint32_t count);
 
-/* Set float uniform */
+/** @brief Set an uniform with a float value.
+* If the uniform was already set, its value is overwritten.
+* Requires shader to be bound.
+* @param sh shader for which to modify uniform.
+* @param name Uniform string name
+* @param val Value of the uniform
+*/
 void LinceSetShaderUniformFloat(LinceShader* sh, const char* name, float val);
 
-/* Set vec2 uniform */
+/** @brief Set an uniform with a 2-float vector.
+* If the uniform was already set, its value is overwritten.
+* Requires shader to be bound.
+* @param sh shader for which to modify uniform.
+* @param name Uniform string name
+* @param v Value of the uniform using cglm `vec2`.
+*/
 void LinceSetShaderUniformVec2(LinceShader* sh, const char* name, vec2 v);
 
-/* Set vec3 uniform */
+/** @brief Set an uniform with a 3-float vector.
+* If the uniform was already set, its value is overwritten.
+* Requires shader to be bound.
+* @param sh shader for which to modify uniform.
+* @param name Uniform string name
+* @param v Value of the uniform using cglm `vec3`.
+*/
 void LinceSetShaderUniformVec3(LinceShader* sh, const char* name, vec3 v);
 
-/* Set vec4 uniform */
+/** @brief Set an uniform with a 4-float vector.
+* If the uniform was already set, its value is overwritten.
+* Requires shader to be bound.
+* @param sh shader for which to modify uniform.
+* @param name Uniform string name
+* @param v Value of the uniform using cglm `vec4`.
+*/
 void LinceSetShaderUniformVec4(LinceShader* sh, const char* name, vec4 v);
 
-/* Set mat3 uniform */
+/** @brief Set an uniform with a 3x3 float matrix.
+* If the uniform was already set, its value is overwritten.
+* Requires shader to be bound.
+* @param sh shader for which to modify uniform.
+* @param name Uniform string name
+* @param v Value of the uniform using cglm `mat3`.
+*/
 void LinceSetShaderUniformMat3(LinceShader* sh, const char* name, mat3 m);
 
-/* Set mat4 uniform */
+/** @brief Set an uniform with a 4x4 float matrix.
+* If the uniform was already set, its value is overwritten.
+* Requires shader to be bound.
+* @param sh shader for which to modify uniform.
+* @param name Uniform string name
+* @param v Value of the uniform using cglm `mat4`.
+*/
 void LinceSetShaderUniformMat4(LinceShader* sh, const char* name, mat4 m);
 
 #endif /* LINCE_SHADER_H */

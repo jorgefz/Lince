@@ -6,6 +6,10 @@
 #include "nuklear_flags.h"
 #include "nuklear.h"
 
+/** @enum LinceFonts
+* @brief Indices of preloaded fonts by the engine,
+* with their sizes in pt.
+*/
 typedef enum LinceFonts {
     LinceFont_Droid15 = 0,
     LinceFont_Droid20,
@@ -14,37 +18,37 @@ typedef enum LinceFonts {
     LinceFont_Count
 } LinceFonts;
 
+/** @struct LinceUILayer
+* @brief Holds Nuklear state allowing to draw GUI.
+*/
 typedef struct LinceUILayer {
-    struct nk_context *ctx;
-    void *glfw;
-	void *glfw_window;
-    struct nk_font* fonts[LinceFont_Count];
+    struct nk_context *ctx; ///< Nuklear context
+    void *glfw;             ///< GLFW backend for Nuklear
+	void *glfw_window;      ///< GLFW window handle for Nuklear
+    struct nk_font* fonts[LinceFont_Count]; ///< Preloaded fonts
 } LinceUILayer;
 
-/* Initialise UI state and Nuklear rendering context */
+/** @brief Initialise UI state and Nuklear rendering context
+* @param glfw_window GLFw window handle from LinceWindow.
+* @todo Change input handle to LinceWindow.
+*/
 LinceUILayer* LinceInitUI(void* glfw_window);
 
-/* Initialise Nuklear's render queue */
+/** @brief Initialise Nuklear's render queue.
+* Any GUI draw calls must be bracketed between LinceBeginUIRender and LinceEndUIRender.
+*/
 void LinceBeginUIRender(LinceUILayer* ui);
 
-/* Close and submit render queue */
+/** @brief Close and submit Nuklear's render queue.
+* Any GUI draw calls must be bracketed between LinceBeginUIRender and LinceEndUIRender.
+*/
 void LinceEndUIRender(LinceUILayer* ui);
 
-/* Passes key and scroll events to Nuklear */
+/** @brief Passes key and mouse input events to Nuklear */
 void LinceUIOnEvent(LinceUILayer* ui, LinceEvent* event);
 
-/* Destroy Nuklear rendering context */
+/** @brief Destroy Nuklear rendering context */
 void LinceTerminateUI(LinceUILayer* ui);
 
-/* Draws text to the screen */
-void LinceUIText(
-    LinceUILayer* ui,    /* UI state */
-    const char* name,     /* Unique name for the Nuklear object */
-    float x, float y,    /* position of the text in pixels */
-    LinceFonts font,     /* font and fontsize of the text */
-    size_t max_size,     /* max characters to render */
-    const char* text,    /* string to render */
-    ...                  /* varargs */
-);
 
 #endif

@@ -12,6 +12,7 @@ Version codes follow [Semantic Versioning](https://semver.org/).
 - Added logging
 - Improved tile animations and tilemaps
 - Re-made the editor
+- Added Doxygen docs to the project
 
 ## v0.6.0
 - Added ECS

@@ -5,7 +5,7 @@
 #include "lince/renderer/shader.h"
 #include "cglm/vec2.h"
 
-/*
+/* NOT FOR DOXYGEN
 Simplest tilemap:
 - array of sprites
 
@@ -50,32 +50,44 @@ struct Tilemap {
 
 */
 
+
+/** @struct LinceTilemap
+* @brief Holds data for a grid of sprites whose textures
+* are picked from a common tileset.
+* @todo If the same tileset is used in many other places,
+* allow user to specify tile array instead of texture.                     
+* @todo Add '-1' index for an 'empty' tile for which to generate no sprite,
+* useful for sparse tilemaps e.g. that contain some trees or overlays
+*/
 typedef struct LinceTilemap{
-    LinceTexture* texture; // texture tileset
-    vec2 cellsize;   // size in pixels of a tile in the texture
-    array_t tiles;   // array<LinceTile>: tiles' coordinates on the texture
-                     // TODO: If the same tileset is used in many other places,
-                     // allow user to specify tile array instead of texture.
-    array_t sprites; // array<LinceSprite>: tile sprites to render
+    LinceTexture* texture; ///< Origin texture from which to pick tiles.
+    vec2 cellsize; ///< Size in pixels of a tile in the texture
+    array_t tiles; ///< array<LinceTile>: each tile contains texture coordinates.
+    array_t sprites; ///< array<LinceSprite>: sprites to render generated from tiles
 
-    vec2 offset; // position offset from world origin
-                 // by default, tilemap lower left corner is the origin
-    vec2 scale;  // scale of individual tiles - default is (1,1)
-    float zorder;
+    vec2 offset;  ///< position offset from world origin. By default, tilemap lower left corner is the origin
+    vec2 scale;   ///< scale of individual tiles - default is (1,1)
+    float zorder; ///< Depth value at which to draw the tilemap
 
-    // Add '-1' index for an 'empty' tile for which to generate no sprite,
-    // useful for sparse tilemaps e.g. that contain some trees or overlays
+    uint32_t width;  ///< Width of the map in tiles
+    uint32_t height; ///< Height of the map in tiles
+    uint32_t* grid;  ///< Indices for which tile to draw at each map location
 
-    uint32_t width, height; // dimensions of the map in tiles
-    uint32_t* grid;         // indices for tiles
-
-    // CallbackFn on_teleport(this, target-tilemap, trigger, ...)
 } LinceTilemap;
 
+/** @brief Initialise tilemap using settings and data pre-defined by the user,
+* and provided via the passed handle.
+*/
 void LinceInitTilemap(LinceTilemap* map);
 
+/** @brief Delete memory allocated within the object, but not the object itself */
 void LinceUninitTilemap(LinceTilemap* tm);
 
+/** @brief Simple helper function that iterates through tilemap->sprites
+* calling `LinceDrawTilemap` on each.
+* @param tm tilemap to draw
+* @param shader Shader to use when rendering
+*/
 void LinceDrawTilemap(LinceTilemap* tm, LinceShader* shader);
 
 #endif /* LINCE_TILEMAP_H */

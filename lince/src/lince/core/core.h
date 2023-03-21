@@ -37,7 +37,6 @@ Note that these do not apply to the containers (e.g. array, hashmap, list).
 | LINCE_REALLOC | Custom version of `realloc` |
 | LINCE_FREE    | Custom version of `free`    |
 
-
 */
 
 

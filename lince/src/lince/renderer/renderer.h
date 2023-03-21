@@ -1,3 +1,9 @@
+/** @file renderer.h
+* In order to draw stuff to the screen,
+* enclose your draw calls between `LinceBeginScene` and `LinceEndScene`,
+* and submit sprites with `LinceDrawSprite`.
+*/
+
 #ifndef LINCE_RENDERER_H
 #define LINCE_RENDERER_H
 
@@ -9,62 +15,65 @@
 #include "lince/core/window.h"
 #include "lince/tiles/tileset.h"
 
-/*
-Calculates the z-order based on the 'y' value of the position.
-    - `float y`: y coordinate
-    - `vec2 ylim`: limits on the value of 'y' (min and max)
-    - `vec2 zlim`: limits on the value of 'z' (min and max)
-
-Equation for normalising a number in a range to another range:
-    xnorm = (bmax - bmin) * (x - amin) / (amax - amin) + bmin
+/** @brief Calculates the z-order based on the 'y' value of the position,
+* such that objects at lower 'y' are drawn objects at higher 'y'.
+* @param y y-coordinate
+* @param ylim limits (min,max) on the value of y
+* @param zlim limits (min,max) on the value of the depth
+* @returns the z depth value 
+*
+* Equation for normalising a number in a range `a` to another range `b`:
+*   `xnorm = (bmax - bmin) * (x - amin) / (amax - amin) + bmin`
 */
 float LinceYSortedZ(float y, vec2 ylim, vec2 zlim);
 
-/* Quad properties, serves as argument for LinceRenderQuad */
+/** @struct LinceSprite
+* @brief Visual and spatial properties of a rectangle.
+*/
 typedef struct LinceSprite{
-	float x, y; 			// 2D position
-	float w, h; 			// width, height
-	float zorder; 			// order of rendering
-	float rotation; 		// clockwise rotation in degrees
-	float color[4]; 		// flat quad color - rgba
-	LinceTexture* texture;
-	LinceTile* tile;
+	float x, y; 			///< 2D position
+	float w, h; 			///< Width and height
+	float zorder; 			///< Depth, order of rendering
+	float rotation; 		///< Clockwise rotation in degrees
+	float color[4]; 		///< Flat color in RGBA format
+	LinceTexture* texture;	///< LinceTexture object. If NULL, only colour is used.
+	LinceTile* tile;		///< LinceTile or subtexture. If NULL, full texture is used.
 } LinceSprite;
 
-/* Initialises renderer state and openGL rendering settings */
+/** @brief Initialises renderer state and openGL rendering settings */
 void LinceInitRenderer();
 
-/* Terminates renderer state and frees allocated memory */
+/** @brief Terminates renderer state and frees allocated memory */
 void LinceTerminateRenderer();
 
-/* Begins rendering scene */
+/** @brief Begins a rendering scene and initialsies batch buffers
+* @param cam Camera required for the view-projection matrix
+*/
 void LinceBeginScene(LinceCamera* cam);
 
-/* Renders scene and flushes batch buffers */
+/** @brief Renders scene and flushes batch buffers to the screen */
 void LinceEndScene();
 
-/* Submits a quad for rendering
-C99 standard guarantees that uninitialised members
-are set to zero if at least one has been initialised
-within the brace-enclosed list.
+/** @brief Submits a recangle sprite for rendering
+* @param sprite Sprite to render
+* @param shader LinceShader to bind. If NULL, a default minimal shader is used.
 */
-void LinceDrawSprite(LinceSprite* props, LinceShader* shader);
+void LinceDrawSprite(LinceSprite* sprite, LinceShader* shader);
 
-
-/* Draws provided vertices directly */
+/** @brief Draws provided vertices directly */
 void LinceDrawIndexed(
 	LinceShader* shader,
 	LinceVertexArray* va,
 	LinceIndexBuffer vb
 );
 
-/* Empties screen buffer */
+/** @brief Empties screen buffer */
 void LinceClear();
 
-/* Sets the default screen color */
+/** @brief Sets the default background screen color */
 void LinceSetClearColor(float r, float g, float b, float a);
 
-/* Draw stored vertices and create new vertex batch */
+/** @brief Draw stored vertices and clear vertex batch */
 void LinceStartNewBatch();
 
 

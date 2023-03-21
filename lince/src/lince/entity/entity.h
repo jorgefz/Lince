@@ -37,8 +37,7 @@ typedef enum LinceEntityState {
 */
 typedef struct LinceEntityRegistry {
     uint32_t component_count;    ///< Number of defined components
-    uint32_t max_components;     ///< Maximum number of components,
-                                 ///< tweaked with LINCE_MAX_ENTITY_COMPONENTS_U64_COUNT
+    uint32_t max_components;     ///< Maximum number of components, tweaked with LINCE_MAX_ENTITY_COMPONENTS_U64_COUNT
     array_t  component_sizes;    ///< array<uint32_t> -> size in bytes of each defined component
     array_t  component_offsets;  ///< array<uint32_t> -> byte offsets between components in an entity
 
