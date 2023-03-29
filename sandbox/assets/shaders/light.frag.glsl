@@ -18,7 +18,7 @@ struct PointLight {
 };
 
 #define MAX_POINT_LIGHTS 32
-uniform vec4 uAmbientLight = vec4(1.0, 1.0, 1.0, 1.0)*0.7;
+uniform vec4 uAmbientLight = vec4(1.0, 1.0, 1.0, 1.0);
 uniform vec2 uPointLightPositions[MAX_POINT_LIGHTS];
 uniform float uPointLightCount = 0;
 // uniform PointLight uPointLights[MAX_POINT_LIGHTS];
@@ -26,7 +26,7 @@ uniform float uPointLightCount = 0;
 vec4 pointlight_brightness(vec2 light_pos){
     // Settings and parameters
     float diffuse = 0.7; // added light reflected from sources (0,1)
-    float visual_radius = 0.5; // visual (max) distance
+    float visual_radius = 0.15; // visual (max) distance
     float plaw = 2.5; // power law index for light spread
     vec4 diffuse_color = vec4(1.0, 0.5, 0.0, 1.0); // color of diffuse light
 

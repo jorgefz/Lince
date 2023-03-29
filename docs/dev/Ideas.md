@@ -2,6 +2,101 @@
 
 ## Lince Engine
 
+### Scene system
+
+A scene is a collection of entities and logic.
+How does one manage multiple scenes with their own logic?
+
+You could define each scene as a different type with custom data and a set of functions and logic to modify it. These could be related in a generic way with a `Scene` struct:
+```c
+struct Scene {
+    void *data;
+    void (*on_enter)(Scene* s);
+    void (*on_update)(Scene* s, float dt);
+    void (*on_draw)(Scene* s); // collect sprite components and draw, also tilemap
+    void (*on_exit)(Scene* s);
+    LinceEntityRegistry* reg;
+}
+```
+
+Different scenes would be managed with a `SceneStack`, where scenes are loaded on top of one another, and only the topmost one is updated and rendered.
+The state of other scenes in the stack would be saved in memory, though. This allows quick switching back to them.
+This assumes a hierarchial structure, where some scenes are 'on top' of others.
+For instance, the first scene would be the main menu, and the world and so on would be loaded on top. The topmost one could be a pause menu. 
+```c
+struct SceneStack {
+    array_t<Scene> scenes;
+    Scene* top;
+}
+
+void PushScene(SceneStack* stack, Scene* scene) {
+    array_push(stack, scene);
+}
+void PopScene(SceneStack* stack){
+    stack->top->on_exit(stack->top);
+    array_pop(stack);
+    stack->top = array_back(stack->scenes);
+}
+```
+
+An example of a custom scene integrated with this scheme would be:
+
+```c
+struct TownScene {
+    Tilemap *town_map;
+    array_t<uint32_t> static_sprites; // entity IDs: trees, etc
+    array_t<uint32_t> townsfolk; // people - sprites that move
+}
+
+void TownEnter(Scene* scene) {
+    TownScene town_data = {
+        .tilemap = LinceCreateTilemap("tilemap file"),
+        .static_sprites = { }
+        .townsfolk = { }
+    };
+    scene->data = LinceNewCopy(&town_data, sizeof(TownScene));
+}
+
+void TownUpdate(Scene* scene) {
+    // Move townsfolk
+    // Update camera entity, etc
+}
+
+void TownDraw(Scene* scene) {
+    // Collect and draw entities
+    // Draw tilemap
+    // FUTURE: If player enters e.g. house, fetch its scene and push it to top of stack.
+}
+
+void TownExit(Scene* scene) {
+    // Deallocate scene->data and set to NULL
+}
+
+void Init(){
+    Scene town_scene = {
+        .on_enter = TownEnter,
+        .on_exit = TownExit,
+        .on_update = TownUpdate,
+        .on_draw = TownDraw
+    }
+    PushScene(&scene)
+}
+
+void Update(){
+    Scene* top_scene = scene_stack->top;
+    top_scene->on_update(top_scene);
+    top_scene->on_draw(top_scene);
+}
+```
+
+How do scenes communicate with one another? How do you push a new scene from another scene?
+
+How do we make this compatible with serialisation?
+We would have to follow a similar approach to that of components:
+Write serialise `on_save` and deserialise `on_load` callbacks for each scene,
+and call each in turn.
+
+
 ### Serialise scenes and entities
 In order to save scenes (collections of entities) to file,
 and them load them up again, we need to provide the engine

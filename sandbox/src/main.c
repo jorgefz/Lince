@@ -7,18 +7,6 @@
 #include <lince/audio/audio.h>
 #include <lince/physics/boxcollider.h>
 
-
-#define QUADTREE_CHILDREN 4
-#define QUADTREE_NODE_CAPACITY 16 // max objects in node before it splits into children
-#define QUADTREE_MAX_DEPTH 8 // max node depth for quadtree
-
-typedef struct quadtree_container {
-    struct quadtree_container* parent;
-    struct quadtree_container* children[QUADTREE_CHILDREN];
-    vec2 key;
-    array_t objects;
-} quadtree_t;
-
 /*
 QueryEntities(registry, mode, result, ncomp, ...)
 
@@ -34,7 +22,7 @@ Change 2: results.
 
 
 #define MOVERS_SIZE 0.1f
-#define MOVERS_COUNT 5
+#define MOVERS_COUNT 0
 
 // WALKING
 enum WalkingAnims {
@@ -75,6 +63,7 @@ typedef struct GameData {
 
     // Tilemap test
     LinceTilemap mapgrid;
+    LinceTilemap citygrid;
     
 } GameData;
 
@@ -216,7 +205,7 @@ void SetupChickenAnimation(){
     LinceBoxCollider chicken_box = {
         .x=chicken_sprite.x, .y=chicken_sprite.y,
         .w=chicken_sprite.w, .h=chicken_sprite.h,
-        .dx=4e-3f, .dy=0.0, .flags = LinceBoxCollider_Bounce};
+        .dx=0.0, .dy=0.0, .flags = LinceBoxCollider_Bounce};
     LinceAddEntityComponent(game_data.reg, chicken_id, Component_Sprite, &chicken_sprite);
     LinceAddEntityComponent(game_data.reg, chicken_id, Component_BoxCollider, &chicken_box);
 
@@ -333,6 +322,10 @@ void MovePlayer(float dt){
     if(LinceIsKeyPressed(LinceKey_w)) pbox->dy =  vel * dt;
     if(LinceIsKeyPressed(LinceKey_s)) pbox->dy = -vel * dt;
 
+    // Update camera position to follow player
+    game_data.camera->pos[0] = pbox->x;
+    game_data.camera->pos[1] = pbox->y;
+
 }
 
 void GameStateInit(){
@@ -352,13 +345,14 @@ void GameStateInit(){
 
     // Entities
     game_data.reg = LinceCreateEntityRegistry(
-        3,
+        4,
         sizeof(LinceBoxCollider),
         sizeof(LinceSprite),
-        sizeof(LinceTileAnim)
+        sizeof(LinceTileAnim),
     );
 
     // --> walls
+    /*
     uint32_t walls[4];
     LinceBoxCollider wall_boxes[4] = {
         {.x =  0.0f, .y =  1.0f, .w =  2.0f, .h = 0.01f},
@@ -373,6 +367,7 @@ void GameStateInit(){
             .w=wall_boxes[i].w, .h=wall_boxes[i].h, .color={0,1,1,1}};
         LinceAddEntityComponent(game_data.reg, walls[i], Component_Sprite, &wall_sprite);   
     }
+    */
 
     // --> player
     LinceSprite sprite = {
@@ -386,6 +381,7 @@ void GameStateInit(){
     LinceAddEntityComponent(game_data.reg, game_data.player, Component_BoxCollider, &box);
 
     // --> static blocks
+    /*
     sprite.color[0] = 1.0;
     sprite.color[2] = 0.0;
     sprite.w *= 4.0f;
@@ -405,6 +401,7 @@ void GameStateInit(){
         LinceAddEntityComponent(game_data.reg, wall_entity, Component_Sprite, &sprite);
         LinceAddEntityComponent(game_data.reg, wall_entity, Component_BoxCollider, &obox);
     }
+    */
 
     // --> movers
     srand(time(NULL));
@@ -451,6 +448,24 @@ void GameStateInit(){
     };
     LinceInitTilemap(&game_data.mapgrid);
 
+    game_data.citygrid = (LinceTilemap){
+        .texture = LinceCreateTexture("tileset",
+            "sandbox/assets/textures/bricks.png"),
+        .cellsize = {32,32},
+        .scale = {0.4,0.4},
+        .offset = {-1, -1},
+        .width = 6,
+        .height = 6,
+        .grid = (uint32_t[]){
+           33,29,29,29,29,34,
+           30,36,36,43,43,31,
+           30,36,36,43,43,31,
+           30, 9, 9,12,12,31,
+           30, 9, 9,12,12,31,
+           32,28,28,28,28,35,
+        }
+    };
+    LinceInitTilemap(&game_data.citygrid);
 }
 
 void GameStateUpdate(float dt){
@@ -469,7 +484,8 @@ void GameStateUpdate(float dt){
     UpdateSpritePositions(game_data.reg);
     LinceDrawSprites(game_data.reg);
 
-    LinceDrawTilemap(&game_data.mapgrid, game_data.custom_shader);
+    // LinceDrawTilemap(&game_data.mapgrid, game_data.custom_shader);
+    LinceDrawTilemap(&game_data.citygrid, game_data.custom_shader);
 
     LinceEndScene();
 
@@ -533,6 +549,9 @@ void GameTerminate(){
     }
     
     array_uninit(&query);
+
+    LinceUninitTilemap(&game_data.mapgrid);
+    LinceUninitTilemap(&game_data.citygrid);
 
     LinceDestroyEntityRegistry(game_data.reg);
     LinceDeleteCamera(game_data.camera);

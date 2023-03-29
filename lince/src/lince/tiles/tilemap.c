@@ -32,9 +32,11 @@ void LinceInitTilemap(LinceTilemap* map){
     
     for(size_t j = 0; j != map->height; ++j){
         for(size_t i = 0; i != map->width; ++i){
+            float x = (float)i;
+            float y = map->height - (float)j - 1;
             LinceSprite sprite = {
-                .x = (float)i * map->scale[0] + map->offset[0] + map->scale[0]/2.0f,
-                .y = (float)j * map->scale[1] + map->offset[1] + map->scale[1]/2.0f,
+                .x = x * map->scale[0] + map->offset[0] + map->scale[0]/2.0f,
+                .y = y * map->scale[1] + map->offset[1] + map->scale[1]/2.0f,
                 .w = map->scale[0], .h = map->scale[1],
                 .color = {1,1,1,1}, .zorder = map->zorder,
                 .texture = map->texture,
