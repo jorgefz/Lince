@@ -2,7 +2,6 @@
 #include "components.h"
 
 void LinceInitScene(LinceScene* scene){
-    scene->reg = LinceCreateEntityRegistry(COMPONENT_SIZES);
     if(scene->on_init){
         scene->on_init(scene);
     }
@@ -12,7 +11,6 @@ void LinceUninitScene(LinceScene* scene){
     if(scene->on_delete){
         scene->on_delete(scene);
     }
-    LinceDestroyEntityRegistry(scene->reg);
 }
 
 LinceSceneStack* LinceCreateSceneStack(){

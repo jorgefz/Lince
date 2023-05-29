@@ -25,15 +25,14 @@ void LinceCalculateProjection(
 	glm_ortho(left, right, bottom, top, near, far, result);
 }
 
-LinceCamera* LinceCreateCamera(float aspect_ratio){
-	LINCE_PROFILER_START(timer);
-	LinceCamera *cam;
+
+void LinceInitCamera(LinceCamera* cam, float aspect_ratio){
 	mat4 proj;
 	LinceCalculateProjection(proj, -aspect_ratio, aspect_ratio, -1.0, 1.0);
-	cam = LinceCreateCameraFromProj(proj);
+	memmove(cam, &default_camera, sizeof(LinceCamera));
+	glm_mat4_copy(proj, cam->proj);
+	glm_mat4_mul(cam->proj, cam->view, cam->view_proj);
 	cam->aspect_ratio = aspect_ratio;
-	LINCE_PROFILER_END(timer);
-	return cam;
 }
 
 LinceCamera* LinceCreateCameraFromProj(mat4 proj){
@@ -44,6 +43,17 @@ LinceCamera* LinceCreateCameraFromProj(mat4 proj){
 	memcpy(cam, &default_camera, sizeof(LinceCamera));
 	glm_mat4_copy(proj, cam->proj);
 	glm_mat4_mul(cam->proj, cam->view, cam->view_proj);
+	LINCE_PROFILER_END(timer);
+	return cam;
+}
+
+LinceCamera* LinceCreateCamera(float aspect_ratio){
+	LINCE_PROFILER_START(timer);
+	LinceCamera *cam;
+	mat4 proj;
+	LinceCalculateProjection(proj, -aspect_ratio, aspect_ratio, -1.0, 1.0);
+	cam = LinceCreateCameraFromProj(proj);
+	cam->aspect_ratio = aspect_ratio;
 	LINCE_PROFILER_END(timer);
 	return cam;
 }

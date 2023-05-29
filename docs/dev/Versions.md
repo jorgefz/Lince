@@ -6,6 +6,10 @@ Version codes follow [Semantic Versioning](https://semver.org/).
 - Refactored minigames and editor
 - Move documentation and minigames to separate github repositories?
 
+## v0.7.1
+- Added functions to initialise camera without allocating heap memory.
+- Started working on the scene system on the sandbox
+
 ## v0.7.0
 - Added support for custom shaders in renderer
 - Moved minigames to a separate github repo

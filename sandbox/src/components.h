@@ -7,9 +7,11 @@ typedef enum Component {
     Component_Sprite,
     Component_Camera,
     Component_Shader,
+    
+    Component_Count
 } Component;
 
-#define COMPONENT_SIZES   2, \
+#define COMPONENT_SIZES   3, \
         sizeof(LinceSprite), \
         sizeof(LinceCamera), \
         sizeof(LinceShader)

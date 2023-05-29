@@ -41,10 +41,20 @@ void LinceCalculateProjection(
 	float bottom, float top
 );
 
-/** @brief Creates camera calculating projection from window aspect ratio */
+/** @brief Initialises a camera via the provided pointer.
+* The projection is calculated from the window aspect ratio.
+* The camera object is POD (plain-old-data)
+* and does not need to be uninitialised.
+*/
+void LinceInitCamera(LinceCamera* camera, float aspect_ratio);
+
+/** @brief Allocates a camera calculating the projection
+* from the window aspect ratio.
+* It must be freed with `LinceDeleteCamera`.
+*/
 LinceCamera* LinceCreateCamera(float aspect_ratio);
 
-/** @brief Creates camera with custom projection matrix */
+/** @brief Allocates a camera with a custom projection matrix */
 LinceCamera* LinceCreateCameraFromProj(mat4 proj);
 
 /** @brief Manually sets projection matrix */

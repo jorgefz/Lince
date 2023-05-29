@@ -6,7 +6,6 @@
 typedef struct LinceScene {
     // Data
     void* scene_data;
-    LinceEntityRegistry* reg;
     char name[LINCE_NAME_MAX];
 
     // Callbacks

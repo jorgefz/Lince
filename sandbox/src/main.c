@@ -46,7 +46,7 @@ typedef struct GameData {
     const char* music_file;
 
     // Rendering
-    LinceCamera* camera;
+    LinceCamera camera;
     LinceShader* custom_shader;
 
     // Entities
@@ -105,7 +105,7 @@ void AnimateWalking(float dt){
     direction |= LinceIsKeyPressed(LinceKey_d) * RIGHT;
 
     const float dr = dt * 1e-3;
-    vec2 next_pos = {game_data.camera->pos[0], game_data.camera->pos[1]};
+    vec2 next_pos = {game_data.camera.pos[0], game_data.camera.pos[1]};
 
     if (direction & UP){
         next_pos[1] += dr;
@@ -260,7 +260,7 @@ void LinceDrawSprites(LinceEntityRegistry* reg){
     
     LinceSprite* psprite = LinceGetEntityComponent(game_data.reg, game_data.player, Component_Sprite);
     vec2 player_pos = {psprite->x,psprite->y};
-    LinceTransformToScreen(game_data.camera->view_proj, player_pos, player_pos);
+    LinceTransformToScreen(game_data.camera.view_proj, player_pos, player_pos);
 
     LinceSetShaderUniformVec2(game_data.custom_shader, "uPointLightPositions[1]", player_pos);
     LinceSetShaderUniformFloat(game_data.custom_shader, "uPointLightCount", 2.0);
@@ -323,15 +323,17 @@ void MovePlayer(float dt){
     if(LinceIsKeyPressed(LinceKey_s)) pbox->dy = -vel * dt;
 
     // Update camera position to follow player
-    game_data.camera->pos[0] = pbox->x;
-    game_data.camera->pos[1] = pbox->y;
+    game_data.camera.pos[0] = pbox->x;
+    game_data.camera.pos[1] = pbox->y;
 
 }
 
 void GameStateInit(){
 
     // Resources
-    game_data.camera = LinceCreateCamera(LinceGetAspectRatio());
+    LinceInitCamera(&game_data.camera, LinceGetAspectRatio());
+    game_data.camera.zoom = 1.3f;
+
     game_data.custom_shader = LinceCreateShader(
         "CustomShader",
 		"sandbox/assets/shaders/light.vert.glsl",
@@ -349,6 +351,7 @@ void GameStateInit(){
         sizeof(LinceBoxCollider),
         sizeof(LinceSprite),
         sizeof(LinceTileAnim),
+        sizeof(LinceCamera)
     );
 
     // --> walls
@@ -454,15 +457,17 @@ void GameStateInit(){
         .cellsize = {32,32},
         .scale = {0.4,0.4},
         .offset = {-1, -1},
-        .width = 6,
-        .height = 6,
+        .width = 8,
+        .height = 8,
         .grid = (uint32_t[]){
-           33,29,29,29,29,34,
-           30,36,36,43,43,31,
-           30,36,36,43,43,31,
-           30, 9, 9,12,12,31,
-           30, 9, 9,12,12,31,
-           32,28,28,28,28,35,
+           66,66,66,66,66,66,66,66,
+           66,33,29,29,29,29,34,66,
+           66,30,36,36,43,43,31,66,
+           66,30,11,11,14,14,31,66,
+           66,30, 9, 9,12,12,31,66,
+           66,32,28,28,28,28,35,66,
+           66,66,66,66,66,66,66,66,
+           66,66,66,66,66,66,66,66,
         }
     };
     LinceInitTilemap(&game_data.citygrid);
@@ -471,16 +476,16 @@ void GameStateInit(){
 void GameStateUpdate(float dt){
 
     // Rendering
-    LinceResizeCameraView(game_data.camera, LinceGetAspectRatio());
-	LinceUpdateCamera(game_data.camera);
+    LinceResizeCameraView(&game_data.camera, LinceGetAspectRatio());
+	LinceUpdateCamera(&game_data.camera);
 
     // Tile animation test
     UpdateTileAnimations(dt);
 
-    LinceBeginScene(game_data.camera);
+    LinceBeginScene(&game_data.camera);
     LinceBindShader(game_data.custom_shader);
     LinceSetShaderUniformMat4(game_data.custom_shader,
-        "u_view_proj", game_data.camera->view_proj);
+        "u_view_proj", game_data.camera.view_proj);
     UpdateSpritePositions(game_data.reg);
     LinceDrawSprites(game_data.reg);
 
@@ -509,7 +514,7 @@ void GameStateUpdate(float dt){
             "FPS: %.1f", 1000.0f/dt
         );
         vec2 mouse;
-        LinceGetMousePosWorld(mouse, game_data.camera);
+        LinceGetMousePosWorld(mouse, &game_data.camera);
         nk_labelf(
             ctx, NK_TEXT_ALIGN_CENTERED,
             "%.2f %.2f", mouse[0], mouse[1]
@@ -554,7 +559,6 @@ void GameTerminate(){
     LinceUninitTilemap(&game_data.citygrid);
 
     LinceDestroyEntityRegistry(game_data.reg);
-    LinceDeleteCamera(game_data.camera);
     LinceDeleteShader(game_data.custom_shader);
     
     LinceDeleteSound(game_data.music);
