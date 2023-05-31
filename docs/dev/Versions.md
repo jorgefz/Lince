@@ -9,6 +9,8 @@ Version codes follow [Semantic Versioning](https://semver.org/).
 ## v0.7.1
 - Added functions to initialise camera without allocating heap memory.
 - Started working on the scene system on the sandbox
+- Fixed z sorting with translucency
+- ...
 
 ## v0.7.0
 - Added support for custom shaders in renderer

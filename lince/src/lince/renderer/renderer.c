@@ -1,3 +1,4 @@
+#include <stdlib.h>
 #include "core/profiler.h"
 #include "renderer/renderer.h"
 #include "renderer/camera.h"
@@ -249,8 +250,53 @@ void LinceFlushScene(){
 	LINCE_PROFILER_END(timer);
 }
 
+// Used in qsort to sort quads by their alpha value
+static int LinceSortQuadZorderAsc(const void *a, const void *b){
+	float z1 = ((const LinceQuadVertex*)(a))->z;
+	float z2 = ((const LinceQuadVertex*)(b))->z;
+	// return (z1 > z2) - (z1 < z2);
+	return z1 > z2 ? 1 : -1; // ascending
+}
+
+// Used in qsort to sort quads by their z position
+static int LinceSortQuadAlphaDesc(const void *a, const void *b){
+	float alpha1 = ((const LinceQuadVertex*)(a))->color[3];
+	float alpha2 = ((const LinceQuadVertex*)(b))->color[3];
+	// return (z1 > z2) - (z1 < z2);
+	return alpha2 > alpha1 ? 1 : -1; // descending
+}
+
+/*
+Enables depth test with translucency.
+Sorts quads such that opaque ones are drawn first,
+followed by translucent ones from back to front.
+See https://www.opengl.org/archives/resources/faq/technical/transparency.htm
+Also see https://learnopengl.com/Advanced-OpenGL/Blending
+*/
+static void LinceSortQuadsForBlending(){
+	/// TODO: avoid sorting by checking if no quads are transparent
+	LinceQuadVertex *batch = renderer_state.vertex_batch;
+	uint32_t count = renderer_state.quad_count;
+
+	// Sort quads by alpha (descending, so opaque ones first)
+	qsort(batch, count, sizeof(LinceQuadVertex)*4, LinceSortQuadAlphaDesc);
+
+	// Sort only the translucent quads (if any) by z distance
+	// (ascending - farthest to nearest)
+	uint32_t n_opaque = 0; // number of opaque quads
+	while(batch[n_opaque*4].color[3] == 1.0 && n_opaque != count){
+		n_opaque++;
+	}
+
+	if (n_opaque != count){
+		qsort(batch+n_opaque*4, count-n_opaque,
+			sizeof(LinceQuadVertex)*4, LinceSortQuadZorderAsc);
+	}
+}
+
+
 void LinceEndScene() {
-	// uint32_t size = (uint32_t)(renderer_state.quad_count * sizeof(LinceQuadVertex) * QUAD_VERTEX_COUNT);
+	LinceSortQuadsForBlending();
 	uint32_t size = (uint32_t)(MAX_VERTICES * sizeof(LinceQuadVertex));
 	LinceSetVertexBufferData(renderer_state.vb, renderer_state.vertex_batch, size);
 	LinceFlushScene();

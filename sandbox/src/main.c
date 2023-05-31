@@ -492,6 +492,20 @@ void GameStateUpdate(float dt){
     // LinceDrawTilemap(&game_data.mapgrid, game_data.custom_shader);
     LinceDrawTilemap(&game_data.citygrid, game_data.custom_shader);
 
+    // TEST TRANSLUCENCY
+    LinceDrawSprite(&(LinceSprite){
+        .x = -2, .y = -1,
+        .w = 0.5, .h = 0.5,
+        .color = {1, 0, 0, 0.4},
+        .zorder = 0.8
+    }, game_data.custom_shader);
+    LinceDrawSprite(&(LinceSprite){
+        .x = -2.1, .y = -1.1,
+        .w = 0.5, .h = 0.5,
+        .color = {0, 0, 1, 0.5},
+        .zorder = 0.7
+    }, game_data.custom_shader);
+
     LinceEndScene();
 
     // Move
