@@ -497,13 +497,13 @@ void GameStateUpdate(float dt){
         .x = -2, .y = -1,
         .w = 0.5, .h = 0.5,
         .color = {1, 0, 0, 0.4},
-        .zorder = 0.8
+        .zorder = 0.2
     }, game_data.custom_shader);
     LinceDrawSprite(&(LinceSprite){
         .x = -2.1, .y = -1.1,
         .w = 0.5, .h = 0.5,
-        .color = {0, 0, 1, 0.5},
-        .zorder = 0.7
+        .color = {1, 1, 0, 0.5},
+        .zorder = -0.1
     }, game_data.custom_shader);
 
     LinceEndScene();
