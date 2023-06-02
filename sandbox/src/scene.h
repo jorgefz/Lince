@@ -3,19 +3,21 @@
 
 #include <lince.h>
 
+struct LinceSceneStack;
+
 typedef struct LinceScene {
     // Data
-    void* scene_data;
+    void* data;
     char name[LINCE_NAME_MAX];
 
     // Callbacks
-    void (*on_init)  (struct LinceScene*); // init custom data
+    void (*on_init)  (struct LinceSceneStack* stack, struct LinceScene*);
     // void (*on_enter) (struct LinceScene*); // called when scene becomes active
-    void (*on_update)(struct LinceScene*, float dt); //called on every frame
-    void (*on_draw)  (struct LinceScene*); // called on draw
-    // void (*on_event) (struct LinceScene*, LinceEvent*); // called on input event
+    void (*on_update)(struct LinceSceneStack* stack, struct LinceScene*, float dt);
+    void (*on_draw)  (struct LinceSceneStack* stack, struct LinceScene*);
+    // void (*on_event) (struct LinceScene*, LinceEvent*);
     // void (*on_exit)  (struct LinceScene*); // called when scene becomes inactive
-    void (*on_delete)(struct LinceScene*); // free custom data
+    void (*on_delete)(struct LinceSceneStack* stack, struct LinceScene*);
 } LinceScene;
 
 typedef struct LinceSceneStack {
@@ -24,9 +26,9 @@ typedef struct LinceSceneStack {
 } LinceSceneStack;
 
 
-void LinceInitScene(LinceScene* scene);
+void LinceInitScene(LinceSceneStack* stack, LinceScene* scene);
 
-void LinceUninitScene(LinceScene* scene);
+void LinceUninitScene(LinceSceneStack* stack, LinceScene* scene);
 
 LinceSceneStack* LinceCreateSceneStack(void);
 

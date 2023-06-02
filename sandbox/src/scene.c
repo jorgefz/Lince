@@ -1,15 +1,15 @@
 #include "scene.h"
 #include "components.h"
 
-void LinceInitScene(LinceScene* scene){
+void LinceInitScene(LinceSceneStack* stack, LinceScene* scene){
     if(scene->on_init){
-        scene->on_init(scene);
+        scene->on_init(stack, scene);
     }
 }
 
-void LinceUninitScene(LinceScene* scene){
+void LinceUninitScene(LinceSceneStack* stack, LinceScene* scene){
     if(scene->on_delete){
-        scene->on_delete(scene);
+        scene->on_delete(stack, scene);
     }
 }
 
@@ -32,12 +32,12 @@ void LincePushScene(LinceSceneStack* stack, LinceScene* scene){
     LINCE_ASSERT(stack, "NULL argument");
     array_push_back(&stack->scenes, scene);
     stack->top = array_back(&stack->scenes);
-    LinceInitScene(stack->top);
+    LinceInitScene(stack, stack->top);
 }
 
 void LincePopScene(LinceSceneStack* stack){
     LINCE_ASSERT(stack && stack->top, "NULL argument");
-    LinceUninitScene(stack->top);
+    LinceUninitScene(stack, stack->top);
     array_pop_back(&stack->scenes);
     stack->top = array_back(&stack->scenes);
 }

@@ -544,7 +544,6 @@ void GameTerminate(){
     array_init(&query, sizeof(uint32_t));
 
     // Delete textures on entities
-    
     LinceSprite* s;
     LinceQueryEntities(game_data.reg, &query, 1, Component_Sprite);
     for(uint32_t i = 0; i != query.size; ++i){
@@ -647,6 +646,32 @@ void GameOnUpdate(float dt){
     // DrawSoundUI();
 }
 
+
+#include "test_scene.h"
+
+LinceSceneStack* scene_stack;
+
+void TestScenesInit() {
+    scene_stack = LinceCreateSceneStack();
+
+    LincePushScene(scene_stack ,&(LinceScene){
+        .on_init   = InitBlueScene,
+        .on_delete = UninitBlueScene,
+        .on_update = UpdateBlueScene,
+        .on_draw   = DrawBlueScene
+    });
+}
+
+void TestScenesUpdate(float dt) {
+    scene_stack->top->on_update(scene_stack, scene_stack->top, dt);
+    scene_stack->top->on_draw(scene_stack, scene_stack->top);
+}
+
+void TestScenesUninit(){
+    LinceDestroySceneStack(scene_stack);
+}
+
+
 void SetupApplication(){
     LinceApp* app = LinceGetAppState();
     
@@ -654,10 +679,11 @@ void SetupApplication(){
     app->screen_height = 720;
     app->title = "Sandbox";
     
-    app->game_init = GameInit;
-    app->game_on_update = GameOnUpdate;
-    app->game_terminate = GameTerminate;
+    app->game_init      = TestScenesInit;   // GameInit;
+    app->game_on_update = TestScenesUpdate; // GameOnUpdate;
+    app->game_terminate = TestScenesUninit; // GameTerminate;
 }
+
 
 int main(void) {
 
