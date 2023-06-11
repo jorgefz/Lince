@@ -6,11 +6,11 @@
 
 
 typedef struct BlueScene {
-    LinceCamera cam;
+    int dummy;
 } BlueScene;
 
 typedef struct RedScene {
-    LinceCamera cam;
+    int dummy;
 } RedScene;
 
 

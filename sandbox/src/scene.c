@@ -2,6 +2,7 @@
 #include "components.h"
 
 void LinceInitScene(LinceSceneStack* stack, LinceScene* scene){
+    LinceInitCamera(&scene->camera, LinceGetAspectRatio());
     if(scene->on_init){
         scene->on_init(stack, scene);
     }
@@ -40,4 +41,13 @@ void LincePopScene(LinceSceneStack* stack){
     LinceUninitScene(stack, stack->top);
     array_pop_back(&stack->scenes);
     stack->top = array_back(&stack->scenes);
+}
+
+void LinceUpdateSceneStack(LinceSceneStack* stack, float dt){
+    if(stack->top->on_update){
+        stack->top->on_update(stack, stack->top, dt);
+    }
+    if(stack->top->on_draw){
+        stack->top->on_draw(stack, stack->top);
+    }
 }

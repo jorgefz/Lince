@@ -648,23 +648,28 @@ void GameOnUpdate(float dt){
 
 
 #include "test_scene.h"
+#include "menu_scene.h"
 
 LinceSceneStack* scene_stack;
 
 void TestScenesInit() {
     scene_stack = LinceCreateSceneStack();
 
+    /*
     LincePushScene(scene_stack ,&(LinceScene){
         .on_init   = InitBlueScene,
         .on_delete = UninitBlueScene,
         .on_update = UpdateBlueScene,
         .on_draw   = DrawBlueScene
     });
+    */
+    LincePushScene(scene_stack ,&(LinceScene){
+        .on_draw = DrawMainMenu,
+    });
 }
 
 void TestScenesUpdate(float dt) {
-    scene_stack->top->on_update(scene_stack, scene_stack->top, dt);
-    scene_stack->top->on_draw(scene_stack, scene_stack->top);
+    LinceUpdateSceneStack(scene_stack, dt);
 }
 
 void TestScenesUninit(){
