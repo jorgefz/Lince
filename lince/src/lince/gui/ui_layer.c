@@ -40,7 +40,10 @@ LinceUILayer* LinceInitUI(void* glfw_window){
     ui->fonts[LinceFont_Droid30] = nk_font_atlas_add_from_file(atlas, LINCE_DIR"lince/assets/fonts/DroidSans.ttf", 30, 0);
     ui->fonts[LinceFont_Droid50] = nk_font_atlas_add_from_file(atlas, LINCE_DIR"lince/assets/fonts/DroidSans.ttf", 50, 0);
 
-    LINCE_ASSERT(ui->fonts[LinceFont_Droid15], "Failed to load font 'Droid'");
+    LINCE_ASSERT(ui->fonts[LinceFont_Droid15],
+        "Failed to load font at '%s'",
+        LINCE_DIR"lince/assets/fonts/DroidSans.ttf"
+    );
 
     nk_glfw3_font_stash_end(ui->glfw);
     
