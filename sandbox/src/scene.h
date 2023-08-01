@@ -23,10 +23,16 @@ typedef struct LinceScene {
     /* Callbacks */
     // Called when loaded and pushed onto stack
     void (*on_init)  (struct LinceSceneStack* stack, struct LinceScene*);
-    
+
+    // Called when the scene is popped or the stack is destroyed
+    void (*on_delete)(struct LinceSceneStack* stack, struct LinceScene*);
+
     // Called when it becomes active again (previous scene popped) 
     // void (*on_enter) (struct LinceScene*); // called when scene becomes active
     
+    // Called when another scene is pushed onto the stack
+    // void (*on_leave)  (struct LinceScene*); // called when scene becomes inactive
+
     // Called on every frame when active
     void (*on_update)(struct LinceSceneStack* stack, struct LinceScene*, float dt);
     
@@ -35,12 +41,7 @@ typedef struct LinceScene {
     
     // Called when an event is propagated
     // void (*on_event) (struct LinceScene*, LinceEvent*);
-    
-    // Called when another scene is pushed onto the stack
-    // void (*on_exit)  (struct LinceScene*); // called when scene becomes inactive
-    
-    // Called when it is popped or the stack is destroyed
-    void (*on_delete)(struct LinceSceneStack* stack, struct LinceScene*);
+
 } LinceScene;
 
 typedef struct LinceSceneStack {

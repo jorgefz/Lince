@@ -144,8 +144,8 @@ void AnimateWalking(float dt){
 }
 
 void SetupTileAnimData(){
-    game_data.walking_tileset = LinceCreateTexture("Walking",
-        "sandbox/assets/textures/elv-games-movement.png");
+    game_data.walking_tileset = LinceLoadTexture(
+        "sandbox/assets/textures/elv-games-movement.png", 0);
 
     // Set up texture coordinates for walking tile animation
     vec2 walk_texsize = {(float)game_data.walking_tileset->width,
@@ -434,8 +434,9 @@ void GameStateInit(){
     SetupChickenAnimation();
 
     game_data.mapgrid = (LinceTilemap){
-        .texture = LinceCreateTexture("tileset",
-            "sandbox/assets/textures/hilau_tilesets/6_floors.png"),
+        .texture = LinceLoadTexture(
+            "sandbox/assets/textures/hilau_tilesets/6_floors.png", 0
+        ),
         .cellsize = {32,32},
         .scale = {0.4,0.4},
         .offset = {-1, -1},
@@ -452,8 +453,8 @@ void GameStateInit(){
     LinceInitTilemap(&game_data.mapgrid);
 
     game_data.citygrid = (LinceTilemap){
-        .texture = LinceCreateTexture("tileset",
-            "sandbox/assets/textures/bricks.png"),
+        .texture = LinceLoadTexture(
+            "sandbox/assets/textures/bricks.png", 0),
         .cellsize = {32,32},
         .scale = {0.4,0.4},
         .offset = {-1, -1},
@@ -654,15 +655,6 @@ LinceSceneStack* scene_stack;
 
 void TestScenesInit() {
     scene_stack = LinceCreateSceneStack();
-
-    /*
-    LincePushScene(scene_stack ,&(LinceScene){
-        .on_init   = InitBlueScene,
-        .on_delete = UninitBlueScene,
-        .on_update = UpdateBlueScene,
-        .on_draw   = DrawBlueScene
-    });
-    */
     LincePushScene(scene_stack ,&(LinceScene){
         .on_draw = DrawMainMenu,
     });
