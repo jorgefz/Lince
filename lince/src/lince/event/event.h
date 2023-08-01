@@ -21,27 +21,32 @@ and then to the OnEvent callbacks of each of the overlays and layers.
 */
 typedef enum LinceEventType {
     LinceEventType_None = 0,
-    LinceEventType_WindowClose, LinceEventType_WindowResize,
-    LinceEventType_KeyPressed, LinceEventType_KeyReleased, LinceEventType_KeyType,
-    LinceEventType_MouseButtonPressed, LinceEventType_MouseButtonReleased,
-    LinceEventType_MouseMoved, LinceEventType_MouseScrolled,
-    LinceEventType_EventNum ///< number of pre-defined events
+    LinceEventType_WindowClose,
+    LinceEventType_WindowResize,
+    LinceEventType_KeyPress,
+    LinceEventType_KeyRelease,
+    LinceEventType_KeyType,
+    LinceEventType_MousePress,
+    LinceEventType_MouseRelease,
+    LinceEventType_MouseMove,
+    LinceEventType_MouseScroll,
+    LinceEventType_Count ///< number of pre-defined events
 } LinceEventType;
 
 /** @union LinceEventData
 * @brief Handy way of accessing specific event data without casting
 */
 typedef union LinceEventData {
-    struct LinceKeyPressedEvent*          KeyPressed;
-    struct LinceKeyReleasedEvent*         KeyReleased;
-    struct LinceKeyTypeEvent*             KeyType;
-    struct LinceWindowCloseEvent*         WindowClose;
-    struct LinceWindowResizeEvent*        WindowResize;
-    struct LinceMouseButtonPressedEvent*  MouseButtonPressed;
-    struct LinceMouseButtonReleasedEvent* MouseButtonReleased;
-    struct LinceMouseMovedEvent*          MouseMoved;
-    struct LinceMouseScrolledEvent*       MouseScrolled;
-    void*                                 GenericEvent;
+    struct LinceKeyPressEvent*     key_press;
+    struct LinceKeyReleaseEvent*   key_release;
+    struct LinceKeyTypeEvent*      key_type;
+    struct LinceWindowCloseEvent*  window_close;
+    struct LinceWindowResizeEvent* window_resize;
+    struct LinceMousePressEvent*   mouse_press;
+    struct LinceMouseReleaseEvent* mouse_release;
+    struct LinceMouseMoveEvent*    mouse_move;
+    struct LinceMouseScrollEvent*  mouse_scroll;
+    void*                          generic;
 } LinceEventData;
 
 /** @struct LinceEvent

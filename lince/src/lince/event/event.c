@@ -1,5 +1,6 @@
 
 #include "event/event.h"
+#include "core/memory.h"
 
 LinceBool LinceDispatchEvent(LinceEvent* e, LinceEventType etype, LinceEventFn func){
     if (e->type == etype){
@@ -10,8 +11,8 @@ LinceBool LinceDispatchEvent(LinceEvent* e, LinceEventType etype, LinceEventFn f
 }
 
 void LinceEndEvent(LinceEvent* e){
-    if(!e || !e->data.GenericEvent) return;
-    free(e->data.GenericEvent);
+    if(!e || !e->data.generic) return;
+    LinceFree(e->data.generic);
 }
 
 

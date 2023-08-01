@@ -3,7 +3,9 @@
 Version codes follow [Semantic Versioning](https://semver.org/).
 
 ### To-Do
-- Reduce event verbosity. Change event data to lower case. Change `KeyPressed` to `KeyPress`, and similar.
+- Merge all key events into single struct.
+- Improve variable name for macros like `LINCE_NAME_MAX`
+- Change entity registry initialisation to take an array of component sizes instead of a list of varargs.
 - Nuklear UI wrapper and/or custom docs.
 - Create functions that don't depend on OpenGL, e.g. `LinceImage` for storing image data, `LinceClock` for timers, etc. 
 
@@ -15,6 +17,8 @@ Version codes follow [Semantic Versioning](https://semver.org/).
 - Removed `LinceCreateTexture`
 - Removed `name` parameter from `LinceTexture` functions.
 - `LINCE_DIR` now generated in premake5 file automatically from any path.
+- Change naming of event-related variable names from past tense (e.g. pressed) to present tense (.e.g press), and shortened "mouse button" to simply "mouse". This affects `LinceEventType` enum values, `LinceEventData` union members, event struct names, and event creation functions.
+
 
 ## v0.7.0
 - Added support for custom shaders in renderer

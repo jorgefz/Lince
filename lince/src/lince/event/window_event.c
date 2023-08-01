@@ -1,5 +1,6 @@
 
 #include "event/window_event.h"
+#include "core/memory.h"
 
 
 LinceEvent LinceNewWindowCloseEvent(){
@@ -23,8 +24,6 @@ LinceEvent LinceNewWindowResizeEvent(int width, int height){
         .width = (unsigned int)width,
         .height = (unsigned int)height
     };
-    e.data.WindowResize = malloc(sizeof(LinceWindowResizeEvent));
-    LINCE_ASSERT(e.data.WindowResize, "Failed to allocate memory\n");
-    *(e.data.WindowResize) = w;
+    e.data.window_resize = LinceNewCopy(&w, sizeof(LinceWindowResizeEvent));
     return e;
 }

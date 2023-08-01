@@ -75,16 +75,16 @@ void LinceUIOnEvent(LinceUILayer* ui, LinceEvent* event){
     glfwSetWindowUserPointer(win, ui->glfw);
     switch (event->type) {
     case LinceEventType_KeyType:
-        nk_glfw3_char_callback(win, event->data.KeyType->keycode);
+        nk_glfw3_char_callback(win, event->data.key_type->keycode);
         break;
-    case LinceEventType_MouseScrolled:
-        nk_gflw3_scroll_callback(win, event->data.MouseScrolled->xoff, event->data.MouseScrolled->yoff);
+    case LinceEventType_MouseScroll:
+        nk_gflw3_scroll_callback(win, event->data.mouse_scroll->xoff, event->data.mouse_scroll->yoff);
         break;
-    case LinceEventType_MouseButtonPressed:
-        nk_glfw3_mouse_button_callback(win, event->data.MouseButtonPressed->button, GLFW_PRESS, 0);
+    case LinceEventType_MousePress:
+        nk_glfw3_mouse_button_callback(win, event->data.mouse_press->button, GLFW_PRESS, 0);
         break;
-    case LinceEventType_MouseButtonReleased:
-        nk_glfw3_mouse_button_callback(win, event->data.MouseButtonPressed->button, GLFW_RELEASE, 0);
+    case LinceEventType_MouseRelease:
+        nk_glfw3_mouse_button_callback(win, event->data.mouse_press->button, GLFW_RELEASE, 0);
         break;
     default:
         break;

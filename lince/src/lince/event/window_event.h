@@ -7,7 +7,7 @@
 * @brief Signals that the application should terminate.
 */
 typedef struct LinceWindowCloseEvent {
-    int dummy; ///< (unused)
+    char dummy; ///< (unused)
 } LinceWindowCloseEvent;
 
 /** @struct LinceWindowResizeEvent

@@ -1,35 +1,32 @@
 
 #include "event/key_event.h"
+#include "core/memory.h"
 
-LinceEvent LinceNewKeyPressedEvent(int key, int repeats){
+LinceEvent LinceNewKeyPressEvent(int key, int repeats){
     LinceEvent e = {
-        .type = LinceEventType_KeyPressed,
-        .name = "LinceKeyPressedEvent",
+        .type = LinceEventType_KeyPress,
+        .name = "LinceKeyPressEvent",
         .handled = LinceFalse,
         .data = {0}
     };
-    LinceKeyPressedEvent k = {
+    LinceKeyPressEvent k = {
         .keycode = key,
         .repeats = repeats
     };
-    e.data.KeyPressed = malloc(sizeof(LinceKeyPressedEvent));
-    LINCE_ASSERT(e.data.KeyPressed, "Failed to allocate memory");
-    *(e.data.KeyPressed) = k;
+    e.data.key_press = LinceNewCopy(&k, sizeof(LinceKeyPressEvent));
     return e;
 }
 
 
-LinceEvent LinceNewKeyReleasedEvent(int key){
+LinceEvent LinceNewKeyReleaseEvent(int key){
     LinceEvent e = {
-        .type = LinceEventType_KeyReleased,
-        .name = "LinceKeyReleasedEvent",
+        .type = LinceEventType_KeyRelease,
+        .name = "LinceKeyReleaseEvent",
         .handled = LinceFalse,
         .data = {0}
     };
-    LinceKeyReleasedEvent k = {.keycode = key};
-    e.data.KeyReleased = malloc(sizeof(LinceKeyReleasedEvent));
-    LINCE_ASSERT(e.data.KeyReleased, "Failed to allocate memory");
-    *(e.data.KeyReleased) = k;
+    LinceKeyReleaseEvent k = {.keycode = key};
+    e.data.key_release = LinceNewCopy(&k, sizeof(LinceKeyReleaseEvent));
     return e;
 }
 
@@ -42,8 +39,6 @@ LinceEvent LinceNewKeyTypeEvent(int key){
         .data = {0}
     };
     LinceKeyTypeEvent k = {.keycode = key};
-    e.data.KeyType = malloc(sizeof(LinceKeyTypeEvent));
-    LINCE_ASSERT(e.data.KeyType, "Failed to allocate memory");
-    *(e.data.KeyType) = k;
+    e.data.key_type = LinceNewCopy(&k, sizeof(LinceKeyTypeEvent));
     return e;
 }

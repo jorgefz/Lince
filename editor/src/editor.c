@@ -282,8 +282,8 @@ void EditorOnUpdate(float dt){
 
 void EditorOnEvent(LinceEvent* event){
 
-    if(event->type == LinceEventType_MouseScrolled){
-        LinceMouseScrolledEvent* scroll = event->data.MouseScrolled;    
+    if(event->type == LinceEventType_MouseScroll){
+        LinceMouseScrollEvent* scroll = event->data.mouse_scroll;    
         STATE.camera->zoom *= powf(0.80, scroll->yoff); // * 0.5 * dt;
         return;
     }

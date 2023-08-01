@@ -298,8 +298,8 @@ static void LinceOnEvent(LinceEvent* e){
 
 static LinceBool LinceOnEventWindowResize(LinceEvent* e){
     LINCE_INFO(" Window resized to %d x %d", 
-        (int)e->data.WindowResize->width,
-        (int)e->data.WindowResize->height
+        (int)e->data.window_resize->width,
+        (int)e->data.window_resize->height
     );
     return LinceFalse; // allow other layers to receive event
 }

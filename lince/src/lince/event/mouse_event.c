@@ -1,58 +1,51 @@
 
 #include "event/mouse_event.h"
+#include "core/memory.h"
 
-LinceEvent LinceNewMouseButtonPressedEvent(int button){
+LinceEvent LinceNewMousePressEvent(int button){
     LinceEvent e = {
-        .type = LinceEventType_MouseButtonPressed,
-        .name = "LinceMouseButtonPressedEvent",
+        .type = LinceEventType_MousePress,
+        .name = "LinceMousePressEvent",
         .handled = 0,
         .data = {0}
     };
-    LinceMouseButtonPressedEvent m = {.button = button};
-    e.data.MouseButtonPressed = malloc(sizeof(LinceMouseButtonPressedEvent));
-    LINCE_ASSERT(e.data.MouseButtonPressed, "Failed to allocate memory");
-    *(e.data.MouseButtonPressed) = m;
+    LinceMousePressEvent m = {.button = button};
+    e.data.mouse_press = LinceNewCopy(&m, sizeof(LinceMousePressEvent));
     return e;
 }
 
-LinceEvent LinceNewMouseButtonReleasedEvent(int button){
+LinceEvent LinceNewMouseReleaseEvent(int button){
     LinceEvent e = {
-        .type = LinceEventType_MouseButtonReleased,
-        .name = "LinceMouseButtonReleasedEvent",
+        .type = LinceEventType_MouseRelease,
+        .name = "LinceMouseReleaseEvent",
         .handled = 0,
         .data = {0}
     };
-    LinceMouseButtonReleasedEvent m = {.button = button};
-    e.data.MouseButtonReleased = malloc(sizeof(LinceMouseButtonReleasedEvent));
-    LINCE_ASSERT(e.data.MouseButtonReleased, "Failed to allocate memory");
-    *(e.data.MouseButtonReleased) = m;
+    LinceMouseReleaseEvent m = {.button = button};
+    e.data.mouse_release = LinceNewCopy(&m, sizeof(LinceMouseReleaseEvent));
     return e;
 }
 
-LinceEvent LinceNewMouseMovedEvent(double xpos, double ypos){
+LinceEvent LinceNewMouseMoveEvent(double xpos, double ypos){
     LinceEvent e = {
-        .type = LinceEventType_MouseMoved,
-        .name = "LinceMouseMovedEvent",
+        .type = LinceEventType_MouseMove,
+        .name = "LinceMouseMoveEvent",
         .handled = 0,
         .data = {0}
     };
-    LinceMouseMovedEvent m = {.xpos = (float)xpos, .ypos = (float)ypos};
-    e.data.MouseMoved = malloc(sizeof(LinceMouseMovedEvent));
-    LINCE_ASSERT(e.data.MouseMoved, "Failed to allocate memory");
-    *(e.data.MouseMoved) = m;
+    LinceMouseMoveEvent m = {.xpos = (float)xpos, .ypos = (float)ypos};
+    e.data.mouse_move = LinceNewCopy(&m, sizeof(LinceMouseMoveEvent));
     return e;
 }
 
-LinceEvent LinceNewMouseScrolledEvent(double xoff, double yoff){
+LinceEvent LinceNewMouseScrollEvent(double xoff, double yoff){
     LinceEvent e = {
-        .type = LinceEventType_MouseScrolled,
-        .name = "LinceMouseScrolledEvent",
+        .type = LinceEventType_MouseScroll,
+        .name = "LinceMouseScrollEvent",
         .handled = 0,
         .data = {0}
     };
-    LinceMouseScrolledEvent m = {.xoff = (float)xoff, .yoff = (float)yoff};
-    e.data.MouseScrolled = malloc(sizeof(LinceMouseScrolledEvent));
-    LINCE_ASSERT(e.data.MouseScrolled, "Failed to allocate memory");
-    *(e.data.MouseScrolled) = m;
+    LinceMouseScrollEvent m = {.xoff = (float)xoff, .yoff = (float)yoff};
+    e.data.mouse_scroll = LinceNewCopy(&m, sizeof(LinceMouseScrollEvent));
     return e;
 }

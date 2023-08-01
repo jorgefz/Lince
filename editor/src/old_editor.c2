@@ -722,13 +722,13 @@ void EditorLayerOnEvent(LinceLayer* layer, LinceEvent* event){
     EditorLayer* data = LinceGetLayerData(layer);
 
     if(event->type == LinceEventType_MouseScrolled){
-        LinceMouseScrolledEvent* scroll = event->data.MouseScrolled;    
+        LinceMouseScrolledEvent* scroll = event->data.mouse_scroll;    
         data->cam->zoom *= powf(0.80, scroll->yoff); // * 0.5 * dt;
         return;
     }
 
     else if(event->type == LinceEventType_MouseButtonPressed){
-        LinceMouseButtonPressedEvent* press = event->data.MouseButtonPressed;
+        LinceMouseButtonPressedEvent* press = event->data.mouse_press;
         if(press->button != LinceMouseButton_1) return;
         
         vec2 xy_ind;

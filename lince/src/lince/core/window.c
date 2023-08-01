@@ -130,13 +130,13 @@ static void KeyCallback(GLFWwindow* wptr, int key, int scancode, int action, int
     LinceEvent e;
     switch (action) {
         case GLFW_PRESS:
-            e = LinceNewKeyPressedEvent(key, 0);
+            e = LinceNewKeyPressEvent(key, 0);
             break;
         case GLFW_RELEASE:
-            e = LinceNewKeyReleasedEvent(key);
+            e = LinceNewKeyReleaseEvent(key);
             break;
         case GLFW_REPEAT:
-            e = LinceNewKeyPressedEvent(key, 1);
+            e = LinceNewKeyPressEvent(key, 1);
             break;
         default:
             LINCE_ASSERT(0, "Invalid KeyCallback action\n");
@@ -160,11 +160,11 @@ static void MouseButtonCallback(GLFWwindow* wptr, int button, int action, int mo
     LinceEvent e;
     switch (action) {
         case GLFW_PRESS: {
-            e = LinceNewMouseButtonPressedEvent(button);
+            e = LinceNewMousePressEvent(button);
             break;
         }
         case GLFW_RELEASE: {
-            e = LinceNewMouseButtonReleasedEvent(button);
+            e = LinceNewMouseReleaseEvent(button);
             break;
         }
         default:
@@ -178,14 +178,14 @@ static void MouseButtonCallback(GLFWwindow* wptr, int button, int action, int mo
 
 static void MouseScrolledCallback(GLFWwindow* wptr, double xoff, double yoff){
     LinceWindow* w = (LinceWindow*)glfwGetWindowUserPointer(wptr);
-    LinceEvent e = LinceNewMouseScrolledEvent(xoff, yoff);
+    LinceEvent e = LinceNewMouseScrollEvent(xoff, yoff);
     if (w->event_callback) w->event_callback(&e);
     LinceEndEvent(&e);
 }
 
 static void MouseMovedCallback(GLFWwindow* wptr, double xpos, double ypos){
     LinceWindow* w = (LinceWindow*)glfwGetWindowUserPointer(wptr);
-    LinceEvent e = LinceNewMouseMovedEvent(xpos, ypos);
+    LinceEvent e = LinceNewMouseMoveEvent(xpos, ypos);
     if (w->event_callback) w->event_callback(&e);
     LinceEndEvent(&e);
 }
