@@ -58,7 +58,7 @@ LinceTexture* LinceLoadTextureWithTiles(
 	vec2 cellsize,		// Size of a tile/cell in pixels
 	array_t* tiles		// array<LinceTile>, returns collected tiles. Must be uninitialised.
 ) {
-	LinceTexture* tex = LinceCreateTexture(fname, fname);
+	LinceTexture* tex = LinceLoadTexture(fname, 0);
 	LinceGetTilesFromTexture(tex, cellsize, tiles);
 	return tex;
 }

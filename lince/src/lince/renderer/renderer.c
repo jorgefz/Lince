@@ -173,7 +173,7 @@ void LinceInitRenderer() {
 	);
 	
 	// create default white texture
-	renderer_state.white_texture = LinceCreateEmptyTexture("WhiteTexture", 1, 1);
+	renderer_state.white_texture = LinceCreateEmptyTexture(1, 1);
 	static unsigned char white_pixel[] = {0xFF, 0xFF, 0xFF, 0xFF};
 	LinceSetTextureData(renderer_state.white_texture, white_pixel);
 	LinceBindTexture(renderer_state.white_texture, 0);

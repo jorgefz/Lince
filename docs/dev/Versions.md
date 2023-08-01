@@ -3,14 +3,18 @@
 Version codes follow [Semantic Versioning](https://semver.org/).
 
 ### To-Do
-- Refactored minigames and editor
-- Move documentation and minigames to separate github repositories?
+- Reduce event verbosity. Change event data to lower case. Change `KeyPressed` to `KeyPress`, and similar.
+- Remove font preloading and `LINCE_DIR`. The user will have to load fonts themselves. Add an interface to help with this, e.g. load a font and automatically generate it in different sizes.
+- Nuklear UI wrapper and/or custom docs.
+- Create functions that don't depend on OpenGL, e.g. `LinceImage` for storing image data, `LinceClock` for timers, etc. 
 
-## v0.7.1
+## v0.7.1 (WIP)
 - Added functions to initialise camera without allocating heap memory.
 - Started working on the scene system on the sandbox
 - Fixed z sorting with translucency
-- ...
+- Improved error message when font fails to load 
+- Removed `LinceCreateTexture`
+- Removed `name` parameter from `LinceTexture` functions.
 
 ## v0.7.0
 - Added support for custom shaders in renderer
