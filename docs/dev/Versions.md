@@ -4,7 +4,6 @@ Version codes follow [Semantic Versioning](https://semver.org/).
 
 ### To-Do
 - Reduce event verbosity. Change event data to lower case. Change `KeyPressed` to `KeyPress`, and similar.
-- Remove font preloading and `LINCE_DIR`. The user will have to load fonts themselves. Add an interface to help with this, e.g. load a font and automatically generate it in different sizes.
 - Nuklear UI wrapper and/or custom docs.
 - Create functions that don't depend on OpenGL, e.g. `LinceImage` for storing image data, `LinceClock` for timers, etc. 
 
@@ -15,6 +14,7 @@ Version codes follow [Semantic Versioning](https://semver.org/).
 - Improved error message when font fails to load 
 - Removed `LinceCreateTexture`
 - Removed `name` parameter from `LinceTexture` functions.
+- `LINCE_DIR` now generated in premake5 file automatically from any path.
 
 ## v0.7.0
 - Added support for custom shaders in renderer
