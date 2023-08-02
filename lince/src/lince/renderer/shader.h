@@ -10,20 +10,17 @@
 /** @struct shader */
 typedef struct LinceShader {
 	uint32_t id; 				///< OpenGL program id
-	char name[LINCE_NAME_MAX]; 	///< Name, normally based on the source file
 	hashmap_t uniforms;   		///< Cache of uniform names and values
 } LinceShader;
 
 /** @brief Create and compile shader from source code files */
 LinceShader* LinceCreateShader(
-	const char* name,			///< Shader string identifier
 	const char* vertex_path,	///< Path to vertex shader source code
 	const char* fragment_path	///< Path to fragment shader source code
 );
 
 /** @brief  Create and compile shader from source code as strings */
 LinceShader* LinceCreateShaderFromSrc(
-	const char* name,			///< Shader string identifier
 	const char* vertex_src,		///< Vertex source code as a char array
 	const char* fragment_src	///< Fragment source code as a char array
 );

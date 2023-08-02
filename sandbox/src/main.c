@@ -335,7 +335,6 @@ void GameStateInit(){
     game_data.camera.zoom = 1.3f;
 
     game_data.custom_shader = LinceCreateShader(
-        "CustomShader",
 		"sandbox/assets/shaders/light.vert.glsl",
 		"sandbox/assets/shaders/light.frag.glsl"
     );

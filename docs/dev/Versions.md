@@ -16,6 +16,7 @@ Version codes follow [Semantic Versioning](https://semver.org/).
 - Improved error message when font fails to load 
 - Removed `LinceCreateTexture`
 - Removed `name` parameter from `LinceTexture` functions.
+- Removed `name` parameter from `LinceShader` functions.
 - `LINCE_DIR` now generated in premake5 file automatically from any path.
 - Change naming of event-related variable names from past tense (e.g. pressed) to present tense (.e.g press), and shortened "mouse button" to simply "mouse". This affects `LinceEventType` enum values, `LinceEventData` union members, event struct names, and event creation functions.
 

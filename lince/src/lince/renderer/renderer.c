@@ -179,7 +179,6 @@ void LinceInitRenderer() {
 	LinceBindTexture(renderer_state.white_texture, 0);
 	
 	renderer_state.default_shader = LinceCreateShaderFromSrc(
-		"RendererShader",
 		default_vertex_source,
 		default_fragment_source
 	);

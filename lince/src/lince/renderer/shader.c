@@ -1,4 +1,5 @@
 #include "core/profiler.h"
+#include "core/memory.h"
 #include "renderer/shader.h"
 #include <string.h>
 #include <glad/glad.h>
@@ -21,21 +22,21 @@ static int LinceCompileShader(const char* source, int type);
 
 /* Create shader from paths to vertex and fragment shader source files */
 LinceShader* LinceCreateShader(
-	const char* name,
 	const char* vertex_path,
 	const char* fragment_path
 ){
 	LINCE_PROFILER_START(timer);
-	LINCE_INFO(" Creating Shader '%s'", name);
+	LINCE_INFO("Creating Shader from vertex file '%s' and fragment file '%s'",
+		vertex_path, fragment_path);
 	LinceShader* shader;
 	char *vsrc, *fsrc;
 
 	vsrc = LinceReadFile(vertex_path);
 	fsrc = LinceReadFile(fragment_path);
-	shader = LinceCreateShaderFromSrc(name, vsrc, fsrc);
+	shader = LinceCreateShaderFromSrc(vsrc, fsrc);
 
-	free(vsrc);
-	free(fsrc);
+	LinceFree(vsrc);
+	LinceFree(fsrc);
 
 	LINCE_PROFILER_END(timer);
 	return shader;
@@ -43,41 +44,36 @@ LinceShader* LinceCreateShader(
 
 /* Create shader from source code of vertex and fragment shaders */
 LinceShader* LinceCreateShaderFromSrc(
-	const char* name,
 	const char* vertex_src,
 	const char* fragment_src
 ){
 	LINCE_PROFILER_START(timer);
-	LINCE_INFO(" Creating Shader '%s' From Source", name);
+	LINCE_INFO("Creating shader from source");
 
-	LinceShader* shader = calloc(1, sizeof(LinceShader));
-	LINCE_ASSERT(shader,
-		"Failed to allocate %d bytes", (int)sizeof(LinceShader));
-	
-	LINCE_ASSERT(strlen(name) < LINCE_NAME_MAX,
-		"Shader name is too long: '%s'", name);
-	memcpy(shader->name, name, strlen(name));
+	LinceShader* shader = LinceCalloc(sizeof(LinceShader));
 	shader->id = glCreateProgram();
+	LINCE_INFO("Shader created with ID %d", shader->id);
 
-	LINCE_INFO(" Compiling Vertex and Fragment Sources for '%s'", name);
+	LINCE_INFO("Compiling vertex and fragment sources");
 	int vs, fs;
 	vs = LinceCompileShader(vertex_src, GL_VERTEX_SHADER);
 	fs = LinceCompileShader(fragment_src, GL_FRAGMENT_SHADER);
 
-	LINCE_INFO(" Linking and Validating Shader '%s'", name);
+	LINCE_INFO("Linking and validating shader");
 	glAttachShader(shader->id, vs);
 	glAttachShader(shader->id, fs);
 	glLinkProgram(shader->id);
 	glValidateProgram(shader->id);
 	
-	//compiled shader files are no longer necessary
+	// Compiled shader files are no longer necessary
 	glDeleteShader(vs);
 	glDeleteShader(fs);
 
-	// start out with hashmap of 21 buckets to avoid costs of
-	// resizing often at small sizes (e.g. at sizes 2, 3, 5, 7, 11, etc).
+	// Start out with hashmap of 21 buckets to avoid costs of
+	// Resizing often at small sizes (e.g. at sizes 2, 3, 5, 7, 11, etc).
 	int ret = hashmap_init(&shader->uniforms, 20);
-	LINCE_ASSERT(ret == 0, "Failed to create hashmap for shader uniforms");
+	LINCE_ASSERT(ret == 0, "Failed to create hashmap for shader %d uniforms",
+		shader->id);
 
 	LINCE_PROFILER_END(timer);
     return shader;
@@ -95,10 +91,10 @@ void LinceUnbindShader(void){
 /* Destroys and deallocates given shader */
 void LinceDeleteShader(LinceShader* shader){
 	if(!shader) return;
-	LINCE_INFO(" Deleting Shader '%s'", shader->name);
+	LINCE_INFO("Deleting shader %d", shader->id);
 	if(shader->id > 0) glDeleteProgram(shader->id);
 	hashmap_uninit(&shader->uniforms);
-	free(shader);
+	LinceFree(shader);
 }
 
 int LinceGetShaderUniformID(LinceShader* shader, const char* name){
@@ -109,11 +105,10 @@ int LinceGetShaderUniformID(LinceShader* shader, const char* name){
 	/*
 	Uniform locations are saved as void* addresses in the hashmap
 	to avoid allocating memory and freein it afterwards.
-	The void* type should be 64 bits long (in 64bit systems), matching a long int.
+	The void* type should be 64 bits long (in 64bit systems).
 	*/
 
 	long location;
-
 	if(hashmap_has_key(&shader->uniforms, name)){
 		location = (long)hashmap_get(&shader->uniforms, name);
 		LINCE_PROFILER_END(timer);
@@ -127,7 +122,8 @@ int LinceGetShaderUniformID(LinceShader* shader, const char* name){
 	// int location =  glGetUniformLocation(shader->id, name);
 	
 	if(location < 0){
-		LINCE_INFO(" Uniform '%s' not found in shader '%s'", name, shader->name);
+		LINCE_INFO("Uniform '%s' not found in shader %d",
+			name, shader->id);
 	}
 	
 	LINCE_PROFILER_END(timer);
@@ -190,20 +186,20 @@ void LinceSetShaderUniformMat4(LinceShader* sh, const char* name, mat4 m){
 
 // TODO: Move to a header more accessible to the whole project
 static char* LinceReadFile(const char* path){
-	LINCE_INFO(" Reading File '%s'", path);
+	LINCE_INFO("Reading file '%s'", path);
+	
 	FILE* handle = fopen(path, "r");
-	LINCE_ASSERT(handle, " Failed to open file '%s'", path);
+	LINCE_ASSERT(handle, "Failed to open file '%s'", path);
 
 	/* Get file length */
 	fseek(handle, 0, SEEK_END);
 	size_t size = ftell(handle);
 	fseek(handle, 0, SEEK_SET);
-	LINCE_ASSERT(size > 0, " Empty file '%s'", path);
+	LINCE_ASSERT(size > 0, "Empty file '%s'", path);
 
-	char* source = calloc(size+1, sizeof(char));
-	LINCE_ASSERT_ALLOC(source, size+1);
+	char* source = LinceCalloc((size+1)*sizeof(char));
 	fread(source, size, 1, handle); // load file data into buffer
-	source[size] = '\0'; // ensure x2 last character is terminator
+	source[size] = '\0'; // enforce last character to be terminator
 
 	fclose(handle);
 	return source;
@@ -228,7 +224,8 @@ int LinceCompileShader(const char* source, int type){
 		glGetShaderiv(id, GL_INFO_LOG_LENGTH, &length);
 		glGetShaderInfoLog(id, 1000, &length, &msg[0]);
 		glDeleteShader(id);
-		LINCE_ASSERT(0, " Failed to compile shader\n%s\n", msg);
+		LINCE_ERROR("Failed to compile shader source");
+		LINCE_ASSERT(0, "%s", msg);
 	}
 	
 	LINCE_PROFILER_END(timer);
