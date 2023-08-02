@@ -13,10 +13,10 @@ void SetupApplication(){
     app->title = "Sandbox";
     // app->flags = LINCE_FULLSCREEN | LINCE_VSYNC | LINCE_RESIZEABLE | ...
 
-    app->game_init = EditorInit;
-    app->game_on_update = EditorOnUpdate;
-    app->game_on_event = EditorOnEvent;
-    app->game_terminate = EditorTerminate;
+    app->on_init = EditorInit;
+    app->on_update = EditorOnUpdate;
+    app->on_event = EditorOnEvent;
+    app->on_terminate = EditorTerminate;
     
     app->enable_profiling = LinceTrue;
     app->profiler_filename = "tests/profiling/profile.txt";

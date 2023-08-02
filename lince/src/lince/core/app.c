@@ -188,7 +188,7 @@ static void LinceInit(){
     app.ui = LinceInitUI(app.window->handle);
     app.running = LinceTrue;
 
-    if (app.game_init) app.game_init(); // user may push layers onto stack
+    if (app.on_init) app.on_init(); // user may push layers onto stack
 }
 
 
@@ -223,7 +223,7 @@ static void LinceOnUpdate(){
     app.current_overlay = -1;
 
     // update user application
-    if (app.game_on_update) app.game_on_update(app.dt);
+    if (app.on_update) app.on_update(app.dt);
 
     LinceEndUIRender(app.ui);
     LinceUpdateWindow(app.window);
@@ -240,7 +240,7 @@ static void LinceTerminate(){
     app.layer_stack = NULL;
     app.overlay_stack = NULL;
     
-    if (app.game_terminate) app.game_terminate();
+    if (app.on_terminate) app.on_terminate();
 
     LinceTerminateUI(app.ui);
 
@@ -292,7 +292,7 @@ static void LinceOnEvent(LinceEvent* e){
     app.current_layer = -1;
 
     // propagate event to user
-    if (app.game_on_event && !e->handled ) app.game_on_event(e);
+    if (app.on_event && !e->handled ) app.on_event(e);
 }
 
 

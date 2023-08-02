@@ -30,7 +30,7 @@
 *  
 * int main(){
 *     LinceApp* app = LinceGetAppState();
-*     app->game_init = GameInit;
+*     app->on_init = GameInit;
 *     
 *     LinceRun();
 *  

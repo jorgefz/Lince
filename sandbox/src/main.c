@@ -675,9 +675,9 @@ void SetupApplication(){
     app->screen_height = 720;
     app->title = "Sandbox";
     
-    app->game_init      = TestScenesInit;   // GameInit;
-    app->game_on_update = TestScenesUpdate; // GameOnUpdate;
-    app->game_terminate = TestScenesUninit; // GameTerminate;
+    app->on_init      = TestScenesInit;   // GameInit;
+    app->on_update = TestScenesUpdate; // GameOnUpdate;
+    app->on_terminate = TestScenesUninit; // GameTerminate;
 }
 
 

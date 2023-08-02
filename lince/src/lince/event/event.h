@@ -5,9 +5,9 @@ Examples are mouse button clicks, key strokes, mouse movement, and window resizi
 Every time an event takes place, a callback function is called
 and a `LinceEvent` object is generated and propagated through the engine.
 If set, your game will receive this events through a custom `OnEvent` function
-via the `game_on_event` callback.
+via the `on_event` callback.
 
-Events are first passed to the application's `game_on_event`
+Events are first passed to the application's `on_event`
 and then to the OnEvent callbacks of each of the overlays and layers.
 */
 

@@ -27,10 +27,10 @@ typedef void (*LinceGameTerminateFn)();
 typedef struct LinceApp{
 
     /* User callbacks */
-    LinceGameInitFn      game_init;      ///< User-defined callback called once when the app is initialized.
-    LinceGameOnUpdateFn  game_on_update; ///< User-defined callback called once per frame.
-    LinceGameOnEventFn   game_on_event;  ///< User-defined callback called when an event is propagated.
-    LinceGameTerminateFn game_terminate; ///< User-defined callback called when the app closes.
+    LinceGameInitFn      on_init;      ///< User-defined callback called once when the app is initialized.
+    LinceGameOnUpdateFn  on_update;    ///< User-defined callback called once per frame.
+    LinceGameOnEventFn   on_event;     ///< User-defined callback called when an event is propagated.
+    LinceGameTerminateFn on_terminate; ///< User-defined callback called when the app closes.
 
     /* User settings */
     void* user_data;        ///< Pointer that may be freely re-assiged by the user.      

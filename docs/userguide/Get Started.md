@@ -64,7 +64,7 @@ int main(){
     app->height = 1080;
     app->title = "My window";
 
-    app->game_on_update = OnUpdate;
+    app->on_update = OnUpdate;
 
     LinceRun();
     return 0;
