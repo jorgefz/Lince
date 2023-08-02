@@ -50,6 +50,11 @@ typedef struct LinceApp{
 
     /* UI */
     LinceUILayer* ui;   ///< State of the GUI, e.g. Nuklear's context.
+
+    LinceBool enable_profiling; ///< If true, it runs the profiler
+    char* profiler_filename;    ///< File to which profiling data is written
+    FILE* profiler_file;        ///< File handle for profiler
+
 } LinceApp;
 
 /** @brief Runs main application loop. `LinceInit()` must have been called.
