@@ -20,7 +20,7 @@ Version codes follow [Semantic Versioning](https://semver.org/).
 - `LINCE_DIR` now generated in premake5 file automatically from any path.
 - Change naming of event-related variable names from past tense (e.g. pressed) to present tense (.e.g press), and shortened "mouse button" to simply "mouse". This affects `LinceEventType` enum values, `LinceEventData` union members, event struct names, and event creation functions.
 - Renamed application callback variables e.g. from `on_update` to `on_update`.
-
+- Removed bug where passing a NULL value as the filename for the log file would result in undefined behaviour.
 
 ## v0.7.0
 - Added support for custom shaders in renderer

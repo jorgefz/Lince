@@ -29,7 +29,9 @@ int LinceOpenLogger(const char* filename){
     return 1;
 #else
     if(!filename){
-        fprintf(stderr, "[Error] Log file undefined");
+        fprintf(stderr, "[Warning] Log filename undefined. Using stderr.");
+        LOGFILE = stderr;
+        return 1;
     }
     LOGFILE = fopen(filename, "w");
     if(!LOGFILE) return 0;
