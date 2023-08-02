@@ -1,5 +1,5 @@
 #include "tiles/tile_anim.h"
-#include "lince/core/memory.h"
+#include "core/memory.h"
 
 /*
 Returns a pointer to the current tile in the animation
@@ -102,5 +102,5 @@ void LinceResetTileAnim(LinceTileAnim* anim){
 void LinceDeleteTileAnim(LinceTileAnim* anim){
 	if(!anim) return;
 	if(anim->frames) array_destroy(anim->frames);
-	if(anim->order)  free(anim->order);
+	if(anim->order)  LinceFree(anim->order);
 }

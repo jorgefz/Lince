@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include "core/profiler.h"
+#include "core/memory.h"
 #include "renderer/renderer.h"
 #include "renderer/camera.h"
 #include <glad/glad.h>
@@ -136,10 +137,8 @@ void LinceInitRenderer() {
 	LinceEnableDepthTest();
 
 	// Initialise geometry
-	renderer_state.vertex_batch = calloc(MAX_VERTICES, sizeof(LinceQuadVertex));
-	renderer_state.index_batch = calloc(MAX_INDICES, sizeof(unsigned int));
-	LINCE_ASSERT_ALLOC(renderer_state.vertex_batch, sizeof(LinceQuadVertex) * MAX_VERTICES);
-	LINCE_ASSERT_ALLOC(renderer_state.index_batch, sizeof(unsigned int) * MAX_INDICES);
+	renderer_state.vertex_batch = LinceCalloc(MAX_VERTICES*sizeof(LinceQuadVertex));
+	renderer_state.index_batch = LinceCalloc(MAX_INDICES*sizeof(unsigned int));
 	
 	renderer_state.vb = LinceCreateVertexBuffer(
 		renderer_state.vertex_batch,
@@ -195,11 +194,11 @@ void LinceInitRenderer() {
 void LinceTerminateRenderer() {
 	renderer_state.quad_count = 0;
 	if(renderer_state.vertex_batch){
-		free(renderer_state.vertex_batch);
+		LinceFree(renderer_state.vertex_batch);
 		renderer_state.vertex_batch = NULL;
 	}
 	if(renderer_state.index_batch){
-		free(renderer_state.index_batch);
+		LinceFree(renderer_state.index_batch);
 		renderer_state.index_batch = NULL;
 	}
 

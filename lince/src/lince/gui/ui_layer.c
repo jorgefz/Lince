@@ -1,4 +1,5 @@
 #include "gui/ui_layer.h"
+#include "core/memory.h"
 
 #include "event/event.h"
 #include "event/key_event.h"
@@ -17,12 +18,9 @@
 
 LinceUILayer* LinceInitUI(void* glfw_window){
 
-	LinceUILayer* ui = calloc(1, sizeof(LinceUILayer));
-	LINCE_ASSERT_ALLOC(ui, sizeof(LinceUILayer));
-
+	LinceUILayer* ui = LinceCalloc(sizeof(LinceUILayer));
 	ui->glfw_window = glfw_window;
-	ui->glfw = calloc(1, sizeof(struct nk_glfw));
-	LINCE_ASSERT_ALLOC(ui->glfw, sizeof(struct nk_glfw));
+	ui->glfw = LinceCalloc(sizeof(struct nk_glfw));
 
 	ui->ctx = nk_glfw3_init(
         ui->glfw,
@@ -95,8 +93,8 @@ void LinceUIOnEvent(LinceUILayer* ui, LinceEvent* event){
 void LinceTerminateUI(LinceUILayer* ui){
 	if(!ui) return;
     nk_glfw3_shutdown(ui->glfw);
-    free(ui->glfw);
-	free(ui);
+    LinceFree(ui->glfw);
+	LinceFree(ui);
 	LINCE_INFO(" UI Terminated");
 }
 

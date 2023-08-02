@@ -1,4 +1,5 @@
 #include "core/profiler.h"
+#include "core/memory.h"
 #include "renderer/vertex_array.h"
 #include <glad/glad.h>
 #include <stdlib.h>
@@ -8,9 +9,7 @@ LinceVertexArray* LinceCreateVertexArray(LinceIndexBuffer ib){
 	LINCE_PROFILER_START(timer);
 	LINCE_INFO(" Creating Vertex Array ");
 
-	LinceVertexArray* va = calloc(1, sizeof(LinceVertexArray));
-	LINCE_ASSERT(va, "Failed to allocate %d bytes",
-		(int)sizeof(LinceVertexArray));
+	LinceVertexArray* va = LinceCalloc(sizeof(LinceVertexArray));
 
 	va->index_buffer = ib;
 	va->vb_count = 0;
@@ -80,7 +79,7 @@ void LinceAddVertexArrayAttributes(
 	}
 
 	// Append vertex buffer to list
-	va->vb_list = realloc(va->vb_list, (va->vb_count + 1)*sizeof(LinceVertexBuffer));
+	va->vb_list = LinceRealloc(va->vb_list, (va->vb_count + 1)*sizeof(LinceVertexBuffer));
 	LINCE_ASSERT(va->vb_list, "Failed to allocate memory");
 	va->vb_list[va->vb_count] = vb;
 	va->vb_count++;
@@ -95,9 +94,9 @@ void LinceDeleteVertexArray(LinceVertexArray* va){
 		for(int i=0; i!=(int)va->vb_count; ++i){
 			LinceDeleteVertexBuffer(va->vb_list[i]);
 		}
-		free(va->vb_list);
+		LinceFree(va->vb_list);
 	}
 	LinceDeleteIndexBuffer(va->index_buffer);
 	glDeleteVertexArrays(1, &va->id);
-	free(va);
+	LinceFree(va);
 }

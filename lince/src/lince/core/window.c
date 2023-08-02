@@ -93,7 +93,7 @@ void LinceDestroyWindow(LinceWindow* window){
     glfwSetErrorCallback(NULL); // otherwise GLFW throws an error on shutdown
     if (window->initialised) glfwTerminate();
     if (window->handle) glfwDestroyWindow((GLFWwindow*)(window->handle));
-	free(window);
+	LinceFree(window);
 }
 
 void LinceSetMainEventCallback(LinceWindow* window, LinceEventCallbackFn func){

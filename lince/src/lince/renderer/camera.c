@@ -1,6 +1,7 @@
 #include "renderer/camera.h"
 #include "core/core.h"
 #include "core/profiler.h"
+#include "core/memory.h"
 #include <cglm/cam.h>
 #include <cglm/mat4.h>
 #include <cglm/affine.h>
@@ -38,9 +39,7 @@ void LinceInitCamera(LinceCamera* cam, float aspect_ratio){
 LinceCamera* LinceCreateCameraFromProj(mat4 proj){
 	LINCE_PROFILER_START(timer);
 	LinceCamera *cam;
-	cam = malloc(sizeof(LinceCamera));
-	LINCE_ASSERT_ALLOC(cam, sizeof(LinceCamera));
-	memcpy(cam, &default_camera, sizeof(LinceCamera));
+	cam = LinceNewCopy(&default_camera, sizeof(LinceCamera));
 	glm_mat4_copy(proj, cam->proj);
 	glm_mat4_mul(cam->proj, cam->view, cam->view_proj);
 	LINCE_PROFILER_END(timer);
@@ -93,5 +92,5 @@ void LinceResizeCameraView(LinceCamera* cam, float aspect_ratio){
 
 void LinceDeleteCamera(LinceCamera* cam){
 	if(!cam) return;
-	free(cam);
+	LinceFree(cam);
 }

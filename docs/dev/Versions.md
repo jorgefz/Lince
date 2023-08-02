@@ -3,6 +3,7 @@
 Version codes follow [Semantic Versioning](https://semver.org/).
 
 ### To-Do
+- Replace layer stack with the custom array type.
 - Merge all key events into single struct.
 - Move misc functions to separate files (`LinceReadFile`, `LinceGetTimeMillis`). 
 - Change entity registry initialisation to take an array of component sizes instead of a list of varargs.
@@ -26,6 +27,7 @@ Version codes follow [Semantic Versioning](https://semver.org/).
 - Added logging platform name in log file.
 - Renamed `LINCE_STR_MAX` to `LINCE_TEXT_MAX`.
 - Renamed function `LinceGetAppState` to `LinceGetApp`.
+- Replaced instances of standard C functions `malloc`,`calloc`,`realloc`, and `free` with the engine versions.
 
 ## v0.7.0
 - Added support for custom shaders in renderer

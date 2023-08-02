@@ -45,7 +45,7 @@ void LinceLayerStackPush(LinceLayerStack* stack, LinceLayer* layer) {
 	if (!stack || !layer) return;
 	
 	// resize stack
-	LinceLayer** ret = realloc(stack->layers, ((size_t)stack->count+1) * sizeof(LinceLayer*));
+	LinceLayer** ret = LinceRealloc(stack->layers, ((size_t)stack->count+1) * sizeof(LinceLayer*));
 	if (!ret) {
 		// Failed to allocate more space for additional pointer
 		LinceDestroyLayerStack(stack);
@@ -88,7 +88,7 @@ void LinceLayerStackPop(LinceLayerStack* stack, LinceLayer* layer) {
 		stack->layers[i] = stack->layers[i + 1];
 	}
 
-	LinceLayer** ret = realloc(stack->layers, (stack->count - 1) * sizeof(LinceLayer*));
+	LinceLayer** ret = LinceRealloc(stack->layers, (stack->count - 1) * sizeof(LinceLayer*));
 	if (!ret) {
 		LinceDestroyLayerStack(stack);
 		LINCE_ASSERT(0, "Failed to allocate memory");
