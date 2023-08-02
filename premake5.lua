@@ -4,8 +4,10 @@ workspace "lince"
     startproject "editor"
     warnings "Extra"
     
+    -- defines{"LINCE_PROFILE"}
     defines {"LINCE_DIR=\"" .. os.getcwd() .. "/\""}
     print("LINCE_DIR=\"" .. os.getcwd() .. "/\"")
+    
     
     configurations {"Debug", "Release"}
     filter "system:windows"

@@ -2,19 +2,24 @@
 
 #include <GLFW/glfw3.h>
 
-static FILE* outfile = NULL;
+static FILE* PROFILER = NULL;
 
 FILE* LinceGetProfiler(){
-	return outfile;
+	return PROFILER;
 }
 
-void LinceSetProfiler(FILE* file){
-	if(file && !outfile){
-		outfile = file;
-	} else if(!file && outfile) {
-		fclose(outfile);
-		outfile = NULL;
-	}
+void LinceOpenProfiler(const char* filename){
+	if(!filename){
+        fprintf(stderr, "[Warning] Profiler filename undefined. Profiling is disabled.");
+        return;
+    }
+	PROFILER = fopen(filename, "w");
+}
+
+void LinceCloseProfiler(){
+	if(!PROFILER) return;
+	fclose(PROFILER);
+    PROFILER = NULL;
 }
 
 double LinceGetTimeMillisec(void){

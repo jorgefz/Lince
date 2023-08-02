@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 from tqdm import tqdm
 
-data = pd.read_csv("profile.txt", delimiter=':', names=["Function","Runtime"])
+data = pd.read_csv("profiler.txt", delimiter=':', names=["Function","Runtime"])
 funcs = np.array(data['Function'].unique())
 
 # Collect average runtime for each function

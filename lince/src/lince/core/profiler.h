@@ -18,11 +18,13 @@
 /** @brief Returns the file used by the profiler to save benchmarking stats */
 FILE* LinceGetProfiler();
 
-/** @brief Provides a file to which stats are written.
-* If the profiler file is already set, it does nothing.
-* If the passed file is NULL, the profiler file is closed and set to NULL. 
+/** @brief Opens the file to which profiling data is written.
+If the filename is NULL, profiling will not start.
 */
-void LinceSetProfiler(FILE* file);
+void LinceOpenProfiler(const char* filename);
+
+/** @brief Closes the file used for profiling */
+void LinceCloseProfiler();
 
 /** @brief Returns number of milliseconds the application has been active */
 double LinceGetTimeMillisec(void);

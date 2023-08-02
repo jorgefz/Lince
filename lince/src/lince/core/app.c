@@ -157,24 +157,25 @@ static void LinceInit(){
 
     //Report Lince version and debug/release configuration
     LINCE_INFO("--- LINCE version "LINCE_VERSION" ---");
+    
+
 #ifdef LINCE_DEBUG
     LINCE_INFO("Debug configuration");
 #else
     LINCE_INFO("Release configuration");
 #endif
 
+    // Open profiling file
+#ifdef LINCE_PROFILE
+    LINCE_INFO("PROFILING ENABLED");
+    LINCE_INFO("Saving profiling data to '%s'", LINCE_DIR"profiler.txt");
+    LinceOpenProfiler(LINCE_DIR"profiler.txt");
+#endif
+
     // Check user settings and set defaults
     if (app.screen_width == 0) app.screen_width = 500;
     if (app.screen_height == 0) app.screen_height = 500;
     if (app.title == NULL) app.title = "Lince Window";
-    if (app.enable_profiling && app.profiler_filename){
-        app.profiler_file = fopen(app.profiler_filename, "w");
-        LinceSetProfiler(app.profiler_file);
-        if(!app.profiler_file){
-            LINCE_INFO("Error: unable to open profiling file '%s'\n",
-                app.profiler_filename);
-        }
-    }
     
     // Create a windowed mode window and its OpenGL context
     app.window = LinceCreateWindow(app.screen_width, app.screen_height, app.title);
@@ -249,10 +250,8 @@ static void LinceTerminate(){
     LinceDestroyWindow(app.window);
     app.window = NULL;
     app.running = 0;
-    
-    LinceSetProfiler(NULL);
 
-    // Close log file
+    LinceCloseProfiler();
     LinceCloseLogger();
 }
 

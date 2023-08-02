@@ -20,7 +20,7 @@ docs/mdbook
 # Output files
 **/Makefile
 **.d
-**/profile.txt
+**/profiler.txt
 obj/
 bin/
 vendor/glfw/bin/
