@@ -155,9 +155,14 @@ static void LinceInit(){
     // Open log file
     LinceOpenLogger(LINCE_DIR"log.txt");
 
-    //Report Lince version and debug/release configuration
+    // Report platform and configuration
     LINCE_INFO("--- LINCE version "LINCE_VERSION" ---");
     
+#ifdef LINCE_WINDOWS
+    LINCE_INFO("OS: Windows");
+#elif defined(LINCE_LINUX)
+    LINCE_INFO("OS: GNU/Linux");
+#endif
 
 #ifdef LINCE_DEBUG
     LINCE_INFO("Debug configuration");
