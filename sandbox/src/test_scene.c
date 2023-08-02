@@ -5,7 +5,7 @@ void InitBlueScene(LinceSceneStack* stack, LinceScene* scene){
     BlueScene* data = LinceMalloc(sizeof(BlueScene));
     scene->data = data;
 
-    LinceUILayer* ui = LinceGetAppState()->ui;
+    LinceUILayer* ui = LinceGetApp()->ui;
     struct nk_context *ctx = ui->ctx;
 
     nk_style_push_color(
@@ -31,7 +31,7 @@ void UpdateBlueScene(LinceSceneStack* stack, LinceScene* scene, float dt){
 	LinceUpdateCamera(&scene->camera);
 
     // GUI
-    LinceUILayer* ui = LinceGetAppState()->ui;
+    LinceUILayer* ui = LinceGetApp()->ui;
     struct nk_context *ctx = ui->ctx;
     nk_style_set_font(ctx, &ui->fonts[LinceFont_Droid20]->handle);
     
@@ -102,7 +102,7 @@ void UpdateRedScene(LinceSceneStack* stack, LinceScene* scene, float dt){
 	LinceUpdateCamera(&scene->camera);
 
     // GUI
-    LinceUILayer* ui = LinceGetAppState()->ui;
+    LinceUILayer* ui = LinceGetApp()->ui;
     struct nk_context *ctx = ui->ctx;
     nk_style_set_font(ctx, &ui->fonts[LinceFont_Droid20]->handle);
 

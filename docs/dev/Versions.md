@@ -4,9 +4,6 @@ Version codes follow [Semantic Versioning](https://semver.org/).
 
 ### To-Do
 - Merge all key events into single struct.
-- Improve variable name for macros like `LINCE_NAME_MAX`.
-- Remove unused variables from `LinceApp`.
-- Rename function `LinceGetAppState` to `LinceGetApp`.
 - Move misc functions to separate files (`LinceReadFile`, `LinceGetTimeMillis`). 
 - Change entity registry initialisation to take an array of component sizes instead of a list of varargs.
 - Nuklear UI wrapper and/or custom docs.
@@ -26,6 +23,9 @@ Version codes follow [Semantic Versioning](https://semver.org/).
 - Renamed application callback variables e.g. from `on_update` to `on_update`.
 - Removed bug where passing a NULL value as the filename for the log file would result in undefined behaviour.
 - Added functions to open and close a profiling file, instead of providing a file handle directly.
+- Added logging platform name in log file.
+- Renamed `LINCE_STR_MAX` to `LINCE_TEXT_MAX`.
+- Renamed function `LinceGetAppState` to `LinceGetApp`.
 
 ## v0.7.0
 - Added support for custom shaders in renderer

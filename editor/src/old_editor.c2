@@ -568,7 +568,7 @@ void EditorLayerOnDetach(LinceLayer* layer) {
 void DrawGUI(EditorLayer* data){
     LINCE_PROFILER_START(timer);
 
-    LinceUILayer* ui = LinceGetAppState()->ui;
+    LinceUILayer* ui = LinceGetApp()->ui;
     vec2 screen_size;
     LinceGetScreenSize(screen_size);
     float width = screen_size[0], height = screen_size[1];
@@ -651,7 +651,7 @@ void EditorLayerOnUpdate(LinceLayer* layer, float dt) {
 
     EditorLayer* data = LinceGetLayerData(layer);
     data->dt = dt;
-    LinceUILayer* ui = LinceGetAppState()->ui;
+    LinceUILayer* ui = LinceGetApp()->ui;
     LINCE_UNUSED(ui);
 
     // UI

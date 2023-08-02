@@ -3,11 +3,11 @@
 
 static void NKLayerOnUpdate(LinceLayer* layer, float dt){
     
-    LinceUILayer* ui = LinceGetAppState()->ui;
+    LinceUILayer* ui = LinceGetApp()->ui;
     struct nk_context *ctx = ui->ctx;
     static struct nk_colorf bg = {0.1, 0.18, 0.24, 1.0};
-    // uint32_t window_width = LinceGetAppState()->window->width;
-    uint32_t window_height = LinceGetAppState()->window->height;
+    // uint32_t window_width = LinceGetApp()->window->width;
+    uint32_t window_height = LinceGetApp()->window->height;
 
     // LinceUIText(ui, "Text1", 10, 10, LinceFont_Droid30, 10, "FPS %.0f", 1000.0/dt);
     // LinceUIText(ui, "Text2", 10, 40, LinceFont_Droid30, 10, "%.2f ms", dt);

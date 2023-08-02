@@ -105,7 +105,7 @@ Note that these do not apply to the containers (e.g. array, hashmap, list).
 
 /* Constants & typedefs */
 #define LINCE_NAME_MAX 100 ///< Used for short names (e.g. shader uniforms)
-#define LINCE_STR_MAX 1000 ///< Used for longer string (e.g. descriptions)
+#define LINCE_TEXT_MAX 1000 ///< Used for longer string (e.g. descriptions)
 
 /** @enum LinceBool
 * Custom boolean type */

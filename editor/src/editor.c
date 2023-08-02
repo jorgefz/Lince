@@ -141,7 +141,7 @@ void GUIShader(){
 
 void DrawGUI(){
 
-    LinceUILayer* ui = LinceGetAppState()->ui;
+    LinceUILayer* ui = LinceGetApp()->ui;
     struct nk_context* ctx = ui->ctx;
 
     vec2 screen_size;

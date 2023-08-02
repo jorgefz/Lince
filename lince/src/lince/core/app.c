@@ -92,7 +92,7 @@ void LinceRun(){
 }
 
 
-LinceApp* LinceGetAppState(){
+LinceApp* LinceGetApp(){
     return &app;
 }
 
@@ -113,8 +113,8 @@ float LinceGetAspectRatio(){
 }
 
 void LinceGetScreenSize(vec2 size){
-    size[0] = (float)LinceGetAppState()->window->width;
-    size[1] = (float)LinceGetAppState()->window->height;
+    size[0] = (float)LinceGetApp()->window->width;
+    size[1] = (float)LinceGetApp()->window->height;
 }
 
 void LinceTransformToWorld(vec2 screen_coords, vec2 screen_size, mat4 vp_inv){

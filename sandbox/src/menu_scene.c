@@ -6,7 +6,7 @@
 
 void DrawMainMenu(LinceSceneStack* stack, LinceScene* scene){
 
-    LinceUILayer* ui = LinceGetAppState()->ui;
+    LinceUILayer* ui = LinceGetApp()->ui;
     struct nk_context *ctx = ui->ctx;
     nk_style_set_font(ctx, &ui->fonts[LinceFont_Droid30]->handle);
 
@@ -60,7 +60,7 @@ void DrawMainMenu(LinceSceneStack* stack, LinceScene* scene){
         }
         nk_layout_row_dynamic(ctx, row_h, 1);
         if (nk_button_label_styled(ctx, &BUTTON_STYLE, "Exit")){
-            LinceGetAppState()->running = LinceFalse;
+            LinceGetApp()->running = LinceFalse;
         }
     }
     nk_end(ctx);

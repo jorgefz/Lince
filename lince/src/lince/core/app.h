@@ -79,7 +79,7 @@ double LinceGetTimeMillis();
 
 /** @brief Returns the global state of the application. See `LinceApp`.
 */
-LinceApp* LinceGetAppState();
+LinceApp* LinceGetApp();
 
 /** @brief Returns aspect ratio of the window.
 */

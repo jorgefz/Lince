@@ -7,7 +7,7 @@ Any of Nuklear's window functions (anything between and including `nk_begin` and
 Example:
 ```c
 void MyLayerOnUpdate(LinceLayer* layer, float dt){
-	struct nk_context *ctx = LinceGetAppState()->ui->ctx;
+	struct nk_context *ctx = LinceGetApp()->ui->ctx;
 
 	if (nk_begin(ctx, "Demo", nk_rect(50, 50, 230, 250),
         NK_WINDOW_BORDER|NK_WINDOW_MOVABLE|NK_WINDOW_SCALABLE|
@@ -48,7 +48,7 @@ The number next to the enum name indicates the font size, e.g. `LinceFont_Droid2
 Example on how to retrieve a preloaded font:
 ```c
 void MyLayerOnUpdate(LinceLayer* layer, float dt){
-	LinceApp* app = LinceGetAppState();
+	LinceApp* app = LinceGetApp();
 	struct nk_font* title_font = app->ui->fonts[LinceFont_Droid50];
 	nk_style_set_font(app->ui->ctx, &title_font->handle);
 }
@@ -71,7 +71,7 @@ void LinceUIText(
 Wrapper function that renders plain text to the screen.
 Parameters:
 - `LinceUILayer* ui`
-	- UI state, this can be retrieved from the application state `LinceGetAppState()->ui`.
+	- UI state, this can be retrieved from the application state `LinceGetApp()->ui`.
 - `const char* name`
 	- Unique string identifier for the Nuklear window.
 - `float x`
@@ -89,7 +89,7 @@ This example renders the current delta-time and FPS to the upper left corner of 
 ```c
 void MyLayerOnUpdate(LinceLayer* layer, float dt){
 
-	LinceUILayer* ui = LinceGetAppState()->ui;
+	LinceUILayer* ui = LinceGetApp()->ui;
 
 	/*          ui,  identifier,     x,  y,  font,              max, text,       format varargs */
 	LinceUIText(ui, "FPS_indicator", 10, 10, LinceFont_Droid30, 10,  "FPS %.0f", 1000.0/dt);

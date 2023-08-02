@@ -220,7 +220,7 @@ int LinceCompileShader(const char* source, int type){
 	if (compile_sucess != GL_TRUE) {
 		// Retrieve GLSL compiler error message
 		int length = 0;
-		char msg[1000] = {0};
+		char msg[LINCE_TEXT_MAX] = {0};
 		glGetShaderiv(id, GL_INFO_LOG_LENGTH, &length);
 		glGetShaderInfoLog(id, 1000, &length, &msg[0]);
 		glDeleteShader(id);

@@ -5,7 +5,7 @@
 
 
 void SetupApplication(){
-    LinceApp* app = LinceGetAppState();
+    LinceApp* app = LinceGetApp();
 
     // app->user_data = NULL;
     app->screen_width = 1280;

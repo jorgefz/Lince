@@ -31,7 +31,7 @@ void OnTerminate() {
 
 int main() {
 
-	LinceApp* app = LinceGetAppState();
+	LinceApp* app = LinceGetApp();
 	app->on_init = OnInit;
 	app->on_update = OnUpdate;
 	app->on_terminate = OnTerminate;

@@ -24,7 +24,7 @@ int main(){
 ## Customise your window
 
 To change the initial settings of your window, you can
-retrieve and modify its initial state with `LinceGetAppState` before running `LinceRun`.
+retrieve and modify its initial state with `LinceGetApp` before running `LinceRun`.
 
 Set its initial width and height in pixels with `app->width` and `app->height`, and the title at the top bar with `app->title`.
 
@@ -32,7 +32,7 @@ Set its initial width and height in pixels with `app->width` and `app->height`, 
 #include <lince.h>
 
 int main(){
-    LinceApp* app = LinceGetAppState();
+    LinceApp* app = LinceGetApp();
     app->width = 1920;
     app->height = 1080;
     app->title = "My window";
@@ -59,7 +59,7 @@ void OnUpdate(float dt){
 }
 
 int main(){
-    LinceApp* app = LinceGetAppState();
+    LinceApp* app = LinceGetApp();
     app->width = 1920;
     app->height = 1080;
     app->title = "My window";
