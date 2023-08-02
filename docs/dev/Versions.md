@@ -4,12 +4,16 @@ Version codes follow [Semantic Versioning](https://semver.org/).
 
 ### To-Do
 - Merge all key events into single struct.
-- Improve variable name for macros like `LINCE_NAME_MAX`
+- Improve variable name for macros like `LINCE_NAME_MAX`.
+- Remove unused variables from `LinceApp`.
+- Rename function `LinceGetAppState` to `LinceGetApp`.
+- Move misc functions to separate files (`LinceReadFile`, `LinceGetTimeMillis`). 
 - Change entity registry initialisation to take an array of component sizes instead of a list of varargs.
 - Nuklear UI wrapper and/or custom docs.
 - Create functions that don't depend on OpenGL, e.g. `LinceImage` for storing image data, `LinceClock` for timers, etc. 
+- Develop and integrate scene system
 
-## v0.7.1 (WIP)
+## v0.8.0 (WIP)
 - Added functions to initialise camera without allocating heap memory.
 - Started working on the scene system on the sandbox
 - Fixed z sorting with translucency
