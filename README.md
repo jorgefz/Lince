@@ -1,7 +1,9 @@
 # Lince 0.7.0
 
-Lince is a game engine written in C for making 2D games.
-Lince is currently in very early development.
+Lince is a game engine written in C for making 2D games, and currently in very early development.
+
+For some working minigames made with the Lince engine, see https://github.com/jorgefz/lince-minigames.
+
 
 ## Minimal code example - drawing a red square
 
@@ -54,6 +56,13 @@ int main() {
 * Collision system for rectangles.
 * Built-in level and scene editor
 
+## Why Lince
+
+"Lince" means "lynx" in Spanish.
+I chose this name to raise awareness of the Iberian Lynx, which is an endangered species in Spain, my home country.
+
+More details soon...
+
 ## Documentation
 
 You need to have Doxygen installed from https://www.doxygen.nl/ or via the command line on Linux:
@@ -78,6 +87,10 @@ On Windows, Visual Studo 2022 is recommended.
 
 
 ## Building Lince
+
+See the projects in the repository at https://github.com/jorgefz/lince-minigames for examples on how to integrate `lince` to build your game.
+
+There is also an user guide in `docs/userguide` in this repository.
 
 On the root folder (where this README.md file is located), run `premake5` to produce the build configuration files appropriate to your building tool:
 

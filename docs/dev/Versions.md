@@ -3,6 +3,10 @@
 Version codes follow [Semantic Versioning](https://semver.org/).
 
 ### To-Do
+- Update readme with link to minigames repository and name choice.
+- Add github banners.
+- Check compilation on Windows.
+- Rename public variables in premake script, e.g. `IncludeDir`.
 - Replace layer stack with the custom array type.
 - Merge all key events into single struct.
 - Move misc functions to separate files (`LinceReadFile`, `LinceGetTimeMillis`). 
@@ -10,12 +14,13 @@ Version codes follow [Semantic Versioning](https://semver.org/).
 - Nuklear UI wrapper and/or custom docs.
 - Create functions that don't depend on OpenGL, e.g. `LinceImage` for storing image data, `LinceClock` for timers, etc. 
 - Develop and integrate scene system
+- Integrate CMocka and ditch the custom test system
 
 ## v0.8.0 (WIP)
 - Added functions to initialise camera without allocating heap memory.
 - Started working on the scene system on the sandbox
 - Fixed z sorting with translucency
-- Improved error message when font fails to load 
+- Improved error message when font fails to load
 - Removed `LinceCreateTexture`
 - Removed `name` parameter from `LinceTexture` functions.
 - Removed `name` parameter from `LinceShader` functions.

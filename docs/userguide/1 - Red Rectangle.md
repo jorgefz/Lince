@@ -73,7 +73,72 @@ int main(){
 
 ## Init and uninit
 
+```c
+#include <lince.h>
+
+void OnInit(){
+    printf("Application started!\n");
+}
+
+void OnUpdate(float dt){
+    printf("Frame time: %f ms", dt);
+}
+
+void OnTerminate(){
+    printf("Application closed!\n");
+}
+
+int main(){
+    LinceApp* app = LinceGetApp();
+    app->width = 1920;
+    app->height = 1080;
+    app->title = "My window";
+
+    app->on_init = OnInit;
+    app->on_update = OnUpdate;
+    app->on_terminate = OnTerminate;
+
+    LinceRun();
+    return 0;
+}
+```
+
+
 ## Camera
+
+```c
+#include <lince.h>
+
+LinceCamera* camera;
+
+void OnInit(){
+    camera = LinceCreateCamera(LinceGetAspectRatio());
+}
+
+void OnUpdate(float dt){
+    LinceResizeCameraView(camera, LinceGetAspectRatio());
+	LinceUpdateCamera(camera);
+    // printf("Frame time: %f ms", dt);
+}
+
+void OnTerminate(){
+    LinceDeleteCamera(camera);
+}
+
+int main(){
+    LinceApp* app = LinceGetApp();
+    app->width = 1920;
+    app->height = 1080;
+    app->title = "My window";
+
+    app->on_init = OnInit;
+    app->on_update = OnUpdate;
+    app->on_terminate = OnTerminate;
+
+    LinceRun();
+    return 0;
+}
+```
 
 ## DrawSprite
 
