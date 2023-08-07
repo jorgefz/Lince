@@ -1,15 +1,4 @@
 
-OutputDir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
-
-IncludeDir = {}
-IncludeDir["glfw"]    = "deps/glfw/include"
-IncludeDir["glad"]    = "deps/glad/include"
-IncludeDir["cglm"]    = "deps/cglm/include"
-IncludeDir["nuklear"] = "deps/nuklear/include"
-IncludeDir["stb"]     = "deps/stb/include"
-IncludeDir["miniaudio"] = "deps/miniaudio/include"
-IncludeDir["lince"]   = "lince/src"
-
 
 project "glfw"
     kind "StaticLib"
@@ -17,8 +6,8 @@ project "glfw"
     staticruntime "on"
     location "build/glfw"
 
-    targetdir ("bin/" .. OutputDir .. "/%{prj.name}")
-    objdir ("obj/" .. OutputDir .. "/%{prj.name}")
+    targetdir ("bin/" .. LinceOutputDir .. "/%{prj.name}")
+    objdir ("obj/" .. LinceOutputDir .. "/%{prj.name}")
 
     SrcDir = "deps/glfw/src"
     
@@ -84,8 +73,8 @@ project "glad"
     staticruntime "On"
     location "build/glad"
 
-    targetdir ("bin/" .. OutputDir .. "/%{prj.name}")
-    objdir ("obj/" .. OutputDir .. "/%{prj.name}")
+    targetdir ("bin/" .. LinceOutputDir .. "/%{prj.name}")
+    objdir ("obj/" .. LinceOutputDir .. "/%{prj.name}")
 
     files {
         "deps/glad/include/glad/glad.h",
@@ -110,8 +99,8 @@ project "cglm"
     staticruntime "On"
     location "build/cglm"
 
-    targetdir ("bin/" .. OutputDir .. "/%{prj.name}")
-    objdir ("obj/" .. OutputDir .. "/%{prj.name}")
+    targetdir ("bin/" .. LinceOutputDir .. "/%{prj.name}")
+    objdir ("obj/" .. LinceOutputDir .. "/%{prj.name}")
 
     files {
         "deps/cglm/src/**.c",
@@ -137,8 +126,8 @@ project "stb"
     staticruntime "On"
     location "build/stb"
 
-    targetdir ("bin/" .. OutputDir .. "/%{prj.name}")
-    objdir ("obj/" .. OutputDir .. "/%{prj.name}")
+    targetdir ("bin/" .. LinceOutputDir .. "/%{prj.name}")
+    objdir ("obj/" .. LinceOutputDir .. "/%{prj.name}")
 
     files {
         "deps/stb/src/**.c",
@@ -162,8 +151,8 @@ project "nuklear"
     staticruntime "on"
     location "build/nuklear"
 
-    objdir ("obj/" .. OutputDir .. "/%{prj.name}" )
-    targetdir ("bin/" .. OutputDir .. "/%{prj.name}" )
+    objdir ("obj/" .. LinceOutputDir .. "/%{prj.name}" )
+    targetdir ("bin/" .. LinceOutputDir .. "/%{prj.name}" )
     
     defines "GLFW_INCLUDED_NONE"
 
@@ -175,9 +164,9 @@ project "nuklear"
     includedirs {
         "deps/nuklear",
         "deps/nuklear/src",
-        "%{IncludeDir.nuklear}",
-        "%{IncludeDir.glfw}",
-        "%{IncludeDir.glad}",
+        "%{LinceIncludeDir.nuklear}",
+        "%{LinceIncludeDir.glfw}",
+        "%{LinceIncludeDir.glad}",
     }
 
     links {
@@ -186,8 +175,8 @@ project "nuklear"
     }
 
     libdirs {
-        "bin/" .. OutputDir .. "/glad",
-        "bin/" .. OutputDir .. "/glfw",
+        "bin/" .. LinceOutputDir .. "/glad",
+        "bin/" .. LinceOutputDir .. "/glfw",
     }
 
 
@@ -197,8 +186,8 @@ project "miniaudio"
     staticruntime "on"
     location "build/miniaudio"
 
-    objdir ("obj/" .. OutputDir .. "/%{prj.name}" )
-    targetdir ("bin/" .. OutputDir .. "/%{prj.name}" )
+    objdir ("obj/" .. LinceOutputDir .. "/%{prj.name}" )
+    targetdir ("bin/" .. LinceOutputDir .. "/%{prj.name}" )
     
     files {
         "deps/miniaudio/src/**.c",
@@ -215,8 +204,8 @@ project "miniaudio"
     }
 
     libdirs {
-        "bin/" .. OutputDir .. "/glad",
-        "bin/" .. OutputDir .. "/glfw",
+        "bin/" .. LinceOutputDir .. "/glad",
+        "bin/" .. LinceOutputDir .. "/glfw",
     }
 
 
@@ -226,8 +215,8 @@ project "lince"
     staticruntime "on"
     location "build/lince"
 
-    targetdir ("bin/" .. OutputDir .. "/%{prj.name}")
-    objdir ("obj/" .. OutputDir .. "/%{prj.name}")
+    targetdir ("bin/" .. LinceOutputDir .. "/%{prj.name}")
+    objdir ("obj/" .. LinceOutputDir .. "/%{prj.name}")
 
     defines "GLFW_INCLUDED_NONE"
 
@@ -240,12 +229,12 @@ project "lince"
         "lince",
 		"lince/src",
         "lince/src/lince",
-        "%{IncludeDir.glfw}",
-        "%{IncludeDir.glad}",
-        "%{IncludeDir.cglm}",
-        "%{IncludeDir.nuklear}",
-        "%{IncludeDir.stb}",
-        "%{IncludeDir.miniaudio}"
+        "%{LinceIncludeDir.glfw}",
+        "%{LinceIncludeDir.glad}",
+        "%{LinceIncludeDir.cglm}",
+        "%{LinceIncludeDir.nuklear}",
+        "%{LinceIncludeDir.stb}",
+        "%{LinceIncludeDir.miniaudio}"
     }
 
     links {
@@ -258,10 +247,10 @@ project "lince"
     }
 
     libdirs {
-        "bin/" .. OutputDir .. "/glad",
-        "bin/" .. OutputDir .. "/glfw",
-        "bin/" .. OutputDir .. "/nuklear",
-        "bin/" .. OutputDir .. "/cglm",
-        "bin/" .. OutputDir .. "/stb",
-        "bin/" .. OutputDir .. "/miniaudio",
+        "bin/" .. LinceOutputDir .. "/glad",
+        "bin/" .. LinceOutputDir .. "/glfw",
+        "bin/" .. LinceOutputDir .. "/nuklear",
+        "bin/" .. LinceOutputDir .. "/cglm",
+        "bin/" .. LinceOutputDir .. "/stb",
+        "bin/" .. LinceOutputDir .. "/miniaudio",
     }

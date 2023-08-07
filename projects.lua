@@ -15,8 +15,8 @@ project "tests"
     staticruntime "on"
     location "build/tests"
 
-    targetdir ("bin/" .. OutputDir .. "/%{prj.name}")
-    objdir ("obj/" .. OutputDir .. "/%{prj.name}")
+    targetdir ("bin/" .. LinceOutputDir .. "/%{prj.name}")
+    objdir ("obj/" .. LinceOutputDir .. "/%{prj.name}")
 
     files {
         "%{prj.name}/src/**.c",
@@ -27,10 +27,10 @@ project "tests"
         "deps/cmocka/include",
         "%{prj.name}",
         "%{prj.name}/src",
-        "%{IncludeDir.lince}",
-        "%{IncludeDir.glfw}",
-        "%{IncludeDir.glad}",
-        "%{IncludeDir.cglm}",
+        "%{LinceIncludeDir.lince}",
+        "%{LinceIncludeDir.glfw}",
+        "%{LinceIncludeDir.glad}",
+        "%{LinceIncludeDir.cglm}",
     }
 
     links {
@@ -45,7 +45,7 @@ project "tests"
 
     libdirs {
         "build/cmocka/src",
-        "bin/" .. OutputDir .. "/lince"
+        "bin/" .. LinceOutputDir .. "/lince"
     }
 
 
@@ -55,8 +55,8 @@ project "editor"
     staticruntime "on"
     location "build/editor"
 
-    targetdir ("bin/" .. OutputDir .. "/%{prj.name}")
-    objdir ("obj/" .. OutputDir .. "/%{prj.name}")
+    targetdir ("bin/" .. LinceOutputDir .. "/%{prj.name}")
+    objdir ("obj/" .. LinceOutputDir .. "/%{prj.name}")
 
     files {
         "%{prj.name}/src/**.c",
@@ -66,12 +66,12 @@ project "editor"
     includedirs {
         "%{prj.name}",
 		"%{prj.name}/src",
-        "%{IncludeDir.lince}",
-        "%{IncludeDir.glfw}",
-        "%{IncludeDir.glad}",
-        "%{IncludeDir.cglm}",
-        "%{IncludeDir.nuklear}",
-        "%{IncludeDir.stb}"
+        "%{LinceIncludeDir.lince}",
+        "%{LinceIncludeDir.glfw}",
+        "%{LinceIncludeDir.glad}",
+        "%{LinceIncludeDir.cglm}",
+        "%{LinceIncludeDir.nuklear}",
+        "%{LinceIncludeDir.stb}"
     }
 
     links {
@@ -83,7 +83,7 @@ project "editor"
         "nuklear"
     }
 
-    libdirs {"bin/" .. OutputDir .. "/lince"}
+    libdirs {"bin/" .. LinceOutputDir .. "/lince"}
 
 
 project "sandbox"
@@ -92,8 +92,8 @@ project "sandbox"
     staticruntime "on"
     location "build/sandbox"
     
-    targetdir ("bin/" .. OutputDir .. "/%{prj.name}")
-    objdir ("obj/" .. OutputDir .. "/%{prj.name}")
+    targetdir ("bin/" .. LinceOutputDir .. "/%{prj.name}")
+    objdir ("obj/" .. LinceOutputDir .. "/%{prj.name}")
 
     files {
         "%{prj.name}/src/**.c",
@@ -103,13 +103,13 @@ project "sandbox"
     includedirs {
         "%{prj.name}",
 		"%{prj.name}/src",
-        "%{IncludeDir.lince}",
-        "%{IncludeDir.glfw}",
-        "%{IncludeDir.glad}",
-        "%{IncludeDir.cglm}",
-        "%{IncludeDir.nuklear}",
-        "%{IncludeDir.stb}",
-        "%{IncludeDir.miniaudio}"
+        "%{LinceIncludeDir.lince}",
+        "%{LinceIncludeDir.glfw}",
+        "%{LinceIncludeDir.glad}",
+        "%{LinceIncludeDir.cglm}",
+        "%{LinceIncludeDir.nuklear}",
+        "%{LinceIncludeDir.stb}",
+        "%{LinceIncludeDir.miniaudio}"
     }
 
     links {
@@ -122,4 +122,4 @@ project "sandbox"
         "miniaudio"
     }
 
-    libdirs {"bin/" .. OutputDir .. "/lince"}
+    libdirs {"bin/" .. LinceOutputDir .. "/lince"}

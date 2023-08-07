@@ -6,7 +6,6 @@ Version codes follow [Semantic Versioning](https://semver.org/).
 - Update readme with link to minigames repository and name choice.
 - Add github banners.
 - Check compilation on Windows.
-- Rename public variables in premake script, e.g. `IncludeDir`.
 - Replace layer stack with the custom array type.
 - Merge all key events into single struct.
 - Move misc functions to separate files (`LinceReadFile`, `LinceGetTimeMillis`). 
@@ -14,7 +13,6 @@ Version codes follow [Semantic Versioning](https://semver.org/).
 - Nuklear UI wrapper and/or custom docs.
 - Create functions that don't depend on OpenGL, e.g. `LinceImage` for storing image data, `LinceClock` for timers, etc. 
 - Develop and integrate scene system
-- Integrate CMocka and ditch the custom test system
 
 ## v0.8.0 (WIP)
 - Added functions to initialise camera without allocating heap memory.
@@ -33,6 +31,8 @@ Version codes follow [Semantic Versioning](https://semver.org/).
 - Renamed `LINCE_STR_MAX` to `LINCE_TEXT_MAX`.
 - Renamed function `LinceGetAppState` to `LinceGetApp`.
 - Replaced instances of standard C functions `malloc`,`calloc`,`realloc`, and `free` with the engine versions.
+- Integrated CMocka as the testing framework
+- Renamed premake5 script variables `OutputDir` to `LinceOutputDir`, and `IncludeDir` to `LinceIncludeDir`.
 
 ## v0.7.0
 - Added support for custom shaders in renderer
