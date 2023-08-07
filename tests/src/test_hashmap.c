@@ -1,7 +1,11 @@
-#include "lince/containers/hashmap.h"
+#include <stdarg.h>
+#include <stddef.h>
+#include <stdint.h>
+#include <setjmp.h>
+#include <cmocka.h>
 
+#include "lince/containers/hashmap.h"
 #include "test.h"
-#include "targets.h"
 
 static void scan_hashmap(hashmap_t* map){
 	printf("\n Hashmap size %u and %u entries\n", map->size, map->entries);
@@ -21,7 +25,7 @@ static void scan_hashmap(hashmap_t* map){
 }
 
 
-int test_hashmap_performance(){
+static int test_hashmap_performance(){
 
 	hashmap_t map;
 	hashmap_init(&map, 5);
@@ -43,38 +47,41 @@ int test_hashmap_performance(){
 	return TEST_PASS;
 }
 
-int test_hashmap(){
+void test_hashmap(void** state){
+	(void)state;
 
-	// init
+	// Initialise
 	hashmap_t map;
 	hashmap_init(&map, 5);
-	TEST_ASSERT(map.table && map.size==7, "Failed to create hashmap");
+	assert_non_null(map.table);
+	assert_true(map.size == 7);
 	
-	// init, size_hint = 0
+	// Initialise with size hint zero
 	hashmap_t map0;
 	hashmap_init(&map0, 0);
-	TEST_ASSERT(map0.table && map0.size == 2, "Failed to create hashmap");
+	assert_non_null(map0.table);
+	assert_true(map0.size == 2);
 	hashmap_uninit(&map0);
 
-	// set
+	// Set values
 	int r = 1, x = 10, y = 20, z = 30;
 	r = r && hashmap_set(&map, "x", &x);
 	r = r && hashmap_set(&map, "y", &y);
 	r = r && hashmap_set(&map, "z", &z);
-	TEST_ASSERT(r, "Failed to insert values to hashmap");
+	assert_true(r);
 	
-	// get
+	// Retrieve values
 	int *rx, *ry, *rz, *none;
 	rx = hashmap_get(&map, "x");
 	ry = hashmap_get(&map, "y");
 	rz = hashmap_get(&map, "z");
 	none = hashmap_get(&map, "n");
 	
-	TEST_ASSERT(rx && ry && rz && !none, "Failed to retrieve values from hashmap");
-	TEST_ASSERT(*rx == x && *ry == y && *rz == z && map.entries == 3,
-		"Failed to retrieve values from hashmap");
+	assert_true(rx && ry && rz && !none);
+	assert_true(*rx == x && *ry == y && *rz == z);
+	assert_true(map.entries == 3);
 	
-	// iter keys
+	// Iterate over keys
 	char* key = NULL;
 	int key_count = 0;
 	do{
@@ -82,16 +89,13 @@ int test_hashmap(){
 		key_count++;
 	} while(key);
 	key_count--;
-	TEST_ASSERT(key_count==3, "Key iteration failed, unexpected number of keys");
-
-	// uninit
+	assert_true(key_count==3);
 	hashmap_uninit(&map);
 
-	// create & destroy
+	// Allocate and destroy
 	hashmap_t* p = hashmap_create(2);
-	TEST_ASSERT(p, "Failed to create hashmap on heap");
+	assert_non_null(p);
 	hashmap_destroy(p);
 
-	return TEST_PASS;
 }
 
