@@ -8,7 +8,7 @@
 
 typedef struct Position { float x, y; } Position;
 typedef struct Velocity { float vx, vy; } Velocity;
-typedef struct Sprite   { LinceQuadProps data; } Sprite;
+typedef struct Sprite   { LinceSprite data; } Sprite;
 typedef struct Timer    { float start, end, step, counter; } Timer;
 typedef struct BoxCollider { float x, y, w, h; } BoxCollider;
 

@@ -18,7 +18,7 @@ LinceTile LinceGetTile(LinceTexture* texture, vec2 pos, vec2 cellsize, vec2 tile
 ```
 This function calculates the texture coordinates of a tile within a texture,
 and returns the results packaged in a `LinceTile` structure along with the input parameters used to calculate it (see above).
-This object may later be passed to the `tile` argument of `LinceQuadProps` on the 2D renderer to render the desired tile only (see [Renderer](./Renderer.md)).
+This object may later be passed to the `tile` argument of `LinceSprite` on the 2D renderer to render the desired tile only (see [Renderer](./Renderer.md)).
 
 Example code:
 ```c
@@ -119,7 +119,7 @@ LinceTileAnim* anim = LinceCreateTileAnim(&(LinceTileAnim){
 /* OnLayerUpdate */
 LinceBeginScene(camera);
 LinceUpdateAnim(anim);
-LinceDrawQuad((LinceQuadProps){
+LinceDrawQuad((LinceSprite){
 	.w = 1.0, .h = 1.0,
 	.color = {0.0, 0.0, 0.0, 1.0},
 	.tile = anim->current_tile;

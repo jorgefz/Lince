@@ -1,4 +1,13 @@
 
+externalproject "cmocka"
+    -- Run CMake for cmocka
+    os.execute("cmake -B "..os.getcwd().."/build/cmocka -S "..os.getcwd().."/deps/cmocka")   
+    location "build/cmocka"
+    uuid "57940020-8E99-AEB6-271F-61E0F7F6B73B"
+    kind "SharedLib"
+    language "C"
+    targetdir ("build/cmocka/src")
+
 
 project "tests"
     kind "ConsoleApp"
@@ -15,15 +24,17 @@ project "tests"
     }
     
     includedirs {
+        "deps/cmocka/include",
         "%{prj.name}",
         "%{prj.name}/src",
         "%{IncludeDir.lince}",
         "%{IncludeDir.glfw}",
         "%{IncludeDir.glad}",
-        "%{IncludeDir.cglm}"
+        "%{IncludeDir.cglm}",
     }
 
     links {
+        "cmocka",
         "lince",
         "glad",
         "glfw",
@@ -32,7 +43,10 @@ project "tests"
         "stb"
     }
 
-    libdirs {"bin/" .. OutputDir .. "/lince"}
+    libdirs {
+        "build/cmocka/src",
+        "bin/" .. OutputDir .. "/lince"
+    }
 
 
 project "editor"
