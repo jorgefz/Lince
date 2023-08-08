@@ -17,9 +17,6 @@ void SetupApplication(){
     app->on_update = EditorOnUpdate;
     app->on_event = EditorOnEvent;
     app->on_terminate = EditorTerminate;
-    
-    app->enable_profiling = LinceTrue;
-    app->profiler_filename = "tests/profiling/profile.txt";
 }
 
 

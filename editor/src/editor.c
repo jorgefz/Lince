@@ -264,7 +264,8 @@ void MoveCamera(float dt){
 
 void EditorInit(){
     STATE.reg = LinceCreateEntityRegistry(
-        3,
+        4,
+        sizeof(LinceTag),
         sizeof(LinceBoxCollider),
         sizeof(LinceSprite),
         sizeof(LinceShader)

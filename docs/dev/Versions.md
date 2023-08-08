@@ -17,15 +17,15 @@ Version codes follow [Semantic Versioning](https://semver.org/).
 ## v0.8.0 (WIP)
 - Added functions to initialise camera without allocating heap memory.
 - Started working on the scene system on the sandbox
-- Fixed z sorting with translucency
+- Added z-sorting with translucency by sorting sprites before drawing
 - Improved error message when font fails to load
 - Removed `LinceCreateTexture`
 - Removed `name` parameter from `LinceTexture` functions.
 - Removed `name` parameter from `LinceShader` functions.
 - `LINCE_DIR` now generated in premake5 file automatically from any path.
 - Change naming of event-related variable names from past tense (e.g. pressed) to present tense (.e.g press), and shortened "mouse button" to simply "mouse". This affects `LinceEventType` enum values, `LinceEventData` union members, event struct names, and event creation functions.
-- Renamed application callback variables e.g. from `on_update` to `on_update`.
-- Removed bug where passing a NULL value as the filename for the log file would result in undefined behaviour.
+- Renamed application callback variables e.g. from `game_on_update` to `on_update`.
+- Fixed bug where passing a NULL value as the filename for the log file would result in undefined behaviour.
 - Added functions to open and close a profiling file, instead of providing a file handle directly.
 - Added logging platform name in log file.
 - Renamed `LINCE_STR_MAX` to `LINCE_TEXT_MAX`.
@@ -33,6 +33,7 @@ Version codes follow [Semantic Versioning](https://semver.org/).
 - Replaced instances of standard C functions `malloc`,`calloc`,`realloc`, and `free` with the engine versions.
 - Integrated CMocka as the testing framework
 - Renamed premake5 script variables `OutputDir` to `LinceOutputDir`, and `IncludeDir` to `LinceIncludeDir`.
+- Fixed bug in editor where entity registry was initalised with the wrong number of components.
 
 ## v0.7.0
 - Added support for custom shaders in renderer
