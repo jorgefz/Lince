@@ -5,6 +5,7 @@
 * Main initialisation and execution functions for the Lince engine
 */
 
+#include "lince/containers/array.h"
 #include "lince/core/window.h"
 #include "lince/core/layer.h"
 #include "lince/event/event.h"
@@ -40,8 +41,11 @@ typedef struct LinceApp{
 
     /* Internal state */
     LinceWindow     *window;        ///< Window state.
-    LinceLayerStack *layer_stack;   ///< Array of rendering layers.
-    LinceLayerStack *overlay_stack; ///< Array of rendering overlays (drawn after layers).
+    // LinceLayerStack *layer_stack;   ///< Array of rendering layers.
+    // LinceLayerStack *overlay_stack; ///< Array of rendering overlays (drawn after layers).
+    array_t layer_stack;   ///< Array of rendering layers.
+    array_t overlay_stack; ///< Array of rendering overlays (drawn after layers).
+
     LinceBool        running;       ///< True if the application is active.
     float time_ms;       ///< Run time in milliseconds.
     float dt;            ///< Frame time step in milliseconds.

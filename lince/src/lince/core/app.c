@@ -80,6 +80,20 @@ void LinceCheckErrors(){
 }
 
 
+// Iterates over layers, calling the provided callback.
+// NOTE: requires __VA_ARGS__ to consume preceding comma!!
+//  This is supported by MSVC and GCC as an extension.
+#define LINCE_MAP_OVER_LAYERS(STACK, CURRENT, CALLBACK, ...)    \
+    for(uint32_t i = 0; i != (STACK).size; ++i){                \
+        CURRENT = i;                                            \
+        LinceLayer* layer = array_get(&(STACK), i);             \
+        if (layer && layer->CALLBACK){                          \
+            layer->CALLBACK(layer, ##__VA_ARGS__);              \
+        }                                                       \
+    }                                                           \
+    CURRENT = -1;                                               \
+
+
 void LinceRun(){
 
     LinceInit();
@@ -97,11 +111,13 @@ LinceApp* LinceGetApp(){
 }
 
 void LincePushLayer(LinceLayer* layer) {
-    LinceLayerStackPush(app.layer_stack, layer);
+    if(layer->OnAttach) layer->OnAttach(layer);
+    array_push_back(&app.layer_stack, layer);
 }
 
 void LincePushOverlay(LinceLayer* overlay) {
-    LinceLayerStackPush(app.overlay_stack, overlay);
+    if(overlay->OnAttach) overlay->OnAttach(overlay);
+    array_push_back(&app.overlay_stack, overlay);
 }
 
 double LinceGetTimeMillis(){
@@ -141,12 +157,12 @@ void LinceGetMousePosWorld(vec2 pos, LinceCamera* cam){
 
 LinceLayer* LinceGetCurrentLayer(){
     if (app.current_layer < 0) return NULL;
-    return app.layer_stack->layers[app.current_layer];
+    return array_get(&app.layer_stack, app.current_layer);
 }
 
 LinceLayer* LinceGetCurrentOverlay(){
     if (app.current_overlay < 0) return NULL;
-    return app.overlay_stack->layers[app.current_overlay];
+    return array_get(&app.overlay_stack, app.current_overlay);
 }
 
 /* --- Implementations of static functions --- */
@@ -186,10 +202,10 @@ static void LinceInit(){
     app.window = LinceCreateWindow(app.screen_width, app.screen_height, app.title);
     LinceSetMainEventCallback(app.window, LinceOnEvent);
 
-    // init layer and overlay stacks
-    app.layer_stack = LinceCreateLayerStack();
-    app.overlay_stack = LinceCreateLayerStack();
-    
+    // Create layer stacks
+    array_init(&app.layer_stack, sizeof(LinceLayer));
+    array_init(&app.overlay_stack, sizeof(LinceLayer));
+
     LinceInitRenderer(app.window);
     app.ui = LinceInitUI(app.window->handle);
     app.running = LinceTrue;
@@ -211,24 +227,11 @@ static void LinceOnUpdate(){
 
     LinceBeginUIRender(app.ui);
 
-    // update layers
-    unsigned int i;
-    for (i = 0; i != app.layer_stack->count; ++i) {
-        LinceLayer* layer = app.layer_stack->layers[i];
-        app.current_layer = i;
-        if (layer && layer->OnUpdate) layer->OnUpdate(layer, app.dt);
-    }
-    app.current_layer = -1;
+    // Update layers
+    LINCE_MAP_OVER_LAYERS(app.layer_stack, app.current_layer, OnUpdate, app.dt);
+    LINCE_MAP_OVER_LAYERS(app.overlay_stack, app.current_overlay, OnUpdate, app.dt);
 
-    // update overlays
-    for (i = 0; i != app.overlay_stack->count; ++i) {
-        LinceLayer* overlay = app.overlay_stack->layers[i];
-        app.current_overlay = i;
-        if (overlay && overlay->OnUpdate) overlay->OnUpdate(overlay, app.dt);
-    }
-    app.current_overlay = -1;
-
-    // update user application
+    // Update user application
     if (app.on_update) app.on_update(app.dt);
 
     LinceEndUIRender(app.ui);
@@ -240,11 +243,12 @@ static void LinceTerminate(){
 
     LinceTerminateRenderer();
     
-    // free layer and overlay stacks
-    LinceDestroyLayerStack(app.layer_stack);
-    LinceDestroyLayerStack(app.overlay_stack);
-    app.layer_stack = NULL;
-    app.overlay_stack = NULL;
+    // Destroy layer stacks
+    LINCE_MAP_OVER_LAYERS(app.layer_stack, app.current_layer, OnDetach);
+    LINCE_MAP_OVER_LAYERS(app.overlay_stack, app.current_overlay, OnDetach);
+
+    array_uninit(&app.layer_stack);
+    array_uninit(&app.overlay_stack);
     
     if (app.on_terminate) app.on_terminate();
 
@@ -276,26 +280,12 @@ static void LinceOnEvent(LinceEvent* e){
 
     LinceUIOnEvent(app.ui, e);
 
-    /* propagate event to layers and overlays,
+    /* Propagate event to layers and overlays,
     the ones in front (rendered last) receive it first */
-    int i;
-    for (i = (int)app.overlay_stack->count - 1; i >= 0; --i) {
-        if (e->handled) break;
-        LinceLayer* overlay = app.overlay_stack->layers[i];
-        app.current_overlay = i;
-        if (overlay && overlay->OnEvent) overlay->OnEvent(overlay, e);
-    }
-    app.current_overlay = -1;
+    LINCE_MAP_OVER_LAYERS(app.layer_stack, app.current_layer, OnEvent, e);
+    LINCE_MAP_OVER_LAYERS(app.overlay_stack, app.current_overlay, OnEvent, e);
 
-    for (i = (int)app.layer_stack->count - 1; i >= 0; --i) {
-        if (e->handled) break;
-        LinceLayer* layer = app.layer_stack->layers[i];
-        app.current_layer = i;
-        if (layer && layer->OnEvent) layer->OnEvent(layer, e);
-    }
-    app.current_layer = -1;
-
-    // propagate event to user
+    // Propagate event to user
     if (app.on_event && !e->handled ) app.on_event(e);
 }
 
