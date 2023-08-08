@@ -13,6 +13,18 @@ LinceIncludeDir["miniaudio"] = "deps/miniaudio/include"
 LinceIncludeDir["lince"]   = "lince/src"
 
 
+if _ACTION == "clean" then
+    os.rmdir(os.getcwd() .. "/build")
+    os.rmdir(os.getcwd() .. "/bin")
+    os.rmdir(os.getcwd() .. "/obj")
+    os.rmdir(os.getcwd() .. "/Makefile")
+    os.rmdir(os.getcwd() .. "/docs/html")
+    os.rmdir(os.getcwd() .. "/docs/latex")
+    print("Action 'clean' finished")
+    os.exit()
+end
+
+
 workspace "lince"
     architecture "x86_64"
     startproject "editor"

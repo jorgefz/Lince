@@ -3,6 +3,7 @@
 Version codes follow [Semantic Versioning](https://semver.org/).
 
 ### To-Do
+- Added premake action 'test' that compiles cmocka and runs tests
 - Update readme with link to minigames repository and name choice.
 - Add github banners.
 - Check compilation on Windows.
@@ -13,6 +14,7 @@ Version codes follow [Semantic Versioning](https://semver.org/).
 - Nuklear UI wrapper and/or custom docs.
 - Create functions that don't depend on OpenGL, e.g. `LinceImage` for storing image data, `LinceClock` for timers, etc. 
 - Develop and integrate scene system
+
 
 ## v0.8.0 (WIP)
 - Added functions to initialise camera without allocating heap memory.
@@ -34,6 +36,8 @@ Version codes follow [Semantic Versioning](https://semver.org/).
 - Integrated CMocka as the testing framework
 - Renamed premake5 script variables `OutputDir` to `LinceOutputDir`, and `IncludeDir` to `LinceIncludeDir`.
 - Fixed bug in editor where entity registry was initalised with the wrong number of components.
+- Added 'clean' action to premake5 that removes build outputs
+
 
 ## v0.7.0
 - Added support for custom shaders in renderer
