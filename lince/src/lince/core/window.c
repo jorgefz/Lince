@@ -44,7 +44,7 @@ LinceWindow* LinceCreateWindow(uint32_t width, uint32_t height, const char* titl
     
     /* Using OpenGL 4.0 */
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
     glfwSetErrorCallback(GLFWErrorCallback);
