@@ -37,6 +37,8 @@ Version codes follow [Semantic Versioning](https://semver.org/).
 - Renamed premake5 script variables `OutputDir` to `LinceOutputDir`, and `IncludeDir` to `LinceIncludeDir`.
 - Fixed bug in editor where entity registry was initalised with the wrong number of components.
 - Added 'clean' action to premake5 that removes build outputs
+- Fixed comaptibility with Windows by enforcing old MSVC preprocessor
+- Fixed minimum required OpenGL version to 4.5.
 
 
 ## v0.7.0

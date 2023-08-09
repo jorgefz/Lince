@@ -25,7 +25,7 @@
 | Name                 | Description                     |
 | -------------------- | --------------------------------|
 | LINCE_NAME_MAX       | Maximum size for short names    |
-| LINCE_NAME_MAX       | Maximum size for longer strings |
+| LINCE_TEXT_MAX       | Maximum size for longer strings |
 
 ## Allocations
 Customise memory management.
@@ -53,6 +53,9 @@ Note that these do not apply to the containers (e.g. array, hashmap, list).
     #undef LINCE_VERSION
 #endif
 #define LINCE_VERSION "0.7.0" ///< Current Lince version
+
+#define LINCE_GL_VERSION_MAJOR 4 ///< Minimum major OpenGL version supported
+#define LINCE_GL_VERSION_MINOR 5 ///< Minimum minor OpenGL version supported
 
 /* Platform */
 #ifdef LINCE_WINDOWS
