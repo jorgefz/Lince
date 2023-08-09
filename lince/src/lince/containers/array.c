@@ -120,7 +120,7 @@ array_t* array_resize(array_t* array, uint32_t size){
 /* Overwrites an element at the given index with the given data */
 void* array_set(array_t* array, void* element, uint32_t index){
 	if(!array || array->element_size == 0 || index >= array->size) return NULL;
-	addr_t addr = array->data + index * array->element_size;
+	addr_t addr = (addr_t)array->data + index * array->element_size;
 	if(!element){
 		memset(addr, 0, array->element_size);
 	} else {
@@ -133,7 +133,7 @@ void* array_set(array_t* array, void* element, uint32_t index){
 /* Returns a pointer to the element at the specified index */
 void* array_get(array_t* array, uint32_t index){
 	if(!array || array->element_size == 0 || index >= array->size) return NULL;
-	addr_t addr = array->data + index * array->element_size;
+	addr_t addr = (addr_t)array->data + index * array->element_size;
 	return addr;
 }
 
@@ -171,7 +171,7 @@ array_t* array_insert(array_t* array, void* element, uint32_t index){
 		if(!r) return NULL;
 	}
 	
-	addr_t addr = array->data + index * array->element_size;
+	addr_t addr = (addr_t)array->data + index * array->element_size;
 	uint32_t move_bytes = (array->size - index) * array->element_size;
 	
 	if(move_bytes > 0){
@@ -213,7 +213,7 @@ array_t* array_remove(array_t* array, uint32_t index){
 		return array;
 	}
 	
-	addr_t dest = array->data + index * array->element_size;
+	addr_t dest = (addr_t)array->data + index * array->element_size;
 	addr_t orig = dest + array->element_size;
 	uint32_t move_bytes = (array->size - index) * array->element_size;
 
