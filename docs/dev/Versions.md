@@ -3,6 +3,7 @@
 Version codes follow [Semantic Versioning](https://semver.org/).
 
 ### To-Do
+- Improve premake5 scripts. Follow example of Hazel engine.
 - Added premake action 'test' that compiles cmocka and runs tests
 - Update readme with link to minigames repository and name choice.
 - Add github banners.
