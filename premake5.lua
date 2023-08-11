@@ -1,17 +1,4 @@
 
--- Folder name for compilation outputs inside 'build/' and 'bin/'.
-LinceOutputDir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
-
--- Location of dependencies
-LinceIncludeDir = {}
-LinceIncludeDir["glfw"]    = "deps/glfw/include"
-LinceIncludeDir["glad"]    = "deps/glad/include"
-LinceIncludeDir["cglm"]    = "deps/cglm/include"
-LinceIncludeDir["nuklear"] = "deps/nuklear/include"
-LinceIncludeDir["stb"]     = "deps/stb/include"
-LinceIncludeDir["miniaudio"] = "deps/miniaudio/include"
-LinceIncludeDir["lince"]   = "lince/src"
-
 
 if _ACTION == "clean" then
     os.rmdir(os.getcwd() .. "/build")
@@ -24,36 +11,33 @@ if _ACTION == "clean" then
     os.exit()
 end
 
+include "deps.lua"
 
 workspace "lince"
     architecture "x86_64"
-    startproject "editor"
+    startproject "lince"
     warnings "Extra"
     
     -- defines{"LINCE_PROFILE"}
     defines {"LINCE_DIR=\"" .. os.getcwd() .. "/\""}
     print("LINCE_DIR=\"" .. os.getcwd() .. "/\"")
     
-    
     configurations {"Debug", "Release"}
-    filter "system:windows"
-        systemversion "latest"
-        defines {"_CRT_SECURE_NO_WARNINGS", "LINCE_WINDOWS"}
-        buildoptions {"/Zc:preprocessor"}
-        links {"opengl32"}
+    flags {"MultiProcessorCompile"}
 
-    filter "system:linux"
-        systemversion "latest"    
-        links {"GL","rt","m","dl","pthread","X11"}
-        defines {"LINCE_LINUX"}
-        
-    filter "configurations:Debug"
-        symbols "on"
-        defines {"LINCE_DEBUG"}
+    group "deps"
+        include "deps/premake5.lua"
+    group ""
+    
+    group "test"
+        include "test/premake5.lua"
+    group ""
 
-    filter "configurations:Release"
-        optimize "on"
-        defines {"LINCE_RELEASE"}
+    group "core"
+        include "lince"
+    group ""
 
-    include "deps.lua"
-    include "projects.lua"
+    group "tools"
+        include "editor/premake5.lua"
+        include "sandbox"
+    group ""
