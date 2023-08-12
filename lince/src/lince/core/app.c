@@ -120,6 +120,22 @@ void LincePushOverlay(LinceLayer* overlay) {
     array_push_back(&app.overlay_stack, overlay);
 }
 
+void LincePopLayer(LinceLayer* layer) {
+    if(layer->on_detach) layer->on_detach(layer);
+    // Find 'layer' in stack. How??
+    // Consider creating uuid for each new layer
+    // Will need LinceLayerInit to generate it.
+    // For generating uuid, use platform libraries.
+    // Preprocessor #if to select appropriate platform library
+    array_pop_back(&app.layer_stack);
+}
+
+void LincePopOverlay(LinceLayer* overlay) {
+    if(overlay->on_detach) overlay->on_detach(overlay);
+    // Find overlay in stack. How??
+    array_pop_back(&app.overlay_stack);
+}
+
 double LinceGetTimeMillis(){
     return (glfwGetTime() * 1000.0);
 }

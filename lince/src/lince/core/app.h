@@ -67,7 +67,6 @@ void LinceCheckErrors();
 
 /** @brief Adds a rendering layer to the application.
 * @param layer Rendering layer to push onto the application's layer stack.
-*              Must have been initialised with `LinceCreateLayer`.
 */
 void LincePushLayer(LinceLayer* layer);
 
@@ -76,6 +75,16 @@ void LincePushLayer(LinceLayer* layer);
 *                Overlays are rendered after layers.
 */
 void LincePushOverlay(LinceLayer* overlay);
+
+/** @brief Removes a rendering layer from the layer stack.
+* @param layer Rendering layer to remove. It's 'on_detach' method will be called.
+*/
+void LincePopLayer(LinceLayer* layer);
+
+/** @brief Removes a rendering overlay from the layer stack.
+* @param layer Rendering overlay to remove. It's 'on_detach' method will be called.
+*/
+void LincePopOverlay(LinceLayer* overlay);
 
 /** @brief Returns the application's run time in milliseconds.
 */
