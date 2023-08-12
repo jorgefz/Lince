@@ -40,6 +40,7 @@ Version codes follow [Semantic Versioning](https://semver.org/).
 - Fixed minimum required OpenGL version to 4.5.
 - Improved premake scripts. Placed separate 'premak5.lua' scripts in the folder of each project with all build commands necessary to build it.
 - Renamed layer callbacks following snake case.
+- Moved input code, and key and mouse codes to 'input' folder
 
 
 ## v0.7.0

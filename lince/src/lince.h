@@ -10,9 +10,9 @@
 #include "lince/core/memory.h"
 
 /* Input */
-#include "lince/core/input.h"
-#include "lince/core/keycodes.h"
-#include "lince/core/mousecodes.h"
+#include "lince/input/input.h"
+#include "lince/input/keycodes.h"
+#include "lince/input/mousecodes.h"
 
 /* Events */
 #include "lince/event/event.h"

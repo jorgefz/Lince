@@ -7,7 +7,7 @@
 #include "core/app.h"
 #include "renderer/renderer.h"
 #include "gui/ui_layer.h"
-#include "core/input.h"
+#include "input/input.h"
 #include "core/profiler.h"
 
 /* Private application state - stack allocated */
