@@ -1,41 +1,38 @@
 /** @file layer.h
 * Example code:
 * ```c
-* void MyLayerOnAttach(LinceLayer* layer){
-*     printf("MyLayer attached\n");
-* }
-*  
-* void MyLayerOnDetach(LinceLayer* layer){
-*     printf("MyLayer detached\n");
-* }
-*  
-* void MyLayerOnUpdate(LinceLayer* layer, float dt){
-*  
-* }
-*  
-* void MyLayerOnEvent(LinceLayer* layer, LinceEvent* e){
+*	void MyLayerOnAttach(LinceLayer* layer){
+*	    printf("MyLayer attached\n");
+*	}
 * 
-* }
+*	void MyLayerOnDetach(LinceLayer* layer){
+*	    printf("MyLayer detached\n");
+*	}
+*
+*	void MyLayerOnUpdate(LinceLayer* layer, float dt){
+*	 
+*	}
+* 
+*	void MyLayerOnEvent(LinceLayer* layer, LinceEvent* e){
+*	
+*	}
 *  
-* void GameInit(){
-*     LinceLayer* layer = LinceCreateLayer(NULL);
-*  
-*     layer->on_attach = MyLayerOnAttach;
-*     layer->on_detach = MyLayerOnDetach;
-*     layer->on_update = MyLayerOnUpdate;
-*     layer->on_event = MyLayerOnEvent;
-*  
-*     LincePushLayer(layer);
-* }
-*  
-* int main(){
-*     LinceApp* app = LinceGetApp();
-*     app->on_init = GameInit;
-*     
-*     LinceRun();
-*  
-*     return 0;
-* }
+*	void GameInit(){
+*		LinceLayer layer = {
+*			.on_attach = MyLayerOnAttach,
+*			.on_detach = MyLayerOnDetach,
+*			.on_update = MyLayerOnUpdate,
+*			.on_event  = MyLayerOnEvent
+*		}
+*		LincePushLayer(&layer);
+*	}
+* 
+*	int main(){
+*		LinceApp* app = LinceGetApp();
+*		app->on_init = GameInit;
+*		LinceRun();
+*		return 0;
+*	}
 * ```
 */
 
@@ -69,42 +66,5 @@ typedef struct LinceLayer {
 	void (*on_event)(struct LinceLayer*, LinceEvent*);
 	///< called when an event propagates to the layer
 } LinceLayer;
-
-/** @struct LinceLayerStack
-* @brief Data structure to store layers in a stack.
-* @todo The layers are stored in an array of pointers. Not cache friendly!
-* @todo Replace with array_t, contiguous memory - more cache friendly.
-*
-* Since LayerStack stores layers as an array of pointers,
-* you must pass a pointer to a previously allocated layer
-* and not free it, as the layer will be destroyed
-* when the stack is popped or destroyed.
-*/
-typedef struct LinceLayerStack {
-	LinceLayer** layers;  ///< Stack of layers
-	unsigned int count;   ///< Number of stacked layers
-} LinceLayerStack;
-
-
-/** @brief Allocates a new layer.
-* @param data User-defined layer data. This is not copied - only the pointer is stored.
-*/
-LinceLayer* LinceCreateLayer(void* data);
-
-/** @brief Deallocates a given layer without freeing user data */
-void LinceDeleteLayer(LinceLayer* layer);
-
-/** @brief Initialises an empty layer stack */
-LinceLayerStack* LinceCreateLayerStack();
-
-/** @brief Detaches and frees all layers */
-void LinceDestroyLayerStack(LinceLayerStack* stack);
-
-/** @brief Adds a layer to the stack */
-void LinceLayerStackPush(LinceLayerStack* stack, LinceLayer* layer);
-
-/** @brief Removes a layer from the top of the stack */
-void LinceLayerStackPop(LinceLayerStack* stack, LinceLayer* layer);
-
 
 #endif // LINCE_LAYER_H

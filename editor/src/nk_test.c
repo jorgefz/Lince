@@ -61,7 +61,6 @@ static void NKLayerOnUpdate(LinceLayer* layer, float dt){
 }
 
 LinceLayer* NKLayerInit(){
-    LinceLayer* layer = LinceCreateLayer(NULL);
-    layer->on_update = NKLayerOnUpdate; 
-    return layer;
+    LinceLayer layer = {.on_update = NKLayerOnUpdate};
+    return LinceNewCopy(&layer, sizeof(LinceLayer));
 }
