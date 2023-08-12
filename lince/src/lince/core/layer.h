@@ -20,10 +20,10 @@
 * void GameInit(){
 *     LinceLayer* layer = LinceCreateLayer(NULL);
 *  
-*     layer->OnAttach = MyLayerOnAttach;
-*     layer->OnDetach = MyLayerOnDetach;
-*     layer->OnUpdate = MyLayerOnUpdate;
-*     layer->OnEvent = MyLayerOnEvent;
+*     layer->on_attach = MyLayerOnAttach;
+*     layer->on_detach = MyLayerOnDetach;
+*     layer->on_update = MyLayerOnUpdate;
+*     layer->on_event = MyLayerOnEvent;
 *  
 *     LincePushLayer(layer);
 * }
@@ -57,16 +57,16 @@ typedef struct LinceLayer {
 	
 	void* data; ///< custom user layer pointer
 
-	void (*OnAttach)(struct LinceLayer*);
+	void (*on_attach)(struct LinceLayer*);
 	///< Called when layer is pushed onto stack
 	
-	void (*OnDetach)(struct LinceLayer*);
+	void (*on_detach)(struct LinceLayer*);
 	///< Called when layer is popped from stack. Should only free user data
 	
-	void (*OnUpdate)(struct LinceLayer*, float dt);
+	void (*on_update)(struct LinceLayer*, float dt);
 	///< Called on each game frame
 	
-	void (*OnEvent)(struct LinceLayer*, LinceEvent*);
+	void (*on_event)(struct LinceLayer*, LinceEvent*);
 	///< called when an event propagates to the layer
 } LinceLayer;
 

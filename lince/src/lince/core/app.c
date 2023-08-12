@@ -82,7 +82,7 @@ void LinceCheckErrors(){
 
 // Iterates over layers, calling the provided callback.
 // NOTE: requires __VA_ARGS__ to consume preceding comma!!
-//  This is supported by MSVC and GCC as an extension.
+//  This is supported by (old) MSVC and GCC as an extension.
 #define LINCE_MAP_OVER_LAYERS(STACK, CURRENT, CALLBACK, ...)    \
     for(uint32_t i = 0; i != (STACK).size; ++i){                \
         CURRENT = i;                                            \
@@ -111,12 +111,12 @@ LinceApp* LinceGetApp(){
 }
 
 void LincePushLayer(LinceLayer* layer) {
-    if(layer->OnAttach) layer->OnAttach(layer);
+    if(layer->on_attach) layer->on_attach(layer);
     array_push_back(&app.layer_stack, layer);
 }
 
 void LincePushOverlay(LinceLayer* overlay) {
-    if(overlay->OnAttach) overlay->OnAttach(overlay);
+    if(overlay->on_attach) overlay->on_attach(overlay);
     array_push_back(&app.overlay_stack, overlay);
 }
 
@@ -228,8 +228,8 @@ static void LinceOnUpdate(){
     LinceBeginUIRender(app.ui);
 
     // Update layers
-    LINCE_MAP_OVER_LAYERS(app.layer_stack, app.current_layer, OnUpdate, app.dt);
-    LINCE_MAP_OVER_LAYERS(app.overlay_stack, app.current_overlay, OnUpdate, app.dt);
+    LINCE_MAP_OVER_LAYERS(app.layer_stack, app.current_layer, on_update, app.dt);
+    LINCE_MAP_OVER_LAYERS(app.overlay_stack, app.current_overlay, on_update, app.dt);
 
     // Update user application
     if (app.on_update) app.on_update(app.dt);
@@ -244,8 +244,8 @@ static void LinceTerminate(){
     LinceTerminateRenderer();
     
     // Destroy layer stacks
-    LINCE_MAP_OVER_LAYERS(app.layer_stack, app.current_layer, OnDetach);
-    LINCE_MAP_OVER_LAYERS(app.overlay_stack, app.current_overlay, OnDetach);
+    LINCE_MAP_OVER_LAYERS(app.layer_stack, app.current_layer, on_detach);
+    LINCE_MAP_OVER_LAYERS(app.overlay_stack, app.current_overlay, on_detach);
 
     array_uninit(&app.layer_stack);
     array_uninit(&app.overlay_stack);
@@ -282,8 +282,8 @@ static void LinceOnEvent(LinceEvent* e){
 
     /* Propagate event to layers and overlays,
     the ones in front (rendered last) receive it first */
-    LINCE_MAP_OVER_LAYERS(app.layer_stack, app.current_layer, OnEvent, e);
-    LINCE_MAP_OVER_LAYERS(app.overlay_stack, app.current_overlay, OnEvent, e);
+    LINCE_MAP_OVER_LAYERS(app.layer_stack, app.current_layer, on_event, e);
+    LINCE_MAP_OVER_LAYERS(app.overlay_stack, app.current_overlay, on_event, e);
 
     // Propagate event to user
     if (app.on_event && !e->handled ) app.on_event(e);

@@ -30,9 +30,9 @@ void LinceDestroyLayerStack(LinceLayerStack* stack) {
 	}
 	unsigned int i;
 	for (i = 0; i != stack->count; ++i) {
-		if (stack->layers[i] && stack->layers[i]->OnDetach) {
-			if (stack->layers[i]->OnDetach) {
-				stack->layers[i]->OnDetach(stack->layers[i]);
+		if (stack->layers[i] && stack->layers[i]->on_detach) {
+			if (stack->layers[i]->on_detach) {
+				stack->layers[i]->on_detach(stack->layers[i]);
 			}
 			LinceFree( stack->layers[i] );
 		}
@@ -56,7 +56,7 @@ void LinceLayerStackPush(LinceLayerStack* stack, LinceLayer* layer) {
 	
 	// attach layer
 	stack->layers[stack->count - 1] = layer;
-	if (layer->OnAttach) layer->OnAttach(layer);
+	if (layer->on_attach) layer->on_attach(layer);
 }
 
 void LinceLayerStackPop(LinceLayerStack* stack, LinceLayer* layer) {
@@ -74,7 +74,7 @@ void LinceLayerStackPop(LinceLayerStack* stack, LinceLayer* layer) {
 	if (stack->count == 0 || which < 0) return;
 
 	// detach layer
-	if (layer->OnDetach) layer->OnDetach(layer);
+	if (layer->on_detach) layer->on_detach(layer);
 
 	// resize layer stack
 	if (stack->count == 1) {

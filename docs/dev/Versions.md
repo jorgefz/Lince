@@ -3,11 +3,9 @@
 Version codes follow [Semantic Versioning](https://semver.org/).
 
 ### To-Do
-- Improve premake5 scripts. Follow example of Hazel engine.
 - Added premake action 'test' that compiles cmocka and runs tests
 - Update readme with link to minigames repository and name choice.
 - Add github banners.
-- Check compilation on Windows.
 - Replace layer stack with the custom array type.
 - Merge all key events into single struct.
 - Move misc functions to separate files (`LinceReadFile`, `LinceGetTimeMillis`). 
@@ -40,6 +38,8 @@ Version codes follow [Semantic Versioning](https://semver.org/).
 - Added 'clean' action to premake5 that removes build outputs
 - Fixed comaptibility with Windows by enforcing old MSVC preprocessor
 - Fixed minimum required OpenGL version to 4.5.
+- Improved premake scripts. Placed separate 'premak5.lua' scripts in the folder of each project with all build commands necessary to build it.
+- Renamed layer callbacks following snake case.
 
 
 ## v0.7.0
