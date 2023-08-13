@@ -1,6 +1,8 @@
 #ifndef LINCE_UUID_H
 #define LINCE_UUID_H
 
+#include "lince/core/core.h"
+
 /// Number of characters needed to store an UUID as a string
 #define LINCE_UUID_STR_SIZE 37
 

@@ -1,4 +1,3 @@
-#include "core/core.h"
 #include "core/uuid.h"
 
 #ifdef LINCE_WINDOWS
