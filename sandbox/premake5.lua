@@ -31,8 +31,7 @@ project "sandbox"
         "cglm",
         "stb",
         "nuklear",
-        "miniaudio",
-        "uuid"
+        "miniaudio"
     }
 
     libdirs {"%{wks.location}/bin/" .. LinceOutputDir .. "/lince"}
@@ -45,7 +44,7 @@ project "sandbox"
 
     filter "system:linux"
         systemversion "latest"    
-        links {"GL","rt","m","dl","pthread","X11"}
+        links {"GL","rt","m","dl","pthread","X11","uuid"}
         defines {"LINCE_LINUX"}
         
     filter "configurations:Debug"

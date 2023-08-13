@@ -33,8 +33,7 @@ project "lince"
         "cglm",
         "nuklear",
         "stb",
-        "miniaudio",
-        "uuid"
+        "miniaudio"
     }
 
     libdirs {
@@ -54,7 +53,7 @@ project "lince"
 
     filter "system:linux"
         systemversion "latest"    
-        links {"GL","rt","m","dl","pthread","X11"}
+        links {"GL","rt","m","dl","pthread","X11","uuid"}
         defines {"LINCE_LINUX"}
         
     filter "configurations:Debug"
