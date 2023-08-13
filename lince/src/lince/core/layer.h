@@ -40,6 +40,7 @@
 #define LINCE_LAYER_H
 
 #include "lince/event/event.h"
+#include "lince/core/uuid.h"
 
 /** @struct LinceLayer
 * @brief Stores geometry that is generally rendered together.
@@ -66,5 +67,6 @@ typedef struct LinceLayer {
 	void (*on_event)(struct LinceLayer*, LinceEvent*);
 	///< called when an event propagates to the layer
 } LinceLayer;
+
 
 #endif // LINCE_LAYER_H

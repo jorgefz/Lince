@@ -122,18 +122,24 @@ void LincePushOverlay(LinceLayer* overlay) {
 
 void LincePopLayer(LinceLayer* layer) {
     if(layer->on_detach) layer->on_detach(layer);
-    // Find 'layer' in stack. How??
-    // Consider creating uuid for each new layer
-    // Will need LinceLayerInit to generate it.
-    // For generating uuid, use platform libraries.
-    // Preprocessor #if to select appropriate platform library
-    array_pop_back(&app.layer_stack);
+    for(uint32_t i = 0; i != app.layer_stack.size; ++i){
+        if(layer == (LinceLayer*)array_get(&app.layer_stack, i)){
+            array_remove(&app.layer_stack, i);
+            return;
+        }
+    }
+    LINCE_ASSERT(0, "Failed to find layer (0x%p) in stack", layer);
 }
 
 void LincePopOverlay(LinceLayer* overlay) {
     if(overlay->on_detach) overlay->on_detach(overlay);
-    // Find overlay in stack. How??
-    array_pop_back(&app.overlay_stack);
+    for(uint32_t i = 0; i != app.overlay_stack.size; ++i){
+        if(overlay == (LinceLayer*)array_get(&app.overlay_stack, i)){
+            array_remove(&app.overlay_stack, i);
+            return;
+        }
+    }
+    LINCE_ASSERT(0, "Failed to find overlay (0x%p) in stack", overlay);
 }
 
 double LinceGetTimeMillis(){
@@ -188,7 +194,7 @@ static void LinceInit(){
     LinceOpenLogger(LINCE_DIR"log.txt");
 
     // Report platform and configuration
-    LINCE_INFO("--- LINCE version "LINCE_VERSION" ---");
+    LINCE_INFO("Lince version: "LINCE_VERSION);
     
 #ifdef LINCE_WINDOWS
     LINCE_INFO("OS: Windows");
