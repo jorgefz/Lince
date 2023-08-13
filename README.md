@@ -74,16 +74,18 @@ Then, simply run `doxygen`, and check out the HTML documentation on `doxydocs/ht
 ## Dependencies
 
 The project uses Premake5 by default as the build system (https://premake.github.io/).
-It also requires OpenGL 4.0 or greater.
+It also requires OpenGL 4.5 or greater.
 
 On Linux, the following packages are required:
 ```bash
-sudo apt install make libx11-dev libxcursor-dev libxrandr-dev libxinerama-dev libxtst-dev libgl-dev`
+sudo apt-get install make libx11-dev libxcursor-dev libxrandr-dev libxinerama-dev libxtst-dev libgl-dev uuid-dev`
 ```
 
 If you are using Windows Subsystem for Linux on Windows 11 (WSLg), as of December 2022, you must manually connect ALSA to PulseAudio following the steps detailed on this thread: https://github.com/microsoft/wslg/issues/864.
 
 On Windows, Visual Studo 2022 is recommended.
+
+The test framework is CMocka, which requires CMake to build.
 
 
 ## Building Lince
@@ -107,6 +109,7 @@ This repository contains the source code for the following projects, which are b
 * stb\_image.h: Single-header image loader by Sean Barret (https://github.com/nothings/stb)
 * Nucklear: ANSI C single-header UI library (https://github.com/Immediate-Mode-UI/Nuklear)
 * Miniaudio: Audio playback and capture library (https://github.com/mackron/miniaudio)
+* CMocka: Testing framework (https://cmocka.org/)
 
 The project makes use of `mdbook` to generate the documentation website (https://github.com/rust-lang/mdBook).
 
