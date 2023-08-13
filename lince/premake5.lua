@@ -33,7 +33,8 @@ project "lince"
         "cglm",
         "nuklear",
         "stb",
-        "miniaudio"
+        "miniaudio",
+        "uuid"
     }
 
     libdirs {

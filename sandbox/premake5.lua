@@ -31,7 +31,8 @@ project "sandbox"
         "cglm",
         "stb",
         "nuklear",
-        "miniaudio"
+        "miniaudio",
+        "uuid"
     }
 
     libdirs {"%{wks.location}/bin/" .. LinceOutputDir .. "/lince"}
