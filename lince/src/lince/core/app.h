@@ -37,7 +37,7 @@ typedef struct LinceApp{
     void* user_data;        ///< Pointer that may be freely re-assiged by the user.      
     uint32_t screen_width;  ///< Width in pixels of the window.
     uint32_t screen_height; ///< Height in pixels of the window.
-    const char* title;      ///< String displayed at the top of the window.
+    char* title;      ///< String displayed at the top of the window.
 
     /* Internal state */
     LinceWindow     *window;        ///< Window state.

@@ -9,6 +9,7 @@
 #include "gui/ui_layer.h"
 #include "input/input.h"
 #include "core/profiler.h"
+#include "core/memory.h"
 
 /* Private application state - stack allocated */
 static LinceApp app = {0};
@@ -235,7 +236,8 @@ static void LinceInit(){
     if (app.screen_width == 0) app.screen_width = 500;
     if (app.screen_height == 0) app.screen_height = 500;
     if (app.title == NULL) app.title = "Lince Window";
-    
+    app.title = LinceNewCopy(app.title, strlen(app.title)+1);
+
     // Create a windowed mode window and its OpenGL context
     app.window = LinceCreateWindow(app.screen_width, app.screen_height, app.title);
     LinceSetMainEventCallback(app.window, LinceOnEvent);
@@ -310,6 +312,7 @@ static void LinceTerminate(){
     LinceDestroyWindow(app.window);
     app.window = NULL;
     app.running = 0;
+    LinceFree(app.title);
 
     LinceCloseProfiler();
     LinceCloseLogger();
