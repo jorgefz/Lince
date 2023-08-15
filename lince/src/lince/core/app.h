@@ -4,7 +4,7 @@
 /** @file app.h
 * Main initialisation and execution functions for the Lince engine
 */
-
+#include "cglm/mat4.h"
 #include "lince/containers/array.h"
 #include "lince/core/window.h"
 #include "lince/core/layer.h"
@@ -14,7 +14,7 @@
 #include "lince/event/window_event.h"
 #include "lince/renderer/camera.h"
 #include "lince/gui/ui_layer.h"
-#include "cglm/mat4.h"
+#include "lince/scene/scene.h"
 
 /** Function pointer typedefs for user-defined application callbacks */
 typedef void (*LinceGameInitFn)();
@@ -45,6 +45,9 @@ typedef struct LinceApp{
     // LinceLayerStack *overlay_stack; ///< Array of rendering overlays (drawn after layers).
     array_t layer_stack;   ///< Array of rendering layers.
     array_t overlay_stack; ///< Array of rendering overlays (drawn after layers).
+    
+    array_t scene_stack; ///< Stack of scenes. Only topmost is rendered.
+    LinceScene* current_scene; ///< Scene at the top of the stack.
 
     LinceBool        running;       ///< True if the application is active.
     float time_ms;       ///< Run time in milliseconds.
@@ -85,6 +88,16 @@ void LincePopLayer(LinceLayer* layer);
 * @param layer Rendering overlay to remove. It's 'on_detach' method will be called.
 */
 void LincePopOverlay(LinceLayer* overlay);
+
+/** @brief Places a new scene on top of the stack.
+* @param scene Scene to run. It's 'on_init' method will be called.
+*/
+void LincePushScene(LinceScene* scene);
+
+/** @brief Removes the topmost scene from the scene stack. It's
+*/
+void LincePopScene();
+
 
 /** @brief Returns the application's run time in milliseconds.
 */

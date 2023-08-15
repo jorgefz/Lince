@@ -16,9 +16,13 @@ Version codes follow [Semantic Versioning](https://semver.org/).
 
 
 ## v0.8.0 (WIP)
-- Added functions to initialise camera without allocating heap memory.
-- Started working on the scene system on the sandbox
+- Added CMocka as the testing framework.
+- Added UUIDs.
 - Added z-sorting with translucency by sorting sprites before drawing
+- Added scene system.
+- Improved premake scripts. Placed separate 'premak5.lua' scripts in the folder of each project with all build commands necessary to build it.
+
+- Added functions to initialise camera without allocating heap memory.
 - Improved error message when font fails to load
 - Removed `LinceCreateTexture`
 - Removed `name` parameter from `LinceTexture` functions.
@@ -32,16 +36,13 @@ Version codes follow [Semantic Versioning](https://semver.org/).
 - Renamed `LINCE_STR_MAX` to `LINCE_TEXT_MAX`.
 - Renamed function `LinceGetAppState` to `LinceGetApp`.
 - Replaced instances of standard C functions `malloc`,`calloc`,`realloc`, and `free` with the engine versions.
-- Integrated CMocka as the testing framework
 - Renamed premake5 script variables `OutputDir` to `LinceOutputDir`, and `IncludeDir` to `LinceIncludeDir`.
 - Fixed bug in editor where entity registry was initalised with the wrong number of components.
 - Added 'clean' action to premake5 that removes build outputs
 - Fixed comaptibility with Windows by enforcing old MSVC preprocessor
 - Fixed minimum required OpenGL version to 4.5.
-- Improved premake scripts. Placed separate 'premak5.lua' scripts in the folder of each project with all build commands necessary to build it.
 - Renamed layer callbacks following snake case.
 - Moved input code, and key and mouse codes to 'input' folder
-- Added UUIDs.
 - Improved layer stack to be more cache friendly. From array of pointers to array of plain layers.
 
 

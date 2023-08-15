@@ -142,6 +142,22 @@ void LincePopOverlay(LinceLayer* overlay) {
     LINCE_ASSERT(0, "Failed to find overlay (0x%p) in stack", overlay);
 }
 
+void LincePushScene(LinceScene* scene){
+    LINCE_ASSERT(scene, "Pushing NULL scene");
+    array_push_back(&app.scene_stack, scene);
+    app.current_scene = array_back(&app.scene_stack);
+    LinceInitScene(app.current_scene);
+}
+
+void LincePopScene(){
+    LINCE_ASSERT(app.scene_stack.size > 0, "No scenes in stack");
+    LINCE_ASSERT(app.current_scene, "No scenes in stack");
+    LinceUninitScene(app.current_scene);
+    array_pop_back(&app.scene_stack);
+    app.current_scene = array_back(&app.scene_stack);
+}
+
+
 double LinceGetTimeMillis(){
     return (glfwGetTime() * 1000.0);
 }
@@ -227,6 +243,9 @@ static void LinceInit(){
     // Create layer stacks
     array_init(&app.layer_stack, sizeof(LinceLayer));
     array_init(&app.overlay_stack, sizeof(LinceLayer));
+    
+    // Create scene stack
+    array_init(&app.scene_stack, sizeof(LinceScene));
 
     LinceInitRenderer(app.window);
     app.ui = LinceInitUI(app.window->handle);
@@ -253,6 +272,11 @@ static void LinceOnUpdate(){
     LINCE_MAP_OVER_LAYERS(app.layer_stack, app.current_layer, on_update, app.dt);
     LINCE_MAP_OVER_LAYERS(app.overlay_stack, app.current_overlay, on_update, app.dt);
 
+    // Update current scene
+    if(app.current_scene){
+        LinceUpdateScene(app.current_scene, app.dt);
+    }
+
     // Update user application
     if (app.on_update) app.on_update(app.dt);
 
@@ -268,9 +292,14 @@ static void LinceTerminate(){
     // Destroy layer stacks
     LINCE_MAP_OVER_LAYERS(app.layer_stack, app.current_layer, on_detach);
     LINCE_MAP_OVER_LAYERS(app.overlay_stack, app.current_overlay, on_detach);
-
     array_uninit(&app.layer_stack);
     array_uninit(&app.overlay_stack);
+    
+    // Destroy scene stack
+    while(app.scene_stack.size > 0){
+        LincePopScene();
+    }
+    array_uninit(&app.scene_stack);
     
     if (app.on_terminate) app.on_terminate();
 
