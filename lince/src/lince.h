@@ -40,4 +40,7 @@
 /* ECS */
 #include "lince/entity/entity.h"
 
+/* Scene */
+#include "lince/scene/scene.h"
+
 #endif //LINCE_H

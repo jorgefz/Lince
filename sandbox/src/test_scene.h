@@ -2,7 +2,6 @@
 #define TEST_SCENE
 
 #include <lince.h>
-#include "lince/scene/scene.h"
 
 
 typedef struct BlueScene {

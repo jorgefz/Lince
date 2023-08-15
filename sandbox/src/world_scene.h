@@ -2,7 +2,6 @@
 #define WORLD_SCENE_H
 
 #include <lince.h>
-#include "lince/scene/scene.h"
 
 typedef struct WorldScene {
     LinceCamera camera;
