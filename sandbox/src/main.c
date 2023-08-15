@@ -650,22 +650,12 @@ void GameOnUpdate(float dt){
 #include "test_scene.h"
 #include "menu_scene.h"
 
-LinceSceneStack* scene_stack;
-
 void TestScenesInit() {
-    scene_stack = LinceCreateSceneStack();
-    LincePushScene(scene_stack ,&(LinceScene){
+    LincePushScene(&(LinceScene){
         .on_draw = DrawMainMenu,
     });
 }
 
-void TestScenesUpdate(float dt) {
-    LinceUpdateSceneStack(scene_stack, dt);
-}
-
-void TestScenesUninit(){
-    LinceDestroySceneStack(scene_stack);
-}
 
 
 void SetupApplication(){
@@ -676,8 +666,8 @@ void SetupApplication(){
     app->title = "Sandbox";
     
     app->on_init      = TestScenesInit;   // GameInit;
-    app->on_update = TestScenesUpdate; // GameOnUpdate;
-    app->on_terminate = TestScenesUninit; // GameTerminate;
+    // app->on_update = TestScenesUpdate; // GameOnUpdate;
+    // app->on_terminate = TestScenesUninit; // GameTerminate;
 }
 
 

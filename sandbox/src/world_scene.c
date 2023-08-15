@@ -13,7 +13,7 @@ static void MoveCamera(LinceCamera* cam, float dt){
 }
 
 
-void WorldSceneInit(LinceSceneStack* stack, LinceScene* scene){
+void WorldSceneInit(LinceScene* scene){
     WorldScene* world_scene = LinceMalloc(sizeof(WorldScene));
     scene->data = world_scene;
     // Load town map
@@ -37,22 +37,22 @@ void WorldSceneInit(LinceSceneStack* stack, LinceScene* scene){
         }
     };
     LinceInitTilemap(&world_scene->map);
-    
+    LinceInitCamera(&world_scene->camera, LinceGetAspectRatio());
 }
 
-void WorldSceneUpdate(LinceSceneStack* stack, LinceScene* scene, float dt){
+void WorldSceneUpdate(LinceScene* scene, float dt){
     WorldScene* world_scene = scene->data;
 
-    MoveCamera(&scene->camera, dt);
-    LinceResizeCameraView(&scene->camera, LinceGetAspectRatio());
-    LinceUpdateCamera(&scene->camera);
+    MoveCamera(&world_scene->camera, dt);
+    LinceResizeCameraView(&world_scene->camera, LinceGetAspectRatio());
+    LinceUpdateCamera(&world_scene->camera);
     
-    LinceBeginScene(&scene->camera);
+    LinceBeginScene(&world_scene->camera);
     LinceDrawTilemap(&world_scene->map, NULL);
     LinceEndScene();
 }
 
-void WorldSceneDestroy(LinceSceneStack* stack, LinceScene* scene){
+void WorldSceneDestroy(LinceScene* scene){
     WorldScene* world_scene = scene->data;
     LinceUninitTilemap(&world_scene->map);
     LinceFree(scene->data);

@@ -1,8 +1,10 @@
 #include "test_scene.h"
 
 
-void InitBlueScene(LinceSceneStack* stack, LinceScene* scene){
+void InitBlueScene(LinceScene* scene){
+
     BlueScene* data = LinceMalloc(sizeof(BlueScene));
+    LinceInitCamera(&data->camera, LinceGetAspectRatio());
     scene->data = data;
 
     LinceUILayer* ui = LinceGetApp()->ui;
@@ -21,14 +23,16 @@ void InitBlueScene(LinceSceneStack* stack, LinceScene* scene){
 
 }
 
-void UninitBlueScene(LinceSceneStack* stack, LinceScene* scene){
+void UninitBlueScene(LinceScene* scene){
     LinceFree(scene->data);
 }
 
-void UpdateBlueScene(LinceSceneStack* stack, LinceScene* scene, float dt){
+void UpdateBlueScene(LinceScene* scene, float dt){
+    LINCE_UNUSED(dt);
+
     BlueScene* data = scene->data;
-    LinceResizeCameraView(&scene->camera, LinceGetAspectRatio());
-	LinceUpdateCamera(&scene->camera);
+    LinceResizeCameraView(&data->camera, LinceGetAspectRatio());
+	LinceUpdateCamera(&data->camera);
 
     // GUI
     LinceUILayer* ui = LinceGetApp()->ui;
@@ -53,13 +57,13 @@ void UpdateBlueScene(LinceSceneStack* stack, LinceScene* scene, float dt){
             /* properties */
             .border   = 0, // float border;
             .rounding = 0, // float rounding;
-            .padding  = 0, // struct nk_vec2 padding;
-            .image_padding = 0, // struct nk_vec2 image_padding;
-            .touch_padding = 0, // struct nk_vec2 touch_padding;
+            .padding  = {0}, // struct nk_vec2 padding;
+            .image_padding = {0}, // struct nk_vec2 image_padding;
+            .touch_padding = {0}, // struct nk_vec2 touch_padding;
         };
         nk_layout_row_dynamic(ctx, 30, 1);
         if (nk_button_label_styled(ctx, &button_style, "Go to red room")){
-            LincePushScene(stack, &(LinceScene){
+            LincePushScene(&(LinceScene){
                 .on_init = InitRedScene,
                 .on_delete = UninitRedScene,
                 .on_update = UpdateRedScene,
@@ -68,15 +72,16 @@ void UpdateBlueScene(LinceSceneStack* stack, LinceScene* scene, float dt){
         }
         nk_layout_row_dynamic(ctx, 30, 1);
         if (nk_button_label_styled(ctx, &button_style, "Back to main menu")){
-            LincePopScene(stack);
+            LincePopScene();
         }
     }
     nk_end(ctx);
 }
 
-void DrawBlueScene(LinceSceneStack* stack, LinceScene* scene){
+void DrawBlueScene(LinceScene* scene){
+
     BlueScene* data = scene->data;
-    LinceBeginScene(&scene->camera);
+    LinceBeginScene(&data->camera);
     LinceDrawSprite(&(LinceSprite){
         .w = 1, .h = 1,
         .x = 0.5, .y = 0.5,
@@ -87,19 +92,22 @@ void DrawBlueScene(LinceSceneStack* stack, LinceScene* scene){
 
 
 
-void InitRedScene(LinceSceneStack* stack, LinceScene* scene){
+void InitRedScene(LinceScene* scene){
     RedScene* data = LinceMalloc(sizeof(RedScene));
+    LinceInitCamera(&data->camera, LinceGetAspectRatio());
     scene->data = data;
 }
 
-void UninitRedScene(LinceSceneStack* stack, LinceScene* scene){
+void UninitRedScene(LinceScene* scene){
     LinceFree(scene->data);
 }
 
-void UpdateRedScene(LinceSceneStack* stack, LinceScene* scene, float dt){
+void UpdateRedScene(LinceScene* scene, float dt){
+    LINCE_UNUSED(dt);
+
     RedScene* data = scene->data;
-    LinceResizeCameraView(&scene->camera, LinceGetAspectRatio());
-	LinceUpdateCamera(&scene->camera);
+    LinceResizeCameraView(&data->camera, LinceGetAspectRatio());
+	LinceUpdateCamera(&data->camera);
 
     // GUI
     LinceUILayer* ui = LinceGetApp()->ui;
@@ -124,22 +132,23 @@ void UpdateRedScene(LinceSceneStack* stack, LinceScene* scene, float dt){
             /* properties */
             .border   = 0, // float border;
             .rounding = 0, // float rounding;
-            .padding  = 0, // struct nk_vec2 padding;
-            .image_padding = 0, // struct nk_vec2 image_padding;
-            .touch_padding = 0, // struct nk_vec2 touch_padding;
+            .padding  = {0}, // struct nk_vec2 padding;
+            .image_padding = {0}, // struct nk_vec2 image_padding;
+            .touch_padding = {0}, // struct nk_vec2 touch_padding;
         };
         nk_layout_row_dynamic(ctx, 30, 1);
         if (nk_button_label_styled(ctx, &button_style, "Go to blue room")){
-            LincePopScene(stack);
+            LincePopScene();
         }
     }
     nk_end(ctx);
 
 }
 
-void DrawRedScene(LinceSceneStack* stack, LinceScene* scene){
+void DrawRedScene(LinceScene* scene){
+    
     RedScene* data = scene->data;
-    LinceBeginScene(&scene->camera);
+    LinceBeginScene(&data->camera);
     LinceDrawSprite(&(LinceSprite){
         .w = 0.5, .h = 0.5,
         .x = -0.5, .y = -0.5,

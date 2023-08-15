@@ -2,14 +2,15 @@
 #define WORLD_SCENE_H
 
 #include <lince.h>
-#include "scene.h"
+#include "lince/scene/scene.h"
 
 typedef struct WorldScene {
+    LinceCamera camera;
     LinceTilemap map;
 } WorldScene;
 
-void WorldSceneInit(LinceSceneStack* stack, LinceScene* scene);
-void WorldSceneUpdate(LinceSceneStack* stack, LinceScene* scene, float dt);
-void WorldSceneDestroy(LinceSceneStack* stack, LinceScene* scene);
+void WorldSceneInit(LinceScene* scene);
+void WorldSceneUpdate(LinceScene* scene, float dt);
+void WorldSceneDestroy(LinceScene* scene);
 
 #endif /* WORLD_SCENE_H */

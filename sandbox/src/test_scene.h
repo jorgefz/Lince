@@ -2,27 +2,27 @@
 #define TEST_SCENE
 
 #include <lince.h>
-#include "scene.h"
+#include "lince/scene/scene.h"
 
 
 typedef struct BlueScene {
-    int dummy;
+    LinceCamera camera;
 } BlueScene;
 
 typedef struct RedScene {
-    int dummy;
+    LinceCamera camera;
 } RedScene;
 
 
-void InitBlueScene(LinceSceneStack* stack, LinceScene* scene);
-void UninitBlueScene(LinceSceneStack* stack, LinceScene* scene);
-void UpdateBlueScene(LinceSceneStack* stack, LinceScene* scene, float dt);
-void DrawBlueScene(LinceSceneStack* stack, LinceScene* scene);
+void InitBlueScene(LinceScene* scene);
+void UninitBlueScene(LinceScene* scene);
+void UpdateBlueScene(LinceScene* scene, float dt);
+void DrawBlueScene(LinceScene* scene);
 
-void InitRedScene(LinceSceneStack* stack, LinceScene* scene);
-void UninitRedScene(LinceSceneStack* stack, LinceScene* scene);
-void UpdateRedScene(LinceSceneStack* stack, LinceScene* scene, float dt);
-void DrawRedScene(LinceSceneStack* stack, LinceScene* scene);
+void InitRedScene(LinceScene* scene);
+void UninitRedScene(LinceScene* scene);
+void UpdateRedScene(LinceScene* scene, float dt);
+void DrawRedScene(LinceScene* scene);
 
 
 #endif /* TEST_SCENE */

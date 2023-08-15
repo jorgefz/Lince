@@ -1,10 +1,9 @@
 #include "menu_scene.h"
-
 #include "test_scene.h"
-
 #include "world_scene.h"
 
-void DrawMainMenu(LinceSceneStack* stack, LinceScene* scene){
+void DrawMainMenu(LinceScene* scene){
+    LINCE_UNUSED(scene);
 
     LinceUILayer* ui = LinceGetApp()->ui;
     struct nk_context *ctx = ui->ctx;
@@ -52,7 +51,7 @@ void DrawMainMenu(LinceSceneStack* stack, LinceScene* scene){
     if (nk_begin(ctx, "MainMenu", nk_rect(btn_pos[0], btn_pos[1], btn_sz[0], btn_sz[1]), 0)) {
         nk_layout_row_dynamic(ctx, row_h, 1);
         if (nk_button_label_styled(ctx, &BUTTON_STYLE, "Play")){
-            LincePushScene(stack ,&(LinceScene){
+            LincePushScene(&(LinceScene){
                 .on_init   = WorldSceneInit,
                 .on_delete = WorldSceneDestroy,
                 .on_update = WorldSceneUpdate,
