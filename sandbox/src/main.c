@@ -7,6 +7,8 @@
 #include <lince/audio/audio.h>
 #include <lince/physics/boxcollider.h>
 
+#include "components.h"
+
 /*
 QueryEntities(registry, mode, result, ncomp, ...)
 
@@ -72,11 +74,6 @@ static GameData game_data = {
     .music_file = "sandbox/assets/sounds/game-town-music.wav"
 };
 
-typedef enum Component {
-    Component_BoxCollider,
-    Component_Sprite,
-    Component_TileAnim
-} Component;
 
 void LinceTransformToScreen(mat4 vp, vec2 world_pos, vec2 screen_pos){
 	float wx = world_pos[0], wy = world_pos[1];
@@ -346,11 +343,7 @@ void GameStateInit(){
 
     // Entities
     game_data.reg = LinceCreateEntityRegistry(
-        4,
-        sizeof(LinceBoxCollider),
-        sizeof(LinceSprite),
-        sizeof(LinceTileAnim),
-        sizeof(LinceCamera)
+        Component_Count, COMPONENT_SIZES
     );
 
     // --> walls
@@ -647,33 +640,48 @@ void GameOnUpdate(float dt){
 }
 
 
-#include "test_scene.h"
-#include "menu_scene.h"
 
-void TestScenesInit() {
-    LincePushScene(&(LinceScene){
-        .on_draw = DrawMainMenu,
-    });
+/*
+****************************************************
+****************************************************
+****************************************************
+****************************************************
+*/
+
+
+#include "components.h"
+#include "scenes/scenes.h"
+
+hashmap_t scenes;
+
+
+void SandboxInit() {
+
+    hashmap_init(&scenes, 11);
+    hashmap_set(&scenes, "MainMenu", &SCENE_CALLBACKS[Scene_MainMenu]);
+    hashmap_set(&scenes, "World", &SCENE_CALLBACKS[Scene_World]);
+    LinceGetApp()->user_data = &scenes;
+
+    LincePushScene(hashmap_get(&scenes, "MainMenu"));
 }
 
-
+void SandboxTerminate(){
+    hashmap_uninit(&scenes);
+}
 
 void SetupApplication(){
     LinceApp* app = LinceGetApp();
-    
     app->screen_width = 1280;
     app->screen_height = 720;
-    app->title = "Sandbox";
-    
-    app->on_init      = TestScenesInit;   // GameInit;
-    // app->on_update = TestScenesUpdate; // GameOnUpdate;
-    // app->on_terminate = TestScenesUninit; // GameTerminate;
+    app->on_init      = SandboxInit;
+    app->on_terminate = SandboxTerminate;
 }
 
 
 int main(void) {
 
     SetupApplication();
+    LinceGetApp()->title = "Sandbox";
 
     LinceRun();
 

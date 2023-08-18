@@ -4,6 +4,7 @@
 #include <lince.h>
 
 typedef struct WorldScene {
+    LinceEntityRegistry* reg;
     LinceCamera camera;
     LinceTilemap map;
 } WorldScene;
