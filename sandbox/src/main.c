@@ -660,6 +660,7 @@ void SandboxInit() {
     hashmap_init(&scenes, 11);
     hashmap_set(&scenes, "MainMenu", &SCENE_CALLBACKS[Scene_MainMenu]);
     hashmap_set(&scenes, "World", &SCENE_CALLBACKS[Scene_World]);
+    hashmap_set(&scenes, "House", &SCENE_CALLBACKS[Scene_House]);
     LinceGetApp()->user_data = &scenes;
 
     LincePushScene(hashmap_get(&scenes, "MainMenu"));

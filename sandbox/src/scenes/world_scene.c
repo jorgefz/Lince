@@ -32,14 +32,15 @@ static uint32_t OUTSIDE_GRID[] = {
 
 
 static void MoveCamera(LinceCamera* cam, float dt){
-
     static const float vel = 8e-4;
-
     if(LinceIsKeyPressed(LinceKey_d)) cam->pos[0] +=  vel * dt;
     if(LinceIsKeyPressed(LinceKey_a)) cam->pos[0] += -vel * dt;
     if(LinceIsKeyPressed(LinceKey_w)) cam->pos[1] +=  vel * dt;
     if(LinceIsKeyPressed(LinceKey_s)) cam->pos[1] += -vel * dt;
 
+    if(LinceIsKeyPressed(LinceKey_Space)){
+        LincePushScene(hashmap_get(LinceGetApp()->user_data, "House"));
+    }
 }
 
 
