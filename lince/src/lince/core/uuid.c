@@ -1,6 +1,7 @@
 #include "core/uuid.h"
 
 #ifdef LINCE_WINDOWS
+    #include "rpc.h"
     #include <rpcdce.h>
 #elif defined(LINCE_LINUX)
     #include <uuid/uuid.h>
