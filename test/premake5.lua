@@ -1,15 +1,23 @@
 
-externalproject "cmocka"
-    -- Run CMake for cmocka
-    location "%{wks.location}/build/%{prj.name}"
-    os.executef(
-        "cmake -B %s/../build/cmocka -S %s/../deps/cmocka",
-        os.getcwd(), os.getcwd()
-    )
-    uuid "57940020-8E99-AEB6-271F-61E0F7F6B73B"
-    kind "SharedLib"
-    language "C"
-    targetdir ("%{wks.location}/build/cmocka/src")
+-- newoption {
+--     trigger = "vcpkg-root",
+--     value       = "path",
+--     description = "Root folder of VCPKG"
+-- }
+-- 
+-- if _OPTIONS['vcpkg-root'] then
+--     local cmocka_dll = _OPTIONS['vcpkg-root'] .. "/installed/x64-windows/debug/bin"
+--     local cmocka_include = _OPTIONS['vcpkg-root'] .. "/installed/x64-windows/include"
+--     if os.isfile(cmocka_dll .. "/cmocka.dll") == false then
+--         print("Failed to locate 'cmocka.dll'")
+--         print("Expected at '%s'", cmocka_dll .. "/cmocka.dll")
+--         cmocka_dll = ""
+--     end
+--     if os.isfile(cmocka_include .. "/cmocka.h") == false then
+--         print("Failed to locate 'cmocka.h'")
+--         print("Expected at '%s'", cmocka_include .. "/cmocka.h")
+--     end
+-- end
 
 
 project "test"
@@ -27,7 +35,6 @@ project "test"
     }
     
     includedirs {
-        "%{wks.location}/deps/cmocka/include",
         "%{prj.name}",
         "%{prj.name}/src",
         "%{wks.location}/%{LinceIncludeDir.lince}",
@@ -37,7 +44,6 @@ project "test"
     }
 
     links {
-        "cmocka",
         "lince",
         "glad",
         "glfw",
@@ -45,9 +51,7 @@ project "test"
         "nuklear",
         "stb"
     }
-
     libdirs {
-        "%{wks.location}/build/cmocka/src",
         "%{wks.location}/bin/" .. LinceOutputDir .. "/lince"
     }
 
@@ -55,12 +59,12 @@ project "test"
         systemversion "latest"
         defines {"_CRT_SECURE_NO_WARNINGS", "LINCE_WINDOWS"}
         buildoptions {"/Zc:preprocessor"}
-        links {"opengl32"}
+        links {"opengl32","cmocka.dll"}
 
     filter "system:linux"
-        systemversion "latest"    
-        links {"GL","rt","m","dl","pthread","X11","uuid"}
+        systemversion "latest"
         defines {"LINCE_LINUX"}
+        links {"GL","rt","m","dl","pthread","X11","uuid","cmocka"}
         
     filter "configurations:Debug"
         symbols "on"

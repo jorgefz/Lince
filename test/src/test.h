@@ -29,7 +29,6 @@ struct test_t {
 	//int passed;
 };
 
-void run_tests(struct test_t* tests, uint32_t count, const char* batch_name);
 
 /* ANSI colour codes */
 #define GREEN "\e[1;32m"
