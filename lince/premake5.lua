@@ -49,7 +49,7 @@ project "lince"
         systemversion "latest"
         defines {"_CRT_SECURE_NO_WARNINGS", "LINCE_WINDOWS"}
         buildoptions {"/Zc:preprocessor"}
-        links {"opengl32"}
+        links {"opengl32","rpcrt4"}
 
     filter "system:linux"
         systemversion "latest"    
