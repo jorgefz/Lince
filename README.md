@@ -85,8 +85,16 @@ If you are using Windows Subsystem for Linux on Windows 11 (WSLg), as of Decembe
 
 On Windows, Visual Studo 2022 is recommended.
 
-The test framework is CMocka, which requires CMake to build.
-
+Lince uses CMocka as the testing framework.
+On Windows, install it with vcpkg and integrate it with the following commands:
+```
+./path/to/vcpkg.exe install cmocka
+./path/to/vcpkg.exe integrate install
+```
+On Linux, install it using a package manager:
+```
+sudo apt install libcmocka-dev
+```
 
 ## Building Lince
 

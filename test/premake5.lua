@@ -1,25 +1,4 @@
 
--- newoption {
---     trigger = "vcpkg-root",
---     value       = "path",
---     description = "Root folder of VCPKG"
--- }
--- 
--- if _OPTIONS['vcpkg-root'] then
---     local cmocka_dll = _OPTIONS['vcpkg-root'] .. "/installed/x64-windows/debug/bin"
---     local cmocka_include = _OPTIONS['vcpkg-root'] .. "/installed/x64-windows/include"
---     if os.isfile(cmocka_dll .. "/cmocka.dll") == false then
---         print("Failed to locate 'cmocka.dll'")
---         print("Expected at '%s'", cmocka_dll .. "/cmocka.dll")
---         cmocka_dll = ""
---     end
---     if os.isfile(cmocka_include .. "/cmocka.h") == false then
---         print("Failed to locate 'cmocka.h'")
---         print("Expected at '%s'", cmocka_include .. "/cmocka.h")
---     end
--- end
-
-
 project "test"
     kind "ConsoleApp"
     language "C"
