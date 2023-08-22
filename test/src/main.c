@@ -18,7 +18,7 @@ int main() {
     const struct CMUnitTest tests[] = {
         cmocka_unit_test(test_array),
         cmocka_unit_test(test_hashmap),
-        //cmocka_unit_test(test_linkedlist),
+        cmocka_unit_test(test_linkedlist),
         cmocka_unit_test(test_entity),
         cmocka_unit_test(test_uuid)
     };

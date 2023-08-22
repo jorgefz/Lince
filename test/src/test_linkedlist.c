@@ -138,5 +138,5 @@ void test_linkedlist(void **state){
     assert_true(list_head(node)->next == list_tail(node));
     assert_true(list_tail(node)->prev == list_head(node));
 
-    list_destroy(head);
+    list_destroy(node);
 }
