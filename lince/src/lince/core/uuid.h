@@ -8,8 +8,8 @@
 
 /** @typedef Holds an UUID (Universal Unique Identifier) */
 typedef struct LinceUUID {
-    uint64_t hi; ///< Low 64 bits of UUID
-    uint64_t lo; ///< High 64 bits of UUID
+    uint64_t hi; ///< High 64 bits of UUID
+    uint64_t lo; ///< Low 64 bits of UUID
 } LinceUUID;
 
 /** @brief Generates an UUID using platform-specific libraries.
