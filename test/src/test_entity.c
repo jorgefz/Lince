@@ -117,6 +117,8 @@ void test_entity(void** state){
     assert_true(reg->entity_data.size == 2);
 
     // Delete first entity
+    flag = array_get(&reg->entity_flags, id);
+    mask = array_get(&reg->entity_masks, id);
     LinceDeleteEntity(reg, id);
     assert_true(*flag == 0);
     assert_true(*mask == 0);
