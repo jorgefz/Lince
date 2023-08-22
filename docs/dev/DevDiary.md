@@ -1,5 +1,54 @@
 # Development Diary
 
+## 21 Aug 2023
+
+In the last year, I have implemented several major components: a sound system (using Miniaudio), a testing framework (CMocka), an entity-component-system (ECS), a scene system, and UUIDs. I have also improve improved tilemaps.
+
+Regarding the **tilemaps**, I decided to reduce their complexity down to a simple grid of tiles. My implementation from 2022 was attempting to define a full game map with characters, trees, and multiple layers of tiles. Now, a tilemap is simply one such layer of tiles.
+
+Now onto the **ECS**.
+Here, an entity is simply the 'glue' that associates a bunch of components, which hold data. A system is simply a function, which takes components and modifies them.
+I have implemented it using a sparse set to take advantage of the speed-up from the CPU cache. This implementation has an array with all the component data for each entity (the dense set), and an array with bitmasks that indicate what components an entity has (the sparse set). Thus, an entity, which is represented by an integer, serves as the index to the sparse set. So one can get the bitmask with `sparse[entity]`, and the component data for an entity with `dense[sparse[entity]]`, and, finally, the data for a specific component using the appropriate offset from that location. This implementation is very cache-friendly because all the data is nicely laid out in a single continuous array.
+It also gives rise to some questions.
+
+1. The implementation, however, is not very memory-friendly, because every entity will actually have enough memory allocated to have all of the components. This is fine if most of your entities have the same components (e.g. sprite, transform, etc). But there might be some entities that are placeholders for specialised components (e.g. camera, tilemap) which all other entities will rarely use, despite that they will have the memory allocated for them. A solution could be to refrain from using the ECS for everything. If a scene will only have one camera, one shader, and one tilmemap, these could be stored not as entities, but as plain scene data.
+
+2. Serialising. Perhaps components could each have a set of callbacks to initialise, update, delete, save, and load them.
+
+3. Components that need to reference other entities. Storing entity IDs or pointers to other components is a bad idea because these may change or be deleted. A better idea is to reference another entity by its UUID, which would be a "mandatory" component generated when the entity is created. 
+As a matter of fact, Cherno defined a list of mandatory component every entity starts out with: UUID, tag, transform, and sprite. It might be worth doing this if I'm sure that very few entities will be abstract enough to not need them, but also not too 'un-ECS' to be stored separately as scene data.
+
+Finally, the **scene system**.
+A scene is simply a collection of entities. I have implemented it as a stack, on which one can push and pop scenes. Only the topmost scene is rendered and updated.
+Each scene has three callbacks defined: `on_init`, `on_update`, and `on_delete`.
+For example, say the player is in a town. This is a scene with a tilemap, and other characters walking around. The player then enters a house through a door. Here, a new scene, the interior of the house, is pushed onto the stack. The state of the previous town scene is effectively paused. If we pop the current scene (we leave the house), the town scene resumes.
+This raises a number of questions.
+
+1. What do we need to 'push' a scene onto the stack? We'd need to define its callbacks. If we push the house interior scene from the town scene, the town scene will need to include the header for the house interior. This enforces a 'hierarchy' of scenes, otherwise you might run into spaghettified code and recursive imports. A solution could be caching all scene callbacks into a hashmap in the main game `on_init` function, and on each scene, retrieving the game data and the desired scene from the hashmap using a string identifier.
+
+2. Say the player enters the house, loots a chest, and leaves the house. The scene would be popped from the stack and its data freed, effectively resetting the scene. The next time the player enters the house, they'll find the chest full of riches once again. Solving this issue requires some sort of caching of scene data. Maybe scenes that are popped from the stack can be saved into the hashmap cache for future use - you'd need to avoid calling its `on_delete` method.
+If the cached scene is pushed again onto the stack, one could check whether `scene->data` points to valid memory (which would indicate its data is in the heap), and if so, skip calling its `on_init` method (as it is already initialised). Resetting a scene would be as simple as calling the `on_delete` and `on_init` methods in that order.
+
+3. Serialising. I have though about defining further callbacks for scenes: `on_save` for writing the scene data to disk, and `on_load` for reading from disk. When re-loading a save, the `on_init` method is skipped in favour of `on_save` in order to restore its previous state.
+
+One final feature I have been worrying about is the issue of resolving directories. It would seem that using raw directories to load resources (e.g. `LoadTexture("path/to/texture.png")`) is a bad idea, as it is dependent on the location from which the executable is run. It has been suggested online that an asset manager should be able to solve this issue. Essentially, it has a predefined location for textures, shaders, etc (e.g. "assets/textures", "assets/shaders"). One would only need to provide the filename (e.g. "player.png"), then the asset manager would look at the extension ("png"), realise it is a texture, and retrieve it from the predefined location for textures. For this, it's necessary for the asset manager to know how to get from the working directory to the asset directory, which is the part I'm not so sure about.
+Finding the answer would solve an issue with loading fonts in the engine (the only resource so far that the engine ships with).
+A solution could be to support only a reduced number of 'locations' from which to run the executable:
+
+1. Get current working directory
+2. Check if any of the supported paths to the assets folder are here:
+	* ./lince/assets
+	* ./lince/lince/assets
+    * etc
+3. Build a path to the assets folder and append to the filename of the requested asset.
+
+As for my next steps, it seems the most practical way of encountering problems to solve is trying to make a game. These include:
+
+1. Porting the old games to the new 0.8 version, improving them to use the new systems.
+2. Creating new games to test out play styles (e.g. platformer).
+3. Creating a tilemap editor. This will become necessary to make more complex games that use maps.
+
+
 ## 12 Aug 2022
 
 I have been working on the idea of a tilemap editor. I have simply setup a Nuklear GUI element with a grid of buttons and images where each is a tile from the tileset. Click events on these buttons save your tile choice, and then click events on the tilemap itself swap the old tile with the new one. These changes are not saved to disk, and the tilemap is reset each time you close the application. Regardless, this is a good start!

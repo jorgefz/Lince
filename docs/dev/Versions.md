@@ -3,16 +3,13 @@
 Version codes follow [Semantic Versioning](https://semver.org/).
 
 ### To-Do
-- Added premake action 'test' that compiles cmocka and runs tests
-- Update readme with link to minigames repository and name choice.
 - Add github banners.
-- Replace layer stack with the custom array type.
-- Merge all key events into single struct.
+- Rename `LinceBeginScene` and `LinceEndScene` to e.g. `LinceBeginDraw` and `LinceEndDraw`.
+- Merge all key events into single struct. Add 'mods' to keys (e.g. Ctrl)
 - Move misc functions to separate files (`LinceReadFile`, `LinceGetTimeMillis`). 
 - Change entity registry initialisation to take an array of component sizes instead of a list of varargs.
 - Nuklear UI wrapper and/or custom docs.
 - Create functions that don't depend on OpenGL, e.g. `LinceImage` for storing image data, `LinceClock` for timers, etc. 
-- Develop and integrate scene system
 
 
 ## v0.8.0 (WIP)
