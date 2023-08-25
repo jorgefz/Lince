@@ -1,4 +1,5 @@
 #include "menu_scene.h"
+#include "gamedata.h"
 
 void DrawMainMenu(LinceScene* scene){
     LINCE_UNUSED(scene);
@@ -6,7 +7,7 @@ void DrawMainMenu(LinceScene* scene){
     LinceUILayer* ui = LinceGetApp()->ui;
     struct nk_context *ctx = ui->ctx;
     LinceApp* app = LinceGetApp();
-    hashmap_t* scene_cache = app->user_data;
+    hashmap_t* scene_cache = &((GameData*)app->user_data)->scene_cache;
 
     const struct nk_style_button button_style = {
         /* background */

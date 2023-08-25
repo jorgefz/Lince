@@ -2,11 +2,14 @@
 #define WORLD_SCENE_H
 
 #include <lince.h>
+#include <lince/physics/boxcollider.h>
+#include "gamedata.h"
 
 typedef struct WorldScene {
     LinceEntityRegistry* reg;
     LinceCamera camera;
     LinceTilemap map;
+    DoorLink house_door;
 } WorldScene;
 
 void WorldSceneInit(LinceScene* scene);

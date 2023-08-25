@@ -1,5 +1,15 @@
 # Development Diary
 
+
+## 24 Aug 2023
+
+I have made some progress in devising ways of implementing two systems:
+
+1. The **scene system** could be implemented as both a hashmap and an array. It doesn't make much sense to implement it as a stack where you can only push or pop. The hashmap would be used to access scenes using a string name, and the array would serve to store the scene data (e.g. callbacks) in contiguous memory. Moreover, this allows storing scene callbacks without initialising the scene, and initialised scenes. You could first load up all scene callbacks into the hashmap and thus the array with a new function (e.g. `LincePreloadScene` or `LinceRegisterScene`). You could tell where an scene has been initalised with an extra boolean parameter - you wouldn't be able to trust whether `scene->data` is NULL because its `on_init` method could be modifying some other global state without using `scene->data`. You'd also have more control over cached scenes, choosing when to free up some memory when a scene hasn't been accessed in some time.
+
+2. When **resolving directories**, allow the user to push custom search paths to a stack.
+
+
 ## 21 Aug 2023
 
 In the last year, I have implemented several major components: a sound system (using Miniaudio), a testing framework (CMocka), an entity-component-system (ECS), a scene system, and UUIDs. I have also improve improved tilemaps.
@@ -31,7 +41,7 @@ If the cached scene is pushed again onto the stack, one could check whether `sce
 
 3. Serialising. I have though about defining further callbacks for scenes: `on_save` for writing the scene data to disk, and `on_load` for reading from disk. When re-loading a save, the `on_init` method is skipped in favour of `on_save` in order to restore its previous state.
 
-One final feature I have been worrying about is the issue of resolving directories. It would seem that using raw directories to load resources (e.g. `LoadTexture("path/to/texture.png")`) is a bad idea, as it is dependent on the location from which the executable is run. It has been suggested online that an asset manager should be able to solve this issue. Essentially, it has a predefined location for textures, shaders, etc (e.g. "assets/textures", "assets/shaders"). One would only need to provide the filename (e.g. "player.png"), then the asset manager would look at the extension ("png"), realise it is a texture, and retrieve it from the predefined location for textures. For this, it's necessary for the asset manager to know how to get from the working directory to the asset directory, which is the part I'm not so sure about.
+One final feature I have been worrying about is the issue of **resolving directories**. It would seem that using raw directories to load resources (e.g. `LoadTexture("path/to/texture.png")`) is a bad idea, as it is dependent on the location from which the executable is run. It has been suggested online that an asset manager should be able to solve this issue. Essentially, it has a predefined location for textures, shaders, etc (e.g. "assets/textures", "assets/shaders"). One would only need to provide the filename (e.g. "player.png"), then the asset manager would look at the extension ("png"), realise it is a texture, and retrieve it from the predefined location for textures. For this, it's necessary for the asset manager to know how to get from the working directory to the asset directory, which is the part I'm not so sure about.
 Finding the answer would solve an issue with loading fonts in the engine (the only resource so far that the engine ships with).
 A solution could be to support only a reduced number of 'locations' from which to run the executable:
 

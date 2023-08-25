@@ -7,7 +7,7 @@
 #include <lince/audio/audio.h>
 #include <lince/physics/boxcollider.h>
 
-#include "components.h"
+#include "gamedata.h"
 
 /*
 QueryEntities(registry, mode, result, ncomp, ...)
@@ -39,7 +39,7 @@ enum WalkingAnims {
     ANIM_COUNT
 };
 
-typedef struct GameData {
+typedef struct OldGameData {
     // Audio
     LinceSoundManager* sound_manager;
     LinceSound* music;
@@ -67,9 +67,9 @@ typedef struct GameData {
     LinceTilemap mapgrid;
     LinceTilemap citygrid;
     
-} GameData;
+} OldGameData;
 
-static GameData game_data = {
+static OldGameData game_data = {
     .audio_file = "sandbox/assets/sounds/cat.wav",
     .music_file = "sandbox/assets/sounds/game-town-music.wav"
 };
@@ -649,25 +649,36 @@ void GameOnUpdate(float dt){
 */
 
 
-#include "components.h"
+#include "gamedata.h"
 #include "scenes/scenes.h"
 
-hashmap_t scenes;
-
+static GameData DATA = {0};
 
 void SandboxInit() {
 
-    hashmap_init(&scenes, 11);
-    hashmap_set(&scenes, "MainMenu", &SCENE_CALLBACKS[Scene_MainMenu]);
-    hashmap_set(&scenes, "World", &SCENE_CALLBACKS[Scene_World]);
-    hashmap_set(&scenes, "House", &SCENE_CALLBACKS[Scene_House]);
-    LinceGetApp()->user_data = &scenes;
+    LinceInitCamera(&DATA.camera, LinceGetAspectRatio());
+    DATA.camera.zoom = 3.0f;
+    DATA.camera_speed = 0.003f;
 
-    LincePushScene(hashmap_get(&scenes, "MainMenu"));
+    DATA.player_box = (LinceBoxCollider){.x=0, .y=0, .w=0.7, .h=0.7};
+    DATA.player_sprite = (LinceSprite){.x=0, .y=0, .w=0.7, .h=0.7, .color={0,0,1,1}, .zorder=1};
+    
+    hashmap_init(&DATA.scene_cache, 11);
+    hashmap_set(&DATA.scene_cache, "MainMenu", &SCENE_CALLBACKS[Scene_MainMenu]);
+    hashmap_set(&DATA.scene_cache, "World", &SCENE_CALLBACKS[Scene_World]);
+    hashmap_set(&DATA.scene_cache, "House", &SCENE_CALLBACKS[Scene_House]);
+    LinceGetApp()->user_data = &DATA;
+
+    LincePushScene(hashmap_get(&DATA.scene_cache, "MainMenu"));
+}
+
+void SandboxUpdate(float dt){
+    LinceResizeCameraView(&DATA.camera, LinceGetAspectRatio());
+    LinceUpdateCamera(&DATA.camera);
 }
 
 void SandboxTerminate(){
-    hashmap_uninit(&scenes);
+    hashmap_uninit(&DATA.scene_cache);
 }
 
 void SetupApplication(){
@@ -675,7 +686,9 @@ void SetupApplication(){
     app->screen_width = 1280;
     app->screen_height = 720;
     app->on_init      = SandboxInit;
+    app->on_update    = SandboxUpdate;
     app->on_terminate = SandboxTerminate;
+    
 }
 
 
