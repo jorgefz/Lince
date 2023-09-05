@@ -1,18 +1,16 @@
 #include "core/profiler.h"
 #include "core/memory.h"
+#include "core/fileio.h"
 #include "renderer/shader.h"
 #include <string.h>
 #include <glad/glad.h>
+#include "core/fileio.h"
 //#include <cglm>
 
 
 
 
 /* --- Static declarations --- */
-
-/* Reads file and returns contents
-as heap allocated string which must be freed */
-static char* LinceReadFile(const char* path);
 
 /* Compiles a shader file from source, returns OpenGL ID */
 static int LinceCompileShader(const char* source, int type);
@@ -31,8 +29,8 @@ LinceShader* LinceCreateShader(
 	LinceShader* shader;
 	char *vsrc, *fsrc;
 
-	vsrc = LinceReadFile(vertex_path);
-	fsrc = LinceReadFile(fragment_path);
+	vsrc = LinceLoadTextFile(vertex_path);
+	fsrc = LinceLoadTextFile(fragment_path);
 	shader = LinceCreateShaderFromSrc(vsrc, fsrc);
 
 	LinceFree(vsrc);
@@ -183,27 +181,6 @@ void LinceSetShaderUniformMat4(LinceShader* sh, const char* name, mat4 m){
 
 
 /* --- Static functions --- */
-
-// TODO: Move to a header more accessible to the whole project
-static char* LinceReadFile(const char* path){
-	LINCE_INFO("Reading file '%s'", path);
-	
-	FILE* handle = fopen(path, "r");
-	LINCE_ASSERT(handle, "Failed to open file '%s'", path);
-
-	/* Get file length */
-	fseek(handle, 0, SEEK_END);
-	size_t size = ftell(handle);
-	fseek(handle, 0, SEEK_SET);
-	LINCE_ASSERT(size > 0, "Empty file '%s'", path);
-
-	char* source = LinceCalloc((size+1)*sizeof(char));
-	fread(source, size, 1, handle); // load file data into buffer
-	source[size] = '\0'; // enforce last character to be terminator
-
-	fclose(handle);
-	return source;
-}
 
 
 int LinceCompileShader(const char* source, int type){

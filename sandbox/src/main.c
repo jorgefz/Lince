@@ -691,8 +691,13 @@ void SetupApplication(){
     
 }
 
+#include "lince/core/fileio.h"
 
 int main(void) {
+
+    char exepath[1000];
+    LinceFetchExeDir(exepath, 1000);
+    printf("%s\n", exepath);
 
     SetupApplication();
     LinceGetApp()->title = "Sandbox";
