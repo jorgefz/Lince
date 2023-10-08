@@ -9,6 +9,7 @@
 #include "lince/core/app.h"
 #include "lince/core/memory.h"
 #include "lince/core/uuid.h"
+#include "lince/core/fileio.h"
 
 /* Input */
 #include "lince/input/input.h"

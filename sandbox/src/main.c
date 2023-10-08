@@ -691,13 +691,18 @@ void SetupApplication(){
     
 }
 
-#include "lince/core/fileio.h"
 
 int main(void) {
 
     char exepath[1000];
     LinceFetchExeDir(exepath, 1000);
+    
+    exepath[strlen(exepath)-1] = '\0';
     printf("%s\n", exepath);
+    
+    printf("Is file: %s\n", LinceIsFile("C:/Users/Lenovo/.gitconfig")?"Yes":"No");
+    printf("Is dir: %s\n", LinceIsDir("C:/Users")?"Yes":"No");
+    return 0;
 
     SetupApplication();
     LinceGetApp()->title = "Sandbox";

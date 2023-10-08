@@ -7,7 +7,24 @@
 * @param max_size Size of the provided buffer
 * @note the output string will be null-terminated.
 */
-void LinceFetchExeDir(char* exe_path, uint64_t max_size);
+void LinceFetchExeDir(char* exe_path, uint32_t max_size);
+
+/** @brief Returns LinceTrue if a given file exists
+* @param path Path to file
+*/
+LinceBool LinceIsFile(const char* path);
+
+/** @brief Returns LinceTrue if a given path exists
+* @param path Directory path
+*/
+LinceBool LinceIsDir(const char* path);
+
+
+/** @brief Copies a binary file's contents into memory.
+* @note Returned memory must be freed.
+* @param filepath path to file to load
+*/
+char* LinceLoadFile(const char* path);
 
 /** @brief Copies a text file's contents into memory, appending a terminator at the end.
 * @note Returned memory must be freed.

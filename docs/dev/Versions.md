@@ -41,7 +41,7 @@ Version codes follow [Semantic Versioning](https://semver.org/).
 - Renamed layer callbacks following snake case.
 - Moved input code, and key and mouse codes to 'input' folder
 - Improved layer stack to be more cache friendly. From array of pointers to array of plain layers.
-
+- Added `fileio.h` functions for file IO: `LinceIsDir`, `LinceIsFile`, `LinceLoadFile`, and `LinceLoadTextFile.`
 
 ## v0.7.0
 - Added support for custom shaders in renderer
