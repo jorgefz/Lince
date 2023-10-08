@@ -1,4 +1,5 @@
 #include "lince/core/core.h"
+#include "lince/containers/array.h"
 #include "lince/core/memory.h"
 #include "lince/core/fileio.h"
 
@@ -90,22 +91,6 @@ LinceBool LinceIsDir(const char* path){
 }
 
 
-/*
-char* LinceFindAssetPath(array_t* search_paths, char* exe_dir, char* asset){
-	for(path in search_paths){
-		char* p = exe_dir + path + asset
-		if (LinceIsFile(p)) return p;
-	}
-	Fail();
-
-	// Append user-defined assets folders
-
-	// For each asset folder, append asset name and check if it exists.
-	// Return sucessful one, and error otherwise.
-}
-*/
-
-
 char* LinceLoadFile(const char* path){
 	LINCE_INFO("Reading file '%s'", path);
 	
@@ -144,4 +129,37 @@ char* LinceLoadTextFile(const char* path){
 	fclose(handle);
 
 	return source;
+}
+
+LinceBool LinceFetchAsset(char* asset_path, char* asset_name, array_t* asset_dirs, char* exe_dir){
+	
+	uint64_t exe_dir_len = strlen(exe_dir);
+	uint64_t asset_name_len = strlen(asset_name);
+
+	memmove(asset_path, exe_dir, exe_dir_len);
+	if( asset_path[exe_dir_len-1] != '\\' && asset_path[exe_dir_len-1] != '/' ){
+		asset_path[exe_dir_len] = '/';
+		exe_dir_len++;
+	}
+
+	for(uint32_t i = 0; i != asset_dirs->size; ++i){
+		char* path = asset_path + exe_dir_len;
+		char* asset_dir = *(char**)array_get(asset_dirs, i);
+		uint64_t asset_dir_len = strlen(asset_dir);
+		memmove(path, asset_dir, asset_dir_len);
+		path += asset_dir_len;
+
+		
+		if( *(path-1) != '\\' && *(path-1) != '/' ){
+			*path = '/';
+			path++;
+		}
+
+		memmove(path, asset_name, asset_name_len);
+		path[asset_name_len] = '\0';
+		
+		if (LinceIsFile(asset_path)) return LinceTrue;
+	}
+	LINCE_ASSERT(0, "Failed to find asset '%s'\n", asset_name);
+	return LinceFalse;
 }

@@ -694,14 +694,22 @@ void SetupApplication(){
 
 int main(void) {
 
-    char exepath[1000];
-    LinceFetchExeDir(exepath, 1000);
+    char exedir[1000];
+    LinceFetchExeDir(exedir, 1000);
+    exedir[strlen(exedir)-1]='\0';
     
-    exepath[strlen(exepath)-1] = '\0';
-    printf("%s\n", exepath);
+    array_t asset_dirs;
+    array_init(&asset_dirs, sizeof(char*));
+
+    const char* my_asset_dir = "../../../sandbox/assets";
+    printf("my_asset_dir: %p\n", my_asset_dir);
+    array_push_back(&asset_dirs, &my_asset_dir);
+
+    char assetpath[1000] = {0};
+    LinceFetchAsset(assetpath, "shaders/light.frag.glsl", &asset_dirs, exedir);
+
+    printf("%s\n", assetpath);
     
-    printf("Is file: %s\n", LinceIsFile("C:/Users/Lenovo/.gitconfig")?"Yes":"No");
-    printf("Is dir: %s\n", LinceIsDir("C:/Users")?"Yes":"No");
     return 0;
 
     SetupApplication();
