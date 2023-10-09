@@ -204,6 +204,63 @@ LinceLayer* LinceGetCurrentOverlay(){
     return array_get(&app.overlay_stack, app.current_overlay);
 }
 
+void LincePushAssetDir(const char* dir){
+    uint32_t length = strlen(dir);
+    uint32_t exedir_length = strlen(app.exe_dir);
+    
+    // LINCE_ASSERT(app.running, "App is not running");
+    LINCE_ASSERT(length < LINCE_PATH_MAX - exedir_length - 1,
+        "Asset directory is too long. Length %u but max is %u",
+        length, LINCE_PATH_MAX-exedir_length-1);
+    
+    array_push_front(&app.asset_dirs, NULL);
+    char* p = array_front(&app.asset_dirs);
+
+    // Prepend directory of executable
+    memmove(p, app.exe_dir, exedir_length);
+    if (p[exedir_length-1] != '\\' && p[exedir_length-1] != '/'){
+        p[exedir_length] = '/';
+        exedir_length++;
+    }
+    p += exedir_length;
+
+    // Append relative directory to assets folder
+    memmove(p, dir, length);
+    if (p[length-1] != '\\' && p[length-1] != '/'){
+        p[length] = '/';
+        length++;
+    }
+    p[length] = '\0';
+
+    printf("%s\n", (char*)array_front(&app.asset_dirs));
+
+    if(LinceIsDir(array_front(&app.asset_dirs)) != 1){
+        LINCE_WARN("Asset folder will not be added because it does not exist: '%s'",
+            (char*)array_front(&app.asset_dirs));
+        array_pop_front(&app.asset_dirs);
+    }
+}
+
+
+LinceBool LinceFetchAssetPath(char* asset_path, const char* asset_filename){
+    for(uint32_t i = 0; i != app.asset_dirs.size; ++i){
+        char* dir = array_get(&app.asset_dirs, i);
+        uint32_t dir_len = strlen(dir);
+        
+        if (dir_len + strlen(asset_filename) >= LINCE_PATH_MAX){
+            LINCE_WARN("Skipping path, too long: '%s' + '%s'", dir, asset_filename);
+            continue;
+        }
+        
+        memmove(asset_path, dir, dir_len);
+        memmove(asset_path + dir_len, asset_filename, strlen(asset_filename)+1);
+        if (LinceIsFile(asset_path)) return LinceTrue;
+    }
+
+    return LinceFalse;
+}
+
+
 /* --- Implementations of static functions --- */
 
 static void LinceInit(){
@@ -248,6 +305,11 @@ static void LinceInit(){
     
     // Create scene stack
     array_init(&app.scene_stack, sizeof(LinceScene));
+
+    app.exe_dir = LinceCalloc(LINCE_PATH_MAX * sizeof(char));
+    LinceFetchExeDir(app.exe_dir, LINCE_PATH_MAX);
+    array_init(&app.asset_dirs, LINCE_PATH_MAX * sizeof(char));
+    LincePushAssetDir("../../../lince/assets");
 
     LinceInitRenderer(app.window);
     app.ui = LinceInitUI(app.window->handle);
@@ -313,6 +375,8 @@ static void LinceTerminate(){
     app.window = NULL;
     app.running = 0;
     LinceFree(app.title);
+    LinceFree(app.exe_dir);
+    array_uninit(&app.asset_dirs);
 
     LinceCloseProfiler();
     LinceCloseLogger();

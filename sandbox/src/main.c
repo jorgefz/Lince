@@ -654,7 +654,18 @@ void GameOnUpdate(float dt){
 
 static GameData DATA = {0};
 
+static const char* asset_dir = "../../../sandbox/assets2";
+static const char* asset_name = "shaders/light.frag.glsl";    
+
+
 void SandboxInit() {
+
+    LincePushAssetDir(asset_dir);
+
+    char asset_path[LINCE_PATH_MAX];
+    LinceBool success = LinceFetchAssetPath(asset_path, "fonts/Cousine-Regular.ttf");
+    printf("Asset %s\n", success?"found":"not found");
+    printf("%20s\n", asset_path);
 
     LinceInitCamera(&DATA.camera, LinceGetAspectRatio());
     DATA.camera.zoom = 3.0f;
@@ -694,27 +705,7 @@ void SetupApplication(){
 
 int main(void) {
 
-    char exedir[1000];
-    LinceFetchExeDir(exedir, 1000);
-    exedir[strlen(exedir)-1]='\0';
-    
-    array_t asset_dirs;
-    array_init(&asset_dirs, sizeof(char*));
-
-    const char* my_asset_dir = "../../../sandbox/assets";
-    printf("my_asset_dir: %p\n", my_asset_dir);
-    array_push_back(&asset_dirs, &my_asset_dir);
-
-    char assetpath[1000] = {0};
-    LinceFetchAsset(assetpath, "shaders/light.frag.glsl", &asset_dirs, exedir);
-
-    printf("%s\n", assetpath);
-    
-    return 0;
-
     SetupApplication();
-    LinceGetApp()->title = "Sandbox";
-
     LinceRun();
 
     return 0;

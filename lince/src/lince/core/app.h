@@ -41,19 +41,23 @@ typedef struct LinceApp{
 
     /* Internal state */
     LinceWindow     *window;        ///< Window state.
-    // LinceLayerStack *layer_stack;   ///< Array of rendering layers.
-    // LinceLayerStack *overlay_stack; ///< Array of rendering overlays (drawn after layers).
     array_t layer_stack;   ///< Array of rendering layers.
     array_t overlay_stack; ///< Array of rendering overlays (drawn after layers).
     
     array_t scene_stack; ///< Stack of scenes. Only topmost is rendered.
     LinceScene* current_scene; ///< Scene at the top of the stack.
 
-    LinceBool        running;       ///< True if the application is active.
+    LinceBool running;   ///< True if the application is active.
     float time_ms;       ///< Run time in milliseconds.
     float dt;            ///< Frame time step in milliseconds.
     int current_layer;   ///< Index of the active layer (during OnUpdate or OnEvent). This is `-1` if no layer is active.
     int current_overlay; ///< Index of the active overlay, akin to the current layer.
+    
+    char* exe_dir;       ///< Absolute path to the running executable
+    array_t asset_dirs;  ///< Folders in which to search for assets
+                         ///< @note: Each element is a string of size LINCE_PATH_MAX, not a pointer!
+                         ///< User-defined folders will be searched before the default Lince assets folder,
+                         /// Allowing the user to override the default engine assets
 
     /* UI */
     LinceUILayer* ui;   ///< State of the GUI, e.g. Nuklear's context.
@@ -147,5 +151,18 @@ LinceLayer* LinceGetCurrentLayer();
 */
 LinceLayer* LinceGetCurrentOverlay();
 
+/** @brief Adds the location of an asset folder to the list of search paths.
+* The path must be relative to the location of the executable.
+* @param dir Zero-terminated string with the path to an asset folder to store.
+*/
+void LincePushAssetDir(const char* dir);
+
+/** @brief Retrieves the full path of an asset file by searching on the asset folders
+* @param asset_path The full asset path is written to this location.
+*                   This memory must have at least LINCE_PATH_MAX bytes in size.
+* @param asset_filename Location of the asset file within the asset folder
+* @returns LinceTrue if the asset was located, and LinceFalse otherwise.
+*/
+LinceBool LinceFetchAssetPath(char* asset_path, const char* asset_filename);
 
 #endif // LINCE_APP_H
