@@ -34,7 +34,7 @@ void LinceFetchExeDir(char* exe_path, uint32_t max_size){
 	LINCE_ASSERT(end != exe_path, "Invalid executable path '%s'", exe_path);
 	*(end+1) = '\0';
 
-	LINCE_INFO("Excutable found at '%s'", exe_path);
+	LINCE_INFO("Executable found at '%s'", exe_path);
 }
 
 

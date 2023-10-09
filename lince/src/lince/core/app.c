@@ -98,7 +98,7 @@ void LinceRun(){
 
     LinceInit();
     
-    LINCE_INFO(" Running main loop...");
+    LINCE_INFO("Running main loop...");
     while(app.running){
         LinceOnUpdate();
     }
@@ -322,7 +322,6 @@ static void LinceInit(){
     char font_path[LINCE_PATH_MAX];
     LinceBool found = LinceFetchAssetPath(font_path, font_fname);
     LINCE_ASSERT(found, "Could not find location of default font '%s'", font_fname);
-    LINCE_INFO("Font file found at '%s'", font_path);
     app.ui = LinceInitUI(app.window->handle, font_path);
     
     app.running = LinceTrue;

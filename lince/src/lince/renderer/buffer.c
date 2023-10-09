@@ -44,7 +44,7 @@ void LinceSetupBufferElementData(LinceBufferElement* elem){
 /* --- Vertex Buffer --- */
 
 LinceVertexBuffer LinceCreateVertexBuffer(void* data, uint32_t size){
-	LINCE_INFO(" Creating Vertex Buffer (%d bytes) ", (int)size);
+	LINCE_INFO("Creating Vertex Buffer (%d bytes) ", (int)size);
 	uint32_t id;
 	glGenBuffers(1, &id);
 	glBindBuffer(GL_ARRAY_BUFFER, id);
@@ -74,7 +74,7 @@ void LinceDeleteVertexBuffer(LinceVertexBuffer vb){
 /* --- Index Buffer --- */
 
 LinceIndexBuffer LinceCreateIndexBuffer(uint32_t* data, uint32_t count){
-	LINCE_INFO(" Creating Index Array (%d indices)", (int)count);
+	LINCE_INFO("Creating Index Array (%d indices)", (int)count);
 	LinceIndexBuffer ib = {.id=0, .count=count};
 	glGenBuffers(1, &ib.id);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ib.id);

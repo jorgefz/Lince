@@ -48,7 +48,7 @@ LinceUILayer* LinceInitUI(void* glfw_window, const char* default_font_path){
     //nk_style_load_all_cursors(data->ctx, atlas->cursors);
     //nk_style_set_font(ui->ctx, ui->fonts[LinceFont_Droid20]);
 
-	LINCE_INFO(" UI Initialised");
+	LINCE_INFO("Nuklear UI Initialised");
 	return ui;
 }
 
@@ -95,7 +95,7 @@ void LinceTerminateUI(LinceUILayer* ui){
     nk_glfw3_shutdown(ui->glfw);
     LinceFree(ui->glfw);
 	LinceFree(ui);
-	LINCE_INFO(" UI Terminated");
+	LINCE_INFO("Nuklear UI Terminated");
 }
 
 

@@ -23,8 +23,9 @@ LinceShader* LinceCreateShader(
 	const char* fragment_path
 ){
 	LINCE_PROFILER_START(timer);
-	LINCE_INFO("Creating Shader from vertex file '%s' and fragment file '%s'",
-		vertex_path, fragment_path);
+	LINCE_INFO("Creating shader from file");
+	LINCE_INFO(" ---> Vertex filepath:   '%s'", vertex_path);
+	LINCE_INFO(" ---> Fragment filepath: '%s'", fragment_path);
 	LinceShader* shader;
 	char *vsrc, *fsrc;
 
@@ -49,14 +50,14 @@ LinceShader* LinceCreateShaderFromSrc(
 
 	LinceShader* shader = LinceCalloc(sizeof(LinceShader));
 	shader->id = glCreateProgram();
-	LINCE_INFO("Shader created with ID %d", shader->id);
+	LINCE_INFO(" ---> ID: %d", shader->id);
 
-	LINCE_INFO("Compiling vertex and fragment sources");
+	LINCE_INFO(" ---> Compiling ...");
 	int vs, fs;
 	vs = LinceCompileShader(vertex_src, GL_VERTEX_SHADER);
 	fs = LinceCompileShader(fragment_src, GL_FRAGMENT_SHADER);
 
-	LINCE_INFO("Linking and validating shader");
+	LINCE_INFO(" ---> Linking and validating ...");
 	glAttachShader(shader->id, vs);
 	glAttachShader(shader->id, fs);
 	glLinkProgram(shader->id);
@@ -69,8 +70,10 @@ LinceShader* LinceCreateShaderFromSrc(
 	// Start out with hashmap of 21 buckets to avoid costs of
 	// Resizing often at small sizes (e.g. at sizes 2, 3, 5, 7, 11, etc).
 	int ret = hashmap_init(&shader->uniforms, 20);
-	LINCE_ASSERT(ret == 0, "Failed to create hashmap for shader %d uniforms",
-		shader->id);
+	LINCE_ASSERT(ret == 0,
+		"Failed to create hashmap for shader %d uniforms", shader->id);
+
+	LINCE_INFO(" ---> Done!")
 
 	LINCE_PROFILER_END(timer);
     return shader;
@@ -88,7 +91,7 @@ void LinceUnbindShader(void){
 /* Destroys and deallocates given shader */
 void LinceDeleteShader(LinceShader* shader){
 	if(!shader) return;
-	LINCE_INFO("Deleting shader %d", shader->id);
+	LINCE_INFO("Deleting shader with ID %d", shader->id);
 	if(shader->id > 0) glDeleteProgram(shader->id);
 	hashmap_uninit(&shader->uniforms);
 	LinceFree(shader);
