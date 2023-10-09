@@ -654,19 +654,11 @@ void GameOnUpdate(float dt){
 
 static GameData DATA = {0};
 
-static const char* asset_dir = "../../../sandbox/assets2";
-static const char* asset_name = "shaders/light.frag.glsl";    
-
+static const char* asset_dir = "../../../sandbox/assets";
 
 void SandboxInit() {
 
     LincePushAssetDir(asset_dir);
-
-    char asset_path[LINCE_PATH_MAX];
-    LinceBool success = LinceFetchAssetPath(asset_path, "fonts/Cousine-Regular.ttf");
-    printf("Asset %s\n", success?"found":"not found");
-    printf("%20s\n", asset_path);
-
     LinceInitCamera(&DATA.camera, LinceGetAspectRatio());
     DATA.camera.zoom = 3.0f;
     DATA.camera_speed = 0.003f;

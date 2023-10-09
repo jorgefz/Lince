@@ -15,9 +15,9 @@
 
 
 void LinceFetchExeDir(char* exe_path, uint32_t max_size){
-	// Get location of executable
+
 #ifdef LINCE_WINDOWS
-	/// NOTE: check return code
+	/// TODO: check return code
 	GetModuleFileNameA(NULL, exe_path, max_size); 
 #elif defined(LINCE_LINUX)
 	memset(exe_path, 0, max_size);
@@ -33,6 +33,8 @@ void LinceFetchExeDir(char* exe_path, uint32_t max_size){
 	while(*end != '/' && *end != '\\' && end != exe_path) end--;
 	LINCE_ASSERT(end != exe_path, "Invalid executable path '%s'", exe_path);
 	*(end+1) = '\0';
+
+	LINCE_INFO("Excutable found at '%s'", exe_path);
 }
 
 
@@ -112,7 +114,7 @@ char* LinceLoadFile(const char* path){
 
 
 char* LinceLoadTextFile(const char* path){
-	LINCE_INFO("Reading file '%s'", path);
+	LINCE_INFO("Reading text file '%s'", path);
 	
 	FILE* handle = fopen(path, "r");
 	LINCE_ASSERT(handle, "Failed to open file '%s'", path);

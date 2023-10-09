@@ -37,7 +37,6 @@ static void LinceOnEvent(LinceEvent* e);
 static LinceBool LinceOnEventWindowResize(LinceEvent* e);
 static LinceBool LinceOnEventWindowClose(LinceEvent* e);
 
-
 static char const* GLGetErrorString(GLenum const err) {
   switch (err) {
     // opengl 2 errors (8)
@@ -232,13 +231,14 @@ void LincePushAssetDir(const char* dir){
     }
     p[length] = '\0';
 
-    printf("%s\n", (char*)array_front(&app.asset_dirs));
-
     if(LinceIsDir(array_front(&app.asset_dirs)) != 1){
-        LINCE_WARN("Asset folder will not be added because it does not exist: '%s'",
+        LINCE_WARN("Failed to add assets folder because it does not exist: '%s'",
             (char*)array_front(&app.asset_dirs));
         array_pop_front(&app.asset_dirs);
+        return;
     }
+
+    LINCE_INFO("Added assets folder '%s'", (char*)array_front(&app.asset_dirs));
 }
 
 
@@ -254,7 +254,10 @@ LinceBool LinceFetchAssetPath(char* asset_path, const char* asset_filename){
         
         memmove(asset_path, dir, dir_len);
         memmove(asset_path + dir_len, asset_filename, strlen(asset_filename)+1);
-        if (LinceIsFile(asset_path)) return LinceTrue;
+        if (LinceIsFile(asset_path)){
+            LINCE_INFO("Located asset '%s' at '%s'", asset_filename, asset_path);
+            return LinceTrue;
+        }
     }
 
     return LinceFalse;
@@ -312,9 +315,17 @@ static void LinceInit(){
     LincePushAssetDir("../../../lince/assets");
 
     LinceInitRenderer(app.window);
-    app.ui = LinceInitUI(app.window->handle);
-    app.running = LinceTrue;
 
+    // TODO: improve
+    // Load default font
+    const char* font_fname = "fonts/DroidSans.ttf";
+    char font_path[LINCE_PATH_MAX];
+    LinceBool found = LinceFetchAssetPath(font_path, font_fname);
+    LINCE_ASSERT(found, "Could not find location of default font '%s'", font_fname);
+    LINCE_INFO("Font file found at '%s'", font_path);
+    app.ui = LinceInitUI(app.window->handle, font_path);
+    
+    app.running = LinceTrue;
     if (app.on_init) app.on_init(); // user may push layers onto stack
 }
 

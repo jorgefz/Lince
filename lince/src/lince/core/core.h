@@ -7,7 +7,7 @@
 | LINCE_LINUX   | Defined on GNU/Linux                      |
 | LINCE_MACOS   | Defined on MacOS                          |
 | LINCE_VERSION | String with current engine version        |
-| LINCE_DIR     | Directory where 'lince' folder is located |
+| LINCE_DIR     | Directory where output files are saved    |
 
 ## Debugging
 | Name                      | Description                                        |
@@ -71,7 +71,7 @@ Note that these do not apply to the containers (e.g. array, hashmap, list).
 
 /* Directory */
 #ifndef LINCE_DIR
-    #define LINCE_DIR ""  ///< Directory where 'lince' folder is located
+    #define LINCE_DIR ""  ///< Directory where output files are saved
 #endif
 
 /* Misc */

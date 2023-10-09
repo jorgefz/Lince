@@ -30,9 +30,10 @@ typedef struct LinceUILayer {
 
 /** @brief Initialise UI state and Nuklear rendering context
 * @param glfw_window GLFw window handle from LinceWindow.
+* @param default_font_path Absolute path to TTF file with the default font
 * @todo Change input handle to LinceWindow.
 */
-LinceUILayer* LinceInitUI(void* glfw_window);
+LinceUILayer* LinceInitUI(void* glfw_window, const char* default_font_path);
 
 /** @brief Initialise Nuklear's render queue.
 * Any GUI draw calls must be bracketed between LinceBeginUIRender and LinceEndUIRender.

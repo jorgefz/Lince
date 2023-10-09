@@ -17,14 +17,16 @@ Version codes follow [Semantic Versioning](https://semver.org/).
 - Added UUIDs.
 - Added z-sorting with translucency by sorting sprites before drawing
 - Added scene system.
-- Improved premake scripts. Placed separate 'premak5.lua' scripts in the folder of each project with all build commands necessary to build it.
+- Improved premake scripts. Placed separate 'premak5.lua' scripts in the folder of each project with all build commands necessary to build it. This allows users to create projects that depend on Lince much more easily.
+- Added rudimentary asset manager. Assets are now sought from a stack of asset folders, whose locations are defined relative to the path of the running executable. This allows the executable to find the application assets when called from anywhere in the system.
 
+- `LINCE_DIR` now generated in premake5 file automatically from any path.
+- Changed scope of `LINCE_DIR` to the directory where output files are generated (e.g. logging, profiling). By default, this is the location from which the executable is called.
 - Added functions to initialise camera without allocating heap memory.
 - Improved error message when font fails to load
 - Removed `LinceCreateTexture`
 - Removed `name` parameter from `LinceTexture` functions.
 - Removed `name` parameter from `LinceShader` functions.
-- `LINCE_DIR` now generated in premake5 file automatically from any path.
 - Change naming of event-related variable names from past tense (e.g. pressed) to present tense (.e.g press), and shortened "mouse button" to simply "mouse". This affects `LinceEventType` enum values, `LinceEventData` union members, event struct names, and event creation functions.
 - Renamed application callback variables e.g. from `game_on_update` to `on_update`.
 - Fixed bug where passing a NULL value as the filename for the log file would result in undefined behaviour.
