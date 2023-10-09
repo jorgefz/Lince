@@ -22,10 +22,11 @@
 | LINCE_PROFILE             | Enables profiling in debug mode                    |
 
 ## Engine constants
-| Name                 | Description                     |
-| -------------------- | --------------------------------|
-| LINCE_NAME_MAX       | Maximum size for short names    |
-| LINCE_TEXT_MAX       | Maximum size for longer strings |
+| Name                 | Description                          |
+| -------------------- | ------------------------------------ |
+| LINCE_NAME_MAX       | Maximum size for short names         |
+| LINCE_TEXT_MAX       | Maximum size for longer strings      |
+| LINCE_PATH_MAX       | Maximum size for a path or directory |
 
 ## Allocations
 Customise memory management.
@@ -107,8 +108,9 @@ Note that these do not apply to the containers (e.g. array, hashmap, list).
 #define LINCE_ASSERT_ALLOC(ptr, size) LINCE_ASSERT(ptr, " Failed to allocate %ld bytes", (long int)(size))
 
 /* Constants & typedefs */
-#define LINCE_NAME_MAX 100 ///< Used for short names (e.g. shader uniforms)
+#define LINCE_NAME_MAX 100  ///< Used for short names (e.g. shader uniforms)
 #define LINCE_TEXT_MAX 1000 ///< Used for longer string (e.g. descriptions)
+#define LINCE_PATH_MAX 1024 ///< Max number of characters in a path
 
 /** @enum LinceBool
 * Custom boolean type */
