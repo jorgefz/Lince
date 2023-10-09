@@ -35,13 +35,4 @@ char* LinceLoadFile(const char* path);
 */
 char* LinceLoadTextFile(const char* path);
 
-/** @brief Finds the path to an asset from a list of asset folders.
-* @param asset_path Path to the matching asset will be written to this location.
-* @param asset_name File name of the asset to fetch
-* @param asset_dirs Array of relative paths between the executable and an asset folder
-* @param exe_dir Absolute path to the executable
-* @returns LinceTrue if the asset was found, and LinceFalse otherwise
-*/
-LinceBool LinceFetchAsset(char* asset_path, char* asset_name, array_t* asset_dirs, char* exe_dir);
-
 #endif /* LINCE_FILEIO_H */
