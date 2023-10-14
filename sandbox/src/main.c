@@ -70,8 +70,8 @@ typedef struct OldGameData {
 } OldGameData;
 
 static OldGameData game_data = {
-    .audio_file = "sandbox/assets/sounds/cat.wav",
-    .music_file = "sandbox/assets/sounds/game-town-music.wav"
+    .audio_file = "sounds/cat.wav",
+    .music_file = "sounds/game-town-music.wav"
 };
 
 
@@ -142,7 +142,7 @@ void AnimateWalking(float dt){
 
 void SetupTileAnimData(){
     game_data.walking_tileset = LinceLoadTexture(
-        "sandbox/assets/textures/elv-games-movement.png", 0);
+        "textures/elv-games-movement.png", 0);
 
     // Set up texture coordinates for walking tile animation
     vec2 walk_texsize = {(float)game_data.walking_tileset->width,
@@ -188,7 +188,7 @@ void SetupTileAnimData(){
 }
 
 void SetupChickenAnimation(){
-    const char* fname = "sandbox/assets/textures/chicken.png";
+    const char* fname = "textures/chicken.png";
     array_t chicken_tiles;
     vec2 cellsize = {16,16};
     LinceTexture* chicken_tileset = LinceLoadTextureWithTiles(fname, cellsize, &chicken_tiles);
@@ -332,8 +332,8 @@ void GameStateInit(){
     game_data.camera.zoom = 1.3f;
 
     game_data.custom_shader = LinceCreateShader(
-		"sandbox/assets/shaders/light.vert.glsl",
-		"sandbox/assets/shaders/light.frag.glsl"
+		"shaders/light.vert.glsl",
+		"shaders/light.frag.glsl"
     );
     LinceBindShader(game_data.custom_shader);
     #define max_texture_slots 32
@@ -427,7 +427,7 @@ void GameStateInit(){
 
     game_data.mapgrid = (LinceTilemap){
         .texture = LinceLoadTexture(
-            "sandbox/assets/textures/hilau_tilesets/6_floors.png", 0
+            "textures/hilau_tilesets/6_floors.png", 0
         ),
         .cellsize = {32,32},
         .scale = {0.4,0.4},
@@ -446,7 +446,7 @@ void GameStateInit(){
 
     game_data.citygrid = (LinceTilemap){
         .texture = LinceLoadTexture(
-            "sandbox/assets/textures/bricks.png", 0),
+            "textures/bricks.png", 0),
         .cellsize = {32,32},
         .scale = {0.4,0.4},
         .offset = {-1, -1},
@@ -658,7 +658,8 @@ static const char* asset_dir = "../../../sandbox/assets";
 
 void SandboxInit() {
 
-    LincePushAssetDir(asset_dir);
+    LinceApp* app = LinceGetApp();
+    LincePushAssetDir(&app->asset_manager, asset_dir);
     LinceInitCamera(&DATA.camera, LinceGetAspectRatio());
     DATA.camera.zoom = 3.0f;
     DATA.camera_speed = 0.003f;
@@ -670,7 +671,7 @@ void SandboxInit() {
     hashmap_set(&DATA.scene_cache, "MainMenu", &SCENE_CALLBACKS[Scene_MainMenu]);
     hashmap_set(&DATA.scene_cache, "World", &SCENE_CALLBACKS[Scene_World]);
     hashmap_set(&DATA.scene_cache, "House", &SCENE_CALLBACKS[Scene_House]);
-    LinceGetApp()->user_data = &DATA;
+    app->user_data = &DATA;
 
     LincePushScene(hashmap_get(&DATA.scene_cache, "MainMenu"));
 }

@@ -53,9 +53,11 @@ void WorldSceneInit(LinceScene* scene){
     scene->data = world_scene;
     
     // Town map
+    char* map_path = LinceFetchAssetPath(&LinceGetApp()->asset_manager, "textures/outside.png");
+    
     world_scene->map =  (LinceTilemap){
         .texture = LinceLoadTexture(
-            "sandbox/assets/textures/outside.png",
+            map_path,
             LinceTexture_FlipY
         ),
         .cellsize = {16,16},
