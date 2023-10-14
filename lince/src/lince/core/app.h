@@ -15,6 +15,7 @@
 #include "lince/renderer/camera.h"
 #include "lince/gui/ui_layer.h"
 #include "lince/scene/scene.h"
+#include "lince/asset_manager/asset_manager.h"
 
 /** Function pointer typedefs for user-defined application callbacks */
 typedef void (*LinceGameInitFn)();
@@ -53,13 +54,7 @@ typedef struct LinceApp{
     int current_layer;   ///< Index of the active layer (during OnUpdate or OnEvent). This is `-1` if no layer is active.
     int current_overlay; ///< Index of the active overlay, akin to the current layer.
     
-    char* exe_dir;       ///< Absolute path to the running executable
-    array_t asset_dirs;  ///< Folders in which to search for assets
-                         ///< @note: Each element is a string of size LINCE_PATH_MAX, not a pointer!
-                         ///< User-defined folders will be searched before the default Lince assets folder,
-                         /// Allowing the user to override the default engine assets
-
-    /* UI */
+    LinceAssetManager asset_manager; ///< Finds paths to assets
     LinceUILayer* ui;   ///< State of the GUI, e.g. Nuklear's context.
 
 } LinceApp;
@@ -151,18 +146,5 @@ LinceLayer* LinceGetCurrentLayer();
 */
 LinceLayer* LinceGetCurrentOverlay();
 
-/** @brief Adds the location of an asset folder to the list of search paths.
-* The path must be relative to the location of the executable.
-* @param dir Zero-terminated string with the path to an asset folder to store.
-*/
-void LincePushAssetDir(const char* dir);
-
-/** @brief Retrieves the full path of an asset file by searching on the asset folders
-* @param asset_path The full asset path is written to this location.
-*                   This memory must have at least LINCE_PATH_MAX bytes in size.
-* @param asset_filename Location of the asset file within the asset folder
-* @returns LinceTrue if the asset was located, and LinceFalse otherwise.
-*/
-LinceBool LinceFetchAssetPath(char* asset_path, const char* asset_filename);
 
 #endif // LINCE_APP_H
