@@ -6,7 +6,7 @@
 
 LinceTexture* LinceLoadTexture(const char* path, uint32_t flags){
 	LINCE_PROFILER_START(timer);
-	LINCE_INFO(" Loading texture from '%s'", path);
+	LINCE_INFO("Loading texture from '%s'", path);
 	
 	// Sets buffer to store data starting from image top-left
 	stbi_set_flip_vertically_on_load(flags & LinceTexture_FlipY);
@@ -16,16 +16,16 @@ LinceTexture* LinceLoadTexture(const char* path, uint32_t flags){
 
 	// Retrieve texture data
 	data = stbi_load(path, &width, &height, &channels, 0);
-	LINCE_ASSERT(data, " Failed to load texture '%s'", path);
-	LINCE_ASSERT((width > 0) && (height > 0), " Empty texture '%s'", path);
+	LINCE_ASSERT(data, "Failed to load texture '%s'", path);
+	LINCE_ASSERT((width > 0) && (height > 0), "Empty texture '%s'", path);
 	LINCE_ASSERT(channels == 4,
-		" Error on image '%s'. Only 4-channel RGBA format supported", path);
+		"Error on image '%s'. Only 4-channel RGBA format supported", path);
 	
 	tex = LinceCreateEmptyTexture((uint32_t)(width), (uint32_t)(height));
 	LinceSetTextureData(tex, data);
 	stbi_image_free(data);
 
-	LINCE_INFO(" Loaded %dx%d texture", width, height);
+	LINCE_INFO("Loaded %dx%d texture", width, height);
 	LINCE_PROFILER_END(timer);
 	return tex;
 }
