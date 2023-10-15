@@ -2,7 +2,7 @@
 
 Version codes follow [Semantic Versioning](https://semver.org/).
 
-### To-Do
+## To-Do
 - Add github banners.
 - Rename `LinceBeginScene` and `LinceEndScene` to e.g. `LinceBeginDraw` and `LinceEndDraw`.
 - Merge all key events into single struct. Add 'mods' to keys (e.g. Ctrl)
