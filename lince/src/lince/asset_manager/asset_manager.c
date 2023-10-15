@@ -66,6 +66,6 @@ char* LinceFetchAssetPath(LinceAssetManager* am, const char* asset_filename){
             return am->result_path;
         }
     }
-
+    LINCE_WARN("Could not locate asset '%s'", asset_filename);
     return NULL;
 }
