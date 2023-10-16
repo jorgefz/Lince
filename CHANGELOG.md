@@ -3,7 +3,12 @@
 Version codes follow [Semantic Versioning](https://semver.org/).
 
 ## To-Do
-- Add github banners.
+- Stabilise v0.8
+- Update minigames to be compatible with v0.8
+- Formalize process to make custom games work with lince
+- Add minimal empty example in minigames repo
+- Improve user guide and clean docs folder
+
 - Rename `LinceBeginScene` and `LinceEndScene` to e.g. `LinceBeginDraw` and `LinceEndDraw`.
 - Merge all key events into single struct. Add 'mods' to keys (e.g. Ctrl)
 - Move misc functions to separate files (`LinceReadFile`, `LinceGetTimeMillis`). 

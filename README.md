@@ -1,9 +1,10 @@
-# Lince 0.7.0
+# Lince
+[![License](https://img.shields.io/badge/License-MIT-mediumorchid)](https://www.github.com/jorgefz/lince/blob/main/LICENSE)
 
-Lince is a game engine written in C for making 2D games, and currently in very early development.
+Lince is a graphical rendering engine focused on 2D games.
+It is currently very early in development.
 
 For some working minigames made with the Lince engine, see https://github.com/jorgefz/lince-minigames.
-
 
 ## Minimal code example - drawing a red square
 
@@ -53,15 +54,13 @@ int main() {
 * Event system for user input
 * Tilemaps and sprite animations
 * Lightweight Entity Component System (ECS) with unlimited entities and components
-* Collision system for rectangles.
+* Collision system for rectangles
 * Built-in level and scene editor
 
 ## Why Lince
 
 "Lince" means "lynx" in Spanish.
 I chose this name to raise awareness of the Iberian Lynx, which is an endangered species in Spain, my home country.
-
-More details soon...
 
 ## Documentation
 
@@ -102,6 +101,11 @@ See the projects in the repository at https://github.com/jorgefz/lince-minigames
 
 There is also an user guide in `docs/userguide` in this repository.
 
+1. Download the source
+Clone the repository with git:
+`git clone github.com/jorgefz/lince`
+
+2. Generate build scripts
 On the root folder (where this README.md file is located), run `premake5` to produce the build configuration files appropriate to your building tool:
 
 * For Unix: `premake5 gmake2`, then run `make`.
