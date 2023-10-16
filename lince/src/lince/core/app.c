@@ -257,14 +257,13 @@ static void LinceInit(){
     LinceInitRenderer(app.window);
 
     /// TODO: improve font handling
-    // Load default font
-    const char* font_fname = "fonts/DroidSans.ttf";
-    char* font_path = LinceFetchAssetPath(&app.asset_manager, font_fname);
-    LINCE_ASSERT(font_path, "Could not find location of default font '%s'", font_fname);
-    app.ui = LinceInitUI(app.window->handle, font_path);
+    app.ui = LinceInitUI(app.window->handle);
     
     app.running = LinceTrue;
     if (app.on_init) app.on_init(); // user may push layers onto stack
+
+    // Delay loading fonts to give the user a chance to push custom asset paths on init
+    LinceUILoadFonts(app.ui, &app.asset_manager);
 }
 
 

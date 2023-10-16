@@ -16,7 +16,7 @@
 #define MAX_ELEMENT_BUFFER (128 * 1024)
 
 
-LinceUILayer* LinceInitUI(void* glfw_window, const char* default_font_path){
+LinceUILayer* LinceInitUI(void* glfw_window){
 
 	LinceUILayer* ui = LinceCalloc(sizeof(LinceUILayer));
 	ui->glfw_window = glfw_window;
@@ -29,27 +29,35 @@ LinceUILayer* LinceInitUI(void* glfw_window, const char* default_font_path){
     );
     LINCE_ASSERT(ui->ctx, "Nuklear context failed to initialise");
 
-	// Initialise Font
+	LINCE_INFO("Nuklear UI Initialised");
+	return ui;
+}
+
+
+void LinceUILoadFonts(LinceUILayer* ui, LinceAssetManager* am){
+
+    static const char* font_files[] = { "fonts/DroidSans.ttf" };
+    const uint32_t font_num = sizeof(font_files) / sizeof(char**);
+
     struct nk_font_atlas *atlas;
     nk_glfw3_font_stash_begin(ui->glfw, &atlas);
     
-    ui->fonts[LinceFont_Droid15] = nk_font_atlas_add_from_file(atlas, default_font_path, 15, 0);
-    ui->fonts[LinceFont_Droid20] = nk_font_atlas_add_from_file(atlas, default_font_path, 20, 0);
-    ui->fonts[LinceFont_Droid30] = nk_font_atlas_add_from_file(atlas, default_font_path, 30, 0);
-    ui->fonts[LinceFont_Droid50] = nk_font_atlas_add_from_file(atlas, default_font_path, 50, 0);
+    for (uint32_t i = 0; i != font_num; ++i){
+        const char* font_path = LinceFetchAssetPath(am, font_files[i]);
+        LINCE_ASSERT(font_path, "Could not find location of default font '%s'", font_files[i]);
 
-    LINCE_ASSERT(ui->fonts[LinceFont_Droid15],
-        "Failed to load font at '%s'",
-        LINCE_DIR"lince/assets/fonts/DroidSans.ttf"
-    );
+        ui->fonts[LinceFont_Droid15] = nk_font_atlas_add_from_file(atlas, font_path, 15, 0);
+        ui->fonts[LinceFont_Droid20] = nk_font_atlas_add_from_file(atlas, font_path, 20, 0);
+        ui->fonts[LinceFont_Droid30] = nk_font_atlas_add_from_file(atlas, font_path, 30, 0);
+        ui->fonts[LinceFont_Droid50] = nk_font_atlas_add_from_file(atlas, font_path, 50, 0);
+        
+        LINCE_ASSERT(ui->fonts[LinceFont_Droid15], "Failed to load font at '%s'", font_path);
+    }
 
     nk_glfw3_font_stash_end(ui->glfw);
     
     //nk_style_load_all_cursors(data->ctx, atlas->cursors);
     //nk_style_set_font(ui->ctx, ui->fonts[LinceFont_Droid20]);
-
-	LINCE_INFO("Nuklear UI Initialised");
-	return ui;
 }
 
 void LinceBeginUIRender(LinceUILayer* ui){
