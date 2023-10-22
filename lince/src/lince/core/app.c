@@ -157,11 +157,6 @@ void LincePopScene(){
     app.current_scene = array_back(&app.scene_stack);
 }
 
-
-double LinceGetTimeMillis(){
-    return (glfwGetTime() * 1000.0);
-}
-
 float LinceGetAspectRatio(){
     return (float)app.window->width / (float)app.window->height;
 }

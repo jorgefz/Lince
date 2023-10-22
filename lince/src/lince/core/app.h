@@ -97,11 +97,6 @@ void LincePushScene(LinceScene* scene);
 */
 void LincePopScene();
 
-
-/** @brief Returns the application's run time in milliseconds.
-*/
-double LinceGetTimeMillis();
-
 /** @brief Returns the global state of the application. See `LinceApp`.
 */
 LinceApp* LinceGetApp();
