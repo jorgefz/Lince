@@ -117,7 +117,14 @@ void LinceGetScreenSize(vec2 size);
 * @todo Add extra argument for return vec2 world coordinates,
 *       instead of overwriting `screen_coords`.
 */
-void LinceTransformToWorld(vec2 screen_coords, vec2 screen_size, mat4 vp_inv);
+void LinceTransformToWorld(vec2 screen_coords, vec2 screen_size, LinceCamera* camera);
+
+/** @brief Transforms a point in space from world to screen coodinates.
+* @param screen_pos vec2 that returns the x and y position on screen.
+* @param world_pos vec2 with the x and y position in the world to transform.
+* @param camera Camera with an up-to-date view-projection matrix
+*/
+void LinceTransformToScreen(vec2 screen_pos, vec2 world_pos, LinceCamera* camera);
 
 /** @brief Returns the position of the mouse pointer in world coordinates.
 * @param pos vec2 used to return the mouse position.

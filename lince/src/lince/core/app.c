@@ -181,6 +181,19 @@ void LinceTransformToWorld(vec2 screen_coords, vec2 screen_size, mat4 vp_inv){
 	screen_coords[1] = wvec[1] / wvec[3];
 }
 
+void LinceTransformToScreen(vec2 screen_pos, vec2 world_pos, LinceCamera* camera){
+	float wx = world_pos[0], wy = world_pos[1];
+
+    // Transform by VP matrix
+    vec4 wpos = {wx, wy, 0.0, 1.0};
+    vec4 spos;
+    glm_mat4_mulv(camera->view_proj, wpos, spos);
+
+    // Normalise from NDC to clip space
+    screen_pos[0] = (spos[0]/spos[3]+1.0)/2.0;
+    screen_pos[1] = (spos[1]/spos[3]+1.0)/2.0;
+}
+
 void LinceGetMousePosWorld(vec2 pos, LinceCamera* cam){
     vec2 screen_size;
     LinceGetMousePos(&pos[0], &pos[1]);
