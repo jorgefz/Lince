@@ -166,19 +166,22 @@ void LinceGetScreenSize(vec2 size){
     size[1] = (float)LinceGetApp()->window->height;
 }
 
-void LinceTransformToWorld(vec2 screen_coords, vec2 screen_size, mat4 vp_inv){
-	float sx = screen_coords[0], sy = screen_coords[1];
+void LinceTransformToWorld(vec2 world_pos, vec2 screen_pos, LinceCamera* camera){
+	vec2 screen_size;
+    LinceGetScreenSize(screen_size);
 	const float w = screen_size[0];
 	const float h = screen_size[1];
+    float sx = screen_pos[0], sy = screen_pos[1];
 
-	// normalise screen coordinates to range (-1,1)
+	// Normalise screen coordinates to range (-1,1)
 	sx = 2.0f*sx/w - 1.0f;
 	sy = 1.0f - 2.0f*sy/h;
+
 	vec4 svec = {sx, sy, 0.0f, 1.0f};
 	vec4 wvec;
-    glm_mat4_mulv(vp_inv, svec, wvec);
-	screen_coords[0] = wvec[0] / wvec[3];
-	screen_coords[1] = wvec[1] / wvec[3];
+    glm_mat4_mulv(camera->view_proj_inv, svec, wvec);
+	world_pos[0] = wvec[0] / wvec[3];
+	world_pos[1] = wvec[1] / wvec[3];
 }
 
 void LinceTransformToScreen(vec2 screen_pos, vec2 world_pos, LinceCamera* camera){

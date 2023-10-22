@@ -50,6 +50,7 @@ Version codes follow [Semantic Versioning](https://semver.org/).
 - Improved layer stack to be more cache friendly. From array of pointers to array of plain layers.
 - Added `fileio.h` functions for file IO: `LinceIsDir`, `LinceIsFile`, `LinceLoadFile`, and `LinceLoadTextFile.`
 - Removed `LinceGetTimeMillis`.
+- Added to-screen transform and improved to-world transform.
 
 ## v0.7.0
 - Added support for custom shaders in renderer
