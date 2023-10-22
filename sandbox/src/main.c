@@ -75,20 +75,6 @@ static OldGameData game_data = {
 };
 
 
-void LinceTransformToScreen(mat4 vp, vec2 world_pos, vec2 screen_pos){
-	float wx = world_pos[0], wy = world_pos[1];
-
-    // Transform by VP matrix
-    vec4 wpos = {wx, wy, 0.0, 1.0};
-    vec4 spos;
-    glm_mat4_mulv(vp, wpos, spos);
-
-    // Normalise from NDC to clip space
-    screen_pos[0] = (spos[0]/spos[3]+1.0)/2.0;
-    screen_pos[1] = (spos[1]/spos[3]+1.0)/2.0;
-}
-
-
 void AnimateWalking(float dt){
 
     // camera & player movement
@@ -257,7 +243,7 @@ void LinceDrawSprites(LinceEntityRegistry* reg){
     
     LinceSprite* psprite = LinceGetEntityComponent(game_data.reg, game_data.player, Component_Sprite);
     vec2 player_pos = {psprite->x,psprite->y};
-    LinceTransformToScreen(game_data.camera.view_proj, player_pos, player_pos);
+    LinceTransformToScreen(player_pos, player_pos, &game_data.camera);
 
     LinceSetShaderUniformVec2(game_data.custom_shader, "uPointLightPositions[1]", player_pos);
     LinceSetShaderUniformFloat(game_data.custom_shader, "uPointLightCount", 2.0);
