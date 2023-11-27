@@ -58,8 +58,8 @@ void HouseSceneInit(LinceScene* scene){
     house_scene->house_door = (DoorLink){
         .box = (LinceBoxCollider){.x=3-0.5, .y=1-0.5, .w=1, .h=1},
         .to_scene = "World",
-        .to_x = 6,
-        .to_y = 6,
+        .to_x = 5.5,
+        .to_y = 4.5,
     };
 }
 
