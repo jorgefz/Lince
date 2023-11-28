@@ -96,7 +96,6 @@ void HouseSceneUpdate(LinceScene* scene, float dt){
             game_data->camera.pos[0] = house_scene->house_door.to_x;
             game_data->camera.pos[1] = house_scene->house_door.to_y;
             LincePushScene(hashmap_get(scene_cache, house_scene->house_door.to_scene));
-            /// NOTE: Infinite pushing !!!
         }
     }
 }

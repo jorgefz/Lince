@@ -1,6 +1,7 @@
 #include "lince/scene/scene.h"
 
 void LinceInitScene(LinceScene* scene){
+    scene->initialised = LinceTrue;
     if(scene->on_init){
         scene->on_init(scene);
     }

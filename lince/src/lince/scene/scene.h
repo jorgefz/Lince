@@ -14,6 +14,9 @@ typedef struct LinceScene {
     void* data; // user data
     // LinceEntityRegistry* entity_registry;
 
+    // Set to true when on_init method has been called
+    LinceBool initialised;
+
     /* Callbacks */
     // Called when loaded and pushed onto stack
     void (*on_init)  (struct LinceScene*);

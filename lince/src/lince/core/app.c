@@ -146,7 +146,9 @@ void LincePushScene(LinceScene* scene){
     LINCE_ASSERT(scene, "Pushing NULL scene");
     array_push_back(&app.scene_stack, scene);
     app.current_scene = array_back(&app.scene_stack);
-    LinceInitScene(app.current_scene);
+    if (!scene->initialised) {
+        LinceInitScene(app.current_scene);
+    }
 }
 
 void LincePopScene(){

@@ -21,11 +21,13 @@ LinceScene SCENE_CALLBACKS[] = {
         .on_init   = WorldSceneInit,
         .on_delete = WorldSceneDestroy,
         .on_update = WorldSceneUpdate,
+        .on_draw   = NULL,
     },
     {
         .on_init   = HouseSceneInit,
         .on_delete = HouseSceneDestroy,
         .on_update = HouseSceneUpdate,
+        .on_draw   = NULL
     }
 };
 

@@ -109,7 +109,9 @@ void WorldSceneUpdate(LinceScene* scene, float dt){
         if(LinceIsKeyPressed(LinceKey_e)){
             game_data->camera.pos[0] = world_scene->house_door.to_x;
             game_data->camera.pos[1] = world_scene->house_door.to_y;
-            LincePushScene(hashmap_get(scene_cache, world_scene->house_door.to_scene));
+            char* target_scene_name = world_scene->house_door.to_scene;
+            LinceScene* target_scene = hashmap_get(scene_cache, target_scene_name);
+            LincePushScene(target_scene);
         }
     }
 
