@@ -11,6 +11,7 @@ void LinceUninitScene(LinceScene* scene){
     if(scene->on_delete){
         scene->on_delete(scene);
     }
+    scene->initialised = LinceFalse;
 }
 
 void LinceUpdateScene(LinceScene* scene, float dt){
