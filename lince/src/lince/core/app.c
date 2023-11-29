@@ -157,6 +157,9 @@ void LinceLoadScene(const char* name) {
      LINCE_INFO("Switched to scene '%s'", name);
 }
 
+LinceScene* LinceGetScene(const char* name) {
+    return hashmap_get(&app.scene_cache, name);
+}
 
 float LinceGetAspectRatio(){
     return (float)app.window->width / (float)app.window->height;
