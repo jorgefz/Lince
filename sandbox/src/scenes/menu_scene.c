@@ -7,7 +7,6 @@ void DrawMainMenu(LinceScene* scene){
     LinceUILayer* ui = LinceGetApp()->ui;
     struct nk_context *ctx = ui->ctx;
     LinceApp* app = LinceGetApp();
-    hashmap_t* scene_cache = &((GameData*)app->user_data)->scene_cache;
 
     const struct nk_style_button button_style = {
         /* background */
@@ -43,7 +42,7 @@ void DrawMainMenu(LinceScene* scene){
     if (nk_begin(ctx, "MainMenu", nk_rect(btn_pos[0], btn_pos[1], btn_sz[0], btn_sz[1]), 0)) {
         nk_layout_row_dynamic(ctx, row_h, 1);
         if (nk_button_label_styled(ctx, &button_style, "Play")){
-            LincePushScene(hashmap_get(scene_cache, "World"));
+            LinceLoadScene("World");
         }
         nk_layout_row_dynamic(ctx, row_h, 1);
         if (nk_button_label_styled(ctx, &button_style, "Exit")){

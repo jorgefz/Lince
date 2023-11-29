@@ -84,7 +84,6 @@ void WorldSceneInit(LinceScene* scene){
 void WorldSceneUpdate(LinceScene* scene, float dt){
     WorldScene* world_scene = scene->data;
     GameData* game_data = LinceGetApp()->user_data;
-    hashmap_t* scene_cache = &game_data->scene_cache;
 
     MoveCamera(&game_data->camera, dt * game_data->camera_speed);
     
@@ -109,9 +108,7 @@ void WorldSceneUpdate(LinceScene* scene, float dt){
         if(LinceIsKeyPressed(LinceKey_e)){
             game_data->camera.pos[0] = world_scene->house_door.to_x;
             game_data->camera.pos[1] = world_scene->house_door.to_y;
-            char* target_scene_name = world_scene->house_door.to_scene;
-            LinceScene* target_scene = hashmap_get(scene_cache, target_scene_name);
-            LincePushScene(target_scene);
+            LinceLoadScene(world_scene->house_door.to_scene);
         }
     }
 

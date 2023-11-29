@@ -5,7 +5,6 @@
 #include <lince/physics/boxcollider.h>
 
 typedef struct GameData {
-    hashmap_t scene_cache;
     LinceCamera camera;
     float camera_speed;
     LinceSprite player_sprite;

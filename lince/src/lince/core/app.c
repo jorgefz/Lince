@@ -142,22 +142,21 @@ void LincePopOverlay(LinceLayer* overlay) {
     LINCE_ASSERT(0, "Failed to find overlay (0x%p) in stack", overlay);
 }
 
-void LincePushScene(LinceScene* scene){
-    LINCE_ASSERT(scene, "Pushing NULL scene");
-    array_push_back(&app.scene_stack, scene);
-    app.current_scene = array_back(&app.scene_stack);
-    if (!scene->initialised) {
-        LinceInitScene(app.current_scene);
-    }
+void LinceRegisterScene(const char* name, LinceScene* callbacks) {
+    hashmap_set(&app.scene_cache, name, LinceNewCopy(callbacks, sizeof(LinceScene)) );
 }
 
-void LincePopScene(){
-    LINCE_ASSERT(app.scene_stack.size > 0, "No scenes in stack");
-    LINCE_ASSERT(app.current_scene, "No scenes in stack");
-    LinceUninitScene(app.current_scene);
-    array_pop_back(&app.scene_stack);
-    app.current_scene = array_back(&app.scene_stack);
+void LinceLoadScene(const char* name) {
+     LinceScene* next_scene = hashmap_get(&app.scene_cache, name);
+     LINCE_ASSERT(next_scene, "Could not load scene '%s'", name);
+     app.current_scene = next_scene;
+     if (!app.current_scene->loaded){
+         LinceInitScene(app.current_scene);
+         LINCE_INFO("Initialised scene '%s'", name);
+     }
+     LINCE_INFO("Switched to scene '%s'", name);
 }
+
 
 float LinceGetAspectRatio(){
     return (float)app.window->width / (float)app.window->height;
@@ -261,7 +260,8 @@ static void LinceInit(){
     array_init(&app.overlay_stack, sizeof(LinceLayer));
     
     // Create scene stack
-    array_init(&app.scene_stack, sizeof(LinceScene));
+    // array_init(&app.scene_stack, sizeof(LinceScene));
+    hashmap_init(&app.scene_cache, 5);
 
     // Create asset manager
     LinceInitAssetManager(&app.asset_manager);
@@ -322,11 +322,18 @@ static void LinceTerminate(){
     array_uninit(&app.layer_stack);
     array_uninit(&app.overlay_stack);
     
-    // Destroy scene stack
-    while(app.scene_stack.size > 0){
-        LincePopScene();
+    // Destroy scene cache
+    char* key = NULL;
+    while ((key = hashmap_iter_keys(&app.scene_cache, key))) {
+        LinceScene* scene = hashmap_get(&app.scene_cache, key);
+        if (scene) {
+            if (scene->loaded) {
+                LinceUninitScene(scene);
+            }
+            LinceFree(scene);
+        }
     }
-    array_uninit(&app.scene_stack);
+    hashmap_uninit(&app.scene_cache);
     
     LinceTerminateUI(app.ui);
 

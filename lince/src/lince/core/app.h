@@ -6,6 +6,7 @@
 */
 #include "cglm/mat4.h"
 #include "lince/containers/array.h"
+#include "lince/containers/hashmap.h"
 #include "lince/core/window.h"
 #include "lince/core/layer.h"
 #include "lince/event/event.h"
@@ -45,7 +46,8 @@ typedef struct LinceApp{
     array_t layer_stack;   ///< Array of rendering layers.
     array_t overlay_stack; ///< Array of rendering overlays (drawn after layers).
     
-    array_t scene_stack; ///< Stack of scenes. Only topmost is rendered.
+    // array_t scene_stack; ///< Stack of scenes. Only topmost is rendered.
+    hashmap_t scene_cache;   
     LinceScene* current_scene; ///< Scene at the top of the stack.
 
     LinceBool running;   ///< True if the application is active.
@@ -88,14 +90,11 @@ void LincePopLayer(LinceLayer* layer);
 */
 void LincePopOverlay(LinceLayer* overlay);
 
-/** @brief Places a new scene on top of the stack.
-* @param scene Scene to run. It's 'on_init' method will be called.
-*/
-void LincePushScene(LinceScene* scene);
 
-/** @brief Removes the topmost scene from the scene stack. It's
-*/
-void LincePopScene();
+void LinceRegisterScene(const char* name, LinceScene* callbacks);
+
+void LinceLoadScene(const char* name);
+
 
 /** @brief Returns the global state of the application. See `LinceApp`.
 */

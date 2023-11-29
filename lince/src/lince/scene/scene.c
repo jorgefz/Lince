@@ -1,7 +1,7 @@
 #include "lince/scene/scene.h"
 
 void LinceInitScene(LinceScene* scene){
-    scene->initialised = LinceTrue;
+    scene->loaded = LinceTrue;
     if(scene->on_init){
         scene->on_init(scene);
     }
@@ -11,7 +11,7 @@ void LinceUninitScene(LinceScene* scene){
     if(scene->on_delete){
         scene->on_delete(scene);
     }
-    scene->initialised = LinceFalse;
+    scene->loaded = LinceFalse;
 }
 
 void LinceUpdateScene(LinceScene* scene, float dt){

@@ -653,13 +653,13 @@ void SandboxInit() {
     DATA.player_box = (LinceBoxCollider){.x=0, .y=0, .w=0.7, .h=0.7};
     DATA.player_sprite = (LinceSprite){.x=0, .y=0, .w=0.7, .h=0.7, .color={0,0,1,1}, .zorder=1};
     
-    hashmap_init(&DATA.scene_cache, 11);
-    hashmap_set(&DATA.scene_cache, "MainMenu", &SCENE_CALLBACKS[Scene_MainMenu]);
-    hashmap_set(&DATA.scene_cache, "World", &SCENE_CALLBACKS[Scene_World]);
-    hashmap_set(&DATA.scene_cache, "House", &SCENE_CALLBACKS[Scene_House]);
     app->user_data = &DATA;
 
-    LincePushScene(hashmap_get(&DATA.scene_cache, "MainMenu"));
+    LinceRegisterScene("MainMenu", &SCENE_CALLBACKS[Scene_MainMenu]);
+    LinceRegisterScene("World", &SCENE_CALLBACKS[Scene_World]);
+    LinceRegisterScene("House", &SCENE_CALLBACKS[Scene_House]);
+
+    LinceLoadScene("MainMenu");
 }
 
 void SandboxUpdate(float dt){
@@ -668,7 +668,7 @@ void SandboxUpdate(float dt){
 }
 
 void SandboxTerminate(){
-    hashmap_uninit(&DATA.scene_cache);
+
 }
 
 void SetupApplication(){
