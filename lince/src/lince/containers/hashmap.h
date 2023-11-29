@@ -26,7 +26,7 @@
 
 
 #ifndef HASHMAP_H
-#define HASHMAP_h
+#define HASHMAP_H
 
 #include <inttypes.h>
 
