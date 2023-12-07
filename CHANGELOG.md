@@ -3,7 +3,6 @@
 Version codes follow [Semantic Versioning](https://semver.org/).
 
 ## To-Do
-- Stabilise v0.8
 - Update minigames to be compatible with v0.8
 - Formalize process to make custom games work with lince
 - Add minimal empty example in minigames repo
@@ -17,14 +16,13 @@ Version codes follow [Semantic Versioning](https://semver.org/).
 - Create functions that don't depend on OpenGL, e.g. `LinceImage` for storing image data, `LinceClock` for timers, etc. 
 
 
-## v0.8.0 (WIP)
+## v0.8.0
 - Added CMocka as the testing framework.
 - Added UUIDs.
 - Added z-sorting with translucency by sorting sprites before drawing
 - Added scene system.
 - Improved premake scripts. Placed separate 'premak5.lua' scripts in the folder of each project with all build commands necessary to build it. This allows users to create projects that depend on Lince much more easily.
 - Added rudimentary asset manager. Assets are now sought from a stack of asset folders, whose locations are defined relative to the path of the running executable. This allows the executable to find the application assets when called from anywhere in the system.
-
 - `LINCE_DIR` now generated in premake5 file automatically from any path.
 - Changed scope of `LINCE_DIR` to the directory where output files are generated (e.g. logging, profiling). By default, this is the location from which the executable is called.
 - Added functions to initialise camera without allocating heap memory.

@@ -53,7 +53,7 @@ Note that these do not apply to the containers (e.g. array, hashmap, list).
 #ifdef LINCE_VERSION
     #undef LINCE_VERSION
 #endif
-#define LINCE_VERSION "0.7.0" ///< Current Lince version
+#define LINCE_VERSION "0.8.0" ///< Current Lince version
 
 #define LINCE_GL_VERSION_MAJOR 4 ///< Minimum major OpenGL version supported
 #define LINCE_GL_VERSION_MINOR 5 ///< Minimum minor OpenGL version supported
