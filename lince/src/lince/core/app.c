@@ -201,11 +201,10 @@ void LinceTransformToScreen(vec2 screen_pos, vec2 world_pos, LinceCamera* camera
     screen_pos[1] = (spos[1]/spos[3]+1.0)/2.0;
 }
 
-void LinceGetMousePosWorld(vec2 pos, LinceCamera* cam){
-    vec2 screen_size;
-    LinceGetMousePos(&pos[0], &pos[1]);
-    LinceGetScreenSize(screen_size);
-    LinceTransformToWorld(pos, screen_size, cam->view_proj_inv);
+void LinceGetMousePosWorld(vec2 world_pos, LinceCamera* cam) {
+    vec2 screen_pos;
+    LinceGetMousePos(&screen_pos[0], &screen_pos[1]);
+    LinceTransformToWorld(world_pos, screen_pos, cam);
 }
 
 LinceLayer* LinceGetCurrentLayer(){
