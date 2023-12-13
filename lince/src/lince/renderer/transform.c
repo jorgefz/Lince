@@ -27,7 +27,7 @@ LincePoint LincePointWorldToScreen(const LincePoint p, LinceCamera* cam) {
 
 
 /* Translates a transform to world coordinates */
-void LinceTransformToWorld(const LinceTransform* in, LinceTransform* out, LinceCamera* cam, const float sc_w, const float sc_h) {
+void LinceTransformToWorld(LinceTransform* out, const LinceTransform* in, LinceCamera* cam, const float sc_w, const float sc_h) {
 	LincePoint centre = { .x = in->x, .y = in->y };
 	LincePoint corner = { .x = in->x + in->w, .y = in->y + in->h };
 	out->coords = LinceCoordSystem_World;
@@ -61,7 +61,7 @@ void LinceTransformToWorld(const LinceTransform* in, LinceTransform* out, LinceC
 
 
 /* Translates a transform to screen coordinates */
-void LinceTransformToScreen(const LinceTransform* in, LinceTransform* out, LinceCamera* cam, const float sc_w, const float sc_h) {
+void LinceTransformToScreen(LinceTransform* out, const LinceTransform* in, LinceCamera* cam, const float sc_w, const float sc_h) {
 	LincePoint centre = { .x = in->x, .y = in->y };
 	LincePoint corner = { .x = in->x + in->w, .y = in->y + in->h };
 	out->coords = LinceCoordSystem_Screen;
@@ -92,7 +92,7 @@ void LinceTransformToScreen(const LinceTransform* in, LinceTransform* out, Lince
 
 
 /* Translates a transform to pixel coordinates */
-void LinceTransformToPixel(const LinceTransform* in, LinceTransform* out, LinceCamera* cam, const float sc_w, const float sc_h) {
+void LinceTransformToPixel(LinceTransform* out, const LinceTransform* in, LinceCamera* cam, const float sc_w, const float sc_h) {
 	LincePoint centre = { .x = in->x, .y = in->y };
 	LincePoint corner = { .x = in->x + in->w, .y = in->y + in->h };
 	out->coords = LinceCoordSystem_Pixel;
