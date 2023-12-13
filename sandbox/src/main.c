@@ -243,7 +243,7 @@ void LinceDrawSprites(LinceEntityRegistry* reg){
     
     LinceSprite* psprite = LinceGetEntityComponent(game_data.reg, game_data.player, Component_Sprite);
     vec2 player_pos = {psprite->x,psprite->y};
-    LinceTransformToScreen(player_pos, player_pos, &game_data.camera);
+    LinceTransformToScreen2(player_pos, player_pos, &game_data.camera);
 
     LinceSetShaderUniformVec2(game_data.custom_shader, "uPointLightPositions[1]", player_pos);
     LinceSetShaderUniformFloat(game_data.custom_shader, "uPointLightCount", 2.0);

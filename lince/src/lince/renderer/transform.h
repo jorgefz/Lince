@@ -29,7 +29,7 @@
 #ifndef LINCE_TRANSFORM
 #define LINCE_TRANSFORM
 
-#include "renderer/camera.h"
+#include "lince/renderer/camera.h"
 
 /** @brief Defines the location of a point in two dimensions */
 typedef struct LincePoint {

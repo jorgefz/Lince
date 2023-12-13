@@ -170,7 +170,7 @@ void LinceGetScreenSize(vec2 size){
     size[1] = (float)LinceGetApp()->window->height;
 }
 
-void LinceTransformToWorld(vec2 world_pos, vec2 screen_pos, LinceCamera* camera){
+void LinceTransformToWorld2(vec2 world_pos, vec2 screen_pos, LinceCamera* camera){
 	vec2 screen_size;
     LinceGetScreenSize(screen_size);
 	const float w = screen_size[0];
@@ -188,7 +188,7 @@ void LinceTransformToWorld(vec2 world_pos, vec2 screen_pos, LinceCamera* camera)
 	world_pos[1] = wvec[1] / wvec[3];
 }
 
-void LinceTransformToScreen(vec2 screen_pos, vec2 world_pos, LinceCamera* camera){
+void LinceTransformToScreen2(vec2 screen_pos, vec2 world_pos, LinceCamera* camera){
 	float wx = world_pos[0], wy = world_pos[1];
 
     // Transform by VP matrix
@@ -204,7 +204,7 @@ void LinceTransformToScreen(vec2 screen_pos, vec2 world_pos, LinceCamera* camera
 void LinceGetMousePosWorld(vec2 world_pos, LinceCamera* cam) {
     vec2 screen_pos;
     LinceGetMousePos(&screen_pos[0], &screen_pos[1]);
-    LinceTransformToWorld(world_pos, screen_pos, cam);
+    LinceTransformToWorld2(world_pos, screen_pos, cam);
 }
 
 LinceLayer* LinceGetCurrentLayer(){

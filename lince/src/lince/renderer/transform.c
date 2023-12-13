@@ -1,5 +1,6 @@
-#include "transform.h"
+
 #include "cglm/mat4.h"
+#include "transform.h"
 
 /* Calculate screen coordinates from pixel location */
 LincePoint LincePointPixelToScreen(const LincePoint p, const float sc_w, const float sc_h) {
@@ -22,7 +23,7 @@ LincePoint LincePointScreenToWorld(const LincePoint p, LinceCamera* cam) {
 LincePoint LincePointWorldToScreen(const LincePoint p, LinceCamera* cam) {
 	vec4 sc, wd = { p.x, p.y, 0.0, 1.0 };
 	glm_mat4_mulv(cam->view_proj, wd, sc);
-	return (LincePoint) { .x = wd[0] / wd[3], .y = wd[1] / wd[3] };
+	return (LincePoint) { .x = sc[0] / sc[3], .y = sc[1] / sc[3] };
 }
 
 
@@ -54,8 +55,8 @@ void LinceTransformToWorld(LinceTransform* out, const LinceTransform* in, LinceC
 
 	out->x = centre.x;
 	out->y = centre.y;
-	out->w = corner.x - centre.x;
-	out->h = corner.y - centre.y;
+	out->w = fabs(corner.x - centre.x);
+	out->h = fabs(corner.y - centre.y);
 }
 
 
@@ -86,8 +87,8 @@ void LinceTransformToScreen(LinceTransform* out, const LinceTransform* in, Lince
 
 	out->x = centre.x;
 	out->y = centre.y;
-	out->w = corner.x - centre.x;
-	out->h = corner.y - centre.y;
+	out->w = fabs(corner.x - centre.x);
+	out->h = fabs(corner.y - centre.y);
 }
 
 
@@ -119,6 +120,6 @@ void LinceTransformToPixel(LinceTransform* out, const LinceTransform* in, LinceC
 
 	out->x = centre.x;
 	out->y = centre.y;
-	out->w = corner.x - centre.x;
-	out->h = corner.y - centre.y;
+	out->w = fabs(corner.x - centre.x);
+	out->h = fabs(corner.y - centre.y);
 }

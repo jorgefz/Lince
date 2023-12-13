@@ -127,14 +127,14 @@ void LinceGetScreenSize(vec2 size);
 * @param screen_pos vec2 with the XY position in the screen to trasnform.
 * @param camera Camera with an up-to-date inverse view-projection matrix
 */
-void LinceTransformToWorld(vec2 world_pos, vec2 screen_pos, LinceCamera* camera);
+void LinceTransformToWorld2(vec2 world_pos, vec2 screen_pos, LinceCamera* camera);
 
 /** @brief Transforms a point in space from world to screen coodinates.
 * @param screen_pos vec2 that returns the XY position on screen.
 * @param world_pos vec2 with the XY position in the world to transform.
 * @param camera Camera with an up-to-date view-projection matrix
 */
-void LinceTransformToScreen(vec2 screen_pos, vec2 world_pos, LinceCamera* camera);
+void LinceTransformToScreen2(vec2 screen_pos, vec2 world_pos, LinceCamera* camera);
 
 /** @brief Returns the position of the mouse pointer in world coordinates.
 * @param pos vec2 used to return the mouse position.
