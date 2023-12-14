@@ -231,11 +231,11 @@ void LinceDrawSprites(LinceEntityRegistry* reg){
 
     // Setup lightning shader uniforms
     LinceBindShader(game_data.custom_shader);
-    vec2 wsize;
-    LinceGetScreenSize(wsize);
+    LincePoint screen_size = LinceGetScreenSize();
+    vec2 wsize = { screen_size.x, screen_size.y };
     LinceSetShaderUniformVec2(game_data.custom_shader, "uWindowSize", wsize);
-    vec2 lightpos;
-    LinceGetMousePos(&lightpos[0], &lightpos[1]);
+    LincePoint mouse_pos = LinceGetMousePos();
+    vec2 lightpos = { mouse_pos.x, mouse_pos.y };
     // convert to proper coords (top left in pixels, to bottom left [0,1])
     lightpos[0] = lightpos[0]/wsize[0];
     lightpos[1] = (1.0 - lightpos[1])/wsize[1] + 1.0;
@@ -506,11 +506,10 @@ void GameStateUpdate(float dt){
             ctx, NK_TEXT_ALIGN_CENTERED,
             "FPS: %.1f", 1000.0f/dt
         );
-        vec2 mouse;
-        LinceGetMousePosWorld(mouse, &game_data.camera);
+        LincePoint mouse = LinceGetMousePosWorld(&game_data.camera);
         nk_labelf(
             ctx, NK_TEXT_ALIGN_CENTERED,
-            "%.2f %.2f", mouse[0], mouse[1]
+            "%.2f %.2f", mouse.x, mouse.y
         );
     }
     nk_end(ctx);
