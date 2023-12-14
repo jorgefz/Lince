@@ -16,6 +16,12 @@ Version codes follow [Semantic Versioning](https://semver.org/).
 - Create functions that don't depend on OpenGL, e.g. `LinceImage` for storing image data, `LinceClock` for timers, etc. 
 
 
+## v0.8.1
+- Added LinceTransform and transform functions
+- Added LincePoint and coordinate conversion functions
+- Added tests
+- Replaced usage of vec2 in app.h functions with LincePoint
+
 ## v0.8.0
 - Added CMocka as the testing framework.
 - Added UUIDs.
