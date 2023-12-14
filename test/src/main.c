@@ -15,6 +15,7 @@ void test_entity(void** state);
 void test_uuid(void** state);
 void test_point(void** state);
 void test_transform(void** state);
+void test_box2d(void** state);
 
 int main() {
     const struct CMUnitTest tests[] = {
@@ -25,6 +26,7 @@ int main() {
         cmocka_unit_test(test_uuid),
         cmocka_unit_test(test_point),
         cmocka_unit_test(test_transform),
+        cmocka_unit_test(test_box2d)
     };
     return cmocka_run_group_tests(tests, NULL, NULL);
 }
