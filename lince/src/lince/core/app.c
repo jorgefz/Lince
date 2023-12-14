@@ -170,41 +170,18 @@ void LinceGetScreenSize(vec2 size){
     size[1] = (float)LinceGetApp()->window->height;
 }
 
-void LinceTransformToWorld2(vec2 world_pos, vec2 screen_pos, LinceCamera* camera){
-	vec2 screen_size;
-    LinceGetScreenSize(screen_size);
-	const float w = screen_size[0];
-	const float h = screen_size[1];
-    float sx = screen_pos[0], sy = screen_pos[1];
-
-	// Normalise screen coordinates to range (-1,1)
-	sx = 2.0f*sx/w - 1.0f;
-	sy = 1.0f - 2.0f*sy/h;
-
-	vec4 svec = {sx, sy, 0.0f, 1.0f};
-	vec4 wvec;
-    glm_mat4_mulv(camera->view_proj_inv, svec, wvec);
-	world_pos[0] = wvec[0] / wvec[3];
-	world_pos[1] = wvec[1] / wvec[3];
-}
-
-void LinceTransformToScreen2(vec2 screen_pos, vec2 world_pos, LinceCamera* camera){
-	float wx = world_pos[0], wy = world_pos[1];
-
-    // Transform by VP matrix
-    vec4 wpos = {wx, wy, 0.0, 1.0};
-    vec4 spos;
-    glm_mat4_mulv(camera->view_proj, wpos, spos);
-
-    // Normalise from NDC to clip space
-    screen_pos[0] = (spos[0]/spos[3]+1.0)/2.0;
-    screen_pos[1] = (spos[1]/spos[3]+1.0)/2.0;
-}
 
 void LinceGetMousePosWorld(vec2 world_pos, LinceCamera* cam) {
-    vec2 screen_pos;
-    LinceGetMousePos(&screen_pos[0], &screen_pos[1]);
-    LinceTransformToWorld2(world_pos, screen_pos, cam);
+    vec2 scr_size;
+    LinceGetScreenSize(scr_size);
+    
+    LincePoint pix, scr, wld;
+    LinceGetMousePos(&pix.x, &pix.y);
+    
+    scr = LincePointPixelToScreen(pix, scr_size[0], scr_size[1]);
+    wld = LincePointScreenToWorld(scr, cam);
+    world_pos[0] = wld.x;
+    world_pos[1] = wld.y;
 }
 
 LinceLayer* LinceGetCurrentLayer(){

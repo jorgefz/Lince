@@ -17,6 +17,7 @@
 #include "lince/gui/ui_layer.h"
 #include "lince/scene/scene.h"
 #include "lince/asset_manager/asset_manager.h"
+#include "lince/renderer/transform.h"
 
 /** Function pointer typedefs for user-defined application callbacks */
 typedef void (*LinceGameInitFn)();
@@ -122,29 +123,12 @@ float LinceGetAspectRatio();
 */
 void LinceGetScreenSize(vec2 size);
 
-/** @brief Transforms a point in space from screen to world coodinates.
-* @param world_pos vec2 that returns the XY position in the world.
-* @param screen_pos vec2 with the XY position in the screen to trasnform.
-* @param camera Camera with an up-to-date inverse view-projection matrix
-*/
-void LinceTransformToWorld2(vec2 world_pos, vec2 screen_pos, LinceCamera* camera);
-
-/** @brief Transforms a point in space from world to screen coodinates.
-* @param screen_pos vec2 that returns the XY position on screen.
-* @param world_pos vec2 with the XY position in the world to transform.
-* @param camera Camera with an up-to-date view-projection matrix
-*/
-void LinceTransformToScreen2(vec2 screen_pos, vec2 world_pos, LinceCamera* camera);
-
 /** @brief Returns the position of the mouse pointer in world coordinates.
 * @param pos vec2 used to return the mouse position.
 * @param cam Camera used to determine the world position.
 * @todo pass the view-projection matrix instead of the camera.
 */
 void LinceGetMousePosWorld(vec2 pos, LinceCamera* cam);
-
-/* Transforms coordinates from world to screen coodinates */
-// void LinceTransformToScreen();
 
 /** @brief Returns current layer being handled or updated.
 * Returns NULL if no layer is being handled.
