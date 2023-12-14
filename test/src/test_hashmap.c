@@ -35,7 +35,7 @@ static int test_hashmap_performance(){
 	int x = 99;
 	for(int i = '!'; i != '~'+1; ++i){
 		for(int j = '!'; j != '~'+1; ++j){
-			char str[] = {i,j,'\0'};
+			char str[] = {(char)i, (char)j, '\0'};
 			r = r && hashmap_set(&map, str, &x);
 		}
 	}
@@ -62,6 +62,12 @@ void test_hashmap(void** state){
 	assert_non_null(map0.table);
 	assert_true(map0.size == 2);
 	hashmap_uninit(&map0);
+
+	// Hashing function
+	uint32_t map_size = 10;
+	uint32_t hash1 = hashmap_hash("key", map_size);
+	uint32_t hash2 = hashmap_hash_bytes("key", 3, map_size);
+	assert_int_equal(hash1, hash2);
 
 	// Set values
 	int r = 1, x = 10, y = 20, z = 30;

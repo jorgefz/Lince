@@ -76,8 +76,6 @@ uint32_t hashmap_hash_bytes(const char* key, uint32_t length, uint32_t mapsize) 
 }
 
 uint32_t hashmap_hash(const char* key, uint32_t mapsize) {
-    // Using 'one-at-a-time' hashing function by Bob Jenkins
-    // https://en.wikipedia.org/wiki/Jenkins_hash_function
     return hashmap_hash_bytes(key, strlen(key), mapsize);
 }
 
