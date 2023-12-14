@@ -11,7 +11,7 @@ static void scan_hashmap(hashmap_t* map){
 	printf("\n Hashmap size %u and %u entries\n", map->size, map->entries);
 	for(uint32_t i = 0; i != map->size; ++i){
 
-		hm_entry_t* entry = map->table[i];
+		hashmap_entry_t* entry = map->table[i];
 		if(!entry) continue;
 
 		printf("%u) ", i);

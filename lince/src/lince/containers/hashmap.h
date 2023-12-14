@@ -30,22 +30,22 @@
 
 #include <inttypes.h>
 
-/** @struct hm_entry_t
+/** @struct hashmap_entry
 * @brief Hashmap entry. Holds a key-value pair.
 */
-typedef struct hm_entry_container {
+typedef struct hashmap_entry {
 	char* key;                       ///< String key
 	void* value;                     ///< Data associated with the key
-	struct hm_entry_container* next; ///< Linked list for hash collisions
-} hm_entry_t;
+	struct hashmap_entry* next; ///< Linked list for hash collisions
+} hashmap_entry_t;
 
 /** @struct hashmap_t
 * @brief Hash map data structure. Holds key-value pairs accessed via hashes.
 */
-typedef struct hashmap_container {
+typedef struct hashmap {
 	uint32_t size;      ///< total number of buckets
     uint32_t entries;   ///< number of filled buckets
-	hm_entry_t **table; ///< Hashtable of entries
+	hashmap_entry_t** table; ///< Hashtable of entries
 } hashmap_t;
 
 

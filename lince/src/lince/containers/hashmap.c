@@ -40,10 +40,10 @@ static int streq(const char* s1, const char* s2){
 }
 
 // Returns the hashmap element with the given key
-static hm_entry_t* hashmap_lookup(hashmap_t* map, const char* key){
+static hashmap_entry_t* hashmap_lookup(hashmap_t* map, const char* key){
     if(!map || !key) return NULL;
     uint32_t hash = hashmap_hash(key, map->size);
-    hm_entry_t* entry = map->table[hash];
+    hashmap_entry_t* entry = map->table[hash];
 
     while(entry){
         if (streq(key, entry->key)){
@@ -86,7 +86,7 @@ Should be deleted using `hashmap_uninit`.
 int hashmap_init(hashmap_t* map, uint32_t size_hint){
     *map = (hashmap_t){0};
     map->size = next_prime(size_hint);
-    map->table = calloc(map->size, sizeof(hm_entry_t*));
+    map->table = calloc(map->size, sizeof(hashmap_entry_t*));
     if(!map->table) return 1;
     return 0;
 }
@@ -96,7 +96,7 @@ void hashmap_uninit(hashmap_t* map){
     if(!map || !map->table) return;
 
     for(uint32_t i=0; i!=map->size; ++i){
-        hm_entry_t* entry = map->table[i], *next;
+        hashmap_entry_t* entry = map->table[i], *next;
         while(entry){
             next = entry->next;
             free(entry->key);
@@ -132,7 +132,7 @@ int hashmap_has_key(hashmap_t* map, const char* key){
 
 /* Retrieves an entry using a key. If the entry does not exist, NULL is returned */
 void* hashmap_get(hashmap_t* map, const char* key){
-    hm_entry_t* entry = hashmap_lookup(map, key);
+    hashmap_entry_t* entry = hashmap_lookup(map, key);
     if(!entry) return NULL;
     return entry->value;
 }
@@ -141,7 +141,7 @@ void* hashmap_get(hashmap_t* map, const char* key){
 hashmap_t* hashmap_set(hashmap_t* map, const char* key, void* value){
     if(!map || !key || !value) return NULL;
 
-    hm_entry_t* entry = hashmap_lookup(map, key);
+    hashmap_entry_t* entry = hashmap_lookup(map, key);
     uint32_t hash = hashmap_hash(key, map->size);
 
     while(entry){
@@ -153,7 +153,7 @@ hashmap_t* hashmap_set(hashmap_t* map, const char* key, void* value){
     }
 
     // no matching key found
-    entry = calloc(1, sizeof(hm_entry_t));
+    entry = calloc(1, sizeof(hashmap_entry_t));
     if(!entry) return NULL;
 
     entry->key = strdup(key);
@@ -176,7 +176,7 @@ hashmap_t* hashmap_resize(hashmap_t* map){
     uint32_t new_size = map->entries * HASHMAP_LOADING_FACTOR;
     hashmap_t new_map;
     hashmap_init(&new_map, new_size);
-    hm_entry_t* entry;
+    hashmap_entry_t* entry;
     uint32_t i;
 
     // Rehash table
@@ -197,7 +197,7 @@ hashmap_t* hashmap_resize(hashmap_t* map){
 char* hashmap_iter_keys(hashmap_t* map, const char* key){
     if(!map || !map->table) return NULL;
  
-    hm_entry_t* entry = NULL;
+    hashmap_entry_t* entry = NULL;
     uint32_t hash;
 
     // search from beginning of table
