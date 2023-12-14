@@ -66,7 +66,7 @@ void test_hashmap(void** state){
 	// Hashing function
 	uint32_t map_size = 10;
 	uint32_t hash1 = hashmap_hash("key", map_size);
-	uint32_t hash2 = hashmap_hash_b("key", 3, map_size);
+	uint32_t hash2 = hashmap_hash_b("key", 4, map_size);
 	assert_int_equal(hash1, hash2);
 
 	// Set values
@@ -125,7 +125,7 @@ void test_hashmap_byte_key(void** state) {
 	// Hashing function a string
 	uint32_t some_map_size = 100; // large enough to avoid collisions
 	uint32_t hash1 = hashmap_hash("key", some_map_size);
-	uint32_t hash2 = hashmap_hash_b("key", 3, some_map_size);
+	uint32_t hash2 = hashmap_hash_b("key", 4, some_map_size);
 	assert_int_equal(hash1, hash2);
 
 	// Hashing function with other plain-old-data

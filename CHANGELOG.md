@@ -21,6 +21,8 @@ Version codes follow [Semantic Versioning](https://semver.org/).
 - Added LincePoint and coordinate conversion functions
 - Added tests
 - Replaced usage of vec2 in app.h functions with LincePoint
+- Added function to hash arbitrary bytes, in preparation to make a hashmap of bitmasks to introduce archetypes to ECS.
+-
 
 ## v0.8.0
 - Added CMocka as the testing framework.

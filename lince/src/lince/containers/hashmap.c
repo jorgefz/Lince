@@ -101,7 +101,7 @@ uint32_t hashmap_hash_b(const void* key_bytes, uint32_t key_length, uint32_t map
 }
 
 uint32_t hashmap_hash(const char* key, uint32_t map_size) {
-    return hashmap_hash_b(key, strlen(key), map_size);
+    return hashmap_hash_b(key, strlen(key)+1, map_size);
 }
 
 /*
@@ -239,7 +239,7 @@ hashmap_t* hashmap_set(hashmap_t* map, const char* key, void* value){
     if(!entry) return NULL;
 
     entry->key = strdup(key);
-    entry->len = strlen(entry->key);
+    entry->len = strlen(entry->key) + 1; // include null terminator
     entry->value = value;
     entry->next = map->table[hash];
     map->table[hash] = entry;
