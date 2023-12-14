@@ -45,4 +45,8 @@
 /* Scene */
 #include "lince/scene/scene.h"
 
+/* Physics */
+#include "lince/physics/box2d.h"
+
+
 #endif //LINCE_H
