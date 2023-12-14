@@ -5,7 +5,6 @@
 
 #include <lince.h>
 #include <lince/audio/audio.h>
-#include <lince/physics/boxcollider.h>
 
 #include "gamedata.h"
 
@@ -185,10 +184,10 @@ void SetupChickenAnimation(){
         .color={1,1,1,1},
         .texture = chicken_tileset
     };
-    LinceBoxCollider chicken_box = {
+    LinceBox2D chicken_box = {
         .x=chicken_sprite.x, .y=chicken_sprite.y,
         .w=chicken_sprite.w, .h=chicken_sprite.h,
-        .dx=0.0, .dy=0.0, .flags = LinceBoxCollider_Bounce};
+        .dx=0.0, .dy=0.0, .flags = LinceBox2D_Bounce};
     LinceAddEntityComponent(game_data.reg, chicken_id, Component_Sprite, &chicken_sprite);
     LinceAddEntityComponent(game_data.reg, chicken_id, Component_BoxCollider, &chicken_box);
 
@@ -287,7 +286,7 @@ void UpdateSpritePositions(LinceEntityRegistry* reg){
     for(uint32_t i = 0; i != num; ++i){
         uint32_t id = *(uint32_t*)array_get(&result, i);
         LinceSprite* sprite = LinceGetEntityComponent(game_data.reg, id, Component_Sprite);
-        LinceBoxCollider* box = LinceGetEntityComponent(game_data.reg, id, Component_BoxCollider);
+        LinceBox2D* box = LinceGetEntityComponent(game_data.reg, id, Component_BoxCollider);
         sprite->x = box->x;
         sprite->y = box->y;
     }
@@ -296,7 +295,7 @@ void UpdateSpritePositions(LinceEntityRegistry* reg){
 
 void MovePlayer(float dt){
 
-    LinceBoxCollider* pbox;
+    LinceBox2D* pbox;
     pbox = LinceGetEntityComponent(game_data.reg, game_data.player, Component_BoxCollider);
     pbox->dx = 0.0f;
     pbox->dy = 0.0f;
@@ -335,7 +334,7 @@ void GameStateInit(){
     // --> walls
     /*
     uint32_t walls[4];
-    LinceBoxCollider wall_boxes[4] = {
+    LinceBox2D wall_boxes[4] = {
         {.x =  0.0f, .y =  1.0f, .w =  2.0f, .h = 0.01f},
         {.x = -1.0f, .y =  0.0f, .w = 0.01f, .h =  2.0f},
         {.x =  0.0f, .y = -1.0f, .w =  2.0f, .h = 0.01f},
@@ -356,7 +355,7 @@ void GameStateInit(){
         .w = 0.1, .h = 0.1,
         .color = {0.0, 0.0, 1.0, 1.0}
     };
-    LinceBoxCollider box = {.x=sprite.x, .y=sprite.y, .w=sprite.w, .h=sprite.h, .dx=0, .dy=0 };
+    LinceBox2D box = {.x=sprite.x, .y=sprite.y, .w=sprite.w, .h=sprite.h, .dx=0, .dy=0 };
     game_data.player = LinceCreateEntity(game_data.reg);
     LinceAddEntityComponent(game_data.reg, game_data.player, Component_Sprite, &sprite);
     LinceAddEntityComponent(game_data.reg, game_data.player, Component_BoxCollider, &box);
@@ -373,11 +372,11 @@ void GameStateInit(){
         uint32_t wall_entity = LinceCreateEntity(game_data.reg);
         sprite.x = pos_x[i];
         sprite.y = pos_y[i];
-        LinceBoxCollider obox = {
+        LinceBox2D obox = {
             .x=sprite.x, .y=sprite.y,
             .w=sprite.w, .h=sprite.h,
             .dx=0, .dy=0,
-            .flags = LinceBoxCollider_Static
+            .flags = LinceBox2D_Static
         };
         LinceAddEntityComponent(game_data.reg, wall_entity, Component_Sprite, &sprite);
         LinceAddEntityComponent(game_data.reg, wall_entity, Component_BoxCollider, &obox);
@@ -399,11 +398,11 @@ void GameStateInit(){
         max =  8e-4;
         float dx = min + rand()/(float)RAND_MAX * (max - min);
         float dy = min + rand()/(float)RAND_MAX * (max - min);
-        LinceBoxCollider mbox = {
+        LinceBox2D mbox = {
             .x=sprite.x, .y=sprite.y,
             .w=sprite.w, .h=sprite.h,
             .dx=dx, .dy=dy,
-            .flags = LinceBoxCollider_Bounce };
+            .flags = LinceBox2D_Bounce };
         LinceAddEntityComponent(game_data.reg, mover_id, Component_Sprite, &sprite);
         LinceAddEntityComponent(game_data.reg, mover_id, Component_BoxCollider, &mbox);
     }
@@ -649,7 +648,7 @@ void SandboxInit() {
     DATA.camera.zoom = 3.0f;
     DATA.camera_speed = 0.003f;
 
-    DATA.player_box = (LinceBoxCollider){.x=0, .y=0, .w=0.7, .h=0.7};
+    DATA.player_box = (LinceBox2D){.x=0, .y=0, .w=0.7, .h=0.7};
     DATA.player_sprite = (LinceSprite){.x=0, .y=0, .w=0.7, .h=0.7, .color={0,0,1,1}, .zorder=1};
     
     app->user_data = &DATA;

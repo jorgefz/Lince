@@ -2,7 +2,6 @@
 #define WORLD_SCENE_H
 
 #include <lince.h>
-#include <lince/physics/boxcollider.h>
 #include "gamedata.h"
 
 typedef struct WorldScene {

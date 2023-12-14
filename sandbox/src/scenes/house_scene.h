@@ -2,7 +2,6 @@
 #define HOUSE_H
 
 #include <lince.h>
-#include <lince/physics/boxcollider.h>
 #include "gamedata.h"
 
 typedef struct HouseScene {

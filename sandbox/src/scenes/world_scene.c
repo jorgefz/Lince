@@ -70,14 +70,14 @@ void WorldSceneInit(LinceScene* scene){
     LinceInitTilemap(&world_scene->map);
  
     world_scene->house_door = (DoorLink){
-        .box = (LinceBoxCollider){.x=6-0.5, .y=6-0.5, .w=1, .h=1},
+        .box = (LinceBox2D){.x=6-0.5, .y=6-0.5, .w=1, .h=1},
         .to_scene = "House",
         .to_x = 3,
         .to_y = 2,
     };
 
-    // world_scene->door_link  = (LinceBoxCollider){.x=7-0.5, .y=6-0.5, .w=1, .h=1};
-    // world_scene->player_box = (LinceBoxCollider){.x=0, .y=0, .w=0.7, .h=0.7};
+    // world_scene->door_link  = (LinceBox2D){.x=7-0.5, .y=6-0.5, .w=1, .h=1};
+    // world_scene->player_box = (LinceBox2D){.x=0, .y=0, .w=0.7, .h=0.7};
     // world_scene->player_sprite = (LinceSprite){.x=0, .y=0, .w=0.7, .h=0.7, .color={0,0,1,1}, .zorder=1};
 }
 
@@ -103,7 +103,7 @@ void WorldSceneUpdate(LinceScene* scene, float dt){
     }, NULL);
 
     // Wait for interact key to enter door
-    if(LinceBoxCollides(&game_data->player_box, &world_scene->house_door.box)){
+    if(LinceBox2DCollides(&game_data->player_box, &world_scene->house_door.box)){
         // "Press E to enter"
         if(LinceIsKeyPressed(LinceKey_e)){
             game_data->camera.pos[0] = world_scene->house_door.to_x;
