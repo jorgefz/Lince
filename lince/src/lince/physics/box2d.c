@@ -43,8 +43,8 @@ void LinceCalculateEntityCollisions(LinceEntityRegistry* reg, array_t* entities,
             if(i == j) continue;
             uint32_t id2 = *(uint32_t*)array_get(entities, j);
             LinceBox2D* box2 = LinceGetEntityComponent(reg, id2, box_component_id);
-            if(move_x) move_x = !LinceBoxCollides(&xb, box2);
-            if(move_y) move_y = !LinceBoxCollides(&yb, box2);
+            if(move_x) move_x = !LinceBox2DCollides(&xb, box2);
+            if(move_y) move_y = !LinceBox2DCollides(&yb, box2);
             if(!move_x && !move_y) break;
         }
         
