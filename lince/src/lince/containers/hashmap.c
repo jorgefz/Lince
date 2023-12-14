@@ -59,12 +59,11 @@ static hm_entry_t* hashmap_lookup(hashmap_t* map, const char* key){
     API definitions
 */
 
-uint32_t hashmap_hash(const char* key, uint32_t size) {
+uint32_t hashmap_hash_bytes(const char* key, uint32_t length, uint32_t mapsize) {
     // Using 'one-at-a-time' hashing function by Bob Jenkins
     // https://en.wikipedia.org/wiki/Jenkins_hash_function
     size_t i = 0;
     uint32_t hash = 0;
-    size_t length = strlen(key);
     while (i != length) {
         hash += key[i++];
         hash += hash << 10;
@@ -73,7 +72,13 @@ uint32_t hashmap_hash(const char* key, uint32_t size) {
     hash += hash << 3;
     hash ^= hash >> 11;
     hash += hash << 15;
-    return hash % size;
+    return hash % mapsize;
+}
+
+uint32_t hashmap_hash(const char* key, uint32_t mapsize) {
+    // Using 'one-at-a-time' hashing function by Bob Jenkins
+    // https://en.wikipedia.org/wiki/Jenkins_hash_function
+    return hashmap_hash_bytes(key, strlen(key), mapsize);
 }
 
 /*

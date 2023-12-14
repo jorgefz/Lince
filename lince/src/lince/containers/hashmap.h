@@ -49,13 +49,22 @@ typedef struct hashmap_container {
 } hashmap_t;
 
 
+/** @brief Returns the hash of a given array of bytes.
+* The size of the hashmap must be passed as an argument,
+* as it will be mod (%) with the hash result.
+* @param key can be a pointer to any set of bytes 
+* @param length number of bytes in the key
+* @param size number of buckets in the hashmap.
+*/
+uint32_t hashmap_hash_bytes(const char* key, uint32_t length, uint32_t mapsize);
+
 /** @brief Returns the hash of a given key.
 * The size of the hashmap must be passed as an argument,
 * as it will be mod (%) with the hash result.
 * @param key string key
 * @param size number of buckets.
 */
-uint32_t hashmap_hash(const char* key, uint32_t size);
+uint32_t hashmap_hash(const char* key, uint32_t mapsize);
 
 /** @brief Initialise hashmap via user-managed object.
 * Should be deleted using `hashmap_uninit`.
