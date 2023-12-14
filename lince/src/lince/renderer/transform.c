@@ -55,8 +55,8 @@ void LinceTransformToWorld(LinceTransform* out, const LinceTransform* in, LinceC
 
 	out->x = centre.x;
 	out->y = centre.y;
-	out->w = fabs(corner.x - centre.x);
-	out->h = fabs(corner.y - centre.y);
+	out->w = (float)fabs(corner.x - centre.x);
+	out->h = (float)fabs(corner.y - centre.y);
 }
 
 
@@ -87,8 +87,8 @@ void LinceTransformToScreen(LinceTransform* out, const LinceTransform* in, Lince
 
 	out->x = centre.x;
 	out->y = centre.y;
-	out->w = fabs(corner.x - centre.x);
-	out->h = fabs(corner.y - centre.y);
+	out->w = (float)fabs(corner.x - centre.x);
+	out->h = (float)fabs(corner.y - centre.y);
 }
 
 
@@ -120,6 +120,6 @@ void LinceTransformToPixel(LinceTransform* out, const LinceTransform* in, LinceC
 
 	out->x = centre.x;
 	out->y = centre.y;
-	out->w = fabs(corner.x - centre.x);
-	out->h = fabs(corner.y - centre.y);
+	out->w = (float)fabs(corner.x - centre.x);
+	out->h = (float)fabs(corner.y - centre.y);
 }
