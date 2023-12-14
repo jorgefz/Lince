@@ -29,6 +29,7 @@
 #include "lince/renderer/shader.h"
 #include "lince/renderer/texture.h"
 #include "lince/renderer/camera.h"
+#include "lince/renderer/transform.h"
 
 /* Tilesets & tilemaps */
 #include "lince/tiles/tileset.h"

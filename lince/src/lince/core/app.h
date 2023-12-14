@@ -112,23 +112,19 @@ LinceScene* LinceGetScene(const char* name);
 
 /** @brief Returns the global state of the application. See `LinceApp`.
 */
-LinceApp* LinceGetApp();
+LinceApp* LinceGetApp(void);
 
 /** @brief Returns aspect ratio of the window.
 */
-float LinceGetAspectRatio();
+float LinceGetAspectRatio(void);
 
-/** @brief Returns the current window width and height in pixels.
-* @param size Array of two floats with window width and height. 
-*/
-void LinceGetScreenSize(vec2 size);
+/** @brief Returns the current window width and height in pixels */
+LincePoint LinceGetScreenSize(void);
 
 /** @brief Returns the position of the mouse pointer in world coordinates.
-* @param pos vec2 used to return the mouse position.
 * @param cam Camera used to determine the world position.
-* @todo pass the view-projection matrix instead of the camera.
 */
-void LinceGetMousePosWorld(vec2 pos, LinceCamera* cam);
+LincePoint LinceGetMousePosWorld(LinceCamera* cam);
 
 /** @brief Returns current layer being handled or updated.
 * Returns NULL if no layer is being handled.

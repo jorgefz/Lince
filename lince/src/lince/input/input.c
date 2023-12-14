@@ -17,22 +17,17 @@ LinceBool LinceIsMouseButtonPressed(int button){
 	return (state == GLFW_PRESS);
 }
 
-void LinceGetMousePos(float* xpos, float* ypos){
-    double x, y;
+LincePoint LinceGetMousePos(void) {
+    LincePoint pos;
     GLFWwindow* handle = LinceGetApp()->window->handle;
-	glfwGetCursorPos(handle, &x, &y);
-    if (xpos) *xpos = (float)x;
-    if (ypos) *ypos = (float)y;
+	glfwGetCursorPos(handle, &pos.x, &pos.y);
+    return pos;
 }
 
 float LinceGetMouseX(){
-    float x;
-    LinceGetMousePos(&x, NULL);
-    return x;
+    LinceGetMousePos().x;
 }
 
 float LinceGetMouseY(){
-    float y;
-    LinceGetMousePos(NULL, &y);
-    return y;
+    LinceGetMousePos().y;
 }

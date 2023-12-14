@@ -165,23 +165,17 @@ float LinceGetAspectRatio(){
     return (float)app.window->width / (float)app.window->height;
 }
 
-void LinceGetScreenSize(vec2 size){
-    size[0] = (float)LinceGetApp()->window->width;
-    size[1] = (float)LinceGetApp()->window->height;
+LincePoint LinceGetScreenSize(){
+    return (LincePoint) {
+        .x = (float)app.window->width,
+        .y = (float)app.window->height
+    };
 }
 
-
-void LinceGetMousePosWorld(vec2 world_pos, LinceCamera* cam) {
-    vec2 scr_size;
-    LinceGetScreenSize(scr_size);
-    
-    LincePoint pix, scr, wld;
-    LinceGetMousePos(&pix.x, &pix.y);
-    
-    scr = LincePointPixelToScreen(pix, scr_size[0], scr_size[1]);
-    wld = LincePointScreenToWorld(scr, cam);
-    world_pos[0] = wld.x;
-    world_pos[1] = wld.y;
+LincePoint LinceGetMousePosWorld(LinceCamera* cam) {
+    LincePoint scr = LinceGetScreenSize();
+    LincePoint pos = LincePointPixelToScreen(LinceGetMousePos(), scr.x, scr.y);
+    return LincePointScreenToWorld(pos, cam);
 }
 
 LinceLayer* LinceGetCurrentLayer(){
