@@ -34,8 +34,9 @@
 * @brief Hashmap entry. Holds a key-value pair.
 */
 typedef struct hashmap_entry {
-	char* key;                       ///< String key
-	void* value;                     ///< Data associated with the key
+	char*    key;               ///< String key
+	uint32_t len;				///< Length of key	
+	void*    value;             ///< Data associated with the key
 	struct hashmap_entry* next; ///< Linked list for hash collisions
 } hashmap_entry_t;
 
@@ -49,14 +50,14 @@ typedef struct hashmap {
 } hashmap_t;
 
 
-/** @brief Returns the hash of a given array of bytes.
+/** @brief Returns the hash of a given number of bytes.
 * The size of the hashmap must be passed as an argument,
 * as it will be mod (%) with the hash result.
 * @param key can be a pointer to any set of bytes 
 * @param length number of bytes in the key
 * @param size number of buckets in the hashmap.
 */
-uint32_t hashmap_hash_bytes(const char* key, uint32_t length, uint32_t mapsize);
+uint32_t hashmap_hash_b(const void* key, uint32_t key_length, uint32_t map_size);
 
 /** @brief Returns the hash of a given key.
 * The size of the hashmap must be passed as an argument,
@@ -64,7 +65,7 @@ uint32_t hashmap_hash_bytes(const char* key, uint32_t length, uint32_t mapsize);
 * @param key string key
 * @param size number of buckets.
 */
-uint32_t hashmap_hash(const char* key, uint32_t mapsize);
+uint32_t hashmap_hash(const char* key, uint32_t map_size);
 
 /** @brief Initialise hashmap via user-managed object.
 * Should be deleted using `hashmap_uninit`.
@@ -94,17 +95,30 @@ hashmap_t* hashmap_create(uint32_t size_hint);
 */
 void hashmap_destroy(hashmap_t* map);
 
+/*
+Returns 1 if the hashmap contains the given byte key,
+and 0 otherwise.
+*/
+int hashmap_has_key_b(hashmap_t* map, const void* key_bytes, uint32_t key_length);
+
+
 /** @brief Returns 1 if the hashmap contains the given key, and 0 otherwise.
 * @param key String key to search for.
 */
 int hashmap_has_key(hashmap_t* map, const char* key);
 
 
+void* hashmap_get_b(hashmap_t* map, const void* key, uint32_t key_length);
+
 /** @brief Retrieves the data associated with a key.
 * If the entry does not exist, NULL is returned.
 * @param key String key to search for.
 */
 void* hashmap_get(hashmap_t* map, const char* key);
+
+
+hashmap_t* hashmap_set_b(hashmap_t* map, const void* key, uint32_t key_length, void* value);
+
 
 /** @brief Adds or modifies an existing entry using a key.
 * Whilst the keys are copied over, the values are not,
@@ -119,11 +133,23 @@ hashmap_t* hashmap_set(hashmap_t* map, const char* key, void* value);
 
 /** @brief Extends the hash table to a size equal to the next prime number
 * from its current size.
+*
+* This is a CPU intensive operation, as the whole table is rehashed.
+* Try this only if you are getting many collisions.
+*/
+hashmap_t* hashmap_resize_b(hashmap_t* map);
+
+/** @brief Extends the hash table to a size equal to the next prime number
+* from its current size.
 * 
 * This is a CPU intensive operation, as the whole table is rehashed.
 * Try this only if you are getting many collisions.
 */
 hashmap_t* hashmap_resize(hashmap_t* map);
+
+
+void* hashmap_iter_keys_b(hashmap_t* map, const char* key, uint32_t key_length, uint32_t* next_key_length);
+
 
 /** @brief Returns the keys in a hashmap in order.
 * 
