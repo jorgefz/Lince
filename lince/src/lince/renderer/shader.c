@@ -69,8 +69,8 @@ LinceShader* LinceCreateShaderFromSrc(
 
 	// Start out with hashmap of 21 buckets to avoid costs of
 	// Resizing often at small sizes (e.g. at sizes 2, 3, 5, 7, 11, etc).
-	int ret = hashmap_init(&shader->uniforms, 20);
-	LINCE_ASSERT(ret == 0,
+	void* ret = hashmap_init(&shader->uniforms, 20);
+	LINCE_ASSERT(ret,
 		"Failed to create hashmap for shader %d uniforms", shader->id);
 
 	LINCE_INFO(" ---> Done!")

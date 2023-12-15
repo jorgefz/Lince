@@ -234,7 +234,8 @@ static void LinceInit(){
     
     // Create scene stack
     // array_init(&app.scene_stack, sizeof(LinceScene));
-    hashmap_init(&app.scene_cache, 5);
+    void* success = hashmap_init(&app.scene_cache, 5);
+    LINCE_ASSERT(success, "Failed to create scene cache");
 
     // Create asset manager
     LinceInitAssetManager(&app.asset_manager);

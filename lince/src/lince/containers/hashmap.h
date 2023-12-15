@@ -73,9 +73,9 @@ uint32_t hashmap_hash(const char* key, uint32_t map_size);
 * Should be deleted using `hashmap_uninit`.
 * @param map Hashmap to initialise
 * @param size_hint starting number of buckets
-* @return 0 on success, and 1 on fail.
+* @returns the input map on success, and NULL otherwise
 */
-int hashmap_init(hashmap_t* map, uint32_t size_hint);
+hashmap_t* hashmap_init(hashmap_t* map, uint32_t size_hint);
 
 /** @brief Clears a hashmap and removes all stored data.
 * It does not free the pointers to values, as these are managed by the user.

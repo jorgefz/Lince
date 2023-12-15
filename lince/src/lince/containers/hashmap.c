@@ -87,12 +87,12 @@ uint32_t hashmap_hash(const char* key, uint32_t map_size) {
 }
 
 
-int hashmap_init(hashmap_t* map, uint32_t size_hint){
+hashmap_t* hashmap_init(hashmap_t* map, uint32_t size_hint){
     *map = (hashmap_t){0};
     map->size = next_prime(size_hint);
     map->table = calloc(map->size, sizeof(hashmap_entry_t*));
-    if(!map->table) return 1;
-    return 0;
+    if(!map->table) return NULL;
+    return map;
 }
 
 /* Clears and deallocates a hashmap */
