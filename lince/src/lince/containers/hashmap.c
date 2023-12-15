@@ -49,7 +49,7 @@ static int streq(const char* s1, const char* s2){
 // Returns the hashmap element with the given key of arbitrary type
 static hashmap_entry_t* hashmap_lookup_b(hashmap_t* map, const void* key_bytes, uint32_t key_length) {
     if (!map || !key_bytes) return NULL;
-    uint32_t hash = hashmap_hash_b(key_bytes, key_length, map->size);
+    uint32_t hash = hashmap_hashb(key_bytes, key_length, map->size);
     hashmap_entry_t* entry = map->table[hash];
 
     while (entry) {
@@ -83,7 +83,7 @@ static hashmap_entry_t* hashmap_lookup(hashmap_t* map, const char* key){
     API definitions
 */
 
-uint32_t hashmap_hash_b(const void* key_bytes, uint32_t key_length, uint32_t map_size) {
+uint32_t hashmap_hashb(const void* key_bytes, uint32_t key_length, uint32_t map_size) {
     // Using 'one-at-a-time' hashing function by Bob Jenkins
     // https://en.wikipedia.org/wiki/Jenkins_hash_function
     size_t i = 0;
@@ -101,13 +101,10 @@ uint32_t hashmap_hash_b(const void* key_bytes, uint32_t key_length, uint32_t map
 }
 
 uint32_t hashmap_hash(const char* key, uint32_t map_size) {
-    return hashmap_hash_b(key, strlen(key)+1, map_size);
+    return hashmap_hashb(key, strlen(key)+1, map_size);
 }
 
-/*
-Initialises hashmap via passed pointer.
-Should be deleted using `hashmap_uninit`.
-*/
+
 int hashmap_init(hashmap_t* map, uint32_t size_hint){
     *map = (hashmap_t){0};
     map->size = next_prime(size_hint);
@@ -151,7 +148,7 @@ void hashmap_destroy(hashmap_t* map){
 Returns 1 if the hashmap contains the given byte key,
 and 0 otherwise.
 */
-int hashmap_has_key_b(hashmap_t* map, const void* key_bytes, uint32_t key_length) {
+int hashmap_has_keyb(hashmap_t* map, const void* key_bytes, uint32_t key_length) {
     return (hashmap_lookup_b(map, key_bytes, key_length) != NULL);
 }
 
@@ -166,7 +163,7 @@ int hashmap_has_key(hashmap_t* map, const char* key){
 
 
 /* Retrieves an entry using a byte key. If the entry does not exist, NULL is returned */
-void* hashmap_get_b(hashmap_t* map, const void* key, uint32_t key_length) {
+void* hashmap_getb(hashmap_t* map, const void* key, uint32_t key_length) {
     hashmap_entry_t* entry = hashmap_lookup_b(map, key, key_length);
     if (!entry) return NULL;
     return entry->value;
@@ -181,11 +178,11 @@ void* hashmap_get(hashmap_t* map, const char* key){
 }
 
 
-hashmap_t* hashmap_set_b(hashmap_t* map, const void* key, uint32_t key_length, void* value) {
+hashmap_t* hashmap_setb(hashmap_t* map, const void* key, uint32_t key_length, void* value) {
     if (!map || !key || !value) return NULL;
 
     hashmap_entry_t* entry = hashmap_lookup_b(map, key, key_length);
-    uint32_t hash = hashmap_hash_b(key, key_length, map->size);
+    uint32_t hash = hashmap_hashb(key, key_length, map->size);
 
     while (entry) {
         if (memeq(key, entry->key, key_length, entry->len)) {
@@ -214,7 +211,7 @@ hashmap_t* hashmap_set_b(hashmap_t* map, const void* key, uint32_t key_length, v
     // Extend if necessary
     map->entries++;
     if (map->entries * HASHMAP_LOADING_FACTOR >= map->size) {
-        hashmap_resize_b(map);
+        hashmap_resize(map);
     }
     return map;
 }
@@ -253,7 +250,7 @@ hashmap_t* hashmap_set(hashmap_t* map, const char* key, void* value){
 }
 
 
-hashmap_t* hashmap_resize_b(hashmap_t* map) {
+hashmap_t* hashmap_resize(hashmap_t* map) {
     if (!map) return NULL;
 
     uint32_t new_size = map->entries * HASHMAP_LOADING_FACTOR;
@@ -266,7 +263,7 @@ hashmap_t* hashmap_resize_b(hashmap_t* map) {
     for (i = 0; i != map->size; ++i) {
         entry = map->table[i];
         while (entry) {
-            hashmap_set_b(&new_map, entry->key, entry->len, entry->value);
+            hashmap_setb(&new_map, entry->key, entry->len, entry->value);
             entry = entry->next;
         }
     }
@@ -277,30 +274,7 @@ hashmap_t* hashmap_resize_b(hashmap_t* map) {
 }
 
 
-hashmap_t* hashmap_resize(hashmap_t* map){
-    if(!map) return NULL;
-
-    uint32_t new_size = map->entries * HASHMAP_LOADING_FACTOR;
-    hashmap_t new_map;
-    hashmap_init(&new_map, new_size);
-    hashmap_entry_t* entry;
-    uint32_t i;
-
-    // Rehash table
-    for(i = 0; i != map->size; ++i){
-        entry = map->table[i];
-        while(entry){
-            hashmap_set(&new_map, entry->key, entry->value);
-            entry = entry->next;
-        }
-    }
-    
-    hashmap_uninit(map);
-    memmove(map, &new_map, sizeof(hashmap_t));
-    return map;
-}
-
-void* hashmap_iter_keys_b(hashmap_t* map, const char* key, uint32_t key_length, uint32_t* next_key_length) {
+void* hashmap_iterb(hashmap_t* map, const char* key, uint32_t key_length, uint32_t* next_key_length) {
     if (!map || !map->table) return NULL;
 
     hashmap_entry_t* entry = NULL;
@@ -323,7 +297,7 @@ void* hashmap_iter_keys_b(hashmap_t* map, const char* key, uint32_t key_length, 
         return entry->next->key;
     }
 
-    hash = hashmap_hash_b(key, key_length, map->size);
+    hash = hashmap_hashb(key, key_length, map->size);
     for (uint32_t i = hash + 1; i != map->size; ++i) {
         if (map->table[i]) {
             *next_key_length = map->table[i]->len;
@@ -334,7 +308,7 @@ void* hashmap_iter_keys_b(hashmap_t* map, const char* key, uint32_t key_length, 
 }
 
 
-char* hashmap_iter_keys(hashmap_t* map, const char* key){
+char* hashmap_iter(hashmap_t* map, const char* key){
     if(!map || !map->table) return NULL;
  
     hashmap_entry_t* entry = NULL;

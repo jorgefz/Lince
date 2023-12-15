@@ -297,7 +297,7 @@ static void LinceTerminate(){
     
     // Destroy scene cache
     char* key = NULL;
-    while ((key = hashmap_iter_keys(&app.scene_cache, key))) {
+    while ((key = hashmap_iter(&app.scene_cache, key))) {
         LinceScene* scene = hashmap_get(&app.scene_cache, key);
         if (scene) {
             if (scene->loaded) {
