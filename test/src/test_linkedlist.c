@@ -7,48 +7,25 @@
 
 #include "lince/containers/linkedlist.h"
 
-#include "test.h"
-
-static void scan_list(listnode_t* node){
-
-    node = list_head(node);
-
-    while(node){
-        if(node->data){
-            printf("%d", *(int*)(node->data));
-        } else {
-            printf("(null)");
-        }
-
-        if(node->next){
-            if(node->next->prev){
-                printf(" <-> ");
-            } else {
-                printf(" -> ");
-            }
-        }
-        node = node->next;
-    }
-    printf("\n");
-}
+#include "benchmark.h"
 
 
-static int test_linkedlist_performance(){
+void benchmark_linkedlist(){
 
     int first_value = -1;
 	listnode_t* head = list_create(&first_value);
 
-	TEST_CLOCK_START(time);
-    int end = 10000;
-	for(int i = 0; i != end; ++i){
+    printf("[BENCHMARK] list_push_back\n");
+    BENCHMARK_LOOP(int, i, 50000) {
         list_push_back(head, NULL);
-	}
-	long int n_op = end;
-	TEST_CLOCK_END(time, n_op);
+    } BENCHMARK_END(int, i, 50000);
+
+    printf("[BENCHMARK] list_tail\n");
+    BENCHMARK_LOOP(int, i, 1) {
+        list_node_at(head, i);
+    } BENCHMARK_END(int, i, 1);
 	
     list_destroy(head);
-
-	return TEST_PASS;
 }
 
 void test_linkedlist(void **state){

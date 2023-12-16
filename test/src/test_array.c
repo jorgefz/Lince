@@ -1,4 +1,4 @@
-#include <stdarg.h>
+	#include <stdarg.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <setjmp.h>
@@ -6,34 +6,20 @@
 
 #include "lince/containers/array.h"
 
-#include "test.h"
+#include "benchmark.h"
 
 
-static void scan_array(array_t* a){
-	if(!a) return;
-	printf(" array of size %u, capacity %u, and element size %u\n",
-		a->size, a->capacity, a->element_size);
-	for(uint32_t i = 0; i != a->size; ++i){
-		char* p = (char*)a->data + i * a->element_size;
-		printf("[%u] %d at %p\n", i, *(int*)p, p);
-	}
-}
-
-static int test_array_performance(){
+void benchmark_array(){
 
 	array_t nums;
 	array_init(&nums, sizeof(int));
 
-	TEST_CLOCK_START(time);
-    int end = 10000000;
-	for(int i = 0; i != end; ++i){
-        array_push_back(&nums, &i);
-	}
-	long int n_op = end;
-	TEST_CLOCK_END(time, n_op);
+	BENCHMARK_LOOP(int, i, 10000000) {
+		array_push_back(&nums, &i);
+	} BENCHMARK_END(int, i, 10000000);
 	
     array_uninit(&nums);
-	return TEST_PASS;
+	return 0;
 }
 
 

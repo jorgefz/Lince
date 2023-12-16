@@ -5,49 +5,9 @@
 #include <cmocka.h>
 
 #include "lince/containers/hashmap.h"
-#include "test.h"
-
-static void scan_hashmap(hashmap_t* map){
-	printf("\n Hashmap size %u and %u entries\n", map->size, map->entries);
-	for(uint32_t i = 0; i != map->size; ++i){
-
-		hashmap_entry_t* entry = map->table[i];
-		if(!entry) continue;
-
-		printf("%u) ", i);
-		while(entry){
-			if(entry->key) printf("<%s>, ", entry->key);
-			else printf("<NULL>, ");
-			entry = entry->next;
-		}
-		printf("\n");
-	}
-}
+#include "benchmark.h"
 
 
-static int test_hashmap_performance(){
-
-	int value = 99;
-	const int iter = 50000;
-	size_t r = 1;
-
-	hashmap_t map;
-	hashmap_init(&map, iter);
-
-	for (int i = 0; i != iter; ++i) {
-		hashmap_setb(&map, &i, sizeof(int), &value);
-	}
-
-	printf("[BENCHMARK] hashmap_getb\n");
-	TEST_CLOCK_START(time);
-	for (int i = 0; i != iter; ++i) {
-		r = r && hashmap_getb(&map, &i, sizeof(int));
-	}
-	TEST_CLOCK_END(time, iter);
-
-	hashmap_uninit(&map);
-	return TEST_PASS;
-}
 
 void test_hashmap(void** state){
 	(void)state;
@@ -136,7 +96,7 @@ void test_hashmap_byte_key(void** state) {
 	uint32_t hash_int2 = hashmap_hashb(&key_int2, sizeof(int), some_map_size);
 	assert_int_not_equal(hash_int1, hash_int2);
 
-	float key_float1 = 1e-3, key_float2 = 1e5;
+	float key_float1 = 1e-3f, key_float2 = 1e5f;
 	uint32_t hash_float1 = hashmap_hashb(&key_float1, sizeof(float), some_map_size);
 	uint32_t hash_float2 = hashmap_hashb(&key_float2, sizeof(float), some_map_size);
 	assert_int_not_equal(hash_float1, hash_float2);
@@ -187,3 +147,26 @@ void test_hashmap_byte_key(void** state) {
 
 }
 
+
+void benchmark_hashmap() {
+
+	int value = 99;
+	const int iter = 100000;
+	size_t r = 1;
+
+	hashmap_t map;
+	hashmap_init(&map, iter);
+
+	for (int i = 0; i != iter; ++i) {
+		hashmap_setb(&map, &i, sizeof(int), &value);
+	}
+
+	printf("[BENCHMARK] hashmap_getb\n");
+
+	BENCHMARK_LOOP(int, i, iter) {
+		r = r && hashmap_getb(&map, &i, sizeof(int));
+	} BENCHMARK_END(int, i, iter);
+
+	hashmap_uninit(&map);
+	return 0;
+}

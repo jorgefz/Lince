@@ -7,7 +7,7 @@
 #include <time.h>
 #include <lince/renderer/renderer.h>
 #include <lince/entity/entity.h>
-#include "test.h"
+#include "benchmark.h"
 
 typedef struct Position { float x, y; } Position;
 typedef struct Velocity { float vx, vy; } Velocity;
@@ -18,7 +18,7 @@ typedef struct BoxCollider { float x, y, w, h; } BoxCollider;
 typedef enum {CompPosition, CompVelocity, CompSprite, CompTimer, CompBoxCollider} Components;
 
 
-static int test_entity_performance(){
+void benchmark_ecs(){
 
     LinceEntityRegistry* reg;
     #define SIZES sizeof(Position), sizeof(Velocity), sizeof(Sprite), sizeof(Timer), sizeof(BoxCollider)
@@ -39,34 +39,26 @@ static int test_entity_performance(){
     array_init(&entities, sizeof(uint32_t));
     array_resize(&entities, num);
 
-    TEST_CLOCK_START(time);
-    for(uint32_t i = 0; i != num; ++i){
+    BENCHMARK_LOOP(uint32_t, i, num) {
         uint32_t id = LinceCreateEntity(reg);
         array_set(&entities, &i, id);
         int r = rand() % 5;
         LinceAddEntityComponent(reg, id, r, instances[r]);
-    }
-    long int op_num = (long int)num;
-    TEST_CLOCK_END(time, op_num);
+    } BENCHMARK_END(uint32_t, i, num);
 
-    TEST_CLOCK_START(time_query);
+
     array_t query_result;
     array_init(&query_result, sizeof(uint32_t));
     array_resize(&query_result, num);
     
-    LinceQueryEntities(reg, &query_result, 1, 0);
-    LinceQueryEntities(reg, &query_result, 1, 1);
-    LinceQueryEntities(reg, &query_result, 1, 2);
-    LinceQueryEntities(reg, &query_result, 1, 3);
-    LinceQueryEntities(reg, &query_result, 1, 4);
+    BENCHMARK_LOOP(uint32_t, i, 5) {
+        LinceQueryEntities(reg, &query_result, 1, i);
+    } BENCHMARK_END(uint32_t, i, 5);
     
     array_uninit(&query_result);
-    long int query_op = 5;
-    TEST_CLOCK_END(time_query, query_op);
-
+    
     array_uninit(&entities);
     LinceDestroyEntityRegistry(reg);
-    return TEST_PASS;
 }
 
 
