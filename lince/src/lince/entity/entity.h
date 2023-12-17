@@ -19,7 +19,7 @@
 #endif
 
 /** @typedef LinceEntityMask
-* @brief Entity mask type, where eacl bit tells you where a given entity
+* @brief Entity mask type, where each bit tells you where a given entity
 * has a specific component.
 * The bit location also tells you the component ID.
 */
