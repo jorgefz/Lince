@@ -1,6 +1,5 @@
-#ifndef LINCE_ECS_H
-#define LINCE_ECS_H
-
+#ifndef LINCE_ENTITY_H
+#define LINCE_ENTITY_H
 
 #include <lince/core/core.h>
 #include <lince/core/memory.h>
@@ -110,4 +109,4 @@ void LinceRemoveEntityComponent(LinceEntityRegistry* reg, uint32_t entity_id, ui
 */
 uint32_t LinceQueryEntities(LinceEntityRegistry* reg, array_t* query, uint32_t component_count, ...);
 
-#endif /* LINCE_ECS_H */
+#endif /* LINCE_ENTITY_H */
