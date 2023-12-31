@@ -101,7 +101,11 @@ typedef struct LinceECS {
 } LinceECS;
 
 
-#ifndef LINCE_RELEASE
+/* Make static functions accessible in debug mode */
+#ifdef LINCE_DEBUG
+void LinceECSSetMaskBit(LinceECSMask mask, uint32_t comp_id);
+void LinceECSUnsetMaskBit(LinceECSMask mask, uint32_t comp_id);
+LinceBool LinceECSCheckMaskBit(LinceECSMask mask, uint32_t comp_id);
 LinceECSArchetype* LinceECSGetOrCreateArchetype(LinceECS* ecs, LinceECSMask mask);
 #endif
 

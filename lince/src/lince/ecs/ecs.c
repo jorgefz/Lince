@@ -1,45 +1,49 @@
 #include "lince/ecs/ecs.h"
 
 
+#ifdef LINCE_DEBUG
+	#define LINCE_STATIC
+#else
+	#define LINCE_STATIC static
+#endif
+
+ 
 #define HASHMAP_INIT_SIZE 10
 
 /** @brief Sets the bit corresponding to a component ID on a bitmask */
-static void LinceECSSetMaskBit(LinceECSMask mask, uint32_t comp_id) {
+LINCE_STATIC void LinceECSSetMaskBit(LinceECSMask mask, uint32_t comp_id) {
 	mask[comp_id / 64] |= ((uint64_t)1 << (comp_id % 64) );
 }
 
 /** @brief Unsets the bit corresponding to a component ID on a bitmask */
-static void LinceECSUnsetMaskBit(LinceECSMask mask, uint32_t comp_id) {
+LINCE_STATIC void LinceECSUnsetMaskBit(LinceECSMask mask, uint32_t comp_id) {
 	mask[comp_id / 64] &= ~((uint64_t)1 << (comp_id % 64));
 }
 
 /** @brief Returns true if a given bit is set on a bit mask */
-static LinceBool LinceECSCheckMaskBit(LinceECSMask mask, uint32_t comp_id) {
-	return mask[comp_id / 64] & ((uint64_t)1 << (comp_id % 64));
+LINCE_STATIC LinceBool LinceECSCheckMaskBit(LinceECSMask mask, uint32_t comp_id) {
+	return !!(mask[comp_id / 64] & ((uint64_t)1 << (comp_id % 64)));
 }
 
 /** @brief Returns the index of a component store in an archetype */
-static uint32_t LinceECSGetComponentStoreIndex(LinceECS* ecs, LinceECSMask mask, uint32_t comp_id) {
+LINCE_STATIC uint32_t LinceECSGetComponentStoreIndex(LinceECS* ecs, LinceECSMask mask, uint32_t comp_id) {
 	hashmap_t* comp_archetypes = array_get(&ecs->component_index, comp_id);
 	return (uint32_t)(uint64_t)hashmap_getb(comp_archetypes, mask, sizeof(LinceECSMask));
 }
 
 /** @brief Returns the store where a component is located given its archetype */
-static LinceECSComponentStore* LinceECSGetComponentStoreWithArch(LinceECS* ecs, LinceECSArchetype* arch, uint32_t comp_id) {
+LINCE_STATIC LinceECSComponentStore* LinceECSGetComponentStoreWithArch(LinceECS* ecs, LinceECSArchetype* arch, uint32_t comp_id) {
 	uint32_t comp_store_id = LinceECSGetComponentStoreIndex(ecs, arch->mask, comp_id);
 	return array_get(&arch->comp_stores, comp_store_id);
 }
 
 /** @brief Returns the store where a component is located in an archetype using its bitmask */
-static LinceECSComponentStore* LinceECSGetComponentStoreWithMask(LinceECS* ecs, LinceECSMask mask, uint32_t comp_id) {
+LINCE_STATIC LinceECSComponentStore* LinceECSGetComponentStoreWithMask(LinceECS* ecs, LinceECSMask mask, uint32_t comp_id) {
 	LinceECSArchetype* arch = hashmap_getb(&ecs->archetype_map, mask, sizeof(LinceECSMask));
 	return LinceECSGetComponentStoreWithArch(ecs, arch, comp_id);
 }
 
-#ifdef LINCE_RELEASE
-static
-#endif
-LinceECSArchetype* LinceECSGetOrCreateArchetype(LinceECS* ecs, LinceECSMask mask) {
+LINCE_STATIC LinceECSArchetype* LinceECSGetOrCreateArchetype(LinceECS* ecs, LinceECSMask mask) {
 
 	LinceECSArchetype* arch = hashmap_getb(&ecs->archetype_map, mask, sizeof(LinceECSMask));
 	if (arch) return arch;
