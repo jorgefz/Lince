@@ -124,7 +124,7 @@ void LinceAddEntityComponent(LinceEntityRegistry* reg, uint32_t entity_id, uint3
     uint64_t* mask = array_get(&reg->entity_masks, entity_id);
     uint32_t i   = component_id / 64; // index in the array
     uint32_t pos = component_id % 64; // bit position within the array element
-    mask[i] |= (1 << pos);
+    mask[i] |= ((uint64_t)1 << pos);
 }
 
 LinceBool LinceHasEntityComponent(LinceEntityRegistry* reg, uint32_t entity_id, uint32_t component_id){
@@ -132,7 +132,7 @@ LinceBool LinceHasEntityComponent(LinceEntityRegistry* reg, uint32_t entity_id, 
     uint64_t* mask = array_get(&reg->entity_masks, entity_id);
     uint32_t i   = component_id / 64; // index in the array
     uint32_t pos = component_id % 64; // bit position within the array element
-    return mask[i] & (1 << pos);
+    return mask[i] & ((uint64_t)1 << pos);
 }
 
 void* LinceGetEntityComponent(LinceEntityRegistry* reg, uint32_t entity_id, uint32_t component_id){
@@ -166,7 +166,7 @@ uint32_t LinceQueryEntities(LinceEntityRegistry* reg, array_t* query, uint32_t c
         uint32_t comp_id = va_arg(args, uint32_t);
         uint32_t ind = comp_id / 64; // index in the array
         uint32_t pos = comp_id % 64; // bit position within the array element
-        query_mask[ind] |= (1 << pos);
+        query_mask[ind] |= ((uint64_t)1 << pos);
     }
     va_end(args);
 

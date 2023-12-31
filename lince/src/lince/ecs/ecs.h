@@ -69,9 +69,11 @@ typedef struct LinceECSComponentStore {
 } LinceECSComponentStore;
 
 typedef struct LinceECSArchetype {
-	array_t        comp_stores;  ///< array< array<bytes> >
+	array_t        comp_stores;  ///< array< LinceECSComponentStore >
 	array_t        entity_ids;   ///< array<LinceEntity>
-	LinceECSMask   mask;		 ///< 
+	array_t		   unused_slots; ///< Empty slots in component data, to be reused
+								 ///< Correspond to indices in entity_ids and comp_stores
+	LinceECSMask   mask;		 ///< bitmask signature of the archetype
 	LinceECSSystem on_update;    ///< system callbacks
 } LinceECSArchetype;
 
@@ -94,9 +96,14 @@ typedef struct LinceECS {
 	array_t   entity_pool;     ///< array<uint32_t> unused entities
 
 	void*     user_data;
-	LinceBool initialised;
+	uint32_t  component_count; ///< Number of components
 
 } LinceECS;
+
+
+#ifndef LINCE_RELEASE
+LinceECSArchetype* LinceECSGetOrCreateArchetype(LinceECS* ecs, LinceECSMask mask);
+#endif
 
 
 LinceECS* LinceECSInit(LinceECS* ecs);
