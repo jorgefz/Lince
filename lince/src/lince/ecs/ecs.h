@@ -45,42 +45,58 @@ QUERY(components)
 #include "lince/containers/hashmap.h"
 #include "lince/core/core.h"
 
-
+/* Integral type for Entity IDs */
 typedef uint64_t LinceEntity;
 
-#ifndef LINCE_ECS_MAX_COMPONENTS_FACTOR
-#define LINCE_ECS_MAX_COMPONENTS_FACTOR 1
+
+/// Number of 64-bit slots in entity bitmasks. Maximum number of components as a multiple of 64.
+#ifndef LINCE_ECS_COMPONENT_SLOTS
+	#define LINCE_ECS_COMPONENT_SLOTS 1
 #endif
 
-typedef uint64_t LinceECSMask[LINCE_ECS_MAX_COMPONENTS_FACTOR];
+/// Maximum number of components
+#define LINCE_ECS_MAX_COMPONENTS ((uint32_t)(LINCE_ECS_COMPONENT_SLOTS) * 64)
 
-struct LinceECS; // Forward declaration
 
+// TODO: switch to struct
+typedef uint64_t LinceECSMask[LINCE_ECS_COMPONENT_SLOTS];
+
+/* Avoid typedef array type, use struct, can be casted to int pointer */
+/*
+typedef struct LinceECSMask {
+	uint64_t slots[LINCE_ECS_MAX_COMPONENTS_FACTOR];
+} LinceECSMask;
+*/
+
+struct LinceECS; /* Forward declaration */
+
+/* Function type for system callbacks */
 typedef void (*LinceECSSystem)(struct LinceECS* ecs, array_t* entity_ids);
 
+/* Flags indicating the state of an entity */
+// TODO: store flags in the top 32 bits of the entity ID
 typedef enum LinceECSFlags {
 	LinceECSFlags_Active = 0x1
 } LinceECSFlags;
 
 typedef struct LinceECSComponentStore {
-	array_t  data;
-	uint32_t id;
-	uint32_t element_size;
+	array_t data;		   	///< array<element size>, stores data of a component for entities with an archetype
+	uint32_t id;			///< ID of the stored component
+	uint32_t element_size;	///< Size in bytes of the stored component
 } LinceECSComponentStore;
 
 typedef struct LinceECSArchetype {
-	array_t        comp_stores;  ///< array< LinceECSComponentStore >
-	array_t        entity_ids;   ///< array<LinceEntity>
-	array_t		   unused_slots; ///< Empty slots in component data, to be reused
-								 ///< Correspond to indices in entity_ids and comp_stores
+	array_t        comp_stores;  ///< array<LinceECSComponentStore>
+	array_t        entity_ids;   ///< array<LinceEntity>, entities with this archetype
+	array_t		   unused_slots; ///< array<uint32_t> Empty slots in component data, to be reused. Correspond to indices in entity_ids and comp_stores
 	LinceECSMask   mask;		 ///< bitmask signature of the archetype
-	LinceECSSystem on_update;    ///< system callbacks
+	LinceECSSystem on_update;    ///< ECs system, to be called 
 } LinceECSArchetype;
 
 typedef struct LinceECSRecord {
 	LinceECSMask       mask;
 	LinceECSFlags      flags;
-	LinceEntity		   row;
+	uint32_t		   row;
 	LinceECSArchetype* archetype;
 } LinceECSRecord;
 
@@ -93,10 +109,11 @@ typedef struct LinceECS {
 	// Relations
 	array_t   component_index; ///< array< hashmap<Mask,uint32_t> > Indexed by comp_id, holds archetypes associated with each component
 	hashmap_t archetype_map;   ///< map<Mask, Archetype*> Links a type mask to the archetype for that type
-	array_t   entity_pool;     ///< array<uint32_t> unused entities
+	array_t   entity_pool;     ///< array<LinceEntity> unused entities
 
 	void*     user_data;
 	uint32_t  component_count; ///< Number of components
+	uint32_t  entity_count;    ///< Number of active entities
 
 } LinceECS;
 
@@ -118,7 +135,7 @@ void LinceECSUninit(LinceECS* ecs);
 LinceEntity LinceECSNewEntity(LinceECS* ecs);
 
 // Removes an entity
-void LinceECSDeleteEntity(LinceECS* ecs);
+void LinceECSDeleteEntity(LinceECS* ecs, LinceEntity entity);
 
 // Register new component and returns its ID
 uint32_t LinceECSNewComponent(LinceECS* ecs, uint32_t component_size);
@@ -126,8 +143,14 @@ uint32_t LinceECSNewComponent(LinceECS* ecs, uint32_t component_size);
 // Adds a component to an entity
 void* LinceECSAddComponent(LinceECS* ecs, LinceEntity entity_id, uint32_t component_id, void* data);
 
-// Get a component of an entity
+// Add components to an entity
+void* LinceECSAddComponents(LinceECS* ecs, LinceEntity entity_id, uint32_t component_num, uint32_t* components_ids);
+
+// Retrieve the component data of an entity
 void* LinceECSGetComponent(LinceECS* ecs, LinceEntity entity_id, uint32_t component_id);
+
+// Provide data for a component of an entity
+void* LinceECSSetComponent(LinceECS* ecs, LinceEntity entity_id, uint32_t component_id, void* data);
 
 // Removes a component from an entity
 void* LinceECSRemoveComponent(LinceECS* ecs, LinceEntity entity_id, uint32_t component_id);
