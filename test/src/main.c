@@ -28,6 +28,9 @@ void benchmark_linkedlist();
 
 int main() {
     const struct CMUnitTest tests[] = {
+
+#ifdef LINCE_DEBUG
+
         cmocka_unit_test(test_array),
         cmocka_unit_test(test_hashmap),
         cmocka_unit_test(test_hashmap_byte_key),
@@ -40,10 +43,14 @@ int main() {
         cmocka_unit_test(test_ecs_mask),
         cmocka_unit_test(test_ecs)
         
-        // cmocka_unit_test(benchmark_hashmap),
-        // cmocka_unit_test(benchmark_array),
-        // cmocka_unit_test(benchmark_ecs),
-        // cmocka_unit_test(benchmark_linkedlist)
+#elif defined( LINCE_RELEASE )
+        
+        cmocka_unit_test(benchmark_hashmap),
+        cmocka_unit_test(benchmark_array),
+        cmocka_unit_test(benchmark_ecs),
+        cmocka_unit_test(benchmark_linkedlist)
+#endif
+    
     };
     return cmocka_run_group_tests(tests, NULL, NULL);
 }
