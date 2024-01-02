@@ -10,7 +10,7 @@
 
 void test_ecs_mask(void** state) {
 
-	assert_int_equal(LINCE_ECS_MAX_COMPONENTS_FACTOR, 1);
+	assert_int_equal(LINCE_ECS_COMPONENT_SLOTS, 1);
 	assert_int_equal(sizeof(LinceECSMask), sizeof(uint64_t));
 
 	LinceECSMask mask = { 0 };
@@ -37,7 +37,7 @@ void test_ecs_mask(void** state) {
 
 void test_ecs(void** state) {
 
-	/* Initialisation */
+	/* --- Initialisation --- */
 	LinceECS ecs, *r;
 	r = LinceECSInit(&ecs);
 
@@ -50,7 +50,7 @@ void test_ecs(void** state) {
 	assert_int_equal(ecs.entity_pool.size, 0);
 	assert_non_null(ecs.archetype_map.table);
 
-	/* Creating Components */
+	/* --- Creating components --- */
 	uint32_t comp_sizes[] = { 8, 16, 32 };
 	uint32_t comp_ids[3];
 
@@ -77,7 +77,7 @@ void test_ecs(void** state) {
 	assert_non_null(((hashmap_t*)array_get(&ecs.component_index, 1))->table);
 	assert_non_null(((hashmap_t*)array_get(&ecs.component_index, 2))->table);
 
-	/* Creating archetypes */
+	/* --- Creating archetypes --- */
 	LinceECSMask arch_mask = { 0 };
 	LinceECSSetMaskBit(arch_mask, 0);
 	LinceECSSetMaskBit(arch_mask, 2);
@@ -91,14 +91,50 @@ void test_ecs(void** state) {
 	assert_int_equal(arch->comp_stores.size,  2);
 	assert_int_equal(arch->entity_ids.size,   0);
 	assert_int_equal(arch->unused_slots.size, 0);
+	
+	// Component stores
+	uint32_t col_comp0 = 0, col_comp2 = 1;
+	LinceECSComponentStore *store0, *store2;
+	store0 = array_get(&arch->comp_stores, col_comp0);
+	assert_non_null(store0);
+	assert_int_equal(store0->id, comp_ids[0]);
+	assert_int_equal(store0->element_size, comp_sizes[0]);
+	assert_int_equal(store0->data.size, 0);
 
-	assert_ptr_equal(arch, hashmap_get(&ecs.archetype_map, arch_mask, sizeof(LinceECSMask)));
+	store2 = array_get(&arch->comp_stores, col_comp2);
+	assert_non_null(store2);
+	assert_int_equal(store2->id, comp_ids[2]);
+	assert_int_equal(store2->element_size, comp_sizes[2]);
+	assert_int_equal(store2->data.size, 0);
 
-	// Check component index
+	// Archetype map
+	assert_ptr_equal(arch, hashmap_getb(&ecs.archetype_map, arch_mask, sizeof(LinceECSMask)));
 
-	// Create entity
+	// Component index
+	hashmap_t* comp_arch0 = array_get(&ecs.component_index, comp_ids[0]);
+	assert_non_null(comp_arch0);
+	uint32_t col0 = (uint64_t)hashmap_getb(comp_arch0, arch_mask, sizeof(LinceECSMask));
+	assert_int_equal(col0, col_comp0); // index of comp store in archetype
 
-	// Add components and check that archetypes are created at every step
+	hashmap_t* comp_arch2 = array_get(&ecs.component_index, comp_ids[2]);
+	assert_non_null(comp_arch2);
+	uint32_t col2 = (uint64_t)hashmap_getb(comp_arch2, arch_mask, sizeof(LinceECSMask));
+	assert_int_equal(col2, col_comp2); // index of comp store in archetype
+
+	/* --- Creating entities --- */
+	LinceEntity entity = LinceECSNewEntity(&ecs);
+
+	assert_int_equal(entity, 0);
+	assert_int_equal(ecs.entity_count, 1);
+	LinceECSRecord* record = array_get(&ecs.entity_records, (uint32_t)entity);
+	assert_non_null(record);
+	assert_int_equal(record->row, 0);
+	assert_memory_equal(record->mask, (LinceECSMask) { 0 }, sizeof(LinceECSMask));
+	assert_null(record->archetype);
+
+	/* Add components */
+
+	/* Remove components */
 
 	LinceECSUninit(&ecs);
 }
