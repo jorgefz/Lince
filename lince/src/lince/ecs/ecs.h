@@ -131,41 +131,48 @@ LinceECS* LinceECSInit(LinceECS* ecs);
 
 void LinceECSUninit(LinceECS* ecs);
 
-// Create an entity
+/** @brief Create an entity and return its ID */
 LinceEntity LinceECSNewEntity(LinceECS* ecs);
 
-// Removes an entity
+/** @brief Remove an entity */
 void LinceECSDeleteEntity(LinceECS* ecs, LinceEntity entity);
 
-// Register new component and returns its ID
+/** @brief Register new component and returns its ID */
 uint32_t LinceECSNewComponent(LinceECS* ecs, uint32_t component_size);
 
-// Adds a component to an entity
+// DEPRECATED: Adds a component to an entity
 void* LinceECSAddComponent(LinceECS* ecs, LinceEntity entity_id, uint32_t component_id, void* data);
 
-// Add components to an entity
+/** @brief Add components to an entity */
 void* LinceECSAddComponents(LinceECS* ecs, LinceEntity entity_id, uint32_t component_num, uint32_t* components_ids);
 
-// Retrieve the component data of an entity
+/** @brief Retrieve a component from an entity */
 void* LinceECSGetComponent(LinceECS* ecs, LinceEntity entity_id, uint32_t component_id);
 
-// Provide data for a component of an entity
+/** @brief Provide or overwrite the data of a component on an entity
+* If the data is not provided (NULL), the component is zeroed.
+*/
 void* LinceECSSetComponent(LinceECS* ecs, LinceEntity entity_id, uint32_t component_id, void* data);
 
-// Removes a component from an entity
+/** @brief Add one component to an entity and provide its data.
+* If the data is NULL, the component is zeroed.
+*/
+void* LinceECSEmplaceComponent(LinceECS* ecs, LinceEntity entity_id, uint32_t component_id, void* data);
+
+/** @brief Remove a component from an entity */
 void* LinceECSRemoveComponent(LinceECS* ecs, LinceEntity entity_id, uint32_t component_id);
 
-// True if an entity has the given component
+/** @brief Returns true if an entity has a given component */
 LinceBool LinceECSHasComponent(LinceECS* ecs, LinceEntity entity_id, uint32_t component_id);
 
-// Returns an array of the entities that have the requested components
+// WIP: Returns an array of the entities that have the requested components
 array_t* LinceECSQuery(LinceECS* ecs, uint32_t comp_num, uint32_t* comp_ids);
 
 // void LinceECSSetSystemCallback(LinceECS* ecs, const char* callback_tag, LinceECSSystem* callback, uint32_t comp_num, uint32_t* comp_ids);
 
 // #define LinceECSSetSystem(ecs, callback, comp_num, comp_ids) LinceECSSetSystemCallback(ecs, #callback, callback, comp_num, comp_ids)
 
-// Move the world by one time step, runs the system callbacks
+/* Move the world by one time step, runs the system callbacks */
 void LinceECSUpdate(LinceECS* ecs, float dt);
 
 

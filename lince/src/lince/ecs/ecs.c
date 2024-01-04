@@ -140,15 +140,15 @@ LinceEntity LinceECSNewEntity(LinceECS* ecs) {
 		memset(record, 0, sizeof(LinceECSRecord));
 		record->flags |= LinceECSFlags_Active;
 		ecs->entity_count++;
-		LINCE_INFO("ECS: Created entity with ID %lu", entity);
+		LINCE_INFO("ECS: Created recycled entity with ID %lu", entity);
 		return entity;
 	}
 
-	entity = (LinceEntity)ecs->entity_count;
-	ecs->entity_count++;
+	entity = (LinceEntity)ecs->entity_records.size;
 	LinceECSRecord new_record = { .flags = LinceECSFlags_Active };
 	array_push_back(&ecs->entity_records, &new_record);
-	LINCE_INFO("ECS: Created entity with ID %lu", entity);
+	ecs->entity_count++;
+	LINCE_INFO("ECS: Created new entity with ID %lu", entity);
 	return entity;
 }
 
@@ -156,7 +156,7 @@ LinceEntity LinceECSNewEntity(LinceECS* ecs) {
 void LinceECSDeleteEntity(LinceECS* ecs, LinceEntity entity) {
 	if (!ecs) return;
 
-	LinceECSRecord* record = array_get(&ecs->entity_records, entity);
+	LinceECSRecord* record = array_get(&ecs->entity_records, (uint32_t)entity);
 	if (!record) return;
 	if (!(record->flags & LinceECSFlags_Active)) {
 		LINCE_WARN("ECS: deleting inactive entity wiht ID %lu", entity);
@@ -175,6 +175,8 @@ void LinceECSDeleteEntity(LinceECS* ecs, LinceEntity entity) {
 
 	// Add to entity pool
 	array_push_back(&ecs->entity_pool, &entity);
+	ecs->entity_count--;
+	LINCE_INFO("ECS: Deleted entity with ID %lu", entity);
 }
 
 
@@ -230,7 +232,7 @@ void* LinceECSAddComponent(LinceECS* ecs, LinceEntity entity_id, uint32_t compon
 		array_pop_back(&new_arch->unused_slots);
 	}
 	else {
-		array_push_back(&new_arch->entity_ids, (void*)entity_id);
+		array_push_back(&new_arch->entity_ids, &entity_id);
 		new_row = new_arch->entity_ids.size - 1;
 	}
 
@@ -296,7 +298,7 @@ void* LinceECSAddComponents(LinceECS* ecs, LinceEntity entity_id, uint32_t compo
 		array_set(&new_arch->entity_ids, &entity_id, new_row);
 		array_pop_back(&new_arch->unused_slots);
 	} else {
-		array_push_back(&new_arch->entity_ids, (void*)entity_id);
+		array_push_back(&new_arch->entity_ids, &entity_id);
 		new_row = new_arch->entity_ids.size - 1;
 		// Create new slots in component stores
 		for (uint32_t i = 0; i != new_arch->comp_stores.size; ++i) {
@@ -375,8 +377,20 @@ void* LinceECSSetComponent(LinceECS* ecs, LinceEntity entity_id, uint32_t compon
 	if (!dest || component_id >= ecs->component_count) return NULL;
 	
 	uint32_t size = *(uint32_t*)array_get(&ecs->component_sizes, component_id);
-	memmove(dest, data, size);
+	if (data) {
+		memmove(dest, data, size);
+	} else {
+		memset(dest, 0, size);
+	}
 	return dest;
+}
+
+
+/* Add a component to an entity and provide its data */
+void* LinceECSEmplaceComponent(LinceECS* ecs, LinceEntity entity_id, uint32_t component_id, void* data) {
+	void* success = LinceECSAddComponents(ecs, entity_id, 1, &component_id);
+	if (!success) return NULL;
+	return LinceECSSetComponent(ecs, entity_id, component_id, data);
 }
 
 
