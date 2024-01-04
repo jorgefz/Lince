@@ -28,17 +28,10 @@ static void ecs_debug_print(LinceECS* ecs) {
 			printf("%lu", LinceECSCheckMaskBit(record->mask, j) );
 		}
 		printf("\n");
-		if (record->archetype) {
-			uint32_t arch_id = (record->archetype - ecs->archetypes.data);
-			printf("	Arch:   %u (0x%p)\n", arch_id, record->archetype);
-		} else {
-			printf("	Arch:   <NULL>\n");
-		}
+		printf("	Arch:   %d\n", (int)record->arch_id);
 		printf("	Row:    %u\n", record->row);
 	}
-
 	printf("\n");
-
 }
 
 
@@ -171,7 +164,7 @@ void test_ecs(void** state) {
 	assert_int_equal(record0->flags & LinceECSFlags_Active, 1);
 	assert_int_equal(record0->row, 0);
 	assert_memory_equal(record0->mask, (LinceECSMask) { 0 }, sizeof(LinceECSMask));
-	assert_null(record0->archetype);
+	assert_int_equal(record0->arch_id, (uint32_t)(-1));
 
 	// Delete the entity
 	LinceECSDeleteEntity(&ecs, entity0);
@@ -213,14 +206,16 @@ void test_ecs(void** state) {
 	assert_int_equal(LinceECSCheckMaskBit(record0->mask, 0), 1);
 	assert_int_equal(LinceECSCheckMaskBit(record0->mask, 1), 0);
 	assert_int_equal(LinceECSCheckMaskBit(record0->mask, 2), 0);
-	assert_non_null(record0->archetype);
-	assert_int_equal(LinceECSCheckMaskBit(record0->archetype->mask, 0), 1);
-	assert_int_equal(LinceECSCheckMaskBit(record0->archetype->mask, 1), 0);
-	assert_int_equal(LinceECSCheckMaskBit(record0->archetype->mask, 2), 0);
-	assert_int_equal(record0->archetype->comp_stores.size, 1);
-	assert_int_equal(record0->archetype->entity_ids.size, 1);
-	assert_int_equal(entity0, *(LinceEntity*)array_get(&record0->archetype->entity_ids,0));
-
+	assert_int_equal(record0->arch_id != -1, 1);
+	LinceECSArchetype* arch0 = array_get(&ecs.archetypes, record0->arch_id);
+	assert_non_null(arch0);
+	assert_int_equal(LinceECSCheckMaskBit(arch0->mask, 0), 1);
+	assert_int_equal(LinceECSCheckMaskBit(arch0->mask, 1), 0);
+	assert_int_equal(LinceECSCheckMaskBit(arch0->mask, 2), 0);
+	assert_int_equal(arch0->comp_stores.size, 1);
+	assert_int_equal(arch0->entity_ids.size, 1);
+	assert_int_equal(entity0, *(LinceEntity*)array_get(&arch0->entity_ids,0));
+	
 	// Check wrong input
 	r = LinceECSAddComponents(NULL, entity0, 1, (uint32_t[]) { comp_ids[1] });
 	assert_null(r); // No ECS provided
@@ -242,7 +237,8 @@ void test_ecs(void** state) {
 	void* comp0_loc = LinceECSGetComponent(&ecs, entity0, comp_ids[0]);
 
 	assert_non_null(comp0_loc);
-	LinceECSComponentStore* store = array_get(&record0->archetype->comp_stores, 0);
+	arch0 = array_get(&ecs.archetypes, record0->arch_id);
+	LinceECSComponentStore* store = array_get(&arch0->comp_stores, 0);
 	void* comp0_ptr = array_get(&store->data, 0);
 	assert_ptr_equal(comp0_loc, comp0_ptr);
 

@@ -94,10 +94,10 @@ typedef struct LinceECSArchetype {
 } LinceECSArchetype;
 
 typedef struct LinceECSRecord {
-	LinceECSMask       mask;
-	LinceECSFlags      flags;
-	uint32_t		   row;
-	LinceECSArchetype* archetype;
+	LinceECSMask       mask;	///< Component mask of the entity
+	LinceECSFlags      flags;	///< State flags
+	uint32_t		   row;     ///< Index inside component stores where entity data is located
+	uint32_t		   arch_id; ///< Index of its archetype. Set to -1 if it has none.
 } LinceECSRecord;
 
 typedef struct LinceECS {
@@ -139,9 +139,6 @@ void LinceECSDeleteEntity(LinceECS* ecs, LinceEntity entity);
 
 /** @brief Register new component and returns its ID */
 uint32_t LinceECSNewComponent(LinceECS* ecs, uint32_t component_size);
-
-// DEPRECATED: Adds a component to an entity
-void* LinceECSAddComponent(LinceECS* ecs, LinceEntity entity_id, uint32_t component_id, void* data);
 
 /** @brief Add components to an entity */
 void* LinceECSAddComponents(LinceECS* ecs, LinceEntity entity_id, uint32_t component_num, uint32_t* components_ids);
