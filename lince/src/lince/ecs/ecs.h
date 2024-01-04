@@ -108,7 +108,7 @@ typedef struct LinceECS {
 	
 	// Relations
 	array_t   component_index; ///< array< hashmap<Mask,uint32_t> > Indexed by comp_id, holds archetypes associated with each component
-	hashmap_t archetype_map;   ///< map<Mask, Archetype*> Links a type mask to the archetype for that type
+	hashmap_t archetype_map;   ///< map<Mask, uint32_t> Links a type mask to the index of the archetype for that type
 	array_t   entity_pool;     ///< array<LinceEntity> unused entities
 
 	void*     user_data;

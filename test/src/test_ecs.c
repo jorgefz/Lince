@@ -18,6 +18,7 @@ static void ecs_debug_print(LinceECS* ecs) {
 	printf(" Archetypes: %u\n", ecs->archetypes.size);
 	printf("\n");
 
+	// Entities
 	for (uint32_t i = 0; i != ecs->entity_records.size; ++i) {
 		LinceECSRecord* record = array_get(&ecs->entity_records, i);
 
@@ -31,6 +32,20 @@ static void ecs_debug_print(LinceECS* ecs) {
 		printf("	Arch:   %d\n", (int)record->arch_id);
 		printf("	Row:    %u\n", record->row);
 	}
+	printf("\n");
+
+	// Archetypes
+	for (uint32_t i = 0; i != ecs->archetypes.size; ++i) {
+		LinceECSArchetype* arch = array_get(&ecs->archetypes, i);
+
+		printf(" -- Archetype %u\n", i);
+		printf("	Mask:   ");
+		for (uint32_t j = 0; j != 64; ++j) {
+			printf("%lu", LinceECSCheckMaskBit(arch->mask, j));
+		}
+		printf("\n");
+	}
+
 	printf("\n");
 }
 
@@ -114,8 +129,10 @@ void test_ecs(void** state) {
 	LinceECSSetMaskBit(arch_mask, 0);
 	LinceECSSetMaskBit(arch_mask, 2);
 	LinceECSArchetype* arch = LinceECSGetOrCreateArchetype(&ecs, arch_mask);
+	uint32_t arch_id = (uint32_t)(uint64_t)(arch - (LinceECSArchetype*)ecs.archetypes.data);
 
 	assert_non_null(arch);
+	assert_int_equal(arch_id, 0);
 	assert_int_equal(ecs.archetypes.size, 1);
 	assert_ptr_equal(arch, array_get(&ecs.archetypes, 0));
 	
@@ -140,7 +157,7 @@ void test_ecs(void** state) {
 	assert_int_equal(store2->data.size, 0);
 
 	// Archetype map
-	assert_ptr_equal(arch, hashmap_getb(&ecs.archetype_map, arch_mask, sizeof(LinceECSMask)));
+	assert_int_equal(arch_id, hashmap_getb(&ecs.archetype_map, arch_mask, sizeof(LinceECSMask)));
 
 	// Component index
 	hashmap_t* comp_arch0 = array_get(&ecs.component_index, comp_ids[0]);
@@ -202,6 +219,8 @@ void test_ecs(void** state) {
 	/* Add components */
 	r = LinceECSAddComponents(&ecs, entity0, 1, (uint32_t[]){comp_ids[0]});
 
+	ecs_debug_print(&ecs);
+
 	assert_non_null(r);
 	assert_int_equal(LinceECSCheckMaskBit(record0->mask, 0), 1);
 	assert_int_equal(LinceECSCheckMaskBit(record0->mask, 1), 0);
@@ -256,12 +275,13 @@ void test_ecs(void** state) {
 	
 	assert_memory_equal(comp0_ptr, &comp0, comp_sizes[0]);
 
+	ecs_debug_print(&ecs);
+
+
 	// Add another component and check it migrated archetypes
 	// struct Comp1 comp1 = { .x = 5.0, .y = -3.0 };
 	// comp0_ptr = LinceECSEmplaceComponent(&ecs, entity0, comp_ids[1], &comp1);
 	// assert_non_null(comp0_ptr);
-
-	ecs_debug_print(&ecs);
 
 
 	// LinceECSAddComponents(&ecs, entity1, 2, (uint32_t[]){comp_ids[0]});
