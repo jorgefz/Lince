@@ -162,7 +162,7 @@ void* hashmap_get(hashmap_t* map, const char* key){
 
 
 hashmap_t* hashmap_setb(hashmap_t* map, const void* key, uint32_t key_length, void* value) {
-    if (!map || !key || !value) return NULL;
+    if (!map || !key) return NULL;
 
     hashmap_entry_t* entry = hashmap_lookupb(map, key, key_length);
     uint32_t hash = hashmap_hashb(key, key_length, map->size);
