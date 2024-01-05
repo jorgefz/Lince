@@ -23,7 +23,7 @@ static void ecs_debug_print(LinceECS* ecs) {
 		LinceECSRecord* record = array_get(&ecs->entity_records, i);
 
 		printf(" -- Entity %u\n", i);
-		printf("	Active: %u\n", record->flags & LinceECSFlags_Active);
+		printf("	Active: %s\n", (record->flags & LinceECSFlags_Active) ? "True" : "False");
 		printf("	Mask:   ");
 		for (uint32_t j = 0; j != 64; ++j) {
 			printf("%lu", LinceECSCheckMaskBit(record->mask, j) );
@@ -42,6 +42,24 @@ static void ecs_debug_print(LinceECS* ecs) {
 		printf("	Mask:   ");
 		for (uint32_t j = 0; j != 64; ++j) {
 			printf("%lu", LinceECSCheckMaskBit(arch->mask, j));
+		}
+		printf("\n");
+
+		printf("	Entity IDs: ");
+		for (uint32_t j = 0; j != arch->entity_ids.size; ++j) {
+			printf("%u ", *(uint32_t*)array_get(&arch->entity_ids, j));
+		}
+		if (arch->entity_ids.size == 0) {
+			printf("<Empty>");
+		}
+		printf("\n");
+
+		printf("	Unused rows: ");
+		for (uint32_t j = 0; j != arch->unused_slots.size; ++j) {
+			printf("%u ", *(uint32_t*)array_get(&arch->unused_slots, j));
+		}
+		if (arch->unused_slots.size == 0) {
+			printf("<Empty>");
 		}
 		printf("\n");
 	}
@@ -88,10 +106,15 @@ void test_ecs(void** state) {
 	assert_ptr_equal(&ecs, r);
 	assert_int_equal(ecs.entity_records.size, 0);
 	assert_int_equal(ecs.component_sizes.size, 0);
-	assert_int_equal(ecs.archetypes.size, 0);
+	assert_int_equal(ecs.archetypes.size, 1);
 	assert_int_equal(ecs.component_index.size, 0);
 	assert_int_equal(ecs.entity_pool.size, 0);
 	assert_non_null(ecs.archetype_map.table);
+
+	// Default archetype with no components
+	LinceECSArchetype* zero_arch = array_get(&ecs.archetypes, 0);
+	assert_memory_equal(zero_arch->mask, (LinceECSMask) { 0 }, sizeof(LinceECSMask));
+
 
 	/* --- Creating components --- */
 	struct Comp0 { int a; };
@@ -132,9 +155,9 @@ void test_ecs(void** state) {
 	uint32_t arch_id = (uint32_t)(uint64_t)(arch - (LinceECSArchetype*)ecs.archetypes.data);
 
 	assert_non_null(arch);
-	assert_int_equal(arch_id, 0);
-	assert_int_equal(ecs.archetypes.size, 1);
-	assert_ptr_equal(arch, array_get(&ecs.archetypes, 0));
+	assert_int_equal(arch_id, ecs.archetypes.size-1);
+	assert_int_equal(ecs.archetypes.size, 2);
+	assert_ptr_equal(arch, array_get(&ecs.archetypes, 1));
 	
 	assert_memory_equal(arch->mask, arch_mask, sizeof(LinceECSMask));
 	assert_int_equal(arch->comp_stores.size,  2);
@@ -181,8 +204,8 @@ void test_ecs(void** state) {
 	assert_int_equal(record0->flags & LinceECSFlags_Active, 1);
 	assert_int_equal(record0->row, 0);
 	assert_memory_equal(record0->mask, (LinceECSMask) { 0 }, sizeof(LinceECSMask));
-	assert_int_equal(record0->arch_id, (uint32_t)(-1));
-
+	assert_int_equal(record0->arch_id, 0); // Default empty archetype
+	
 	// Delete the entity
 	LinceECSDeleteEntity(&ecs, entity0);
 
@@ -218,8 +241,6 @@ void test_ecs(void** state) {
 
 	/* Add components */
 	r = LinceECSAddComponents(&ecs, entity0, 1, (uint32_t[]){comp_ids[0]});
-
-	ecs_debug_print(&ecs);
 
 	assert_non_null(r);
 	assert_int_equal(LinceECSCheckMaskBit(record0->mask, 0), 1);
@@ -275,21 +296,24 @@ void test_ecs(void** state) {
 	
 	assert_memory_equal(comp0_ptr, &comp0, comp_sizes[0]);
 
+	// Add another component and check it migrated archetypes
+	struct Comp1 comp1 = { .x = 5.0, .y = -3.0 };
+	comp0_ptr = LinceECSEmplaceComponent(&ecs, entity0, comp_ids[1], &comp1);
+	
+	assert_non_null(comp0_ptr);
+
 	ecs_debug_print(&ecs);
 
-
-	// Add another component and check it migrated archetypes
-	// struct Comp1 comp1 = { .x = 5.0, .y = -3.0 };
-	// comp0_ptr = LinceECSEmplaceComponent(&ecs, entity0, comp_ids[1], &comp1);
-	// assert_non_null(comp0_ptr);
-
-
+	
 	// LinceECSAddComponents(&ecs, entity1, 2, (uint32_t[]){comp_ids[0]});
 
 	// Ensure archetype we created before is reused
 
-
 	/* Remove components */
+
+	/* Query entities */
+
+	/* Systems */
 
 	LinceECSUninit(&ecs);
 }

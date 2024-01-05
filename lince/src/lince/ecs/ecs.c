@@ -86,6 +86,65 @@ LINCE_STATIC LinceECSArchetype* LinceECSGetOrCreateArchetype(LinceECS* ecs, Linc
 	return arch;
 }
 
+/* Adds an entity to an archetype and returns its slot. Does not modify the entity record. */
+LINCE_STATIC uint32_t LinceECSAddToArchetype(LinceECS* ecs, LinceEntity entity_id, LinceECSArchetype* arch) {
+	
+	LinceECSRecord* record = array_get(&ecs->entity_records, (uint32_t)entity_id);
+	uint32_t row;
+
+	// Find slot in target archetype
+	if (arch->unused_slots.size > 0) {
+
+		row = *(uint32_t*)array_back(&arch->unused_slots);
+		array_set(&arch->entity_ids, &entity_id, row);
+		array_pop_back(&arch->unused_slots);
+
+	} else {
+
+		array_push_back(&arch->entity_ids, &entity_id);
+		row = arch->entity_ids.size - 1;
+
+		// Create new space in component stores
+		for (uint32_t i = 0; i != arch->comp_stores.size; ++i) {
+			LinceECSComponentStore* store = array_get(&arch->comp_stores, i);
+			array_push_back(&store->data, NULL);
+		}
+	}
+
+	// Copy components to the new archetype
+	LinceECSArchetype* old_arch = array_get(&ecs->archetypes, record->arch_id);
+	uint32_t old_row = record->row;
+
+	for (uint32_t i = 0; i != old_arch->comp_stores.size; ++i) {
+		LinceECSComponentStore* old_store = array_get(&old_arch->comp_stores, i);
+		uint32_t comp_id = old_store->id;
+		uint32_t comp_size = old_store->element_size;
+
+		// Skip if component is not present in the new archetype
+		if (!LinceECSCheckMaskBit(arch->mask, comp_id)) {
+			continue;
+		}
+
+		LinceECSComponentStore* new_store = LinceECSGetComponentStoreWithArch(ecs, arch, comp_id);
+		void* p1 = array_get(&new_store->data, old_row);
+		void* p2 = array_get(&new_store->data, row);
+		memcpy(p2, p1, comp_size);
+	}
+
+	return row;
+}
+
+/* Removes an entity from an archetype */
+LINCE_STATIC void LinceECSRemoveFromArchetype(LinceECS* ecs, LinceEntity entity_id) {
+
+	LinceECSRecord* record = array_get(&ecs->entity_records, (uint32_t)entity_id);
+	LinceECSArchetype* arch = array_get(&ecs->archetypes, record->arch_id);
+
+	// Flag slot in old archetype as unused
+	array_push_back(&arch->unused_slots, &record->row);
+
+}
+
 
 LinceECS* LinceECSInit(LinceECS* ecs) {
 	LINCE_ASSERT(ecs, "Null pointer");
@@ -101,6 +160,10 @@ LinceECS* LinceECSInit(LinceECS* ecs) {
 	array_init(&ecs->component_index,   sizeof(hashmap_t));
 	array_init(&ecs->entity_pool,       sizeof(LinceEntity));
 	hashmap_init(&ecs->archetype_map,   HASHMAP_INIT_SIZE);
+
+	// Create the default archetype with no components
+	// Located at index 0, the default value when initialising an entity record
+	LinceECSGetOrCreateArchetype(ecs, (LinceECSMask) { 0 });
 	
 	LINCE_INFO("ECS initialised");
 
@@ -140,22 +203,25 @@ void LinceECSUninit(LinceECS* ecs) {
 // Create an entity
 LinceEntity LinceECSNewEntity(LinceECS* ecs) {
 	LinceEntity entity;
+	LinceECSRecord *record, emtpy_record = { .flags = LinceECSFlags_Active };
 
 	if (ecs->entity_pool.size > 0) {
+		// Draw entity from pool of inactive ones
 		entity = *(LinceEntity*)array_back(&ecs->entity_pool);
 		array_pop_back(&ecs->entity_pool);
-		LinceECSRecord* record = array_get(&ecs->entity_records, (uint32_t)entity);
-		memset(record, 0, sizeof(LinceECSRecord));
-		record->flags |= LinceECSFlags_Active;
-		record->arch_id = (uint32_t)(-1);
-		ecs->entity_count++;
-		LINCE_INFO("ECS: Created recycled entity with ID %lu", entity);
-		return entity;
+		record = array_get(&ecs->entity_records, (uint32_t)entity);
+		memcpy(record, &emtpy_record, sizeof(LinceECSRecord));
+	}
+	else {
+		entity = (LinceEntity)ecs->entity_records.size;
+		array_push_back(&ecs->entity_records, &emtpy_record);
+		record = array_back(&ecs->entity_records);
 	}
 
-	entity = (LinceEntity)ecs->entity_records.size;
-	LinceECSRecord new_record = { .flags = LinceECSFlags_Active, .arch_id = (uint32_t)(- 1)};
-	array_push_back(&ecs->entity_records, &new_record);
+	// Append to empty archetype
+	LinceECSArchetype* zero_arch = array_get(&ecs->archetypes, 0);
+	record->row = LinceECSAddToArchetype(ecs, entity, zero_arch);
+
 	ecs->entity_count++;
 	LINCE_INFO("ECS: Created new entity with ID %lu", entity);
 	return entity;
@@ -172,17 +238,12 @@ void LinceECSDeleteEntity(LinceECS* ecs, LinceEntity entity) {
 		return;
 	}
 
-	// Remove from archetype
-	if (record->arch_id != -1) {
-		// TODO
-	}
+	// Flag its archetype slot as available
+	LinceECSRemoveFromArchetype(ecs, entity);
 
 	// Reset record
-	record->flags = 0;
-	record->row = 0;
-	record->arch_id = (uint32_t)(-1);
-	memset(record->mask, 0, sizeof(LinceECSMask));
-
+	memset(record, 0, sizeof(LinceECSRecord));
+	
 	// Add to entity pool
 	array_push_back(&ecs->entity_pool, &entity);
 	ecs->entity_count--;
@@ -211,9 +272,9 @@ uint32_t LinceECSNewComponent(LinceECS* ecs, uint32_t component_size) {
 }
 
 
-void* LinceECSAddComponents(LinceECS* ecs, LinceEntity entity_id, uint32_t component_num, uint32_t* components_ids) {
+void* LinceECSAddComponents(LinceECS* ecs, LinceEntity entity_id, uint32_t component_num, uint32_t* component_ids) {
 	
-	if (!ecs || !components_ids || component_num == 0) return NULL;
+	if (!ecs || !component_ids || component_num == 0) return NULL;
 	
 	LinceECSRecord* record = array_get(&ecs->entity_records, (uint32_t)entity_id);
 	LINCE_ASSERT(record, "Entity %lu does not exist", entity_id);
@@ -224,8 +285,9 @@ void* LinceECSAddComponents(LinceECS* ecs, LinceEntity entity_id, uint32_t compo
 	LinceECSMask new_mask;
 	memcpy(new_mask, record->mask, sizeof(LinceECSMask));
 	for (uint32_t i = 0; i != component_num; ++i) {
-		uint32_t comp_id = components_ids[i];
+		uint32_t comp_id = component_ids[i];
 		if (comp_id >= ecs->component_count) return NULL;
+		if (LinceECSCheckMaskBit(record->mask, comp_id)) return NULL; // Component already present
 		LinceECSSetMaskBit(new_mask, comp_id);
 	}
 
@@ -239,50 +301,13 @@ void* LinceECSAddComponents(LinceECS* ecs, LinceEntity entity_id, uint32_t compo
 	if (!new_arch) return NULL;
 	uint64_t new_arch_id = (new_arch - (LinceECSArchetype*)ecs->archetypes.data);
 
-	uint32_t new_row;
+	// Move between archetypes
+	uint32_t new_row = LinceECSAddToArchetype(ecs, entity_id, new_arch);
+	LinceECSRemoveFromArchetype(ecs, entity_id);
 
-	if (new_arch->unused_slots.size > 0) {
-		new_row = *(uint32_t*)array_back(&new_arch->unused_slots);
-		array_set(&new_arch->entity_ids, &entity_id, new_row);
-		array_pop_back(&new_arch->unused_slots);
-	} else {
-		array_push_back(&new_arch->entity_ids, &entity_id);
-		new_row = new_arch->entity_ids.size - 1;
-		// Create new slots in component stores
-		for (uint32_t i = 0; i != new_arch->comp_stores.size; ++i) {
-			LinceECSComponentStore* store = array_get(&new_arch->comp_stores, i);
-			array_push_back(&store->data, NULL);
-		}
-	}
-	
-	if (record->arch_id == (uint32_t)(-1)) {
-		// No previous archetype
-		// Only update records with new archetype and mask
-		memcpy(record->mask, new_mask, sizeof(LinceECSMask));
-		record->arch_id = (uint32_t)new_arch_id;
-		record->row = new_row;
-		return ecs;
-	}
-
-	// Copy components from old to new archetype
-	LinceECSArchetype* old_arch = array_get(&ecs->archetypes, record->arch_id);
-	for (uint32_t i = 0; i != old_arch->comp_stores.size; ++i) {
-		LinceECSComponentStore* old_store = array_get(&old_arch->comp_stores, i);
-		uint32_t comp_id = old_store->id;
-		uint32_t comp_size = old_store->element_size;
-
-		LinceECSComponentStore* new_store = LinceECSGetComponentStoreWithArch(ecs, new_arch, comp_id);
-		void* p1 = array_get(&new_store->data, record->row);
-		void* p2 = array_get(&new_store->data, new_row);
-		memcpy(p2, p1, comp_size);
-	}
-
-	// Flag slot in old archetype as unused
-	array_push_back(&old_arch->unused_slots, &record->row);
-
-	// Update records with archetype and mask
+	// Update records
 	memcpy(record->mask, new_mask, sizeof(LinceECSMask));
-	record->arch_id = (uint32_t)((char*)new_arch - (char*)ecs->archetypes.data) / ecs->archetypes.element_size;
+	record->arch_id = (uint32_t)new_arch_id;
 	record->row = new_row;
 	return ecs;
 }
@@ -338,8 +363,46 @@ void* LinceECSEmplaceComponent(LinceECS* ecs, LinceEntity entity_id, uint32_t co
 }
 
 
-// Removes a component from an entity
-void* LinceECSRemoveComponent(LinceECS* ecs, LinceEntity entity_id, uint32_t component_id);
+void* LinceECSRemoveComponents(LinceECS* ecs, LinceEntity entity_id, uint32_t component_num, uint32_t* component_ids) {
+	
+	if (!ecs || !component_ids || component_num == 0) return NULL;
+
+	LinceECSRecord* record = array_get(&ecs->entity_records, (uint32_t)entity_id);
+	LINCE_ASSERT(record, "Entity %lu does not exist", entity_id);
+	LINCE_ASSERT(record->flags & LinceECSFlags_Active, "Entity %lu is not active", entity_id);
+	if (!record || !(record->flags & LinceECSFlags_Active)) return NULL;
+
+	// Create new mask
+	LinceECSMask new_mask;
+	memcpy(new_mask, record->mask, sizeof(LinceECSMask));
+	for (uint32_t i = 0; i != component_num; ++i) {
+		uint32_t comp_id = component_ids[i];
+		if (comp_id >= ecs->component_count) return NULL;
+		if (!LinceECSCheckMaskBit(record->mask, comp_id)) return NULL; // Component already not present
+		LinceECSUnsetMaskBit(new_mask, comp_id);
+	}
+
+	if (memcmp(record->mask, new_mask, sizeof(LinceECSMask)) == 0) {
+		// Masks are identical, no components removed!
+		return NULL;
+	}
+
+	// Fetch or create its new archetype
+	LinceECSArchetype* new_arch = LinceECSGetOrCreateArchetype(ecs, new_mask);
+	if (!new_arch) return NULL;
+	uint64_t new_arch_id = (new_arch - (LinceECSArchetype*)ecs->archetypes.data);
+
+	// Move between archetypes
+	uint32_t new_row = LinceECSAddToArchetype(ecs, entity_id, new_arch);
+	LinceECSRemoveFromArchetype(ecs, entity_id);
+
+	// Update records
+	memcpy(record->mask, new_mask, sizeof(LinceECSMask));
+	record->arch_id = (uint32_t)new_arch_id;
+	record->row = new_row;
+	return ecs;
+
+}
 
 // True if an entity has the given component
 LinceBool LinceECSHasComponent(LinceECS* ecs, LinceEntity entity_id, uint32_t component_id) {

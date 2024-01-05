@@ -90,14 +90,14 @@ typedef struct LinceECSArchetype {
 	array_t        entity_ids;   ///< array<LinceEntity>, entities with this archetype
 	array_t		   unused_slots; ///< array<uint32_t> Empty slots in component data, to be reused. Correspond to indices in entity_ids and comp_stores
 	LinceECSMask   mask;		 ///< bitmask signature of the archetype
-	LinceECSSystem on_update;    ///< ECs system, to be called 
+	LinceECSSystem on_update;    ///< ECS system, to be called 
 } LinceECSArchetype;
 
 typedef struct LinceECSRecord {
 	LinceECSMask       mask;	///< Component mask of the entity
 	LinceECSFlags      flags;	///< State flags
 	uint32_t		   row;     ///< Index inside component stores where entity data is located
-	uint32_t		   arch_id; ///< Index of its archetype. Set to -1 if it has none.
+	uint32_t		   arch_id; ///< Index of its archetype.
 } LinceECSRecord;
 
 typedef struct LinceECS {
@@ -156,8 +156,8 @@ void* LinceECSSetComponent(LinceECS* ecs, LinceEntity entity_id, uint32_t compon
 */
 void* LinceECSEmplaceComponent(LinceECS* ecs, LinceEntity entity_id, uint32_t component_id, void* data);
 
-/** @brief Remove a component from an entity */
-void* LinceECSRemoveComponent(LinceECS* ecs, LinceEntity entity_id, uint32_t component_id);
+/** @brief Remove components from an entity */
+void* LinceECSRemoveComponents(LinceECS* ecs, LinceEntity entity_id, uint32_t component_num, uint32_t* component_ids);
 
 /** @brief Returns true if an entity has a given component */
 LinceBool LinceECSHasComponent(LinceECS* ecs, LinceEntity entity_id, uint32_t component_id);
