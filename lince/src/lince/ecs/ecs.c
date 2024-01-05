@@ -49,7 +49,8 @@ LINCE_STATIC LinceECSArchetype* LinceECSGetOrCreateArchetype(LinceECS* ecs, Linc
 	uint64_t arch_id;
 	LinceECSArchetype* arch;
 
-	if (hashmap_has_keyb(&ecs->archetype_map, mask, sizeof(LinceECSMask))) {
+	LinceBool has_key = hashmap_has_keyb(&ecs->archetype_map, mask, sizeof(LinceECSMask));
+	if (has_key) {
 		arch_id = (uint64_t)hashmap_getb(&ecs->archetype_map, mask, sizeof(LinceECSMask));
 		arch = array_get(&ecs->archetypes, (uint32_t)arch_id);
 		return arch;
@@ -81,8 +82,9 @@ LINCE_STATIC LinceECSArchetype* LinceECSGetOrCreateArchetype(LinceECS* ecs, Linc
 	
 	// Update archetype_map
 	arch_id = (uint64_t)(ecs->archetypes.size - 1);
-	hashmap_setb(&ecs->archetype_map, mask, sizeof(LinceECSMask), (void*)arch_id);
-	
+	void* r = hashmap_setb(&ecs->archetype_map, mask, sizeof(LinceECSMask), (void*)arch_id);
+	if (!r) return NULL;
+
 	return arch;
 }
 
@@ -163,8 +165,9 @@ LinceECS* LinceECSInit(LinceECS* ecs) {
 
 	// Create the default archetype with no components
 	// Located at index 0, the default value when initialising an entity record
-	LinceECSGetOrCreateArchetype(ecs, (LinceECSMask) { 0 });
-	
+	void* zero_arch = LinceECSGetOrCreateArchetype(ecs, (LinceECSMask) { 0 });
+	if (!zero_arch) return NULL;
+
 	LINCE_INFO("ECS initialised");
 
 	return ecs;

@@ -54,9 +54,11 @@ static void ecs_debug_print(LinceECS* ecs) {
 		}
 		printf("\n");
 
-		printf("	Unused rows: ");
+		printf("	Unused slots: ");
 		for (uint32_t j = 0; j != arch->unused_slots.size; ++j) {
-			printf("%u ", *(uint32_t*)array_get(&arch->unused_slots, j));
+			uint32_t slot = *(uint32_t*)array_get(&arch->unused_slots, j);
+			LinceEntity slot_value = *(LinceEntity*)array_get(&arch->entity_ids, slot);
+			printf("[%u]=%lu ", slot, (unsigned long)slot_value);
 		}
 		if (arch->unused_slots.size == 0) {
 			printf("<Empty>");
@@ -298,19 +300,32 @@ void test_ecs(void** state) {
 
 	// Add another component and check it migrated archetypes
 	struct Comp1 comp1 = { .x = 5.0, .y = -3.0 };
+	uint32_t prev_arch_id = record0->arch_id;
 	comp0_ptr = LinceECSEmplaceComponent(&ecs, entity0, comp_ids[1], &comp1);
 	
 	assert_non_null(comp0_ptr);
-
-	ecs_debug_print(&ecs);
-
-	
-	// LinceECSAddComponents(&ecs, entity1, 2, (uint32_t[]){comp_ids[0]});
-
-	// Ensure archetype we created before is reused
+	assert_int_not_equal(record0->arch_id, prev_arch_id);
+	assert_memory_not_equal(
+		array_get(&ecs.archetypes, record0->arch_id),
+		array_get(&ecs.archetypes, prev_arch_id),
+		sizeof(LinceECSArchetype)
+	);
 
 	/* Remove components */
 
+	// Remove one component
+	r = LinceECSRemoveComponents(&ecs, entity0, 1, (uint32_t[]){ comp_ids[1] });
+
+	assert_non_null(r);
+	assert_int_equal(record0->arch_id, prev_arch_id);
+
+	// Remove all components
+	r = LinceECSRemoveComponents(&ecs, entity0, 1, (uint32_t[]) { comp_ids[0] });
+
+	assert_non_null(r);
+	assert_int_equal(record0->arch_id, 0);
+	// ecs_debug_print(&ecs);
+	
 	/* Query entities */
 
 	/* Systems */
