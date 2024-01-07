@@ -427,11 +427,11 @@ LinceBool LinceECSHasComponent(LinceECS* ecs, LinceEntity entity_id, uint32_t co
 // Returns an array of the entities that have the requested components
 array_t* LinceECSQuery(LinceECS* ecs, LinceECSMask mask, array_t* result) {
 
-
 	for (uint32_t arch_id = 0; arch_id != ecs->archetypes.size; ++arch_id) {
 		LinceECSArchetype* arch = array_get(&ecs->archetypes, arch_id);
 
 		// Compare masks
+		// Works with the zero-component archetype
 		LinceBool match = LinceTrue;
 		for (uint32_t comp_id = 0; comp_id != ecs->component_count; ++comp_id) {
 			if (!LinceECSCheckMaskBit(mask, comp_id)) continue;
@@ -443,28 +443,16 @@ array_t* LinceECSQuery(LinceECS* ecs, LinceECSMask mask, array_t* result) {
 		if (!match) continue;
 		if (arch->entity_ids.size == 0) continue;
 
+		// Collect entities from matching archetype
 		for(uint32_t i = 0; i != arch->entity_ids.size; ++i){
-			// ignore unused
-			// Change arch->unused_slots to int unused_count and array<bool> is_unused.
+			LinceBool used = *(LinceBool*)array_get(&arch->unused_index, i);
+			if (!used) continue;
+			LinceEntity* entity_id = array_get(&arch->entity_ids, i);
+			array_push_back(result, entity_id);
 		}
 
 	}
-	// Iterate through archetypes
-
-	// Find those that have all of the requested components
-
-	// Use cache, or regenerate cache if required
-
-	// - Collect IDs
-	// Use component_index to get arcetypes with the first component
-	// Run through archetypes, matching those with one of the requested component
-	// Collect the IDs of the matching archetypes
-
-	// What about the zero-component archetype?
-
-
-
-
+	return result;
 }
 
 
