@@ -178,10 +178,9 @@ hashmap_t* hashmap_resize(hashmap_t* map);
 * Example:
 * ```c
 * char* key = NULL;
-* uint32_t len = 0, next_len = 0;
+* uint32_t len = 0;
 * do{
-*	key = hashmap_iter_keysb(map, key, len, &next_len);
-*	len = next_len;
+*	key = hashmap_iterb(map, key, len, &len);
 * } while(key);
 * ```
 * @param key Previous key, which can be any set of bytes. To start iterating, input NULL.
