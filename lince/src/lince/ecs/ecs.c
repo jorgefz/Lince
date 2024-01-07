@@ -63,7 +63,8 @@ LINCE_STATIC LinceECSArchetype* LinceECSGetOrCreateArchetype(LinceECS* ecs, Linc
 	array_init(&arch->entity_ids, sizeof(LinceEntity));
 	array_init(&arch->comp_stores, sizeof(LinceECSComponentStore));
 	array_init(&arch->unused_slots, sizeof(uint32_t));
-	
+	array_init(&arch->unused_index, sizeof(uint32_t));
+
 	for (uint32_t comp_id = 0, column = 0; comp_id != ecs->component_count; ++comp_id) {
 		if (!LinceECSCheckMaskBit(mask, comp_id)) continue;
 
@@ -88,22 +89,26 @@ LINCE_STATIC LinceECSArchetype* LinceECSGetOrCreateArchetype(LinceECS* ecs, Linc
 	return arch;
 }
 
+
 /* Adds an entity to an archetype and returns its slot. Does not modify the entity record. */
 LINCE_STATIC uint32_t LinceECSAddToArchetype(LinceECS* ecs, LinceEntity entity_id, LinceECSArchetype* arch) {
 	
 	LinceECSRecord* record = array_get(&ecs->entity_records, (uint32_t)entity_id);
 	uint32_t row;
+	static uint32_t USED = LinceTrue;
 
 	// Find slot in target archetype
 	if (arch->unused_slots.size > 0) {
-
+		
 		row = *(uint32_t*)array_back(&arch->unused_slots);
 		array_set(&arch->entity_ids, &entity_id, row);
+		array_set(&arch->unused_index, &USED, row);
 		array_pop_back(&arch->unused_slots);
 
 	} else {
 
 		array_push_back(&arch->entity_ids, &entity_id);
+		array_push_back(&arch->unused_index, &USED);
 		row = arch->entity_ids.size - 1;
 
 		// Create new space in component stores
@@ -143,8 +148,9 @@ LINCE_STATIC void LinceECSRemoveFromArchetype(LinceECS* ecs, LinceEntity entity_
 	LinceECSArchetype* arch = array_get(&ecs->archetypes, record->arch_id);
 
 	// Flag slot in old archetype as unused
+	static uint32_t UNUSED = LinceFalse;
 	array_push_back(&arch->unused_slots, &record->row);
-
+	array_set(&arch->unused_index, &UNUSED, record->row);
 }
 
 
@@ -179,9 +185,11 @@ void LinceECSUninit(LinceECS* ecs) {
 	for (uint32_t i = 0; i != ecs->archetypes.size; ++i) {
 		LinceECSArchetype* arch = array_get(&ecs->archetypes, i);
 		array_uninit(&arch->entity_ids);
+		array_uninit(&arch->unused_slots);
+		array_uninit(&arch->unused_index);
 		for (uint32_t j = 0; j != arch->comp_stores.size; ++j) {
-			LinceECSComponentStore* comp_store = array_get(&arch->comp_stores, j);
-			array_uninit(&comp_store->data);
+			LinceECSComponentStore* store = array_get(&arch->comp_stores, j);
+			array_uninit(&store->data);
 		}
 		array_uninit(&arch->comp_stores);
 	}
@@ -417,4 +425,63 @@ LinceBool LinceECSHasComponent(LinceECS* ecs, LinceEntity entity_id, uint32_t co
 }
 
 // Returns an array of the entities that have the requested components
-array_t* LinceECSQuery(LinceECS* ecs, uint32_t comp_num, uint32_t* comp_ids);
+array_t* LinceECSQuery(LinceECS* ecs, LinceECSMask mask, array_t* result) {
+
+
+	for (uint32_t arch_id = 0; arch_id != ecs->archetypes.size; ++arch_id) {
+		LinceECSArchetype* arch = array_get(&ecs->archetypes, arch_id);
+
+		// Compare masks
+		LinceBool match = LinceTrue;
+		for (uint32_t comp_id = 0; comp_id != ecs->component_count; ++comp_id) {
+			if (!LinceECSCheckMaskBit(mask, comp_id)) continue;
+			if (!LinceECSCheckMaskBit(arch->mask, comp_id)) {
+				match = LinceFalse;
+				break;
+			}
+		}
+		if (!match) continue;
+		if (arch->entity_ids.size == 0) continue;
+
+		for(uint32_t i = 0; i != arch->entity_ids.size; ++i){
+			// ignore unused
+			// Change arch->unused_slots to int unused_count and array<bool> is_unused.
+		}
+
+	}
+	// Iterate through archetypes
+
+	// Find those that have all of the requested components
+
+	// Use cache, or regenerate cache if required
+
+	// - Collect IDs
+	// Use component_index to get arcetypes with the first component
+	// Run through archetypes, matching those with one of the requested component
+	// Collect the IDs of the matching archetypes
+
+	// What about the zero-component archetype?
+
+
+
+
+}
+
+
+void LinceECSUpdate(LinceECS* ecs, float dt) {
+
+	array_t query;
+	array_init(&query, sizeof(LinceEntity));
+
+	for (uint32_t i = 0; i != ecs->archetypes.size; ++i) {
+		LinceECSArchetype* arch = array_get(&ecs->archetypes, i);
+		if (!arch->on_update) continue;
+
+		LinceECSQuery(ecs, arch->mask, &query);
+		arch->on_update(ecs, &query);
+		array_clear(&query);
+	}
+
+	array_uninit(&query);
+
+}

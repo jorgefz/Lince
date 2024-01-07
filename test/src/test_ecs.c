@@ -54,13 +54,13 @@ static void ecs_debug_print(LinceECS* ecs) {
 		}
 		printf("\n");
 
-		printf("	Unused slots: ");
-		for (uint32_t j = 0; j != arch->unused_slots.size; ++j) {
-			uint32_t slot = *(uint32_t*)array_get(&arch->unused_slots, j);
+		printf("	Unused indices: ");
+		for (uint32_t j = 0; j != arch->unused_index.size; ++j) {
+			uint32_t slot = *(uint32_t*)array_get(&arch->unused_index, j);
 			LinceEntity slot_value = *(LinceEntity*)array_get(&arch->entity_ids, slot);
 			printf("[%u]=%lu ", slot, (unsigned long)slot_value);
 		}
-		if (arch->unused_slots.size == 0) {
+		if (arch->unused_index.size == 0) {
 			printf("<Empty>");
 		}
 		printf("\n");
@@ -164,7 +164,7 @@ void test_ecs(void** state) {
 	assert_memory_equal(arch->mask, arch_mask, sizeof(LinceECSMask));
 	assert_int_equal(arch->comp_stores.size,  2);
 	assert_int_equal(arch->entity_ids.size,   0);
-	assert_int_equal(arch->unused_slots.size, 0);
+	assert_int_equal(arch->unused_index.size, 0);
 	
 	// Component stores
 	uint32_t col_comp0 = 0, col_comp2 = 1;

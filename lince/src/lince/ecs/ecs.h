@@ -88,7 +88,8 @@ typedef struct LinceECSComponentStore {
 typedef struct LinceECSArchetype {
 	array_t        comp_stores;  ///< array<LinceECSComponentStore>
 	array_t        entity_ids;   ///< array<LinceEntity>, entities with this archetype
-	array_t		   unused_slots; ///< array<uint32_t> Empty slots in component data, to be reused. Correspond to indices in entity_ids and comp_stores
+	array_t		   unused_index; ///< array<uint32_t> Indices of empty slots in component data.
+	array_t		   unused_slots; ///< array<LinceBool> Bools for whether slots are being used or not
 	LinceECSMask   mask;		 ///< bitmask signature of the archetype
 	LinceECSSystem on_update;    ///< ECS system, to be called 
 } LinceECSArchetype;
@@ -163,13 +164,13 @@ void* LinceECSRemoveComponents(LinceECS* ecs, LinceEntity entity_id, uint32_t co
 LinceBool LinceECSHasComponent(LinceECS* ecs, LinceEntity entity_id, uint32_t component_id);
 
 // WIP: Returns an array of the entities that have the requested components
-array_t* LinceECSQuery(LinceECS* ecs, uint32_t comp_num, uint32_t* comp_ids);
+array_t* LinceECSQuery(LinceECS* ecs, LinceECSMask mask, array_t* result);
 
 // void LinceECSSetSystemCallback(LinceECS* ecs, const char* callback_tag, LinceECSSystem* callback, uint32_t comp_num, uint32_t* comp_ids);
 
 // #define LinceECSSetSystem(ecs, callback, comp_num, comp_ids) LinceECSSetSystemCallback(ecs, #callback, callback, comp_num, comp_ids)
 
-/* Move the world by one time step, runs the system callbacks */
+/** @brief Move the world by one time step, calls the system callbacks */
 void LinceECSUpdate(LinceECS* ecs, float dt);
 
 
