@@ -47,20 +47,11 @@ static void ecs_debug_print(LinceECS* ecs) {
 
 		printf("	Entity IDs: ");
 		for (uint32_t j = 0; j != arch->entity_ids.size; ++j) {
-			printf("%u ", *(uint32_t*)array_get(&arch->entity_ids, j));
+			LinceBool used = *(LinceBool*)array_get(&arch->unused_index, j);
+			if (used) printf("%u ", *(uint32_t*)array_get(&arch->entity_ids, j));
+			else      printf("- ");
 		}
 		if (arch->entity_ids.size == 0) {
-			printf("<Empty>");
-		}
-		printf("\n");
-
-		printf("	Unused indices: ");
-		for (uint32_t j = 0; j != arch->unused_index.size; ++j) {
-			uint32_t slot = *(uint32_t*)array_get(&arch->unused_index, j);
-			LinceEntity slot_value = *(LinceEntity*)array_get(&arch->entity_ids, slot);
-			printf("[%u]=%lu ", slot, (unsigned long)slot_value);
-		}
-		if (arch->unused_index.size == 0) {
 			printf("<Empty>");
 		}
 		printf("\n");
@@ -71,6 +62,7 @@ static void ecs_debug_print(LinceECS* ecs) {
 
 
 void test_ecs_mask(void** state) {
+	(void)state;
 
 	assert_int_equal(LINCE_ECS_COMPONENT_SLOTS, 1);
 	assert_int_equal(sizeof(LinceECSMask), sizeof(uint64_t));
@@ -98,6 +90,7 @@ void test_ecs_mask(void** state) {
 
 
 void test_ecs(void** state) {
+	(void)state;
 
 	/* --- Initialisation --- */
 	LinceECS ecs;
@@ -324,11 +317,72 @@ void test_ecs(void** state) {
 
 	assert_non_null(r);
 	assert_int_equal(record0->arch_id, 0);
-	// ecs_debug_print(&ecs);
 	
 	/* Query entities */
 
+	// Test zero-component archetype
+	// No entities should have components
+	LinceECSMask query_mask = { 0 };
+	array_t query;
+	array_init(&query, sizeof(LinceEntity));
+
+	r = LinceECSQuery(&ecs, query_mask, &query);
+
+	assert_non_null(r);
+	assert_ptr_equal(&query, r);
+	assert_int_equal(query.size, 3);
+	assert_memory_equal(query.data, ((LinceEntity[]){ 0,1,2 }), query.size*query.element_size );
+
+	array_clear(&query);
+
+	// Add some components to make it interesting
+	LinceECSAddComponents(&ecs, entity0, 3, comp_ids);          // Entity 0: 0 1 2
+	LinceECSAddComponents(&ecs, entity1, 2, (uint32_t[]){0,2}); // Entity 1: 0   2
+	LinceECSAddComponents(&ecs, entity2, 1, (uint32_t[]){0,1}); // Entity 2: 0 1   
+
+	// Find entities with components 0, 1, and 2 (only entity 0)
+	LinceECSSetMaskBit(query_mask, 0);
+	LinceECSSetMaskBit(query_mask, 1);
+	LinceECSSetMaskBit(query_mask, 2);
+	r = LinceECSQuery(&ecs, query_mask, &query);
+
+	assert_non_null(r);
+	assert_ptr_equal(&query, r);
+	assert_int_equal(query.size, 1);
+	assert_memory_equal(query.data, &entity0, query.size * query.element_size);
+
+	// Find entities with component 0 (all entities, despite having different archetypes)
+	array_clear(&query);
+	LinceECSUnsetMaskBit(query_mask, 1);
+	LinceECSUnsetMaskBit(query_mask, 2);
+	r = LinceECSQuery(&ecs, query_mask, &query);
+
+	assert_non_null(r);
+	assert_ptr_equal(&query, r);
+	assert_int_equal(query.size, 3);
+	assert_memory_equal(query.data, ((LinceEntity[]){1,2,0}), query.size * query.element_size);
+
+	// Find entities with component 4 (no entities)
+	array_clear(&query);
+	uint32_t new_comp_id = LinceECSNewComponent(&ecs, sizeof(int));
+
+	LinceECSUnsetMaskBit(query_mask, 0);
+	LinceECSSetMaskBit(query_mask, new_comp_id);
+	r = LinceECSQuery(&ecs, query_mask, &query);
+
+	assert_non_null(r);
+	assert_ptr_equal(&query, r);
+	assert_int_equal(query.size, 0);
+
+	array_uninit(&query);
+
+
 	/* Systems */
+
+
+	// ecs_debug_print(&ecs);
+
+
 
 	LinceECSUninit(&ecs);
 }

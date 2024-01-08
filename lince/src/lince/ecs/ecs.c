@@ -466,6 +466,10 @@ void LinceECSUpdate(LinceECS* ecs, float dt) {
 		if (!arch->on_update) continue;
 
 		LinceECSQuery(ecs, arch->mask, &query);
+
+		// Give the on_update function all entities that match the query?
+		// Or iterate through entities, and call it with each entity ID?
+
 		arch->on_update(ecs, &query);
 		array_clear(&query);
 	}
