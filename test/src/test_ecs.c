@@ -320,19 +320,15 @@ void test_ecs(void** state) {
 	
 	/* Query entities */
 
-	// Test zero-component archetype
-	// No entities should have components
 	LinceECSMask query_mask = { 0 };
 	array_t query;
 	array_init(&query, sizeof(LinceEntity));
 
+	// Test zero-component archetype
+	// No entities should have components
 	r = LinceECSQuery(&ecs, query_mask, &query);
-
-	assert_non_null(r);
-	assert_ptr_equal(&query, r);
-	assert_int_equal(query.size, 3);
-	assert_memory_equal(query.data, ((LinceEntity[]){ 0,1,2 }), query.size*query.element_size );
-
+	assert_null(r);
+	
 	array_clear(&query);
 
 	// Add some components to make it interesting

@@ -429,22 +429,23 @@ LinceBool LinceECSHasComponent(LinceECS* ecs, LinceEntity entity_id, uint32_t co
 // Returns an array of the entities that have the requested components
 array_t* LinceECSQuery(LinceECS* ecs, LinceECSMask mask, array_t* result) {
 
+	if (memcmp(mask, (LinceECSMask) { 0 }, sizeof(LinceECSMask)) == 0) {
+		return NULL; // Empty mask
+	}
+
 	for (uint32_t arch_id = 0; arch_id != ecs->archetypes.size; ++arch_id) {
 		LinceECSArchetype* arch = array_get(&ecs->archetypes, arch_id);
 
 		// Compare masks
-		// Does not work with the zero-component archetype
+		// NOTE: Does not work with the zero-component archetype
 		LinceBool match = LinceTrue;
-		uint32_t sum = 0;
 		for (uint32_t comp_id = 0; comp_id != ecs->component_count; ++comp_id) {
-			sum += 1;
 			if (!LinceECSCheckMaskBit(mask, comp_id)) continue;
 			if (!LinceECSCheckMaskBit(arch->mask, comp_id)) {
 				match = LinceFalse;
 				break;
 			}
 		}
-		if (sum == 0) return NULL; // Empty mask
 		if (!match) continue;
 		if (arch->entity_ids.size == 0) continue;
 
