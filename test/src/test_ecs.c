@@ -376,13 +376,87 @@ void test_ecs(void** state) {
 
 	array_uninit(&query);
 
+	LinceECSUninit(&ecs);
+}
 
-	/* Systems */
 
+
+
+void System100(LinceECS* ecs, float dt, array_t* entities) {
+	assert_non_null(ecs);
+	assert_float_equal(dt, 1.0, 1e-6);
+	assert_int_equal(entities->size, 3);
+	assert_memory_equal(entities->data, ((LinceEntity[]){0, 1, 2}), entities->size*entities->element_size);
+}
+
+void System101(LinceECS* ecs, float dt, array_t* entities) {
+	assert_non_null(ecs);
+	assert_float_equal(dt, 1.0, 1e-6);
+	assert_int_equal(entities->size, 2);
+	assert_memory_equal(entities->data, ((LinceEntity[]){0,1}), entities->size*entities->element_size);
+}
+
+void System111(LinceECS* ecs, float dt, array_t* entities) {
+	assert_non_null(ecs);
+	assert_float_equal(dt, 1.0, 1e-6);
+	assert_int_equal(entities->size, 1);
+	assert_memory_equal(entities->data, ((LinceEntity[]){0}), entities->size*entities->element_size);
+}
+
+void System0001(LinceECS* ecs, float dt, array_t* entities) {
+	assert_non_null(ecs);
+	assert_float_equal(dt, 1.0, 1e-6);
+	assert_int_equal(entities->size, 0);
+}
+
+
+
+
+void test_ecs_system(void** state) {
+	(void)state;
+
+	// Prepare state
+	void* r;
+	LinceECS ecs;
+	LinceECSInit(&ecs);
+
+	LinceEntity entity_ids[3];
+	uint32_t comp_ids[4];
+	uint32_t comp_sizes[4] = { 8, 16, 32, 64 };
+
+	for (uint32_t i = 0; i != 4; ++i) {
+		comp_ids[i] = LinceECSNewComponent(&ecs, comp_sizes[i]);
+	}
+
+
+	for (uint32_t i = 0; i != 3; ++i) {
+		entity_ids[i] = LinceECSNewEntity(&ecs);
+	}
+
+	LinceECSAddComponents(&ecs, entity_ids[0], 3, comp_ids);
+	LinceECSAddComponents(&ecs, entity_ids[1], 2, (uint32_t[]){0,2});
+	LinceECSAddComponents(&ecs, entity_ids[2], 2, (uint32_t[]){0,1});
+
+	// Test functions
+	r = LinceECSAddSystem(&ecs, NULL, 0, NULL);
+	assert_null(r);
+
+	r = LinceECSAddSystem(&ecs, System100, 1, &comp_ids[0]);
+	assert_non_null(r);
+
+	r = LinceECSAddSystem(&ecs, System101, 2, (uint32_t[]) { comp_ids[0], comp_ids[2] });
+	assert_non_null(r);
+
+	r = LinceECSAddSystem(&ecs, System111, 3, comp_ids);
+	assert_non_null(r);
+
+	r = LinceECSAddSystem(&ecs, System0001, 1, &comp_ids[3]);
+	assert_non_null(r);
+
+	LinceECSUpdate(&ecs, 1.0);
 
 	// ecs_debug_print(&ecs);
 
-
-
 	LinceECSUninit(&ecs);
 }
+

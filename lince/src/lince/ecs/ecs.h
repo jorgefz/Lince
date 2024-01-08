@@ -71,7 +71,7 @@ typedef struct LinceECSMask {
 struct LinceECS; /* Forward declaration */
 
 /* Function type for system callbacks */
-typedef void (*LinceECSSystem)(struct LinceECS* ecs, array_t* entity_ids);
+typedef void (*LinceECSSystem)(struct LinceECS* ecs, float dt, array_t* entities);
 
 /* Flags indicating the state of an entity */
 // TODO: store flags in the top 32 bits of the entity ID
@@ -88,8 +88,8 @@ typedef struct LinceECSComponentStore {
 typedef struct LinceECSArchetype {
 	array_t        comp_stores;  ///< array<LinceECSComponentStore>
 	array_t        entity_ids;   ///< array<LinceEntity>, entities with this archetype
-	array_t		   unused_index; ///< array<uint32_t> Indices of empty slots in component data.
-	array_t		   unused_slots; ///< array<LinceBool> Bools for whether slots are being used or not
+	array_t		   unused_index; ///< array<LinceBool> Bools for whether slots are used (1) or unused (0).
+	array_t		   unused_slots; ///< array<uint32_t> Indices of empty slots in component data.
 	LinceECSMask   mask;		 ///< bitmask signature of the archetype
 	LinceECSSystem on_update;    ///< ECS system, to be called 
 } LinceECSArchetype;
@@ -112,9 +112,11 @@ typedef struct LinceECS {
 	hashmap_t archetype_map;   ///< map<Mask, uint32_t> Links a type mask to the index of the archetype for that type
 	array_t   entity_pool;     ///< array<LinceEntity> unused entities
 
+	// Generic
 	void*     user_data;
 	uint32_t  component_count; ///< Number of components
 	uint32_t  entity_count;    ///< Number of active entities
+	array_t   query_result;    ///< Caches the array for ECSQuery so that it is only initialised once
 
 } LinceECS;
 
@@ -163,14 +165,13 @@ void* LinceECSRemoveComponents(LinceECS* ecs, LinceEntity entity_id, uint32_t co
 /** @brief Returns true if an entity has a given component */
 LinceBool LinceECSHasComponent(LinceECS* ecs, LinceEntity entity_id, uint32_t component_id);
 
-// WIP: Returns an array of the entities that have the requested components
+/** @brief Returns an array of the entities that have the requested components */
 array_t* LinceECSQuery(LinceECS* ecs, LinceECSMask mask, array_t* result);
 
-// void LinceECSSetSystemCallback(LinceECS* ecs, const char* callback_tag, LinceECSSystem* callback, uint32_t comp_num, uint32_t* comp_ids);
+/** @brief Register a callback that is run on entities that have a given set of components */
+void* LinceECSAddSystem(LinceECS* ecs, LinceECSSystem callback, uint32_t comp_num, uint32_t* comp_ids);
 
-// #define LinceECSSetSystem(ecs, callback, comp_num, comp_ids) LinceECSSetSystemCallback(ecs, #callback, callback, comp_num, comp_ids)
-
-/** @brief Move the world by one time step, calls the system callbacks */
+/** @brief Advances the world by one time step and runs the system callbacks */
 void LinceECSUpdate(LinceECS* ecs, float dt);
 
 

@@ -19,6 +19,7 @@ void test_transform(void** state);
 void test_box2d(void** state);
 
 void test_ecs_mask(void** state);
+void test_ecs_system(void** state);
 void test_ecs(void** state);
 
 void benchmark_hashmap();
@@ -41,7 +42,8 @@ int main() {
         cmocka_unit_test(test_transform),
         cmocka_unit_test(test_box2d),
         cmocka_unit_test(test_ecs_mask),
-        cmocka_unit_test(test_ecs)
+        cmocka_unit_test(test_ecs),
+        cmocka_unit_test(test_ecs_system)
         
 #elif defined( LINCE_RELEASE )
         

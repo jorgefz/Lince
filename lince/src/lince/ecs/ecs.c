@@ -167,6 +167,7 @@ LinceECS* LinceECSInit(LinceECS* ecs) {
 	array_init(&ecs->archetypes,        sizeof(LinceECSArchetype));
 	array_init(&ecs->component_index,   sizeof(hashmap_t));
 	array_init(&ecs->entity_pool,       sizeof(LinceEntity));
+	array_init(&ecs->query_result,      sizeof(LinceEntity));
 	hashmap_init(&ecs->archetype_map,   HASHMAP_INIT_SIZE);
 
 	// Create the default archetype with no components
@@ -206,6 +207,7 @@ void LinceECSUninit(LinceECS* ecs) {
 	array_uninit(&ecs->component_index);
 	array_uninit(&ecs->entity_pool);
 	hashmap_uninit(&ecs->archetype_map);
+	array_uninit(&ecs->query_result);
 	ecs->component_count = 0;
 	ecs->entity_count = 0;
 	ecs->user_data = NULL;
@@ -431,15 +433,18 @@ array_t* LinceECSQuery(LinceECS* ecs, LinceECSMask mask, array_t* result) {
 		LinceECSArchetype* arch = array_get(&ecs->archetypes, arch_id);
 
 		// Compare masks
-		// Works with the zero-component archetype
+		// Does not work with the zero-component archetype
 		LinceBool match = LinceTrue;
+		uint32_t sum = 0;
 		for (uint32_t comp_id = 0; comp_id != ecs->component_count; ++comp_id) {
+			sum += 1;
 			if (!LinceECSCheckMaskBit(mask, comp_id)) continue;
 			if (!LinceECSCheckMaskBit(arch->mask, comp_id)) {
 				match = LinceFalse;
 				break;
 			}
 		}
+		if (sum == 0) return NULL; // Empty mask
 		if (!match) continue;
 		if (arch->entity_ids.size == 0) continue;
 
@@ -456,24 +461,49 @@ array_t* LinceECSQuery(LinceECS* ecs, LinceECSMask mask, array_t* result) {
 }
 
 
+void* LinceECSAddSystem(LinceECS* ecs, LinceECSSystem callback, uint32_t comp_num, uint32_t* comp_ids) {
+	if (comp_num == 0 || !comp_ids) return NULL;
+
+	LinceECSMask mask = { 0 };
+	for (uint32_t i = 0; i != comp_num; ++i) {
+		if (comp_ids[i] >= ecs->component_count) return NULL;
+		LinceECSSetMaskBit(mask, comp_ids[i]);
+	}
+
+	LinceECSArchetype* arch = LinceECSGetOrCreateArchetype(ecs, mask);
+	if (!arch) return NULL;
+	arch->on_update = callback;
+
+	return ecs;
+}
+
+
 void LinceECSUpdate(LinceECS* ecs, float dt) {
 
-	array_t query;
-	array_init(&query, sizeof(LinceEntity));
+	array_clear(&ecs->query_result);
 
 	for (uint32_t i = 0; i != ecs->archetypes.size; ++i) {
 		LinceECSArchetype* arch = array_get(&ecs->archetypes, i);
 		if (!arch->on_update) continue;
 
-		LinceECSQuery(ecs, arch->mask, &query);
+		/* --- TODO: cache queries ---
+		
+		// This archetype member stores all entities that have the components
+		// in its mask. This inclues entities on different archetypes.
+		array_t* cache = arch->query_cache;
+		
+		if(arch->redo_query){
+			LinceECSQuery(ecs, cache->mask, cache);
+			arch->redo_query = LinceFalse;
+		}
 
-		// Give the on_update function all entities that match the query?
-		// Or iterate through entities, and call it with each entity ID?
+		arch->on_update(ecs, dt, cache);
 
-		arch->on_update(ecs, &query);
-		array_clear(&query);
+		*/
+
+		LinceECSQuery(ecs, arch->mask, &ecs->query_result);
+		arch->on_update(ecs, dt, &ecs->query_result);
+		array_clear(&ecs->query_result);
 	}
-
-	array_uninit(&query);
 
 }
