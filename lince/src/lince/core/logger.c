@@ -4,12 +4,11 @@
 
 static FILE* LOGFILE = NULL;
 
-
-#define CHECK_LOGFILE       \
-    if(!LOGFILE) do{        \
-        LOGFILE = stderr;   \
-        LinceLoggerWarn("Log file is not open. Using stderr."); \
-    } while(0)              \
+#ifdef LINCE_DEBUG
+    #define CHECK_LOGFILE LOGFILE = stderr
+#elif defined( LINCE_RELEASE )
+    #define CHECK_LOGFILE if(!LOGFILE) return;            
+#endif
 
 #define WRITE_LOGFILE(header, fmt)          \
     do {                                    \
@@ -27,11 +26,9 @@ int LinceOpenLogger(const char* filename){
     LOGFILE = stderr;
     (void)filename;
     return 1;
-#else
+#elif defined( LINCE_RELEASE )
     if(!filename){
-        fprintf(stderr, "[Warning] Log filename undefined. Using stderr.");
-        LOGFILE = stderr;
-        return 1;
+        return 0;
     }
     LOGFILE = fopen(filename, "w");
     if(!LOGFILE) return 0;
