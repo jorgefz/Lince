@@ -68,6 +68,8 @@ uint32_t RandComp();
 
 void benchmark_old_ecs(uint32_t n_iter) {
 	
+	printf(" === OLD ECS BENCHMARK - %u ITERATIONS\n", n_iter);
+
 	srand((uint32_t)time(NULL));
 	
 	uint32_t s = (uint32_t)(sizeof(int) * 4);
@@ -125,8 +127,17 @@ int main() {
 	// return 0;
 #endif
 
+	benchmark_old_ecs(10000);
 	benchmark_old_ecs(20000);
+	benchmark_old_ecs(30000);
+	benchmark_old_ecs(40000);
+	benchmark_old_ecs(50000);
+
+	benchmark_new_ecs(10000);
 	benchmark_new_ecs(20000);
+	benchmark_new_ecs(30000);
+	benchmark_new_ecs(40000);
+	benchmark_new_ecs(50000);
 	
 	return 0;
 

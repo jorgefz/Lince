@@ -166,7 +166,7 @@ LinceECS* LinceECSInit(LinceECS* ecs) {
 	array_init(&ecs->component_index,   sizeof(hashmap_t));
 	array_init(&ecs->entity_pool,       sizeof(LinceEntity));
 	array_init(&ecs->query_result,      sizeof(LinceEntity));
-	hashmap_init(&ecs->archetype_map,   128);
+	hashmap_init(&ecs->archetype_map,   64);
 
 	// Create the default archetype with no components
 	// Located at index 0, the default value when initialising an entity record
