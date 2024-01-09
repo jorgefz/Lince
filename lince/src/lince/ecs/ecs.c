@@ -7,8 +7,6 @@
 	#define LINCE_STATIC static
 #endif
 
- 
-#define HASHMAP_INIT_SIZE 10
 
 /** @brief Sets the bit corresponding to a component ID on a bitmask */
 LINCE_STATIC void LinceECSSetMaskBit(LinceECSMask mask, uint32_t comp_id) {
@@ -168,7 +166,7 @@ LinceECS* LinceECSInit(LinceECS* ecs) {
 	array_init(&ecs->component_index,   sizeof(hashmap_t));
 	array_init(&ecs->entity_pool,       sizeof(LinceEntity));
 	array_init(&ecs->query_result,      sizeof(LinceEntity));
-	hashmap_init(&ecs->archetype_map,   HASHMAP_INIT_SIZE);
+	hashmap_init(&ecs->archetype_map,   128);
 
 	// Create the default archetype with no components
 	// Located at index 0, the default value when initialising an entity record
