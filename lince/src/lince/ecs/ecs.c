@@ -304,11 +304,6 @@ void* LinceECSAddComponents(LinceECS* ecs, LinceEntity entity_id, uint32_t compo
 		LinceECSSetMaskBit(new_mask, comp_id);
 	}
 
-	if (memcmp(record->mask, new_mask, sizeof(LinceECSMask)) == 0) {
-		// Masks are identical, no new components added!
-		return NULL;
-	}
-
 	// Fetch or create its new archetype
 	LinceECSArchetype* new_arch = LinceECSGetOrCreateArchetype(ecs, new_mask);
 	if (!new_arch) return NULL;
