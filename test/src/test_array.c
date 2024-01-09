@@ -6,23 +6,6 @@
 
 #include "lince/containers/array.h"
 
-#include "benchmark.h"
-
-
-void benchmark_array(){
-
-	array_t nums;
-	array_init(&nums, sizeof(int));
-
-	BENCHMARK_LOOP(int, i, 10000000) {
-		array_push_back(&nums, &i);
-	} BENCHMARK_END(int, i, 10000000);
-	
-    array_uninit(&nums);
-	return 0;
-}
-
-
 
 void test_array(void** state){
 	(void)state;

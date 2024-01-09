@@ -7,27 +7,6 @@
 
 #include "lince/containers/linkedlist.h"
 
-#include "benchmark.h"
-
-
-void benchmark_linkedlist(){
-
-    int first_value = -1;
-	listnode_t* head = list_create(&first_value);
-
-    printf("[BENCHMARK] list_push_back\n");
-    BENCHMARK_LOOP(int, i, 50000) {
-        list_push_back(head, NULL);
-    } BENCHMARK_END(int, i, 50000);
-
-    printf("[BENCHMARK] list_tail\n");
-    BENCHMARK_LOOP(int, i, 1) {
-        list_node_at(head, i);
-    } BENCHMARK_END(int, i, 1);
-	
-    list_destroy(head);
-}
-
 void test_linkedlist(void **state){
     (void)state;
     

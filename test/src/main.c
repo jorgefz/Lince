@@ -17,21 +17,14 @@ void test_uuid(void** state);
 void test_point(void** state);
 void test_transform(void** state);
 void test_box2d(void** state);
-
 void test_ecs_mask(void** state);
 void test_ecs_system(void** state);
 void test_ecs(void** state);
 
-void benchmark_hashmap();
-void benchmark_array();
-void benchmark_ecs();
-void benchmark_linkedlist();
 
 int main() {
+
     const struct CMUnitTest tests[] = {
-
-#ifdef LINCE_DEBUG
-
         cmocka_unit_test(test_array),
         cmocka_unit_test(test_hashmap),
         cmocka_unit_test(test_hashmap_byte_key),
@@ -44,15 +37,6 @@ int main() {
         cmocka_unit_test(test_ecs_mask),
         cmocka_unit_test(test_ecs),
         cmocka_unit_test(test_ecs_system)
-        
-#elif defined( LINCE_RELEASE )
-        
-        cmocka_unit_test(benchmark_hashmap),
-        cmocka_unit_test(benchmark_array),
-        cmocka_unit_test(benchmark_ecs),
-        cmocka_unit_test(benchmark_linkedlist)
-#endif
-    
     };
     return cmocka_run_group_tests(tests, NULL, NULL);
 }

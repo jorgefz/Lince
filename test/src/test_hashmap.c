@@ -5,8 +5,6 @@
 #include <cmocka.h>
 
 #include "lince/containers/hashmap.h"
-#include "benchmark.h"
-
 
 
 void test_hashmap(void** state){
@@ -145,28 +143,4 @@ void test_hashmap_byte_key(void** state) {
 	assert_non_null(p);
 	hashmap_destroy(p);
 
-}
-
-
-void benchmark_hashmap() {
-
-	int value = 99;
-	const int iter = 100000;
-	size_t r = 1;
-
-	hashmap_t map;
-	hashmap_init(&map, iter);
-
-	for (int i = 0; i != iter; ++i) {
-		hashmap_setb(&map, &i, sizeof(int), &value);
-	}
-
-	printf("[BENCHMARK] hashmap_getb\n");
-
-	BENCHMARK_LOOP(int, i, iter) {
-		r = r && hashmap_getb(&map, &i, sizeof(int));
-	} BENCHMARK_END(int, i, iter);
-
-	hashmap_uninit(&map);
-	return 0;
 }

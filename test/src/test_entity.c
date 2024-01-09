@@ -7,7 +7,6 @@
 #include <time.h>
 #include <lince/renderer/renderer.h>
 #include <lince/entity/entity.h>
-#include "benchmark.h"
 
 typedef struct Position { float x, y; } Position;
 typedef struct Velocity { float vx, vy; } Velocity;

@@ -4,9 +4,7 @@
 #include <setjmp.h>
 #include <cmocka.h>
 
-#include <lince/ecs/ecs.h>
-#include "benchmark.h"
-
+#include "lince/ecs/ecs.h"
 
 static void ecs_debug_print(LinceECS* ecs) {
 	if (!ecs) return;
