@@ -32,10 +32,23 @@ void benchmark_new_ecs(uint64_t n_iter) {
 	} BENCHMARK_END(uint64_t, counter, n_iter);
 
 	/* Add components */
+	static uint32_t prefab_arch_count = 10;
+	uint32_t comp_ids[][4] = {
+		{ RandComp(), RandComp(), RandComp(), RandComp() },
+		{ RandComp(), RandComp(), RandComp(), RandComp() },
+		{ RandComp(), RandComp(), RandComp(), RandComp() },
+		{ RandComp(), RandComp(), RandComp(), RandComp() },
+		{ RandComp(), RandComp(), RandComp(), RandComp() },
+		{ RandComp(), RandComp(), RandComp(), RandComp() },
+		{ RandComp(), RandComp(), RandComp(), RandComp() },
+		{ RandComp(), RandComp(), RandComp(), RandComp() },
+		{ RandComp(), RandComp(), RandComp(), RandComp() },
+		{ RandComp(), RandComp(), RandComp(), RandComp() }
+	};
+
 	printf("AddComponents: ");
 	BENCHMARK_LOOP(uint64_t, counter, n_iter) {
-		uint32_t comp_ids[] = { RandComp(), RandComp(), RandComp(), RandComp() };
-		LinceECSAddComponents(&ecs, counter, 4, comp_ids);
+		LinceECSAddComponents(&ecs, counter, 4, comp_ids[rand() % prefab_arch_count]);
 	} BENCHMARK_END(uint64_t, counter, n_iter);
 
 	/* Get components */

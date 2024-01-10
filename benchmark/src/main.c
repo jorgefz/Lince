@@ -90,10 +90,25 @@ void benchmark_old_ecs(uint32_t n_iter) {
 	} BENCHMARK_END(uint64_t, counter, n_iter);
 
 	/* Add components */
+	static uint32_t prefab_arch_count = 10;
+	uint32_t comp_ids[][4] = {
+		{ RandComp(), RandComp(), RandComp(), RandComp() },
+		{ RandComp(), RandComp(), RandComp(), RandComp() },
+		{ RandComp(), RandComp(), RandComp(), RandComp() },
+		{ RandComp(), RandComp(), RandComp(), RandComp() },
+		{ RandComp(), RandComp(), RandComp(), RandComp() },
+		{ RandComp(), RandComp(), RandComp(), RandComp() },
+		{ RandComp(), RandComp(), RandComp(), RandComp() },
+		{ RandComp(), RandComp(), RandComp(), RandComp() },
+		{ RandComp(), RandComp(), RandComp(), RandComp() },
+		{ RandComp(), RandComp(), RandComp(), RandComp() }
+	};
+
 	printf("AddComponents: ");
 	BENCHMARK_LOOP(uint64_t, counter, n_iter) {
+		uint32_t idx = rand() % 4;
 		for (uint32_t i = 0; i != 4; ++i) {
-			LinceAddEntityComponent(reg, (uint32_t)counter, RandComp(), (int[]) { 1, 2, 3, 4 });
+			LinceAddEntityComponent(reg, (uint32_t)counter, comp_ids[idx][i], (int[]) { 1, 2, 3, 4 });
 		}
 	} BENCHMARK_END(uint64_t, counter, n_iter);
 
