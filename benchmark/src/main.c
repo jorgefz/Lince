@@ -47,127 +47,51 @@ void benchmark_hashmap() {
 }
 
 
-#include "lince/containers/array.h"
-
-void benchmark_array() {
-
-	array_t nums;
-	array_init(&nums, sizeof(int));
-
-	BENCHMARK_LOOP(int, i, 10000000) {
-		array_push_back(&nums, &i);
-	} BENCHMARK_END(int, i, 10000000);
-
-	array_uninit(&nums);
-	return 0;
-}
-
-#include "lince/entity/entity.h"
-
-uint32_t RandComp();
-
-void benchmark_old_ecs(uint32_t n_iter) {
-	
-	printf(" === OLD ECS BENCHMARK - %u ITERATIONS\n", n_iter);
-
-	srand((uint32_t)time(NULL));
-	
-	uint32_t s = (uint32_t)(sizeof(int) * 4);
-	LinceEntityRegistry* reg;
-
-	/* Create components */
-	reg = LinceCreateEntityRegistry(64,
-		s, s, s, s, s, s, s, s, s, s, s, s, s, s, s, s,
-		s, s, s, s, s, s, s, s, s, s, s, s, s, s, s, s,
-		s, s, s, s, s, s, s, s, s, s, s, s, s, s, s, s,
-		s, s, s, s, s, s, s, s, s, s, s, s, s, s, s, s
-	);
-
-	/* Create entities */
-	printf("NewEntity:     ");
-	BENCHMARK_LOOP(uint64_t, counter, n_iter) {
-		LinceCreateEntity(reg);
-	} BENCHMARK_END(uint64_t, counter, n_iter);
-
-	/* Add components */
-	static uint32_t prefab_arch_count = 10;
-	uint32_t comp_ids[][4] = {
-		{ RandComp(), RandComp(), RandComp(), RandComp() },
-		{ RandComp(), RandComp(), RandComp(), RandComp() },
-		{ RandComp(), RandComp(), RandComp(), RandComp() },
-		{ RandComp(), RandComp(), RandComp(), RandComp() },
-		{ RandComp(), RandComp(), RandComp(), RandComp() },
-		{ RandComp(), RandComp(), RandComp(), RandComp() },
-		{ RandComp(), RandComp(), RandComp(), RandComp() },
-		{ RandComp(), RandComp(), RandComp(), RandComp() },
-		{ RandComp(), RandComp(), RandComp(), RandComp() },
-		{ RandComp(), RandComp(), RandComp(), RandComp() }
-	};
-
-	printf("AddComponents: ");
-	BENCHMARK_LOOP(uint64_t, counter, n_iter) {
-		uint32_t idx = rand() % 4;
-		for (uint32_t i = 0; i != 4; ++i) {
-			LinceAddEntityComponent(reg, (uint32_t)counter, comp_ids[idx][i], (int[]) { 1, 2, 3, 4 });
-		}
-	} BENCHMARK_END(uint64_t, counter, n_iter);
-
-	/* Get components */
-	printf("GetComponent:  ");
-	BENCHMARK_LOOP(uint64_t, counter, n_iter) {
-		LinceGetEntityComponent(reg, counter, RandComp());
-	} BENCHMARK_END(uint64_t, counter, n_iter);
-
-	/* Querying */
-	printf("Query:         ");
-	array_t query;
-	array_init(&query, sizeof(uint32_t));
-	BENCHMARK_LOOP(uint64_t, counter, n_iter) {
-		LinceQueryEntities(reg, &query, 4, RandComp(), RandComp(), RandComp(), RandComp());
-		array_clear(&query);
-	} BENCHMARK_END(uint64_t, counter, n_iter);
-	array_uninit(&query);
-}
 
 // void benchmark_hashmap(uint64_t n_iter);
-// void benchmark_array(uint64_t n_iter);
+void benchmark_array(uint64_t n_iter);
 // void benchmark_linkedlist(uint64_t n_iter);
 // void benchmark_old_ecs(uint64_t n_iter);
+void benchmark_new_ecs(uint64_t n_iter);
 void benchmark_new_ecs(uint64_t n_iter);
 
 int main() {
 	
 #ifndef LINCE_RELEASE
-	printf("Please run in Release configuration\n");
-	// return 0;
+	printf("Please run in Release configuration for more accurate results\n");
 #endif
 
-	benchmark_old_ecs(10000);
-	benchmark_old_ecs(20000);
-	benchmark_old_ecs(30000);
-	benchmark_old_ecs(40000);
-	benchmark_old_ecs(50000);
+	benchmark_array(10000);
+	benchmark_array(20000);
+	benchmark_array(30000);
+	benchmark_array(40000);
+	benchmark_array(50000);
 
-	benchmark_new_ecs(10000);
-	benchmark_new_ecs(20000);
-	benchmark_new_ecs(30000);
-	benchmark_new_ecs(40000);
-	benchmark_new_ecs(50000);
-	
 	return 0;
 
-	benchmark_new_ecs(1000);
-	benchmark_new_ecs(2500);
-	benchmark_new_ecs(5000);
-	benchmark_new_ecs(7500);
+	// benchmark_old_ecs(10000);
+	// benchmark_old_ecs(20000);
+	// benchmark_old_ecs(30000);
+	// benchmark_old_ecs(40000);
+	// benchmark_old_ecs(50000);
+	// benchmark_old_ecs(75000);
+	// benchmark_old_ecs(100000);
+	// benchmark_old_ecs(200000);
+
+	printf("\n\n");
 
 	benchmark_new_ecs(10000);
-	benchmark_new_ecs(15000);
 	benchmark_new_ecs(20000);
-	benchmark_new_ecs(25000);
 	benchmark_new_ecs(30000);
 	benchmark_new_ecs(40000);
 	benchmark_new_ecs(50000);
-
+	benchmark_new_ecs(75000);
+	benchmark_new_ecs(100000);
+	benchmark_new_ecs(200000);
+	benchmark_new_ecs(300000);
+	benchmark_new_ecs(400000);
+	benchmark_new_ecs(500000);
+	benchmark_new_ecs(750000);
+	
 	return 0;
 }
