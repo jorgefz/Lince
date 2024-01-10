@@ -12,8 +12,6 @@ uint64_t RandMask() {
 
 void benchmark_new_ecs(uint64_t n_iter) {
 
-	printf(" === NEW ECS BENCHMARK - %llu ITERATIONS ===\n", n_iter);
-
 	srand((unsigned int)time(NULL));
 
 	LinceECS ecs;
@@ -66,4 +64,6 @@ void benchmark_new_ecs(uint64_t n_iter) {
 		}
 		LinceECSQuery(&ecs, mask, &ecs.query_result);
 	} BENCHMARK_END(uint64_t, counter, n_iter);
+
+	printf("\n");
 }

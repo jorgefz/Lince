@@ -6,8 +6,6 @@ extern uint32_t RandComp();
 
 void benchmark_old_ecs(uint32_t n_iter) {
 
-	printf(" === OLD ECS BENCHMARK - %u ITERATIONS\n", n_iter);
-
 	srand((uint32_t)time(NULL));
 
 	uint32_t s = (uint32_t)(sizeof(int) * 4);
@@ -53,7 +51,7 @@ void benchmark_old_ecs(uint32_t n_iter) {
 	/* Get components */
 	printf("GetComponent:  ");
 	BENCHMARK_LOOP(uint64_t, counter, n_iter) {
-		LinceGetEntityComponent(reg, counter, RandComp());
+		LinceGetEntityComponent(reg, (uint32_t)counter, RandComp());
 	} BENCHMARK_END(uint64_t, counter, n_iter);
 
 	/* Querying */
@@ -65,4 +63,6 @@ void benchmark_old_ecs(uint32_t n_iter) {
 		array_clear(&query);
 	} BENCHMARK_END(uint64_t, counter, n_iter);
 	array_uninit(&query);
+
+	printf("\n");
 }

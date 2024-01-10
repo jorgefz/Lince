@@ -61,25 +61,24 @@ int main() {
 	printf("Please run in Release configuration for more accurate results\n");
 #endif
 
+	printf("\n === Array === \n");
 	benchmark_array(10000);
 	benchmark_array(20000);
 	benchmark_array(30000);
 	benchmark_array(40000);
 	benchmark_array(50000);
 
-	return 0;
-
-	// benchmark_old_ecs(10000);
-	// benchmark_old_ecs(20000);
-	// benchmark_old_ecs(30000);
-	// benchmark_old_ecs(40000);
-	// benchmark_old_ecs(50000);
+	printf("\n === Old ECS === \n");
+	benchmark_old_ecs(10000);
+	benchmark_old_ecs(20000);
+	benchmark_old_ecs(30000);
+	benchmark_old_ecs(40000);
+	benchmark_old_ecs(50000);
 	// benchmark_old_ecs(75000);
 	// benchmark_old_ecs(100000);
 	// benchmark_old_ecs(200000);
 
-	printf("\n\n");
-
+	printf("\n === New ECS === \n");
 	benchmark_new_ecs(10000);
 	benchmark_new_ecs(20000);
 	benchmark_new_ecs(30000);
