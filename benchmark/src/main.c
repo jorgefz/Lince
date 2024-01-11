@@ -21,39 +21,12 @@ void benchmark_linkedlist() {
     list_destroy(head);
 }
 
-#include "lince/containers/hashmap.h"
 
-void benchmark_hashmap() {
-
-	int value = 99;
-	const int iter = 100000;
-	size_t r = 1;
-
-	hashmap_t map;
-	hashmap_init(&map, iter);
-
-	for (int i = 0; i != iter; ++i) {
-		hashmap_setb(&map, &i, sizeof(int), &value);
-	}
-
-	printf("[BENCHMARK] hashmap_getb\n");
-
-	BENCHMARK_LOOP(int, i, iter) {
-		r = r && hashmap_getb(&map, &i, sizeof(int));
-	} BENCHMARK_END(int, i, iter);
-
-	hashmap_uninit(&map);
-	return 0;
-}
-
-
-
-// void benchmark_hashmap(uint64_t n_iter);
 void benchmark_array(uint64_t n_iter);
+void benchmark_hashmap(uint64_t n_iter);
 // void benchmark_linkedlist(uint64_t n_iter);
-// void benchmark_old_ecs(uint64_t n_iter);
 void benchmark_new_ecs(uint64_t n_iter);
-void benchmark_new_ecs(uint64_t n_iter);
+void benchmark_old_ecs(uint64_t n_iter);
 
 int main() {
 	
@@ -67,6 +40,13 @@ int main() {
 	benchmark_array(30000);
 	benchmark_array(40000);
 	benchmark_array(50000);
+
+	printf("\n === Hahsmap === \n");
+	benchmark_hashmap(10000);
+	benchmark_hashmap(20000);
+	benchmark_hashmap(30000);
+	benchmark_hashmap(40000);
+	benchmark_hashmap(50000);
 
 	printf("\n === Old ECS === \n");
 	benchmark_old_ecs(10000);
