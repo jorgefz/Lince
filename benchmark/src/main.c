@@ -3,28 +3,10 @@
 
 #include "lince/containers/linkedlist.h"
 
-void benchmark_linkedlist() {
-
-    int first_value = -1;
-    listnode_t* head = list_create(&first_value);
-
-    printf("[BENCHMARK] list_push_back\n");
-    BENCHMARK_LOOP(int, i, 50000) {
-        list_push_back(head, NULL);
-    } BENCHMARK_END(int, i, 50000);
-
-    printf("[BENCHMARK] list_tail\n");
-    BENCHMARK_LOOP(int, i, 1) {
-        list_node_at(head, i);
-    } BENCHMARK_END(int, i, 1);
-
-    list_destroy(head);
-}
-
 
 void benchmark_array(uint64_t n_iter);
 void benchmark_hashmap(uint64_t n_iter);
-// void benchmark_linkedlist(uint64_t n_iter);
+void benchmark_linkedlist(uint64_t n_iter);
 void benchmark_new_ecs(uint64_t n_iter);
 void benchmark_old_ecs(uint64_t n_iter);
 
@@ -33,7 +15,7 @@ int main() {
 #ifndef LINCE_RELEASE
 	printf("Please run in Release configuration for more accurate results\n");
 #endif
-
+	/*
 	printf("\n === Array === \n");
 	benchmark_array(10000);
 	benchmark_array(20000);
@@ -47,6 +29,13 @@ int main() {
 	benchmark_hashmap(30000);
 	benchmark_hashmap(40000);
 	benchmark_hashmap(50000);
+	*/
+	printf("\n === List === \n");
+	benchmark_linkedlist(10000);
+	benchmark_linkedlist(20000);
+	benchmark_linkedlist(30000);
+	benchmark_linkedlist(40000);
+	benchmark_linkedlist(50000);
 
 	printf("\n === Old ECS === \n");
 	benchmark_old_ecs(10000);

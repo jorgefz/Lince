@@ -70,7 +70,7 @@ void benchmark_new_ecs(uint64_t n_iter) {
 }
 
 
-void benchmark_old_ecs(uint32_t n_iter) {
+void benchmark_old_ecs(uint64_t n_iter) {
 
 	srand((uint32_t)time(NULL));
 
