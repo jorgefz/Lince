@@ -4,11 +4,12 @@
 void benchmark_linkedlist(uint64_t n_iter) {
 
 	listnode_t* list = list_create(NULL);
+	list_push_back(list, NULL);
 
 	/* Insert */
 	printf("Insert:  ");
 	BENCHMARK_LOOP(uint64_t, i, n_iter) {
-		list_insert_at(list, rand() % i, NULL);
+		list_insert_at(list, rand() % (i+1), NULL);
 	} BENCHMARK_END(uint64_t, i, n_iter);
 
 	/* Get */
@@ -19,7 +20,6 @@ void benchmark_linkedlist(uint64_t n_iter) {
 	} BENCHMARK_END(uint64_t, i, n_iter);
 
 	/* Delete */
-
-
 	list_destroy(list);
+	
 }

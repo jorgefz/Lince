@@ -15,7 +15,7 @@ int main() {
 #ifndef LINCE_RELEASE
 	printf("Please run in Release configuration for more accurate results\n");
 #endif
-	/*
+
 	printf("\n === Array === \n");
 	benchmark_array(10000);
 	benchmark_array(20000);
@@ -29,13 +29,15 @@ int main() {
 	benchmark_hashmap(30000);
 	benchmark_hashmap(40000);
 	benchmark_hashmap(50000);
-	*/
+	
+	/*
 	printf("\n === List === \n");
 	benchmark_linkedlist(10000);
 	benchmark_linkedlist(20000);
 	benchmark_linkedlist(30000);
 	benchmark_linkedlist(40000);
 	benchmark_linkedlist(50000);
+	*/
 
 	printf("\n === Old ECS === \n");
 	benchmark_old_ecs(10000);
