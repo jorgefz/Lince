@@ -85,7 +85,6 @@ listnode_t* list_insert(listnode_t* node, void* data){
     return new_node;
 }
 
-#include <stdio.h>
 
 /* Places a new node before the node at the given index */
 listnode_t* list_insert_at(listnode_t* head, uint32_t index, void* data){
