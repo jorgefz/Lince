@@ -49,42 +49,41 @@ QUERY(components)
 typedef uint64_t LinceEntity;
 
 
-/// Number of 64-bit slots in entity bitmasks. Maximum number of components as a multiple of 64.
+/** Number of 64-bit slots in component bitmasks. Maximum number of components as a multiple of 64. */
 #ifndef LINCE_ECS_COMPONENT_SLOTS
 	#define LINCE_ECS_COMPONENT_SLOTS 1
 #endif
 
-/// Maximum number of components
+/** Maximum number of components */
 #define LINCE_ECS_MAX_COMPONENTS ((uint32_t)(LINCE_ECS_COMPONENT_SLOTS) * 64)
 
-
-// TODO: switch to struct
+/** Bitmask that represents a combination of components */
 typedef uint64_t LinceECSMask[LINCE_ECS_COMPONENT_SLOTS];
-
-/* Avoid typedef array type, use struct, can be casted to int pointer */
-/*
-typedef struct LinceECSMask {
-	uint64_t slots[LINCE_ECS_MAX_COMPONENTS_FACTOR];
-} LinceECSMask;
-*/
 
 struct LinceECS; /* Forward declaration */
 
-/* Function type for system callbacks */
+/** @brief Function type for ECS systems
+* @param ecs ECS state
+* @param dt Delta time
+* @param entities Array<LinceEntity> array with all entities that have the requested components
+*/
 typedef void (*LinceECSSystem)(struct LinceECS* ecs, float dt, array_t* entities);
 
-/* Flags indicating the state of an entity */
-// TODO: store flags in the top 32 bits of the entity ID
+/** Flags indicating the state of an entity
+* @todo store flags in the top 32 bits of the entity ID
+*/
 typedef enum LinceECSFlags {
 	LinceECSFlags_Active = 0x1
 } LinceECSFlags;
 
+/** Stores the data of one component of all entities with the same components */
 typedef struct LinceECSComponentStore {
 	array_t data;		   	///< array<element size>, stores data of a component for entities with an archetype
 	uint32_t id;			///< ID of the stored component
 	uint32_t element_size;	///< Size in bytes of the stored component
 } LinceECSComponentStore;
 
+/** Stores the data of entities with the same components */
 typedef struct LinceECSArchetype {
 	array_t        comp_stores;  ///< array<LinceECSComponentStore>
 	array_t        entity_ids;   ///< array<LinceEntity>, entities with this archetype
@@ -95,6 +94,7 @@ typedef struct LinceECSArchetype {
 								 ///< All such systems are run when LinceECSUpdate is called.
 } LinceECSArchetype;
 
+/** Stores metadata of an entity */
 typedef struct LinceECSRecord {
 	LinceECSMask       mask;	///< Component mask of the entity
 	LinceECSFlags      flags;	///< State flags
@@ -102,6 +102,7 @@ typedef struct LinceECSRecord {
 	uint32_t		   arch_id; ///< Index of its archetype.
 } LinceECSRecord;
 
+/** Main state */
 typedef struct LinceECS {
 	// Data
 	array_t   entity_records;  ///< array<Record> Indexed by entity_id, holds masks and flags
@@ -118,35 +119,11 @@ typedef struct LinceECS {
 	uint32_t  component_count; ///< Number of components
 	uint32_t  entity_count;    ///< Number of active entities
 	array_t   query_result;    ///< Caches the array for ECSQuery so that it is only initialised once
-	// hashmap_t query_cache;     ///< Hashmap< Array<arch_id> > Arrays of archetypes that match the search query for a given mask.
-
-	/*
-	
-	// -- Fetch query cache
-	cache = query_cache[query_mask];
-	for arch_id in cache {
-		query_result.add( archetypes[arch_id].entities );
-	}
-	
-	// -- Remake query
-	cache = query_cache[query_mask]
-	for arch_id, arch in archetypes {
-		if(arch.mask & query_mask){
-			cache.add( arch_id );
-			query_result.add( arch.entities )
-		}
-	}
-
-	// -- Signal redo query (when new archetype is added)
-	// No need to do this every time an entity moves archetypes
-	// because we do not cache matching entities, but matching archetypes
-
-	*/
 
 } LinceECS;
 
 
-/* Make static functions accessible in debug mode */
+/** Make static functions accessible in debug mode */
 #ifdef LINCE_DEBUG
 void LinceECSSetMaskBit(LinceECSMask mask, uint32_t comp_id);
 void LinceECSUnsetMaskBit(LinceECSMask mask, uint32_t comp_id);
@@ -154,9 +131,13 @@ LinceBool LinceECSCheckMaskBit(LinceECSMask mask, uint32_t comp_id);
 LinceECSArchetype* LinceECSGetOrCreateArchetype(LinceECS* ecs, LinceECSMask mask);
 #endif
 
-
+/** @brief Initialise ECS state
+* @param ecs Input state, must point to valid memory.
+* @returns The address of the input state if successful, and NULL otherwise.
+*/
 LinceECS* LinceECSInit(LinceECS* ecs);
 
+/** @brief Deallocate memory and reset state */
 void LinceECSUninit(LinceECS* ecs);
 
 /** @brief Create an entity and return its ID */
@@ -165,42 +146,91 @@ LinceEntity LinceECSNewEntity(LinceECS* ecs);
 /** @brief Remove an entity */
 void LinceECSDeleteEntity(LinceECS* ecs, LinceEntity entity);
 
-/** @brief Register new component and returns its ID */
+/** @brief Register new component and returns its ID
+* @param ecs ECS state
+* @param component_size size of the new component in bytes, must be greater than zero.
+* @returns component ID with value between 0 and LINCE_ECS_MAX_COMPONENTS if successful, or -1 otherwise. 
+*/
 uint32_t LinceECSNewComponent(LinceECS* ecs, uint32_t component_size);
 
-/** @brief Add components to an entity */
+/** @brief Registers components with an entity
+* @param ecs ECS state
+* @param entity_id Entity to which to add components
+* @param component_num Number of components to add. Must be greater than zero.
+* @param component_ids Array of IDs of components to add. All components must have been registered.
+* @returns Non-null pointer if successul, NULL otherwise.
+* @note Space for the input components will be allocated, but their data will not be set. Use LinceECSSetComponent to provide the data.
+*/
 void* LinceECSAddComponents(LinceECS* ecs, LinceEntity entity_id, uint32_t component_num, uint32_t* components_ids);
 
-/** @brief Retrieve a component from an entity */
+/** @brief Retrieve the data of a component
+* @param ecs ECS state
+* @param entity_id Entity from which to retrieve a component
+* @param component_id ID of component whose data to return
+* @returns pointer to location where the component's data is stored, or NULL if unsuccessul.
+* @note to test only for the presence of a component, it is faster to use LinceECSHasComponent.
+*/
 void* LinceECSGetComponent(LinceECS* ecs, LinceEntity entity_id, uint32_t component_id);
 
-/** @brief Provide or overwrite the data of a component on an entity
-* If the data is not provided (NULL), the component is zeroed.
+/** @brief Provide or overwrite the data of a component
+* @param ecs ECS state
+* @param entity_id ID of entity whose component to set
+* @param component_id ID of component to modify
+* @param data New data for component. If NULL, the component is zeroed.
+* @returns Pointer to component data, or NULL if unsuccessful.
 */
 void* LinceECSSetComponent(LinceECS* ecs, LinceEntity entity_id, uint32_t component_id, void* data);
 
-/** @brief Add one component to an entity and provide its data.
-* If the data is NULL, the component is zeroed.
+/** @brief Add a component to an entity and provide its data.
+* @param ecs ECS state
+* @param entity_id ID of entity whose component to add
+* @param component_id ID of component to modify
+* @param data Data for component. If NULL, the component is zeroed.
+* @returns Pointer to component data, or NULL if unsuccessful.
+* @note If adding several components, it is faster to add them together with LinceECSAddComponent, and then set their data with LinceECSSetComponent.
 */
 void* LinceECSEmplaceComponent(LinceECS* ecs, LinceEntity entity_id, uint32_t component_id, void* data);
 
-/** @brief Remove components from an entity */
+/** @brief Remove components from an entity
+* @param ecs ECS state
+* @param entity_id ID of entity whose component(s) to remove
+* @param component_num Number of components to remove. Must be greater than zero.
+* @param component_ids Array of IDs of components to remove. All components must have been registered.
+* @returns non-null pointer if successful, or NULL if unsuccessful.
+*/
 void* LinceECSRemoveComponents(LinceECS* ecs, LinceEntity entity_id, uint32_t component_num, uint32_t* component_ids);
 
-/** @brief Returns true if an entity has a given component */
+/** @brief Returns true if an entity has a given component.
+* @param ecs ECS state
+* @param entity_id ID of entity
+* @param component_id ID of component whose existence to check
+* @returns LinceTrue if the entity has the component, and LinceFalse otherwise.
+*/
 LinceBool LinceECSHasComponent(LinceECS* ecs, LinceEntity entity_id, uint32_t component_id);
 
-/** @brief Returns an array of the entities that have the requested components */
+/** @brief Returns an array of the entities that have the requested components.
+* @param ecs ECS state
+* @param result Initialised array to which the query results will be written
+* @param component_num Number of components to query. Must be greater than zero.
+* @param component_ids Array of IDs of components to query. All components must have been registered.
+*/
 array_t* LinceECSQuery(LinceECS* ecs, array_t* result, uint32_t comp_count, uint32_t* comp_ids);
 
-/** @brief Register a callback that is run on entities that have a given set of components */
-void* LinceECSAddSystem(LinceECS* ecs, LinceECSSystem callback, uint32_t comp_num, uint32_t* comp_ids);
+/** @brief Register a callback that is run on entities that have a given set of components.
+* @param ecs ECS state
+* @param system Function callback to assign to the given combination of components.
+* @param comp_num Number of components in signature.
+* @param Components that entities must have to be passed to the system.
+* @returns non-null pointer if successful, NULL otherwise.
+* @note Systems are called sequentially when LinceECSUpdate is run.
+*/
+void* LinceECSAddSystem(LinceECS* ecs, LinceECSSystem system, uint32_t comp_num, uint32_t* comp_ids);
 
-/** @brief Advances the world by one time step and runs the system callbacks */
+/** @brief Advances the world by one time step and runs the system callbacks.
+* @param ecs ECS state
+* @param dt delta time
+*/
 void LinceECSUpdate(LinceECS* ecs, float dt);
-
-
-
 
 
 

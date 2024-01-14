@@ -269,6 +269,13 @@ uint32_t LinceECSNewComponent(LinceECS* ecs, uint32_t component_size) {
 	LINCE_ASSERT(ecs->component_count < LINCE_ECS_MAX_COMPONENTS,
 		"ECS: Exceeded maximum number of components");
 	
+	if (!ecs || component_size == 0) {
+		return (uint32_t)(-1);
+	}
+	if (ecs->component_count >= LINCE_ECS_MAX_COMPONENTS) {
+		return (uint32_t)(-1);
+	}
+
 	uint32_t component_id = ecs->component_count;
 	array_push_back(&ecs->component_sizes, &component_size);
 	ecs->component_count++;
