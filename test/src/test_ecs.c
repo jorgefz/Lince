@@ -324,7 +324,7 @@ void test_ecs(void** state) {
 
 	// Test zero-component archetype
 	// No entities should have components
-	r = LinceECSQuery(&ecs, query_mask, &query);
+	r = LinceECSQuery(&ecs, &query, 0, NULL);
 	assert_null(r);
 	
 	array_clear(&query);
@@ -335,10 +335,7 @@ void test_ecs(void** state) {
 	LinceECSAddComponents(&ecs, entity2, 1, (uint32_t[]){0,1}); // Entity 2: 0 1   
 
 	// Find entities with components 0, 1, and 2 (only entity 0)
-	LinceECSSetMaskBit(query_mask, 0);
-	LinceECSSetMaskBit(query_mask, 1);
-	LinceECSSetMaskBit(query_mask, 2);
-	r = LinceECSQuery(&ecs, query_mask, &query);
+	r = LinceECSQuery(&ecs, &query, 3, (uint32_t[]){0,1,2});
 
 	assert_non_null(r);
 	assert_ptr_equal(&query, r);
@@ -347,9 +344,7 @@ void test_ecs(void** state) {
 
 	// Find entities with component 0 (all entities, despite having different archetypes)
 	array_clear(&query);
-	LinceECSUnsetMaskBit(query_mask, 1);
-	LinceECSUnsetMaskBit(query_mask, 2);
-	r = LinceECSQuery(&ecs, query_mask, &query);
+	r = LinceECSQuery(&ecs, &query, 1, (uint32_t[]){0});
 
 	assert_non_null(r);
 	assert_ptr_equal(&query, r);
@@ -362,7 +357,7 @@ void test_ecs(void** state) {
 
 	LinceECSUnsetMaskBit(query_mask, 0);
 	LinceECSSetMaskBit(query_mask, new_comp_id);
-	r = LinceECSQuery(&ecs, query_mask, &query);
+	r = LinceECSQuery(&ecs, &query, 1, (uint32_t[]) { new_comp_id });
 
 	assert_non_null(r);
 	assert_ptr_equal(&query, r);

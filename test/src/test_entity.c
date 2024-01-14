@@ -17,50 +17,6 @@ typedef struct BoxCollider { float x, y, w, h; } BoxCollider;
 typedef enum {CompPosition, CompVelocity, CompSprite, CompTimer, CompBoxCollider} Components;
 
 
-void benchmark_ecs(){
-
-    LinceEntityRegistry* reg;
-    #define SIZES sizeof(Position), sizeof(Velocity), sizeof(Sprite), sizeof(Timer), sizeof(BoxCollider)
-    void* instances[5] = {
-        &(Position){2.0,3.0},
-        &(Velocity){3.0,4.0},
-        &(Sprite){0},
-        &(Timer){0.0, 100.0, 0.1, 0.0},
-        &(BoxCollider){0.0, -1.0, 1.0, 5.0},
-    };
-
-    srand(time(NULL));
-
-    reg = LinceCreateEntityRegistry(5, SIZES);
-
-    uint32_t num = 1000000;
-    array_t entities;
-    array_init(&entities, sizeof(uint32_t));
-    array_resize(&entities, num);
-
-    BENCHMARK_LOOP(uint32_t, i, num) {
-        uint32_t id = LinceCreateEntity(reg);
-        array_set(&entities, &i, id);
-        int r = rand() % 5;
-        LinceAddEntityComponent(reg, id, r, instances[r]);
-    } BENCHMARK_END(uint32_t, i, num);
-
-
-    array_t query_result;
-    array_init(&query_result, sizeof(uint32_t));
-    array_resize(&query_result, num);
-    
-    BENCHMARK_LOOP(uint32_t, i, 5) {
-        LinceQueryEntities(reg, &query_result, 1, i);
-    } BENCHMARK_END(uint32_t, i, 5);
-    
-    array_uninit(&query_result);
-    
-    array_uninit(&entities);
-    LinceDestroyEntityRegistry(reg);
-}
-
-
 void test_entity(void** state){
     (void)state;
 
