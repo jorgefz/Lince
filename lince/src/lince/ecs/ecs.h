@@ -91,7 +91,8 @@ typedef struct LinceECSArchetype {
 	array_t		   unused_index; ///< array<LinceBool> Bools for whether slots are used (1) or unused (0).
 	array_t		   unused_slots; ///< array<uint32_t> Indices of empty slots in component data.
 	LinceECSMask   mask;		 ///< bitmask signature of the archetype
-	LinceECSSystem on_update;    ///< ECS system, to be called 
+	LinceECSSystem on_update;    ///< Callback provided with all the entities (across all archetypes) that have the components in this archetype.
+								 ///< All such systems are run when LinceECSUpdate is called.
 } LinceECSArchetype;
 
 typedef struct LinceECSRecord {
@@ -117,6 +118,30 @@ typedef struct LinceECS {
 	uint32_t  component_count; ///< Number of components
 	uint32_t  entity_count;    ///< Number of active entities
 	array_t   query_result;    ///< Caches the array for ECSQuery so that it is only initialised once
+	// hashmap_t query_cache;     ///< Hashmap< Array<arch_id> > Arrays of archetypes that match the search query for a given mask.
+
+	/*
+	
+	// -- Fetch query cache
+	cache = query_cache[query_mask];
+	for arch_id in cache {
+		query_result.add( archetypes[arch_id].entities );
+	}
+	
+	// -- Remake query
+	cache = query_cache[query_mask]
+	for arch_id, arch in archetypes {
+		if(arch.mask & query_mask){
+			cache.add( arch_id );
+			query_result.add( arch.entities )
+		}
+	}
+
+	// -- Signal redo query (when new archetype is added)
+	// No need to do this every time an entity moves archetypes
+	// because we do not cache matching entities, but matching archetypes
+
+	*/
 
 } LinceECS;
 
@@ -166,7 +191,7 @@ void* LinceECSRemoveComponents(LinceECS* ecs, LinceEntity entity_id, uint32_t co
 LinceBool LinceECSHasComponent(LinceECS* ecs, LinceEntity entity_id, uint32_t component_id);
 
 /** @brief Returns an array of the entities that have the requested components */
-array_t* LinceECSQuery(LinceECS* ecs, LinceECSMask mask, array_t* result);
+array_t* LinceECSQuery(LinceECS* ecs, array_t* result, uint32_t comp_count, uint32_t* comp_ids);
 
 /** @brief Register a callback that is run on entities that have a given set of components */
 void* LinceECSAddSystem(LinceECS* ecs, LinceECSSystem callback, uint32_t comp_num, uint32_t* comp_ids);

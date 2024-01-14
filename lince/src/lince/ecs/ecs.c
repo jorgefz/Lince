@@ -419,8 +419,9 @@ LinceBool LinceECSHasComponent(LinceECS* ecs, LinceEntity entity_id, uint32_t co
 	return LinceECSCheckMaskBit(record->mask, component_id);
 }
 
+
 // Returns an array of the entities that have the requested components
-array_t* LinceECSQuery(LinceECS* ecs, LinceECSMask mask, array_t* result) {
+static array_t* LinceECSQueryWithMask(LinceECS* ecs, LinceECSMask mask, array_t* result) {
 
 	if (memcmp(mask, (LinceECSMask) { 0 }, sizeof(LinceECSMask)) == 0) {
 		return NULL; // Empty mask
@@ -454,6 +455,16 @@ array_t* LinceECSQuery(LinceECS* ecs, LinceECSMask mask, array_t* result) {
 	return result;
 }
 
+
+array_t* LinceECSQuery(LinceECS* ecs, array_t* result, uint32_t comp_count, uint32_t* comp_ids) {
+
+	LinceECSMask mask = { 0 };
+	for (uint32_t i = 0; i != comp_count; i++) {
+		LinceECSSetMaskBit(mask, comp_ids[i]);
+	}
+
+	return LinceECSQueryWithMask(ecs, mask, result);
+}
 
 void* LinceECSAddSystem(LinceECS* ecs, LinceECSSystem callback, uint32_t comp_num, uint32_t* comp_ids) {
 	if (comp_num == 0 || !comp_ids) return NULL;
@@ -495,7 +506,7 @@ void LinceECSUpdate(LinceECS* ecs, float dt) {
 
 		*/
 
-		LinceECSQuery(ecs, arch->mask, &ecs->query_result);
+		LinceECSQueryWithMask(ecs, arch->mask, &ecs->query_result);
 		arch->on_update(ecs, dt, &ecs->query_result);
 		array_clear(&ecs->query_result);
 	}
