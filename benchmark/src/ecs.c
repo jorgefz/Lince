@@ -59,11 +59,8 @@ void benchmark_new_ecs(uint64_t n_iter) {
 	/* Querying */
 	printf("Query:         ");
 	BENCHMARK_LOOP(uint64_t, counter, n_iter) {
-		LinceECSMask mask = { 0 };
-		for (uint32_t i = 0; i != 4; ++i) {
-			mask[0] &= ((uint64_t)1 << RandComp());
-		}
-		LinceECSQuery(&ecs, mask, &ecs.query_result);
+		LinceECSQuery(&ecs, &ecs.query_result, 4, (uint32_t[]){RandComp(), RandComp(), RandComp(), RandComp()});
+		array_clear(&ecs.query_result);
 	} BENCHMARK_END(uint64_t, counter, n_iter);
 
 	printf("\n");
