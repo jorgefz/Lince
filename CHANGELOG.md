@@ -17,6 +17,7 @@ Version codes follow [Semantic Versioning](https://semver.org/).
 
 
 ## v0.8.1
+- Added new ECS 
 - Added LinceTransform and transform functions
 - Added LincePoint and coordinate conversion functions
 - Added tests
@@ -24,6 +25,8 @@ Version codes follow [Semantic Versioning](https://semver.org/).
 - Added function to hash arbitrary bytes, in preparation to make a hashmap of bitmasks to introduce archetypes to ECS.
 - Added functionality to hashmap to use byte keys of arbitrary length.
 - Improved benchmarking macros in testing
+- Moved benchmarking to separate project
+- Added benchmarking of new and old ECS, array, and hashmap.
 
 ## v0.8.0
 - Added CMocka as the testing framework.
