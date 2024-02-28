@@ -42,3 +42,7 @@ workspace "lince"
         include "editor/premake5.lua"
         include "sandbox"
     group ""
+
+    group "demos"
+        include "demos/premake5.lua"
+    group ""
