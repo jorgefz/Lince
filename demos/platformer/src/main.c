@@ -16,6 +16,11 @@ void OnUpdate(float dt) {
     LinceResizeCameraView(&camera, LinceGetAspectRatio());
     LinceUpdateCamera(&camera);
 
+    if(LinceIsKeyPressed(LinceKey_Right)) square.x += 0.02f;
+    if(LinceIsKeyPressed(LinceKey_Left))  square.x -= 0.02f;
+    if(LinceIsKeyPressed(LinceKey_Up))    square.y += 0.02f;
+    if(LinceIsKeyPressed(LinceKey_Down))  square.y -= 0.02f;
+
     LinceBeginScene(&camera);
     LinceDrawSprite(&square, NULL);
     LinceEndScene();
