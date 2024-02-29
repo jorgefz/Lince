@@ -18,16 +18,16 @@ LinceBool LinceIsMouseButtonPressed(int button){
 }
 
 LincePoint LinceGetMousePos(void) {
-    LincePoint pos;
+    double x, y;
     GLFWwindow* handle = LinceGetApp()->window->handle;
-	glfwGetCursorPos(handle, &pos.x, &pos.y);
-    return pos;
+	glfwGetCursorPos(handle, &x, &y);
+    return (LincePoint){ (float)x, (float)y };
 }
 
 float LinceGetMouseX(){
-    LinceGetMousePos().x;
+    return LinceGetMousePos().x;
 }
 
 float LinceGetMouseY(){
-    LinceGetMousePos().y;
+    return LinceGetMousePos().y;
 }
