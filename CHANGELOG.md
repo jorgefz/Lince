@@ -3,12 +3,12 @@
 Version codes follow [Semantic Versioning](https://semver.org/).
 
 ## To-Do
-- Update minigames to be compatible with v0.8
-- Formalize process to make custom games work with lince
-- Add minimal empty example in minigames repo
-- Improve user guide and clean docs folder
 
-- Rename `LinceBeginScene` and `LinceEndScene` to e.g. `LinceBeginDraw` and `LinceEndDraw`.
+- Rename `LinceBeginScene` and `LinceEndScene` to e.g. `LinceBeginRender` and `LinceEndRender`.
+- Rename functions in `app.c` to begin with `LinceApp...`.
+- Fix GetMousePos, as it requests mouse position using floats when it should be doubles.
+
+
 - Merge all key events into single struct. Add 'mods' to keys (e.g. Ctrl)
 - Move misc functions to separate files (`LinceReadFile`, `LinceGetTimeMillis`). 
 - Change entity registry initialisation to take an array of component sizes instead of a list of varargs.
@@ -16,7 +16,7 @@ Version codes follow [Semantic Versioning](https://semver.org/).
 - Create functions that don't depend on OpenGL, e.g. `LinceImage` for storing image data, `LinceClock` for timers, etc. 
 
 
-## v0.8.1
+## v0.8.1 (WIP)
 - Added new ECS 
 - Added LinceTransform and transform functions
 - Added LincePoint and coordinate conversion functions
@@ -27,6 +27,8 @@ Version codes follow [Semantic Versioning](https://semver.org/).
 - Improved benchmarking macros in testing
 - Moved benchmarking to separate project
 - Added benchmarking of new and old ECS, array, and hashmap.
+- Added demos
+- Added tutorials
 
 ## v0.8.0
 - Added CMocka as the testing framework.
