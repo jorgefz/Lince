@@ -110,6 +110,12 @@ LinceApp* LinceGetApp(){
     return &app;
 }
 
+void LinceAppSetTitle(const char* title) {
+    size_t len = strlen(title) + 1;
+    memcpy(app.title, title, (len > LINCE_TITLE_MAX) ? LINCE_TITLE_MAX : len);
+    app.title[LINCE_TITLE_MAX - 1] = '\0';
+}
+
 void LincePushLayer(LinceLayer* layer) {
     if(layer->on_attach) layer->on_attach(layer);
     array_push_back(&app.layer_stack, layer);
@@ -221,9 +227,7 @@ static void LinceInit(){
     // Check user settings and set defaults
     if (app.screen_width == 0) app.screen_width = 500;
     if (app.screen_height == 0) app.screen_height = 500;
-    if (app.title == NULL) app.title = "Lince Window";
-    app.title = LinceNewCopy(app.title, strlen(app.title)+1);
-
+    
     // Create a windowed mode window and its OpenGL context
     app.window = LinceCreateWindow(app.screen_width, app.screen_height, app.title);
     LinceSetMainEventCallback(app.window, LinceOnEvent);
@@ -318,8 +322,7 @@ static void LinceTerminate(){
     LinceDestroyWindow(app.window);
     app.window = NULL;
     app.running = 0;
-    LinceFree(app.title);
-
+    
     LinceCloseProfiler();
     LinceCloseLogger();
 }

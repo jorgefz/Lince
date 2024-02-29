@@ -37,10 +37,10 @@ typedef struct LinceApp{
     LinceGameTerminateFn on_terminate; ///< User-defined callback called when the app closes.
 
     /* User settings */
-    void* user_data;        ///< Pointer that may be freely re-assiged by the user.      
-    uint32_t screen_width;  ///< Width in pixels of the window.
-    uint32_t screen_height; ///< Height in pixels of the window.
-    char* title;      ///< String displayed at the top of the window.
+    void* user_data;             ///< Pointer that may be freely re-assiged by the user.      
+    uint32_t screen_width;       ///< Width in pixels of the window.
+    uint32_t screen_height;      ///< Height in pixels of the window.
+    char title[LINCE_TITLE_MAX]; ///< String displayed at the top of the window.
 
     /* Internal state */
     LinceWindow     *window;        ///< Window state.
@@ -113,6 +113,10 @@ LinceScene* LinceGetScene(const char* name);
 /** @brief Returns the global state of the application. See `LinceApp`.
 */
 LinceApp* LinceGetApp(void);
+
+/** @brief Set the window title. Only works before the window is initialised.
+*/
+void LinceAppSetTitle(const char* title);
 
 /** @brief Returns aspect ratio of the window.
 */
