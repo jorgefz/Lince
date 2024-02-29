@@ -1,5 +1,9 @@
 #include <lince.h>
 
+typedef struct GameState {
+    LinceCamera camera;
+} GameState;
+
 LinceCamera camera;
 LinceSprite square = {
     .x = 0, .y = 0,     // position
@@ -37,7 +41,8 @@ int main() {
     app->on_init = OnInit;
     app->on_update = OnUpdate;
     app->on_terminate = OnTerminate;
-
+    LinceAppSetTitle("Platformer Demo");
+    
 	LinceRun();
 
 	return 0;
