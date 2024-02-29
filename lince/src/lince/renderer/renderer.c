@@ -132,7 +132,7 @@ void LinceEnableDepthTest(){
 
 void LinceInitRenderer() {
 	LINCE_PROFILER_START(timer);
-
+	
 	LinceEnableAlphaBlend();
 	LinceEnableDepthTest();
 
@@ -210,7 +210,7 @@ void LinceTerminateRenderer() {
     LinceDeleteVertexArray(renderer_state.va);
 }
 
-void LinceBeginScene(LinceCamera* cam) {
+void LinceBeginRender(LinceCamera* cam) {
 	LINCE_PROFILER_START(timer);
 
 	/* Bind OpenGL objects */
@@ -277,7 +277,7 @@ static void LinceSortQuadsForBlending(){
 }
 
 
-void LinceEndScene() {
+void LinceEndRender() {
 	LinceSortQuadsForBlending();
 	uint32_t size = (uint32_t)(MAX_VERTICES * sizeof(LinceQuadVertex));
 	LinceSetVertexBufferData(renderer_state.vb, renderer_state.vertex_batch, size);
@@ -285,7 +285,7 @@ void LinceEndScene() {
 }
 
 void LinceStartNewBatch(){
-	LinceEndScene();
+	LinceEndRender();
 	renderer_state.quad_count = 0;
 	renderer_state.texture_slots[0] = renderer_state.white_texture;
 	renderer_state.texture_slot_count = 1;
@@ -316,7 +316,7 @@ void LinceDrawSprite(LinceSprite* sprite, LinceShader* shader) {
 	
 	if(sprite->texture){
 		uint32_t slots = renderer_state.texture_slot_count;
-
+		
 		// check if texture already in slots
 		for(uint32_t i = 0; i != slots; ++i){
 			if(sprite->texture != renderer_state.texture_slots[i]) continue;

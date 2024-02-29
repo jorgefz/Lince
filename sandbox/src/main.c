@@ -460,7 +460,7 @@ void GameStateUpdate(float dt){
     // Tile animation test
     UpdateTileAnimations(dt);
 
-    LinceBeginScene(&game_data.camera);
+    LinceBeginRender(&game_data.camera);
     LinceBindShader(game_data.custom_shader);
     LinceSetShaderUniformMat4(game_data.custom_shader,
         "u_view_proj", game_data.camera.view_proj);
@@ -484,7 +484,7 @@ void GameStateUpdate(float dt){
         .zorder = -0.1
     }, game_data.custom_shader);
 
-    LinceEndScene();
+    LinceEndRender();
 
     // Move
     MovePlayer(dt);

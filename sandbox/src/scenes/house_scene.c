@@ -69,7 +69,7 @@ void HouseSceneUpdate(LinceScene* scene, float dt){
 
     MoveCamera(&game_data->camera, dt * game_data->camera_speed);
     
-    LinceBeginScene(&game_data->camera);
+    LinceBeginRender(&game_data->camera);
     LinceDrawTilemap(&house_scene->map, NULL);
 
     LinceDrawSprite(&game_data->player_sprite, NULL);
@@ -86,7 +86,7 @@ void HouseSceneUpdate(LinceScene* scene, float dt){
     }, NULL);
 
 
-    LinceEndScene();
+    LinceEndRender();
 
     // Wait for interact key to enter door
    if(LinceBox2DCollides(&game_data->player_box, &house_scene->house_door.box)){

@@ -4,9 +4,7 @@ Version codes follow [Semantic Versioning](https://semver.org/).
 
 ## To-Do
 
-- Rename `LinceBeginScene` and `LinceEndScene` to e.g. `LinceBeginRender` and `LinceEndRender`.
 - Rename functions in `app.c` to begin with `LinceApp...`.
-- Fix GetMousePos, as it requests mouse position using floats when it should be doubles.
 
 
 - Merge all key events into single struct. Add 'mods' to keys (e.g. Ctrl)
@@ -29,6 +27,10 @@ Version codes follow [Semantic Versioning](https://semver.org/).
 - Added benchmarking of new and old ECS, array, and hashmap.
 - Added demos
 - Added tutorials
+- Renames `LinceBeginScene` and `LinceEndScene` to `LinceBeginRender` and `LinceEndRender`.
+- Fixed bug on `GetMousePos` with float pointers treated as double pointers.
+- Fixed `GetMouseX` and `GetMouseY` not returning a value.
+
 
 ## v0.8.0
 - Added CMocka as the testing framework.

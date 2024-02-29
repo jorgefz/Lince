@@ -12,9 +12,9 @@ void OnInit() {
 }
 
 void OnUpdate(float dt) {
-    LinceBeginScene(&camera);
+    LinceBeginRender(&camera);
     LinceDrawSprite(&square, NULL);
-    LinceEndScene();
+    LinceEndRender();
 }
 
 int main() {

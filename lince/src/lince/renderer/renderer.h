@@ -49,10 +49,10 @@ void LinceTerminateRenderer();
 /** @brief Begins a rendering scene and initialsies batch buffers
 * @param cam Camera required for the view-projection matrix
 */
-void LinceBeginScene(LinceCamera* cam);
+void LinceBeginRender(LinceCamera* cam);
 
 /** @brief Renders scene and flushes batch buffers to the screen */
-void LinceEndScene();
+void LinceEndRender();
 
 /** @brief Submits a recangle sprite for rendering
 * @param sprite Sprite to render

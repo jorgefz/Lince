@@ -87,7 +87,7 @@ void WorldSceneUpdate(LinceScene* scene, float dt){
 
     MoveCamera(&game_data->camera, dt * game_data->camera_speed);
     
-    LinceBeginScene(&game_data->camera);
+    LinceBeginRender(&game_data->camera);
     LinceDrawTilemap(&world_scene->map, NULL);
     LinceDrawSprite(&game_data->player_sprite, NULL);
     UpdatePlayer(game_data);
@@ -112,7 +112,7 @@ void WorldSceneUpdate(LinceScene* scene, float dt){
         }
     }
 
-    LinceEndScene();
+    LinceEndRender();
 }
 
 void WorldSceneDestroy(LinceScene* scene){
