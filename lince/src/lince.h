@@ -5,8 +5,8 @@
 /* Core */
 #include "lince/core/core.h"
 #include "lince/core/window.h"
-#include "lince/core/layer.h"
-#include "lince/core/app.h"
+#include "lince/app/layer.h"
+#include "lince/app/app.h"
 #include "lince/core/memory.h"
 #include "lince/core/uuid.h"
 #include "lince/core/fileio.h"

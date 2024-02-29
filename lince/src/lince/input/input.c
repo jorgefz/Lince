@@ -3,7 +3,7 @@
 #include <GLFW/glfw3.h>
 
 #include "input/input.h"
-#include "lince/core/app.h"
+#include "lince/app/app.h"
 
 LinceBool LinceIsKeyPressed(int key){
     GLFWwindow* handle = LinceGetApp()->window->handle;

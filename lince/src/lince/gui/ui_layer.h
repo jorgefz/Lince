@@ -1,7 +1,7 @@
 #ifndef LINCE_UI_LAYER_H
 #define LINCE_UI_LAYER_H
 
-#include "lince/core/layer.h"
+#include "lince/app/layer.h"
 #include "lince/asset_manager/asset_manager.h"
 
 #include "nuklear_flags.h"

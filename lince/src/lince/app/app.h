@@ -8,7 +8,7 @@
 #include "lince/containers/array.h"
 #include "lince/containers/hashmap.h"
 #include "lince/core/window.h"
-#include "lince/core/layer.h"
+#include "lince/app/layer.h"
 #include "lince/event/event.h"
 #include "lince/event/key_event.h"
 #include "lince/event/mouse_event.h"

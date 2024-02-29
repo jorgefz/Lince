@@ -4,7 +4,7 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
-#include "core/app.h"
+#include "app/app.h"
 #include "renderer/renderer.h"
 #include "gui/ui_layer.h"
 #include "input/input.h"
