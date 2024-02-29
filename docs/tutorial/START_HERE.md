@@ -12,4 +12,4 @@ It is written in C and uses the OpenGL graphics framework.
 ## Basic application
 
 * [Create a window](create_window.md)
-* [Draw a test square]()
+* [Render a square](draw_square.md)
