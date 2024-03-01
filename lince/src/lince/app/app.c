@@ -116,17 +116,17 @@ void LinceAppSetTitle(const char* title) {
     app.title[LINCE_TITLE_MAX - 1] = '\0';
 }
 
-void LincePushLayer(LinceLayer* layer) {
+void LinceAppPushLayer(LinceLayer* layer) {
     if(layer->on_attach) layer->on_attach(layer);
     array_push_back(&app.layer_stack, layer);
 }
 
-void LincePushOverlay(LinceLayer* overlay) {
+void LinceAppPushOverlay(LinceLayer* overlay) {
     if(overlay->on_attach) overlay->on_attach(overlay);
     array_push_back(&app.overlay_stack, overlay);
 }
 
-void LincePopLayer(LinceLayer* layer) {
+void LinceAppPopLayer(LinceLayer* layer) {
     if(layer->on_detach) layer->on_detach(layer);
     for(uint32_t i = 0; i != app.layer_stack.size; ++i){
         if(layer == (LinceLayer*)array_get(&app.layer_stack, i)){
@@ -137,7 +137,7 @@ void LincePopLayer(LinceLayer* layer) {
     LINCE_ASSERT(0, "Failed to find layer (0x%p) in stack", layer);
 }
 
-void LincePopOverlay(LinceLayer* overlay) {
+void LinceAppPopOverlay(LinceLayer* overlay) {
     if(overlay->on_detach) overlay->on_detach(overlay);
     for(uint32_t i = 0; i != app.overlay_stack.size; ++i){
         if(overlay == (LinceLayer*)array_get(&app.overlay_stack, i)){

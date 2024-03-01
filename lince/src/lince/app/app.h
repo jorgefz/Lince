@@ -73,23 +73,23 @@ void LinceCheckErrors();
 /** @brief Adds a rendering layer to the application.
 * @param layer Rendering layer to push onto the application's layer stack.
 */
-void LincePushLayer(LinceLayer* layer);
+void LinceAppPushLayer(LinceLayer* layer);
 
 /** @brief Adds a rendering overlay to the application.
 * @param overlay Rendering overlays to push onto the application's overlay stack.
 *                Overlays are rendered after layers.
 */
-void LincePushOverlay(LinceLayer* overlay);
+void LinceAppPushOverlay(LinceLayer* overlay);
 
 /** @brief Removes a rendering layer from the layer stack.
 * @param layer Rendering layer to remove. It's 'on_detach' method will be called.
 */
-void LincePopLayer(LinceLayer* layer);
+void LinceAppPopLayer(LinceLayer* layer);
 
 /** @brief Removes a rendering overlay from the layer stack.
 * @param layer Rendering overlay to remove. It's 'on_detach' method will be called.
 */
-void LincePopOverlay(LinceLayer* overlay);
+void LinceAppPopOverlay(LinceLayer* overlay);
 
 /** @brief Creates new scene in cache with defined callbacks. Will not call `on_init`.
 * @param name Scene identifier
