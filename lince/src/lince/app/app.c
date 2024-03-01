@@ -194,7 +194,31 @@ LinceLayer* LinceGetCurrentOverlay(){
     return array_get(&app.overlay_stack, app.current_overlay);
 }
 
+static void LinceAppDebugUIUpdate(LinceLayer* overlay, float dt){
+    LINCE_UNUSED(overlay);
+    
+    LinceUILayer* ui = LinceGetApp()->ui;
+    struct nk_context *ctx = ui->ctx;
+    static char buffer[1000] = {0};
 
+    if (nk_begin(ctx, "Debug", nk_rect(50, 50, 300, 250),
+        NK_WINDOW_BORDER|NK_WINDOW_MOVABLE|NK_WINDOW_SCALABLE|
+        NK_WINDOW_MINIMIZABLE|NK_WINDOW_TITLE
+    )) {
+
+        nk_layout_row_static(ctx, 30, 250, 1);
+        
+        // Frame time
+        sprintf(buffer, "dt (ms): %.2f", dt);
+        nk_label(ctx, buffer, NK_TEXT_LEFT);
+        // FPS
+        sprintf(buffer, "FPS: %.2f", 1000.0/dt);
+        nk_label(ctx, buffer, NK_TEXT_LEFT);
+
+    }
+    nk_end(ctx);
+
+}
 
 /* --- Implementations of static functions --- */
 
@@ -255,6 +279,13 @@ static void LinceInit(){
 
     // Delay loading fonts to give the user a chance to push custom asset paths on init
     LinceUILoadFonts(app.ui, &app.asset_manager);
+
+    #ifdef LINCE_DEBUG
+    // Default font
+    nk_style_set_font(app.ui->ctx, &app.ui->fonts[LinceFont_Droid15]->handle);
+    // Create panel with debug info
+    LinceAppPushOverlay(&(LinceLayer){.on_update = LinceAppDebugUIUpdate});
+    #endif
 }
 
 
