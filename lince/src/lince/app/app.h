@@ -7,6 +7,7 @@
 #include "cglm/mat4.h"
 #include "lince/containers/array.h"
 #include "lince/containers/hashmap.h"
+#include "lince/utils/clock.h"
 #include "lince/core/window.h"
 #include "lince/app/layer.h"
 #include "lince/event/event.h"
@@ -52,8 +53,10 @@ typedef struct LinceApp{
     LinceScene* current_scene; ///< Scene at the top of the stack.
 
     LinceBool running;   ///< True if the application is active.
-    float time_ms;       ///< Run time in milliseconds.
+    LinceClock clock;    ///< Application timer
+    float runtime;       ///< Run time in milliseconds.
     float dt;            ///< Frame time step in milliseconds.
+    
     int current_layer;   ///< Index of the active layer (during OnUpdate or OnEvent). This is `-1` if no layer is active.
     int current_overlay; ///< Index of the active overlay, akin to the current layer.
     

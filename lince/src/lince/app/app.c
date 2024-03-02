@@ -2,7 +2,6 @@
 #include <stdio.h>
 
 #include <glad/glad.h>
-#include <GLFW/glfw3.h>
 
 #include "app/app.h"
 #include "renderer/renderer.h"
@@ -274,6 +273,9 @@ static void LinceInit(){
     /// TODO: improve font handling
     app.ui = LinceInitUI(app.window->handle);
     
+    app.clock = LinceNewClock();
+    app.runtime = 0;
+
     app.running = LinceTrue;
     if (app.on_init) app.on_init(); // user may push layers onto stack
 
@@ -293,10 +295,11 @@ static void LinceOnUpdate(){
     LINCE_PROFILER_START(timer);
     LinceClear();
 
-    // Calculate delta time
-    float new_time_ms = (float)(glfwGetTime() * 1000.0);
-    app.dt = new_time_ms - app.time_ms;
-    app.time_ms = new_time_ms;
+    // Calculate time elapsed between frames
+    float runtime = LinceReadClock(app.clock) * 1000.0f; // to millisecs
+    app.dt = runtime - app.runtime;
+    app.runtime = LinceReadClock(app.clock) * 1000.0f;
+
     app.screen_width = app.window->width;
     app.screen_height = app.window->height;
 
