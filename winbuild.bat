@@ -5,6 +5,7 @@ IF not defined proj GOTO error
 
 echo Building project %proj%
 devenv lince.sln /Project build/%proj%/%proj%.vcxproj /Build "Debug|x64"
+exit /b
 
 :error
 echo Error: provide project name
