@@ -1,8 +1,9 @@
 #ifndef LINCE_CLOCK_H
 #define LINCE_CLOCK_H
 
+/** @struct Measures the number of seconds elapsed */
 typedef struct LinceClock {
-    double start;
+    double start; ///< Arbitrary timestamp of clock creation.
 } LinceClock;
 
 /** @brief Create a new clock. Starts ticking immediately. */
