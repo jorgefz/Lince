@@ -1,5 +1,5 @@
 #include "lince/asset_manager/asset_manager.h"
-#include "lince/core/fileio.h"
+#include "lince/utils/fileio.h"
 
 void LinceInitAssetManager(LinceAssetManager* am){
     array_init(&am->asset_dirs, LINCE_PATH_MAX * sizeof(char));

@@ -1,5 +1,5 @@
 #include "core/profiler.h"
-#include "core/memory.h"
+#include "utils/memory.h"
 #include "renderer/texture.h"
 #include <stb_image.h>
 #include <glad/glad.h>

@@ -1,5 +1,5 @@
 #include "core/profiler.h"
-#include "core/memory.h"
+#include "utils/memory.h"
 #include "renderer/vertex_array.h"
 #include <glad/glad.h>
 #include <stdlib.h>

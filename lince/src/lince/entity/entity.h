@@ -2,7 +2,7 @@
 #define LINCE_ENTITY_H
 
 #include <lince/core/core.h>
-#include <lince/core/memory.h>
+#include <lince/utils/memory.h>
 #include <lince/containers/array.h>
 
 #ifndef LINCE_MAX_ENTITY_COMPONENTS_U64_COUNT

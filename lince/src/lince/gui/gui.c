@@ -1,5 +1,5 @@
 #include "gui/gui.h"
-#include "core/memory.h"
+#include "utils/memory.h"
 
 #include "event/event.h"
 #include "event/key_event.h"

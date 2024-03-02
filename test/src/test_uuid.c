@@ -1,4 +1,4 @@
-#include "lince/core/uuid.h"
+#include "lince/utils/uuid.h"
 
 #include <stdarg.h>
 #include <stddef.h>

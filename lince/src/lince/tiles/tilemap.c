@@ -1,6 +1,6 @@
 
 #include "lince/core/core.h"
-#include "lince/core/memory.h"
+#include "lince/utils/memory.h"
 #include "lince/tiles/tilemap.h"
 #include "lince/renderer/renderer.h"
 

@@ -1,6 +1,6 @@
 
 #include "event/key_event.h"
-#include "core/memory.h"
+#include "utils/memory.h"
 
 LinceEvent LinceNewKeyPressEvent(int key, int repeats){
     LinceEvent e = {

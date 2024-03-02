@@ -1,6 +1,6 @@
 
 #include "event/event.h"
-#include "core/memory.h"
+#include "utils/memory.h"
 
 LinceBool LinceDispatchEvent(LinceEvent* e, LinceEventType etype, LinceEventFn func){
     if (e->type == etype){

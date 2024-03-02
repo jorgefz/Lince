@@ -1,7 +1,7 @@
 #include "renderer/camera.h"
 #include "core/core.h"
 #include "core/profiler.h"
-#include "core/memory.h"
+#include "utils/memory.h"
 #include <cglm/cam.h>
 #include <cglm/mat4.h>
 #include <cglm/affine.h>

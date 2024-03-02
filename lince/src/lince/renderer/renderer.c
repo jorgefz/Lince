@@ -1,6 +1,6 @@
 #include <stdlib.h>
 #include "core/profiler.h"
-#include "core/memory.h"
+#include "utils/memory.h"
 #include "renderer/renderer.h"
 #include "renderer/camera.h"
 #include <glad/glad.h>

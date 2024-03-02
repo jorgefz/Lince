@@ -40,7 +40,7 @@
 #define LINCE_LAYER_H
 
 #include "lince/event/event.h"
-#include "lince/core/uuid.h"
+#include "lince/utils/uuid.h"
 
 /** @struct LinceLayer
 * @brief Stores geometry that is generally rendered together.

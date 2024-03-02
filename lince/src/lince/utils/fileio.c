@@ -1,7 +1,7 @@
 #include "lince/core/core.h"
 #include "lince/containers/array.h"
-#include "lince/core/memory.h"
-#include "lince/core/fileio.h"
+#include "lince/utils/memory.h"
+#include "lince/utils/fileio.h"
 
 #ifdef LINCE_WINDOWS
 	#include <sys/types.h>

@@ -1,6 +1,6 @@
 #include "core/profiler.h"
-#include "core/memory.h"
-#include "core/fileio.h"
+#include "utils/memory.h"
+#include "utils/fileio.h"
 #include "renderer/shader.h"
 #include <string.h>
 #include <glad/glad.h>

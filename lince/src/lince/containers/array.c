@@ -1,5 +1,5 @@
 #include "containers/array.h"
-#include "core/memory.h"
+#include "utils/memory.h"
 
 /* Factor by which the capacity is increased */
 #define ARRAY_GROW_FACTOR 1.5

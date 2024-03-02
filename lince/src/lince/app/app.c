@@ -9,7 +9,7 @@
 #include "gui/gui.h"
 #include "input/input.h"
 #include "core/profiler.h"
-#include "core/memory.h"
+#include "utils/memory.h"
 
 /* Private application state - stack allocated */
 static LinceApp app = {0};

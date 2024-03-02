@@ -1,6 +1,6 @@
 
 #include "event/window_event.h"
-#include "core/memory.h"
+#include "utils/memory.h"
 
 
 LinceEvent LinceNewWindowCloseEvent(){

@@ -4,7 +4,7 @@
 
 #include "audio.h"
 #include <lince/core/core.h>
-#include <lince/core/memory.h>
+#include <lince/utils/memory.h>
 
 
 static const LinceSoundConfig default_sound_config = {

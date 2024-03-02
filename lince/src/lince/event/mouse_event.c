@@ -1,6 +1,6 @@
 
 #include "event/mouse_event.h"
-#include "core/memory.h"
+#include "utils/memory.h"
 
 LinceEvent LinceNewMousePressEvent(int button){
     LinceEvent e = {
