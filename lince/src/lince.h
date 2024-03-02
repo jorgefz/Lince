@@ -10,6 +10,7 @@
 #include "lince/utils/memory.h"
 #include "lince/utils/uuid.h"
 #include "lince/utils/fileio.h"
+#include "lince/utils/clock.h"
 
 /* Input */
 #include "lince/input/input.h"

@@ -4,13 +4,14 @@ Version codes follow [Semantic Versioning](https://semver.org/).
 
 ## To-Do
 
+- Rename asset manager to e.g. asset cache.
+- Create functions that don't depend on OpenGL, e.g. `LinceImage` for storing image data, `LinceClock` for timers, etc. 
 - Rename functions in `app.c` to begin with `LinceApp...`.
 - Make font system more dynamic
 
 - Merge all key events into single struct. Add 'mods' to keys (e.g. Ctrl)
 - Move misc functions to separate files (`LinceReadFile`, `LinceGetTimeMillis`). 
 - Nuklear UI wrapper and/or custom docs.
-- Create functions that don't depend on OpenGL, e.g. `LinceImage` for storing image data, `LinceClock` for timers, etc. 
 
 
 ## v0.8.1 (WIP)
