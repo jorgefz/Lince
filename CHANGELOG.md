@@ -30,6 +30,8 @@ Version codes follow [Semantic Versioning](https://semver.org/).
 - Renames `LinceBeginScene` and `LinceEndScene` to `LinceBeginRender` and `LinceEndRender`.
 - Fixed bug on `GetMousePos` with float pointers treated as double pointers.
 - Fixed `GetMouseX` and `GetMouseY` not returning a value.
+- Added LinceClock
+- Improved profiler
 
 
 ## v0.8.0

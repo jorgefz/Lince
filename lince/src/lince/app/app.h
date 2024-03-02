@@ -137,13 +137,13 @@ LincePoint LinceGetMousePosWorld(LinceCamera* cam);
 * Returns NULL if no layer is being handled.
 * Should only be used within a layer's OnUpdate and OnEvent callbacks.
 */
-LinceLayer* LinceGetCurrentLayer();
+LinceLayer* LinceAppGetCurrentLayer();
 
 /** @brief Returns current overlay being handled or updated.
 * Returns NULL if no overlay is being handled.
 * Should only be used within a overlay's OnUpdate and OnEvent callbacks.
 */
-LinceLayer* LinceGetCurrentOverlay();
+LinceLayer* LinceAppGetCurrentOverlay();
 
 
 #endif // LINCE_APP_H

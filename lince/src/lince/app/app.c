@@ -33,8 +33,8 @@ propagates it to layers and user */
 static void LinceOnEvent(LinceEvent* e);
 
 /* Window event callbacks */
-static LinceBool LinceOnEventWindowResize(LinceEvent* e);
-static LinceBool LinceOnEventWindowClose(LinceEvent* e);
+static LinceBool LinceAppEventWindowResize(LinceEvent* e);
+static LinceBool LinceAppEventWindowClose(LinceEvent* e);
 
 static char const* GLGetErrorString(GLenum const err) {
   switch (err) {
@@ -183,12 +183,12 @@ LincePoint LinceGetMousePosWorld(LinceCamera* cam) {
     return LincePointScreenToWorld(pos, cam);
 }
 
-LinceLayer* LinceGetCurrentLayer(){
+LinceLayer* LinceAppGetCurrentLayer(){
     if (app.current_layer < 0) return NULL;
     return array_get(&app.layer_stack, app.current_layer);
 }
 
-LinceLayer* LinceGetCurrentOverlay(){
+LinceLayer* LinceAppGetCurrentOverlay(){
     if (app.current_overlay < 0) return NULL;
     return array_get(&app.overlay_stack, app.current_overlay);
 }
@@ -207,13 +207,11 @@ static void LinceAppDebugUIUpdate(LinceLayer* overlay, float dt){
 
         nk_layout_row_static(ctx, 30, 250, 1);
         
-        // Frame time
-        sprintf(buffer, "dt (ms): %.2f", dt);
-        nk_label(ctx, buffer, NK_TEXT_LEFT);
-        // FPS
-        sprintf(buffer, "FPS: %.2f", 1000.0/dt);
-        nk_label(ctx, buffer, NK_TEXT_LEFT);
-
+        nk_labelf(ctx, NK_TEXT_LEFT, "Window: %ux%u", app.screen_width, app.screen_height);
+        nk_labelf(ctx, NK_TEXT_LEFT, "dt: %.2f ms", dt);
+        nk_labelf(ctx, NK_TEXT_LEFT, "FPS: %.2f", 1000.0/dt);
+        nk_labelf(ctx, NK_TEXT_LEFT, "Runtime: %.2f s", app.runtime/1000.0);
+        
     }
     nk_end(ctx);
 
@@ -368,11 +366,11 @@ static void LinceOnEvent(LinceEvent* e){
     LinceDispatchEvent(
         e,
         LinceEventType_WindowResize,
-        LinceOnEventWindowResize
+        LinceAppEventWindowResize
     );
     LinceDispatchEvent(e,
         LinceEventType_WindowClose,
-        LinceOnEventWindowClose
+        LinceAppEventWindowClose
     );
 
     LinceUIOnEvent(app.ui, e);
@@ -387,7 +385,7 @@ static void LinceOnEvent(LinceEvent* e){
 }
 
 
-static LinceBool LinceOnEventWindowResize(LinceEvent* e){
+static LinceBool LinceAppEventWindowResize(LinceEvent* e){
     LINCE_INFO(" Window resized to %d x %d", 
         (int)e->data.window_resize->width,
         (int)e->data.window_resize->height
@@ -395,7 +393,7 @@ static LinceBool LinceOnEventWindowResize(LinceEvent* e){
     return LinceFalse; // allow other layers to receive event
 }
 
-static LinceBool LinceOnEventWindowClose(LinceEvent* e) {
+static LinceBool LinceAppEventWindowClose(LinceEvent* e) {
     app.running = LinceFalse;
     return LinceFalse; // allow other layers to receive event
     LINCE_UNUSED(e);
