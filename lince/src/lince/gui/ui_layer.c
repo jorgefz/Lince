@@ -46,6 +46,7 @@ void LinceUILoadFonts(LinceUILayer* ui, LinceAssetManager* am){
         const char* font_path = LinceFetchAssetPath(am, font_files[i]);
         LINCE_ASSERT(font_path, "Could not find location of default font '%s'", font_files[i]);
 
+        ui->fonts[LinceFont_Droid8]  = nk_font_atlas_add_from_file(atlas, font_path, 8, 0);
         ui->fonts[LinceFont_Droid15] = nk_font_atlas_add_from_file(atlas, font_path, 15, 0);
         ui->fonts[LinceFont_Droid20] = nk_font_atlas_add_from_file(atlas, font_path, 20, 0);
         ui->fonts[LinceFont_Droid30] = nk_font_atlas_add_from_file(atlas, font_path, 30, 0);

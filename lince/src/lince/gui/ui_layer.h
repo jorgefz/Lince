@@ -12,7 +12,8 @@
 * with their sizes in pt.
 */
 typedef enum LinceFonts {
-    LinceFont_Droid15 = 0,
+    LinceFont_Droid8 = 0,
+    LinceFont_Droid15,
     LinceFont_Droid20,
     LinceFont_Droid30,
     LinceFont_Droid50,

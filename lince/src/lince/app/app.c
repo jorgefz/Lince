@@ -282,7 +282,7 @@ static void LinceInit(){
 
     #ifdef LINCE_DEBUG
     // Default font
-    nk_style_set_font(app.ui->ctx, &app.ui->fonts[LinceFont_Droid15]->handle);
+    nk_style_set_font(app.ui->ctx, &app.ui->fonts[LinceFont_Droid8]->handle);
     // Create panel with debug info
     LinceAppPushOverlay(&(LinceLayer){.on_update = LinceAppDebugUIUpdate});
     #endif
