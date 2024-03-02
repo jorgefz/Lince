@@ -2,10 +2,10 @@
 
 #include <GLFW/glfw3.h>
 
-static FILE* PROFILER = NULL;
+static LinceProfiler PROFILER = {0};
 
 FILE* LinceGetProfiler(){
-	return PROFILER;
+	return PROFILER.output_file;
 }
 
 void LinceOpenProfiler(const char* filename){
@@ -13,16 +13,13 @@ void LinceOpenProfiler(const char* filename){
         fprintf(stderr, "[Warning] Profiler filename undefined. Profiling is disabled.");
         return;
     }
-	PROFILER = fopen(filename, "w");
+	PROFILER.output_file = fopen(filename, "w");
 }
 
 void LinceCloseProfiler(){
-	if(!PROFILER) return;
-	fclose(PROFILER);
-    PROFILER = NULL;
+	if(!PROFILER.output_file) return;
+	fclose(PROFILER.output_file);
+    PROFILER.output_file = NULL;
 }
 
-double LinceGetTimeMillisec(void){
-	return (glfwGetTime() * 1000.0);
-}
 
