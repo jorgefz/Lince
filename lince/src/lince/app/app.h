@@ -14,7 +14,7 @@
 #include "lince/event/mouse_event.h"
 #include "lince/event/window_event.h"
 #include "lince/renderer/camera.h"
-#include "lince/gui/ui_layer.h"
+#include "lince/gui/gui.h"
 #include "lince/scene/scene.h"
 #include "lince/asset_manager/asset_manager.h"
 #include "lince/renderer/transform.h"

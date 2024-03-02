@@ -1,4 +1,4 @@
-#include "gui/ui_layer.h"
+#include "gui/gui.h"
 #include "core/memory.h"
 
 #include "event/event.h"

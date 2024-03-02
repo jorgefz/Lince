@@ -6,7 +6,7 @@
 
 #include "app/app.h"
 #include "renderer/renderer.h"
-#include "gui/ui_layer.h"
+#include "gui/gui.h"
 #include "input/input.h"
 #include "core/profiler.h"
 #include "core/memory.h"
