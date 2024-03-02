@@ -73,7 +73,7 @@ LinceShader* LinceCreateShaderFromSrc(
 	LINCE_ASSERT(ret,
 		"Failed to create hashmap for shader %d uniforms", shader->id);
 
-	LINCE_INFO(" ---> Done!")
+	LINCE_INFO(" ---> Done!");
 
 	LINCE_PROFILER_END(timer);
     return shader;
