@@ -272,7 +272,7 @@ followed by translucent ones from back to front.
 See https://www.opengl.org/archives/resources/faq/technical/transparency.htm
 Also see https://learnopengl.com/Advanced-OpenGL/Blending
 */
-static void LinceSortQuadsForBlending(){
+static void LinceSortQuadsBlendOrder(){
 	LinceQuadVertex *batch = renderer_state.vertex_batch;
 	uint32_t count = renderer_state.quad_count;
 	qsort(batch, count, sizeof(LinceQuadVertex)*4, LinceCompareQuadsBlendOrder);
@@ -280,7 +280,7 @@ static void LinceSortQuadsForBlending(){
 
 
 void LinceEndRender() {
-	LinceSortQuadsForBlending();
+	LinceSortQuadsBlendOrder();
 	uint32_t size = (uint32_t)(MAX_VERTICES * sizeof(LinceQuadVertex));
 	LinceSetVertexBufferData(renderer_state.vb, renderer_state.vertex_batch, size);
 	LinceFlushRender();
