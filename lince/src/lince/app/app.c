@@ -165,6 +165,7 @@ static void LinceAppDrawDebugUIPanel(LinceLayer* overlay, float dt){
     
     LinceUILayer* ui = LinceGetApp()->ui;
     struct nk_context *ctx = ui->ctx;
+    nk_style_push_font(ctx, &ui->fonts[LinceFont_Droid20]->handle);
 
     if (nk_begin(ctx, "Debug", nk_rect(50, 50, 300, 250),
         NK_WINDOW_BORDER|NK_WINDOW_MOVABLE|NK_WINDOW_SCALABLE|
@@ -175,12 +176,12 @@ static void LinceAppDrawDebugUIPanel(LinceLayer* overlay, float dt){
         
         nk_labelf(ctx, NK_TEXT_LEFT, "Window: %ux%u", app.screen_width, app.screen_height);
         nk_labelf(ctx, NK_TEXT_LEFT, "dt: %.2f ms", dt);
-        nk_labelf(ctx, NK_TEXT_LEFT, "FPS: %.2f", 1000.0/dt);
-        nk_labelf(ctx, NK_TEXT_LEFT, "Runtime: %.2f s", app.runtime/1000.0);
+        nk_labelf(ctx, NK_TEXT_LEFT, "FPS: %.2f", 1000.0f/dt);
+        nk_labelf(ctx, NK_TEXT_LEFT, "Runtime: %.2f s", app.runtime/1000.0f);
         
     }
     nk_end(ctx);
-
+    nk_style_pop_font(ctx);
 }
 
 /* --- Implementations of static functions --- */
