@@ -198,7 +198,6 @@ static void LinceAppDebugUIUpdate(LinceLayer* overlay, float dt){
     
     LinceUILayer* ui = LinceGetApp()->ui;
     struct nk_context *ctx = ui->ctx;
-    static char buffer[1000] = {0};
 
     if (nk_begin(ctx, "Debug", nk_rect(50, 50, 300, 250),
         NK_WINDOW_BORDER|NK_WINDOW_MOVABLE|NK_WINDOW_SCALABLE|
