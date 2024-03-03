@@ -237,7 +237,7 @@ void LinceBeginRender(LinceCamera* cam) {
 	LINCE_PROFILER_END(timer);
 }
 
-void LinceFlushScene(){
+static void LinceFlushRender(){
 	LINCE_PROFILER_START(timer);
 
 	for (uint32_t i = 0; i != renderer_state.texture_slot_count; ++i){
@@ -281,7 +281,7 @@ void LinceEndRender() {
 	LinceSortQuadsForBlending();
 	uint32_t size = (uint32_t)(MAX_VERTICES * sizeof(LinceQuadVertex));
 	LinceSetVertexBufferData(renderer_state.vb, renderer_state.vertex_batch, size);
-	LinceFlushScene();
+	LinceFlushRender();
 }
 
 void LinceStartNewBatch(){
