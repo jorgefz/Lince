@@ -250,12 +250,14 @@ static void LinceFlushRender(){
 
 
 static int LinceCompareQuadsBlendOrder(const void *a, const void *b){
-	float alpha1 = ((const LinceQuadVertex*)(a))->color[3];
-	float alpha2 = ((const LinceQuadVertex*)(b))->color[3];
+	const LinceQuadVertex* qva = a;
+	const LinceQuadVertex* qvb = b;
+	float alpha1 = qva->color[3];
+	float alpha2 = qvb->color[3];
 	// If both opaque or both translucent, sort by z order
 	if ((alpha1 == 1.0 && alpha2 == 1.0) || (alpha1 < 1.0 && alpha2 < 1.0)){
-		float z1 = ((const LinceQuadVertex*)(a))->z;
-		float z2 = ((const LinceQuadVertex*)(b))->z;
+		float z1 = qva->z;
+		float z2 = qvb->z;
 		return z1 > z2 ? 1 : -1; // ascending
 	}
 	// If one opaque and one translucent,
