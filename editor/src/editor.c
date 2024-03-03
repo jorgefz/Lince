@@ -145,7 +145,7 @@ void DrawGUI(){
     struct nk_context* ctx = ui->ctx;
 
     vec2 screen_size;
-    LinceGetScreenSize(screen_size);
+    LinceAppGetScreenSize(screen_size);
     float width = screen_size[0], height = screen_size[1];
     
     nk_style_set_font(ctx, &ui->fonts[LinceFont_Droid15]->handle);
@@ -270,12 +270,12 @@ void EditorInit(){
         sizeof(LinceSprite),
         sizeof(LinceShader)
     );
-    STATE.camera = LinceCreateCamera(LinceGetAspectRatio());
+    STATE.camera = LinceCreateCamera(LinceAppGetAspectRatio());
 }
 
 void EditorOnUpdate(float dt){
     MoveCamera(dt);
-    LinceResizeCameraView(STATE.camera, LinceGetAspectRatio());
+    LinceResizeCameraView(STATE.camera, LinceAppGetAspectRatio());
 	LinceUpdateCamera(STATE.camera);
     DrawGUI();
     DrawEntities();

@@ -230,7 +230,7 @@ void LinceDrawSprites(LinceEntityRegistry* reg){
 
     // Setup lightning shader uniforms
     LinceBindShader(game_data.custom_shader);
-    LincePoint screen_size = LinceGetScreenSize();
+    LincePoint screen_size = LinceAppGetScreenSize();
     vec2 wsize = { screen_size.x, screen_size.y };
     LinceSetShaderUniformVec2(game_data.custom_shader, "uWindowSize", wsize);
     LincePoint mouse_pos = LinceGetMousePos();
@@ -313,7 +313,7 @@ void MovePlayer(float dt){
 void GameStateInit(){
 
     // Resources
-    LinceInitCamera(&game_data.camera, LinceGetAspectRatio());
+    LinceInitCamera(&game_data.camera, LinceAppGetAspectRatio());
     game_data.camera.zoom = 1.3f;
 
     game_data.custom_shader = LinceCreateShader(
@@ -454,7 +454,7 @@ void GameStateInit(){
 void GameStateUpdate(float dt){
 
     // Rendering
-    LinceResizeCameraView(&game_data.camera, LinceGetAspectRatio());
+    LinceResizeCameraView(&game_data.camera, LinceAppGetAspectRatio());
 	LinceUpdateCamera(&game_data.camera);
 
     // Tile animation test
@@ -644,7 +644,7 @@ void SandboxInit() {
 
     LinceApp* app = LinceGetApp();
     LincePushAssetDir(&app->asset_manager, asset_dir);
-    LinceInitCamera(&DATA.camera, LinceGetAspectRatio());
+    LinceInitCamera(&DATA.camera, LinceAppGetAspectRatio());
     DATA.camera.zoom = 3.0f;
     DATA.camera_speed = 0.003f;
 
@@ -661,7 +661,7 @@ void SandboxInit() {
 }
 
 void SandboxUpdate(float dt){
-    LinceResizeCameraView(&DATA.camera, LinceGetAspectRatio());
+    LinceResizeCameraView(&DATA.camera, LinceAppGetAspectRatio());
     LinceUpdateCamera(&DATA.camera);
 }
 

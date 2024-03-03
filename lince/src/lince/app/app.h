@@ -123,10 +123,10 @@ void LinceAppSetTitle(const char* title);
 
 /** @brief Returns aspect ratio of the window.
 */
-float LinceGetAspectRatio(void);
+float LinceAppGetAspectRatio(void);
 
 /** @brief Returns the current window width and height in pixels */
-LincePoint LinceGetScreenSize(void);
+LincePoint LinceAppGetScreenSize(void);
 
 /** @brief Returns the position of the mouse pointer in world coordinates.
 * @param cam Camera used to determine the world position.

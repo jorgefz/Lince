@@ -166,11 +166,11 @@ LinceScene* LinceGetScene(const char* name) {
     return hashmap_get(&app.scene_cache, name);
 }
 
-float LinceGetAspectRatio(){
+float LinceAppGetAspectRatio(){
     return (float)app.window->width / (float)app.window->height;
 }
 
-LincePoint LinceGetScreenSize(){
+LincePoint LinceAppGetScreenSize(){
     return (LincePoint) {
         .x = (float)app.window->width,
         .y = (float)app.window->height
@@ -178,7 +178,7 @@ LincePoint LinceGetScreenSize(){
 }
 
 LincePoint LinceGetMousePosWorld(LinceCamera* cam) {
-    LincePoint scr = LinceGetScreenSize();
+    LincePoint scr = LinceAppGetScreenSize();
     LincePoint pos = LincePointPixelToScreen(LinceGetMousePos(), scr.x, scr.y);
     return LincePointScreenToWorld(pos, cam);
 }

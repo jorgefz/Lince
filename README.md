@@ -19,7 +19,7 @@ LinceSprite square = {
 };
 
 void OnInit() {
-	camera = LinceCreateCamera(LinceGetAspectRatio());
+	camera = LinceCreateCamera(LinceAppGetAspectRatio());
 }
 
 void OnUpdate(float dt) {
