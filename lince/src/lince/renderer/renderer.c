@@ -237,7 +237,7 @@ void LinceBeginRender(LinceCamera* cam) {
 	LINCE_PROFILER_END(timer);
 }
 
-static void LinceFlushRender(){
+static void LinceDrawBatch(){
 	LINCE_PROFILER_START(timer);
 
 	for (uint32_t i = 0; i != renderer_state.texture_slot_count; ++i){
@@ -248,7 +248,9 @@ static void LinceFlushRender(){
 	LINCE_PROFILER_END(timer);
 }
 
-
+/*
+Describes blending order for quads.
+*/
 static int LinceCompareQuadsBlendOrder(const void *a, const void *b){
 	const LinceQuadVertex* qva = a;
 	const LinceQuadVertex* qvb = b;
@@ -283,10 +285,10 @@ void LinceEndRender() {
 	LinceSortQuadsBlendOrder();
 	uint32_t size = (uint32_t)(MAX_VERTICES * sizeof(LinceQuadVertex));
 	LinceSetVertexBufferData(renderer_state.vb, renderer_state.vertex_batch, size);
-	LinceFlushRender();
+	LinceDrawBatch();
 }
 
-void LinceStartNewBatch(){
+void LinceFlushRender(){
 	LinceEndRender();
 	renderer_state.quad_count = 0;
 	renderer_state.texture_slots[0] = renderer_state.white_texture;
@@ -301,7 +303,7 @@ void LinceDrawSprite(LinceSprite* sprite, LinceShader* shader) {
 		shader = renderer_state.default_shader;
 		LinceBindShader(renderer_state.default_shader);
 	} else if (shader != renderer_state.shader){
-		LinceStartNewBatch();
+		LinceFlushRender();
 		LinceBindShader(renderer_state.shader);
 	}
 	renderer_state.shader = shader;
@@ -310,7 +312,7 @@ void LinceDrawSprite(LinceSprite* sprite, LinceShader* shader) {
 	if (renderer_state.quad_count >= MAX_QUADS ||
 		renderer_state.texture_slot_count >= MAX_TEXTURE_SLOTS)
 	{
-		LinceStartNewBatch();
+		LinceFlushRender();
 	}
 	
 	// calculate texture index

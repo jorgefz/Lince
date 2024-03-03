@@ -54,6 +54,11 @@ void LinceBeginRender(LinceCamera* cam);
 /** @brief Renders scene and flushes batch buffers to the screen */
 void LinceEndRender();
 
+/** @brief Draw stored vertices and clear vertex batch.
+ * Useful to draw sprites using same shader with different values for uniforms.
+*/
+void LinceFlushRender();
+
 /** @brief Submits a recangle sprite for rendering
 * @param sprite Sprite to render
 * @param shader LinceShader to bind. If NULL, a default minimal shader is used.
@@ -73,8 +78,6 @@ void LinceClear();
 /** @brief Sets the default background screen color */
 void LinceSetClearColor(float r, float g, float b, float a);
 
-/** @brief Draw stored vertices and clear vertex batch */
-void LinceStartNewBatch();
 
 
 #endif // LINCE_RENDERER_H
