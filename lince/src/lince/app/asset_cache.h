@@ -24,10 +24,10 @@ void LinceUninitAssetCache(LinceAssetCache* cache);
 */
 LinceBool LinceAssetCachePushDir(LinceAssetCache* cache, const char* dir);
 
-/** @brief Retrieves the full path of an asset file by searching on the asset folders
-* @note the resulting path is written to the `result_path` field in `LinceAssetManager`.
-* @param asset_filename Location of the asset file within an asset folder
-* @returns a pointer to the `result_path` field with the resolved asset path, or NULL if the asset could not be found
+/** @brief Retrieves the full path of an asset file by searching in the stored asset folders
+* @param filename Location of the asset file within an asset folder
+* @returns a pointer to the resulting path, or NULL if the asset could not be found
+* @note the path returned is saved internally and will be overwritten the next time the function is called.
 */
 char* LinceAssetCacheFetchPath(LinceAssetCache* cache, const char* filename);
 
