@@ -2,7 +2,7 @@
 #define LINCE_UI_LAYER_H
 
 #include "lince/app/layer.h"
-#include "lince/asset_manager/asset_manager.h"
+#include "lince/app/asset_cache.h"
 
 #include "nuklear_flags.h"
 #include "nuklear.h"
@@ -41,7 +41,7 @@ LinceUILayer* LinceInitUI(void* glfw_window);
 * @param ui initialised ui state
 * @param am initialised asset manager to resolve paths to the fonts
 */
-void LinceUILoadFonts(LinceUILayer* ui, LinceAssetManager* am);
+void LinceUILoadFonts(LinceUILayer* ui, LinceAssetCache* am);
 
 /** @brief Initialise Nuklear's render queue.
 * Any GUI draw calls must be bracketed between LinceBeginUIRender and LinceEndUIRender.

@@ -34,7 +34,7 @@ LinceUILayer* LinceInitUI(void* glfw_window){
 }
 
 
-void LinceUILoadFonts(LinceUILayer* ui, LinceAssetManager* am){
+void LinceUILoadFonts(LinceUILayer* ui, LinceAssetCache* am){
 
     static const char* font_files[] = { "fonts/DroidSans.ttf" };
     const uint32_t font_num = sizeof(font_files) / sizeof(char**);
@@ -43,7 +43,7 @@ void LinceUILoadFonts(LinceUILayer* ui, LinceAssetManager* am){
     nk_glfw3_font_stash_begin(ui->glfw, &atlas);
     
     for (uint32_t i = 0; i != font_num; ++i){
-        const char* font_path = LinceFetchAssetPath(am, font_files[i]);
+        const char* font_path = LinceAssetCacheFetchPath(am, font_files[i]);
         LINCE_ASSERT(font_path, "Could not find location of default font '%s'", font_files[i]);
 
         ui->fonts[LinceFont_Droid8]  = nk_font_atlas_add_from_file(atlas, font_path, 8, 0);

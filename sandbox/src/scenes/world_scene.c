@@ -53,7 +53,7 @@ void WorldSceneInit(LinceScene* scene){
     scene->data = world_scene;
     
     // Town map
-    char* map_path = LinceFetchAssetPath(&LinceGetApp()->asset_manager, "textures/outside.png");
+    char* map_path = LinceAppFetchAssetPath("textures/outside.png");
     
     world_scene->map =  (LinceTilemap){
         .texture = LinceLoadTexture(

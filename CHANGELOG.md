@@ -32,6 +32,8 @@ Version codes follow [Semantic Versioning](https://semver.org/).
 - Fixed `GetMouseX` and `GetMouseY` not returning a value.
 - Added LinceClock
 - Improved profiler
+- Renamed some App functions
+- Renamed asset manager to asset cache
 
 
 ## v0.8.0

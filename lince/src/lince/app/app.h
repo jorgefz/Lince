@@ -17,7 +17,7 @@
 #include "lince/renderer/camera.h"
 #include "lince/gui/gui.h"
 #include "lince/scene/scene.h"
-#include "lince/asset_manager/asset_manager.h"
+#include "lince/app/asset_cache.h"
 #include "lince/renderer/transform.h"
 
 /** Function pointer typedefs for user-defined application callbacks */
@@ -60,7 +60,7 @@ typedef struct LinceApp{
     int current_layer;   ///< Index of the active layer (during OnUpdate or OnEvent). This is `-1` if no layer is active.
     int current_overlay; ///< Index of the active overlay, akin to the current layer.
     
-    LinceAssetManager asset_manager; ///< Finds paths to assets
+    LinceAssetCache asset_cache; ///< Finds paths to assets
     LinceUILayer* ui;   ///< State of the GUI, e.g. Nuklear's context.
 
 } LinceApp;
@@ -69,9 +69,19 @@ typedef struct LinceApp{
 */
 void LinceRun();
 
-/** @brief Fetches OpenGL errors and quits the program if any are found.
+/** @brief Returns the global state of the application. See `LinceApp`.
 */
-void LinceCheckErrors();
+LinceApp* LinceGetApp(void);
+
+/** @brief Set the window title. Only works before the window is initialised.
+*/
+void LinceAppSetTitle(const char* title);
+
+/** @brief Save the location of an assets folder relative to the executable */
+void LinceAppPushAssetDir(const char* dir);
+
+/** @brief Save the location of an assets folder relative to the executable */
+char* LinceAppFetchAssetPath(const char* filename);
 
 /** @brief Adds a rendering layer to the application.
 * @param layer Rendering layer to push onto the application's layer stack.
@@ -94,6 +104,18 @@ void LinceAppPopLayer(LinceLayer* layer);
 */
 void LinceAppPopOverlay(LinceLayer* overlay);
 
+/** @brief Returns current layer being handled or updated.
+* Returns NULL if no layer is being handled.
+* Should only be used within a layer's OnUpdate and OnEvent callbacks.
+*/
+LinceLayer* LinceAppGetCurrentLayer();
+
+/** @brief Returns current overlay being handled or updated.
+* Returns NULL if no overlay is being handled.
+* Should only be used within a overlay's OnUpdate and OnEvent callbacks.
+*/
+LinceLayer* LinceAppGetCurrentOverlay();
+
 /** @brief Creates new scene in cache with defined callbacks. Will not call `on_init`.
 * @param name Scene identifier
 * @callbacks scene struct with callbacks defined
@@ -112,15 +134,6 @@ void LinceAppLoadScene(const char* name);
 */
 LinceScene* LinceAppGetScene(const char* name);
 
-
-/** @brief Returns the global state of the application. See `LinceApp`.
-*/
-LinceApp* LinceGetApp(void);
-
-/** @brief Set the window title. Only works before the window is initialised.
-*/
-void LinceAppSetTitle(const char* title);
-
 /** @brief Returns aspect ratio of the window.
 */
 float LinceAppGetAspectRatio(void);
@@ -133,17 +146,7 @@ LincePoint LinceAppGetScreenSize(void);
 */
 LincePoint LinceGetMousePosWorld(LinceCamera* cam);
 
-/** @brief Returns current layer being handled or updated.
-* Returns NULL if no layer is being handled.
-* Should only be used within a layer's OnUpdate and OnEvent callbacks.
-*/
-LinceLayer* LinceAppGetCurrentLayer();
 
-/** @brief Returns current overlay being handled or updated.
-* Returns NULL if no overlay is being handled.
-* Should only be used within a overlay's OnUpdate and OnEvent callbacks.
-*/
-LinceLayer* LinceAppGetCurrentOverlay();
 
 
 #endif // LINCE_APP_H

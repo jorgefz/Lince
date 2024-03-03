@@ -73,6 +73,15 @@ void LinceAppSetTitle(const char* title) {
     app.title[LINCE_TITLE_MAX - 1] = '\0';
 }
 
+void LinceAppPushAssetDir(const char* dir){
+    LinceAssetCachePushDir(&app.asset_cache, dir);
+}
+
+char* LinceAppFetchAssetPath(const char* filename){
+    return LinceAssetCacheFetchPath(&app.asset_cache, filename);
+}
+
+
 void LinceAppPushLayer(LinceLayer* layer) {
     if(layer->on_attach) layer->on_attach(layer);
     array_push_back(&app.layer_stack, layer);
@@ -220,8 +229,8 @@ static void LinceInit(){
     LINCE_ASSERT(success, "Failed to create scene cache");
 
     // Create asset manager
-    LinceInitAssetManager(&app.asset_manager);
-    LincePushAssetDir(&app.asset_manager, "../../../lince/assets");
+    LinceInitAssetCache(&app.asset_cache);
+    LinceAssetCachePushDir(&app.asset_cache, "../../../lince/assets");
 
     LinceInitRenderer(app.window);
 
@@ -235,7 +244,7 @@ static void LinceInit(){
     if (app.on_init) app.on_init(); // user may push layers onto stack
 
     // Delay loading fonts to give the user a chance to push custom asset paths on init
-    LinceUILoadFonts(app.ui, &app.asset_manager);
+    LinceUILoadFonts(app.ui, &app.asset_cache);
 
     #ifdef LINCE_DEBUG
     // Default font
@@ -304,7 +313,7 @@ static void LinceAppTerminate(){
     
     LinceTerminateUI(app.ui);
 
-    LinceUninitAssetManager(&app.asset_manager);
+    LinceUninitAssetCache(&app.asset_cache);
 
     /* shutdown window last, as it destroys opengl context
     and all its functions */
