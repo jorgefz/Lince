@@ -304,7 +304,8 @@ void LinceDrawSprite(LinceSprite* sprite, LinceShader* shader) {
 		LinceBindShader(renderer_state.default_shader);
 	} else if (shader != renderer_state.shader){
 		LinceFlushRender();
-		LinceBindShader(renderer_state.shader);
+		// LinceBindShader(renderer_state.shader);
+		LinceBindShader(shader);
 	}
 	renderer_state.shader = shader;
 

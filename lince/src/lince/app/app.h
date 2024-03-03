@@ -98,19 +98,19 @@ void LinceAppPopOverlay(LinceLayer* overlay);
 * @param name Scene identifier
 * @callbacks scene struct with callbacks defined
 */
-void LinceRegisterScene(const char* name, LinceScene* callbacks);
+void LinceAppRegisterScene(const char* name, LinceScene* callbacks);
 
 /** @brief Sets a scene as the current scene. Calls its on_init method if uninitialised.
 * Must have been registered with `LinceRegisterScene`.
 * @param name Scene identifier to load
 */
-void LinceLoadScene(const char* name);
+void LinceAppLoadScene(const char* name);
 
 /** @brief Return the scene with a given string identifier, or NULL if the scene has not been registered.
 * @param name Scene identifier to load
 * @returns Scene with matching identifier
 */
-LinceScene* LinceGetScene(const char* name);
+LinceScene* LinceAppGetScene(const char* name);
 
 
 /** @brief Returns the global state of the application. See `LinceApp`.

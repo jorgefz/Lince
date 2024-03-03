@@ -95,7 +95,7 @@ void HouseSceneUpdate(LinceScene* scene, float dt){
             game_data->camera.pos[0] = house_scene->house_door.to_x;
             game_data->camera.pos[1] = house_scene->house_door.to_y;
             
-            LinceLoadScene(house_scene->house_door.to_scene);
+            LinceAppLoadScene(house_scene->house_door.to_scene);
         }
     }
 }

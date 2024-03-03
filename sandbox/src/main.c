@@ -618,7 +618,6 @@ void GameInit(){
 }
 
 void GameOnUpdate(float dt){
-    LinceCheckErrors();
     GameStateUpdate(dt);
     // DrawSoundUI();
 }
@@ -653,11 +652,11 @@ void SandboxInit() {
     
     app->user_data = &DATA;
 
-    LinceRegisterScene("MainMenu", &SCENE_CALLBACKS[Scene_MainMenu]);
-    LinceRegisterScene("World", &SCENE_CALLBACKS[Scene_World]);
-    LinceRegisterScene("House", &SCENE_CALLBACKS[Scene_House]);
+    LinceAppRegisterScene("MainMenu", &SCENE_CALLBACKS[Scene_MainMenu]);
+    LinceAppRegisterScene("World", &SCENE_CALLBACKS[Scene_World]);
+    LinceAppRegisterScene("House", &SCENE_CALLBACKS[Scene_House]);
 
-    LinceLoadScene("MainMenu");
+    LinceAppLoadScene("MainMenu");
 }
 
 void SandboxUpdate(float dt){

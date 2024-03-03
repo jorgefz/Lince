@@ -23,14 +23,14 @@ void LinceRun();
 static void LinceInit();
 
 /* Called once per frame, updates window and renders layers */
-static void LinceOnUpdate();
+static void LinceAppOnUpdate();
 
 /* Shuts down application and frees allocated memory */
-static void LinceTerminate();
+static void LinceAppTerminate();
 
 /* Called when game event occurs,
 propagates it to layers and user */
-static void LinceOnEvent(LinceEvent* e);
+static void LinceAppOnEvent(LinceEvent* e);
 
 /* Window event callbacks */
 static LinceBool LinceAppEventWindowResize(LinceEvent* e);
@@ -57,9 +57,9 @@ void LinceRun(){
     
     LINCE_INFO("Running main loop...");
     while(app.running){
-        LinceOnUpdate();
+        LinceAppOnUpdate();
     }
-    LinceTerminate();
+    LinceAppTerminate();
 }
 
 
@@ -105,11 +105,11 @@ void LinceAppPopOverlay(LinceLayer* overlay) {
     LINCE_ASSERT(0, "Failed to find overlay (0x%p) in stack", overlay);
 }
 
-void LinceRegisterScene(const char* name, LinceScene* callbacks) {
+void LinceAppRegisterScene(const char* name, LinceScene* callbacks) {
     hashmap_set(&app.scene_cache, name, LinceNewCopy(callbacks, sizeof(LinceScene)) );
 }
 
-void LinceLoadScene(const char* name) {
+void LinceAppLoadScene(const char* name) {
      LinceScene* next_scene = hashmap_get(&app.scene_cache, name);
      LINCE_ASSERT(next_scene, "Could not load scene '%s'", name);
      app.current_scene = next_scene;
@@ -120,7 +120,7 @@ void LinceLoadScene(const char* name) {
      LINCE_INFO("Switched to scene '%s'", name);
 }
 
-LinceScene* LinceGetScene(const char* name) {
+LinceScene* LinceAppGetScene(const char* name) {
     return hashmap_get(&app.scene_cache, name);
 }
 
@@ -151,7 +151,7 @@ LinceLayer* LinceAppGetCurrentOverlay(){
     return array_get(&app.overlay_stack, app.current_overlay);
 }
 
-static void LinceAppDebugUIUpdate(LinceLayer* overlay, float dt){
+static void LinceAppDrawDebugUIPanel(LinceLayer* overlay, float dt){
     LINCE_UNUSED(overlay);
     
     LinceUILayer* ui = LinceGetApp()->ui;
@@ -208,7 +208,7 @@ static void LinceInit(){
     
     // Create a windowed mode window and its OpenGL context
     app.window = LinceCreateWindow(app.screen_width, app.screen_height, app.title);
-    LinceSetMainEventCallback(app.window, LinceOnEvent);
+    LinceSetMainEventCallback(app.window, LinceAppOnEvent);
 
     // Create layer stacks
     array_init(&app.layer_stack, sizeof(LinceLayer));
@@ -241,19 +241,19 @@ static void LinceInit(){
     // Default font
     nk_style_set_font(app.ui->ctx, &app.ui->fonts[LinceFont_Droid8]->handle);
     // Create panel with debug info
-    LinceAppPushOverlay(&(LinceLayer){.on_update = LinceAppDebugUIUpdate});
+    LinceAppPushOverlay(&(LinceLayer){.on_update = LinceAppDrawDebugUIPanel});
     #endif
 }
 
 
-static void LinceOnUpdate(){
+static void LinceAppOnUpdate(){
     LINCE_PROFILER_START(timer);
     LinceClear();
 
     // Calculate time elapsed between frames
-    float runtime = LinceReadClock(app.clock) * 1000.0f; // to millisecs
+    float runtime = (float)LinceReadClock(app.clock) * 1000.0f; // to millisecs
     app.dt = runtime - app.runtime;
-    app.runtime = LinceReadClock(app.clock) * 1000.0f;
+    app.runtime = (float)LinceReadClock(app.clock) * 1000.0f;
 
     app.screen_width = app.window->width;
     app.screen_height = app.window->height;
@@ -277,7 +277,7 @@ static void LinceOnUpdate(){
     LINCE_PROFILER_END(timer);
 }
 
-static void LinceTerminate(){
+static void LinceAppTerminate(){
 
     if (app.on_terminate) app.on_terminate();
 
@@ -316,7 +316,7 @@ static void LinceTerminate(){
     LinceCloseLogger();
 }
 
-static void LinceOnEvent(LinceEvent* e){
+static void LinceAppOnEvent(LinceEvent* e){
     /* Pre-defined event responses:
     adapt viewport when window is resized,
     and shutdown program when window is closed */
