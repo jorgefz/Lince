@@ -11,14 +11,62 @@
 #include "event/mouse_event.h"
 #include "event/window_event.h"
 
+/*
+Returns the OpenGL string name for an error code.
+Note: returning string literals is fine because they have static storage.
+*/
+static char const* LincGetGLErrorString(GLenum const err) {
+  switch (err) {
+    // opengl 2 errors (8)
+    case GL_NO_ERROR:
+      return "GL_NO_ERROR";
 
-static void GLFWErrorCallback(int error, const char* description) {
-    LINCE_INFO("GLFW ERROR %d -> ", error);
-    LINCE_ASSERT(0, "%s", description);
+    case GL_INVALID_ENUM:
+      return "GL_INVALID_ENUM";
+
+    case GL_INVALID_VALUE:
+      return "GL_INVALID_VALUE";
+
+    case GL_INVALID_OPERATION:
+      return "GL_INVALID_OPERATION";
+
+    case GL_STACK_OVERFLOW:
+      return "GL_STACK_OVERFLOW";
+
+    case GL_STACK_UNDERFLOW:
+      return "GL_STACK_UNDERFLOW";
+
+    case GL_OUT_OF_MEMORY:
+      return "GL_OUT_OF_MEMORY";
+
+    // opengl 3 errors (1)
+    case GL_INVALID_FRAMEBUFFER_OPERATION:
+      return "GL_INVALID_FRAMEBUFFER_OPERATION";
+
+    // gles 2, 3 and gl 4 error are handled by the switch above
+    default:
+      return "Unknown Error";
+  }
+}
+
+/*
+Finds any raised OpenGL errors and if so, stops the program.
+*/
+static void LinceCheckGLErrors(){
+    //return;
+    GLenum err;
+    while((err = glGetError()) != GL_NO_ERROR) {
+        LINCE_ASSERT(LinceFalse, "[OpenGL] Error %d: %s", err, LincGetGLErrorString(err));
+    }
+}
+
+
+static void LinceGLFWErrorCallback(int error, const char* description) {
+    LINCE_ASSERT(LinceFalse, "[GLFW] Error %d: %s", error, description);
 }
 
 // forward declare to call from CreateWindow
-static void SetGLFWCallbacks();
+static void LinceSetGLFWCallbacks();
 
 /* Initialise OpenGL context */
 static void LinceInitGLContext(GLFWwindow* handle){
@@ -47,7 +95,7 @@ LinceWindow* LinceCreateWindow(uint32_t width, uint32_t height, const char* titl
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, LINCE_GL_VERSION_MINOR);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-    glfwSetErrorCallback(GLFWErrorCallback);
+    glfwSetErrorCallback(LinceGLFWErrorCallback);
     
     GLFWwindow* handle = glfwCreateWindow(width, height, title, NULL, NULL);
     if (!handle) {
@@ -75,7 +123,7 @@ LinceWindow* LinceCreateWindow(uint32_t width, uint32_t height, const char* titl
     };
 
     glfwSetWindowUserPointer((GLFWwindow*)window->handle, window);
-    SetGLFWCallbacks(window);
+    LinceSetGLFWCallbacks(window);
 
     return window;
 }
@@ -192,7 +240,7 @@ static void MouseMovedCallback(GLFWwindow* wptr, double xpos, double ypos){
 
 
 // forward declare to call from CreateWindow
-static void SetGLFWCallbacks(LinceWindow* w){
+static void LinceSetGLFWCallbacks(LinceWindow* w){
     GLFWwindow* window = w->handle;
     glfwSetFramebufferSizeCallback(window, WindowResizeCallback);
     glfwSetWindowCloseCallback(window, WindowCloseCallback);
