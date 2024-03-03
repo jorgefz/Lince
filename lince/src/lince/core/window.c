@@ -56,13 +56,15 @@ static void LinceCheckGLErrors(){
     //return;
     GLenum err;
     while((err = glGetError()) != GL_NO_ERROR) {
-        LINCE_ASSERT(LinceFalse, "[OpenGL] Error %d: %s", err, LincGetGLErrorString(err));
+        LINCE_ERROR("[OpenGL] Error %d: %s", err, LincGetGLErrorString(err));
+        exit(-1);
     }
 }
 
 
 static void LinceGLFWErrorCallback(int error, const char* description) {
-    LINCE_ASSERT(LinceFalse, "[GLFW] Error %d: %s", error, description);
+    LINCE_ERROR("[GLFW] Error %d: %s", error, description);
+    exit(-1);
 }
 
 // forward declare to call from CreateWindow
