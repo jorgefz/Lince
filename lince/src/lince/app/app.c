@@ -15,17 +15,22 @@
 
 /** Iterates over layers, calling the provided callback.
 *   NOTE: requires __VA_ARGS__ to consume preceding comma!!
-*   This is supported by (old) MSVC and GCC as an extension.
+*   This is supported by GCC and MSVC as an extension.
+*  @param STACK application layer_stack
+*  @param CURRENT application variable that stores the index of the current layer
+*  @param CALLBACK layer funtion to call
+*  @param ... extra arguments to pass to the callback   
 **/
-#define LINCE_MAP_OVER_LAYERS(STACK, CURRENT, CALLBACK, ...)    \
-    for(uint32_t i = 0; i != (STACK).size; ++i){                \
-        CURRENT = i;                                            \
-        LinceLayer* layer = array_get(&(STACK), i);             \
-        if (layer && layer->CALLBACK){                          \
-            layer->CALLBACK(layer, ##__VA_ARGS__);              \
-        }                                                       \
-    }                                                           \
-    CURRENT = -1;                                               \
+#define LINCE_MAP_OVER_LAYERS(STACK, CURRENT, CALLBACK, ...)               \
+    do {                                                                   \
+        for(uint32_t i__ = 0; i__ != (STACK).size; ++i__){                 \
+            CURRENT = i__;                                                 \
+            LinceLayer* layer__ = array_get(&(STACK), i__);                \
+            if (!layer__ || !layer__->CALLBACK) continue;                  \
+            layer__->CALLBACK(layer__, ## __VA_ARGS__);                    \
+        }                                                                  \
+        CURRENT = -1;                                                      \
+    } while(0)
 
 
 /* ==== Static variables ==== */
