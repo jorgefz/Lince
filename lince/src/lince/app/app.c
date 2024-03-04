@@ -14,8 +14,9 @@
 /* ==== Macros ==== */
 
 /** Iterates over layers, calling the provided callback.
-*   NOTE: requires __VA_ARGS__ to consume preceding comma!!
-*   This is supported by GCC and MSVC as an extension.
+*  @note Requires ## __VA_ARGS__ to consume preceding comma.
+*   Supported by GCC and by MSVC with the new preprocessor
+*   (enabled with /Zc:preprocessor compiler switch)
 *  @param STACK application layer_stack
 *  @param CURRENT application variable that stores the index of the current layer
 *  @param CALLBACK layer funtion to call
