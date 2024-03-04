@@ -10,36 +10,13 @@
 #include "core/profiler.h"
 #include "utils/memory.h"
 
-/* Private application state - stack allocated */
-static LinceApp app = {0};
 
-/* Calls the program's main loop */
-void LinceRun();
+/* ==== Macros ==== */
 
-
-/* --- Static functions --- */
-
-/* Initialises OpenGL window and layer stacks */
-static void LinceInit();
-
-/* Called once per frame, updates window and renders layers */
-static void LinceAppOnUpdate();
-
-/* Shuts down application and frees allocated memory */
-static void LinceAppTerminate();
-
-/* Called when game event occurs,
-propagates it to layers and user */
-static void LinceAppOnEvent(LinceEvent* e);
-
-/* Window event callbacks */
-static LinceBool LinceAppEventWindowResize(LinceEvent* e);
-static LinceBool LinceAppEventWindowClose(LinceEvent* e);
-
-
-// Iterates over layers, calling the provided callback.
-// NOTE: requires __VA_ARGS__ to consume preceding comma!!
-//  This is supported by (old) MSVC and GCC as an extension.
+/** Iterates over layers, calling the provided callback.
+*   NOTE: requires __VA_ARGS__ to consume preceding comma!!
+*   This is supported by (old) MSVC and GCC as an extension.
+**/
 #define LINCE_MAP_OVER_LAYERS(STACK, CURRENT, CALLBACK, ...)    \
     for(uint32_t i = 0; i != (STACK).size; ++i){                \
         CURRENT = i;                                            \
@@ -51,6 +28,39 @@ static LinceBool LinceAppEventWindowClose(LinceEvent* e);
     CURRENT = -1;                                               \
 
 
+/* ==== Static variables ==== */
+
+/** @brief Private application state - stack allocated */
+static LinceApp app = {0};
+
+
+/* ==== Static function declarations ==== */
+
+/** Initialises OpenGL window and layer stacks */
+static void LinceInit();
+
+/** Called once per frame, updates window and renders layers */
+static void LinceAppOnUpdate();
+
+/** Shuts down application and frees allocated memory */
+static void LinceAppTerminate();
+
+/** Called when game event occurs,
+propagates it to layers and user */
+static void LinceAppOnEvent(LinceEvent* e);
+
+/** Draws an UI panel showing debug information & stats */
+static void LinceAppDrawDebugUIPanel(LinceLayer* overlay, float dt);
+
+/** Window event callbacks */
+static LinceBool LinceAppEventWindowResize(LinceEvent* e);
+static LinceBool LinceAppEventWindowClose(LinceEvent* e);
+
+
+/* ==== Public function definitions ==== */
+
+/** @brief Runs main application loop. `LinceInit()` must have been called.
+*/
 void LinceRun(){
 
     LinceInit();
@@ -62,36 +72,50 @@ void LinceRun(){
     LinceAppTerminate();
 }
 
-
+/** @brief Returns the global state of the application. See `LinceApp`.
+*/
 LinceApp* LinceGetApp(){
     return &app;
 }
 
+/** @brief Set the window title. Only works before the window is initialised.
+*/
 void LinceAppSetTitle(const char* title) {
     size_t len = strlen(title) + 1;
     memcpy(app.title, title, (len > LINCE_TITLE_MAX) ? LINCE_TITLE_MAX : len);
     app.title[LINCE_TITLE_MAX - 1] = '\0';
 }
 
+/** @brief Save the location of an assets folder relative to the executable */
 void LinceAppPushAssetDir(const char* dir){
     LinceAssetCachePushDir(&app.asset_cache, dir);
 }
 
+/** @brief Save the location of an assets folder relative to the executable */
 char* LinceAppFetchAssetPath(const char* filename){
     return LinceAssetCacheFetchPath(&app.asset_cache, filename);
 }
 
-
+/** @brief Adds a rendering layer to the application.
+* @param layer Rendering layer to push onto the application's layer stack.
+*/
 void LinceAppPushLayer(LinceLayer* layer) {
     if(layer->on_attach) layer->on_attach(layer);
     array_push_back(&app.layer_stack, layer);
 }
 
+/** @brief Adds a rendering overlay to the application.
+* @param overlay Rendering overlays to push onto the application's overlay stack.
+*                Overlays are rendered after layers.
+*/
 void LinceAppPushOverlay(LinceLayer* overlay) {
     if(overlay->on_attach) overlay->on_attach(overlay);
     array_push_back(&app.overlay_stack, overlay);
 }
 
+/** @brief Removes a rendering layer from the layer stack.
+* @param layer Rendering layer to remove. It's 'on_detach' method will be called.
+*/
 void LinceAppPopLayer(LinceLayer* layer) {
     if(layer->on_detach) layer->on_detach(layer);
     for(uint32_t i = 0; i != app.layer_stack.size; ++i){
@@ -103,6 +127,9 @@ void LinceAppPopLayer(LinceLayer* layer) {
     LINCE_ASSERT(0, "Failed to find layer (0x%p) in stack", layer);
 }
 
+/** @brief Removes a rendering overlay from the layer stack.
+* @param layer Rendering overlay to remove. It's 'on_detach' method will be called.
+*/
 void LinceAppPopOverlay(LinceLayer* overlay) {
     if(overlay->on_detach) overlay->on_detach(overlay);
     for(uint32_t i = 0; i != app.overlay_stack.size; ++i){
@@ -114,10 +141,36 @@ void LinceAppPopOverlay(LinceLayer* overlay) {
     LINCE_ASSERT(0, "Failed to find overlay (0x%p) in stack", overlay);
 }
 
+/** @brief Returns current layer being handled or updated.
+* Returns NULL if no layer is being handled.
+* Should only be used within a layer's OnUpdate and OnEvent callbacks.
+*/
+LinceLayer* LinceAppGetCurrentLayer(){
+    if (app.current_layer < 0) return NULL;
+    return array_get(&app.layer_stack, app.current_layer);
+}
+
+/** @brief Returns current overlay being handled or updated.
+* Returns NULL if no overlay is being handled.
+* Should only be used within a overlay's OnUpdate and OnEvent callbacks.
+*/
+LinceLayer* LinceAppGetCurrentOverlay(){
+    if (app.current_overlay < 0) return NULL;
+    return array_get(&app.overlay_stack, app.current_overlay);
+}
+
+/** @brief Creates new scene in cache with defined callbacks. Will not call `on_init`.
+* @param name Scene identifier
+* @callbacks scene struct with callbacks defined
+*/
 void LinceAppRegisterScene(const char* name, LinceScene* callbacks) {
     hashmap_set(&app.scene_cache, name, LinceNewCopy(callbacks, sizeof(LinceScene)) );
 }
 
+/** @brief Sets a scene as the current scene. Calls its on_init method if uninitialised.
+* Must have been registered with `LinceRegisterScene`.
+* @param name Scene identifier to load
+*/
 void LinceAppLoadScene(const char* name) {
      LinceScene* next_scene = hashmap_get(&app.scene_cache, name);
      LINCE_ASSERT(next_scene, "Could not load scene '%s'", name);
@@ -129,14 +182,21 @@ void LinceAppLoadScene(const char* name) {
      LINCE_INFO("Switched to scene '%s'", name);
 }
 
+/** @brief Return the scene with a given string identifier, or NULL if the scene has not been registered.
+* @param name Scene identifier to load
+* @returns Scene with matching identifier
+*/
 LinceScene* LinceAppGetScene(const char* name) {
     return hashmap_get(&app.scene_cache, name);
 }
 
+/** @brief Returns aspect ratio of the window.
+*/
 float LinceAppGetAspectRatio(){
     return (float)app.window->width / (float)app.window->height;
 }
 
+/** @brief Returns the current window width and height in pixels */
 LincePoint LinceAppGetScreenSize(){
     return (LincePoint) {
         .x = (float)app.window->width,
@@ -144,47 +204,19 @@ LincePoint LinceAppGetScreenSize(){
     };
 }
 
+/** @brief Returns the position of the mouse pointer in world coordinates.
+* @param cam Camera used to determine the world position.
+*/
 LincePoint LinceGetMousePosWorld(LinceCamera* cam) {
     LincePoint scr = LinceAppGetScreenSize();
     LincePoint pos = LincePointPixelToScreen(LinceGetMousePos(), scr.x, scr.y);
     return LincePointScreenToWorld(pos, cam);
 }
 
-LinceLayer* LinceAppGetCurrentLayer(){
-    if (app.current_layer < 0) return NULL;
-    return array_get(&app.layer_stack, app.current_layer);
-}
 
-LinceLayer* LinceAppGetCurrentOverlay(){
-    if (app.current_overlay < 0) return NULL;
-    return array_get(&app.overlay_stack, app.current_overlay);
-}
 
-static void LinceAppDrawDebugUIPanel(LinceLayer* overlay, float dt){
-    LINCE_UNUSED(overlay);
-    
-    LinceUILayer* ui = LinceGetApp()->ui;
-    struct nk_context *ctx = ui->ctx;
-    nk_style_push_font(ctx, &ui->fonts[LinceFont_Droid20]->handle);
+/* ==== Public function definitions ==== */
 
-    if (nk_begin(ctx, "Debug", nk_rect(50, 50, 300, 250),
-        NK_WINDOW_BORDER|NK_WINDOW_MOVABLE|NK_WINDOW_SCALABLE|
-        NK_WINDOW_MINIMIZABLE|NK_WINDOW_TITLE
-    )) {
-
-        nk_layout_row_static(ctx, 30, 250, 1);
-        
-        nk_labelf(ctx, NK_TEXT_LEFT, "Window: %ux%u", app.screen_width, app.screen_height);
-        nk_labelf(ctx, NK_TEXT_LEFT, "dt: %.2f ms", dt);
-        nk_labelf(ctx, NK_TEXT_LEFT, "FPS: %.2f", 1000.0f/dt);
-        nk_labelf(ctx, NK_TEXT_LEFT, "Runtime: %.2f s", app.runtime/1000.0f);
-        
-    }
-    nk_end(ctx);
-    nk_style_pop_font(ctx);
-}
-
-/* --- Implementations of static functions --- */
 
 static void LinceInit(){
     // Open log file
@@ -254,7 +286,6 @@ static void LinceInit(){
     LinceAppPushOverlay(&(LinceLayer){.on_update = LinceAppDrawDebugUIPanel});
     #endif
 }
-
 
 static void LinceAppOnUpdate(){
     LINCE_PROFILER_START(timer);
@@ -351,6 +382,29 @@ static void LinceAppOnEvent(LinceEvent* e){
     if (app.on_event && !e->handled ) app.on_event(e);
 }
 
+static void LinceAppDrawDebugUIPanel(LinceLayer* overlay, float dt){
+    LINCE_UNUSED(overlay);
+    
+    LinceUILayer* ui = LinceGetApp()->ui;
+    struct nk_context *ctx = ui->ctx;
+    nk_style_push_font(ctx, &ui->fonts[LinceFont_Droid20]->handle);
+
+    if (nk_begin(ctx, "Debug", nk_rect(50, 50, 300, 250),
+        NK_WINDOW_BORDER|NK_WINDOW_MOVABLE|NK_WINDOW_SCALABLE|
+        NK_WINDOW_MINIMIZABLE|NK_WINDOW_TITLE
+    )) {
+
+        nk_layout_row_static(ctx, 30, 250, 1);
+        
+        nk_labelf(ctx, NK_TEXT_LEFT, "Window: %ux%u", app.screen_width, app.screen_height);
+        nk_labelf(ctx, NK_TEXT_LEFT, "dt: %.2f ms", dt);
+        nk_labelf(ctx, NK_TEXT_LEFT, "FPS: %.2f", 1000.0f/dt);
+        nk_labelf(ctx, NK_TEXT_LEFT, "Runtime: %.2f s", app.runtime/1000.0f);
+        
+    }
+    nk_end(ctx);
+    nk_style_pop_font(ctx);
+}
 
 static LinceBool LinceAppEventWindowResize(LinceEvent* e){
     LINCE_INFO(" Window resized to %d x %d", 
@@ -365,6 +419,4 @@ static LinceBool LinceAppEventWindowClose(LinceEvent* e) {
     return LinceFalse; // allow other layers to receive event
     LINCE_UNUSED(e);
 }
-
-
 
