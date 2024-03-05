@@ -108,14 +108,14 @@ int LinceGetShaderUniformID(LinceShader* shader, const char* name){
 	The void* type should be 64 bits long (in 64bit systems).
 	*/
 
-	long location;
+	uint64_t location;
 	if(hashmap_has_key(&shader->uniforms, name)){
-		location = (long)hashmap_get(&shader->uniforms, name);
+		location = (uint64_t)hashmap_get(&shader->uniforms, name);
 		LINCE_PROFILER_END(timer);
 		return (int)location;
 	}
 	
-	location = glGetUniformLocation(shader->id, name);
+	location = (uint64_t)glGetUniformLocation(shader->id, name);
 	hashmap_set(&shader->uniforms, name, (void*)location);
 	
 	// Implementation without hashmap - slower?
