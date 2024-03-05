@@ -15,6 +15,37 @@
 #include "lince/core/window.h"
 #include "lince/tiles/tileset.h"
 
+
+#define LINCE_MAX_TEXTURE_UNITS 32   // max number of textures the GPU can bind simultaneously
+
+
+// stores information of one vertex
+// Should be packed because everything is a float
+typedef struct LinceQuadVertex {
+	float x, y, z; 	   // position
+	float s, t; 	   // texture coordinates
+	float color[4];	   // rgba color
+	float texture_id;  // binding slot for the texture
+} LinceQuadVertex;
+
+typedef struct LinceRendererState {
+	LinceShader *default_shader, *shader;
+	LinceTexture* white_texture;
+	
+	LinceVertexArray* va;
+    LinceVertexBuffer vb;
+    LinceIndexBuffer ib;
+
+	// Batch rendering
+	unsigned int quad_count;       // number of quads in the batch
+	LinceQuadVertex* vertex_batch; // collection of vertices to render
+	unsigned int* index_batch;     // collection of indices to render
+
+	unsigned int texture_slot_count;
+	LinceTexture* texture_slots[LINCE_MAX_TEXTURE_UNITS];
+
+} LinceRendererState;
+
 /** @brief Calculates the z-order based on the 'y' value of the position,
 * such that objects at lower 'y' are drawn objects at higher 'y'.
 * @param y y-coordinate

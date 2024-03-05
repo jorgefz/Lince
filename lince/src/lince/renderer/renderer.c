@@ -16,7 +16,6 @@
 #define MAX_QUADS 20000    // Maximum number of quads in a single vertex batch
 #define MAX_VERTICES (MAX_QUADS * QUAD_VERTEX_COUNT) // max number of vertices in a batch
 #define MAX_INDICES (MAX_QUADS * QUAD_INDEX_COUNT)   // max number of indices in a batch
-#define MAX_TEXTURE_SLOTS 32   // max number of textures the GPU can bind simultaneously
 
 
 const char default_fragment_source[] =
@@ -56,33 +55,6 @@ float LinceYSortedZ(float y, vec2 ylim, vec2 zlim){
     float z = (zlim[0] - zlim[1]) * ynorm + zlim[1];
     return z;
 }
-
-// stores information of one vertex
-// Should be packed because everything is a float
-typedef struct LinceQuadVertex {
-	float x, y, z; 	   // position
-	float s, t; 	   // texture coordinates
-	float color[4];	   // rgba color
-	float texture_id;  // binding slot for the texture
-} LinceQuadVertex;
-
-typedef struct LinceRendererState {
-	LinceShader *default_shader, *shader;
-	LinceTexture* white_texture;
-	
-	LinceVertexArray* va;
-    LinceVertexBuffer vb;
-    LinceIndexBuffer ib;
-
-	// Batch rendering
-	unsigned int quad_count;       // number of quads in the batch
-	LinceQuadVertex* vertex_batch; // collection of vertices to render
-	unsigned int* index_batch;     // collection of indices to render
-
-	unsigned int texture_slot_count;
-	LinceTexture* texture_slots[MAX_TEXTURE_SLOTS];
-
-} LinceRendererState;
 
 /* Global rendering state */
 static LinceRendererState renderer_state = {0};
@@ -183,9 +155,9 @@ void LinceInitRenderer() {
 	);
     LinceBindShader(renderer_state.default_shader);
 
-	int samplers[MAX_TEXTURE_SLOTS] = { 0 };
-	for (int i = 0; i != MAX_TEXTURE_SLOTS; ++i) samplers[i] = i;
-	LinceSetShaderUniformIntN(renderer_state.default_shader, "uTextureSlots", samplers, MAX_TEXTURE_SLOTS);
+	int samplers[LINCE_MAX_TEXTURE_UNITS] = { 0 };
+	for (int i = 0; i != LINCE_MAX_TEXTURE_UNITS; ++i) samplers[i] = i;
+	LinceSetShaderUniformIntN(renderer_state.default_shader, "uTextureSlots", samplers, LINCE_MAX_TEXTURE_UNITS);
 	renderer_state.shader = renderer_state.default_shader;
 
 	LINCE_PROFILER_END(timer);
@@ -311,7 +283,7 @@ void LinceDrawSprite(LinceSprite* sprite, LinceShader* shader) {
 
 	// batch size check
 	if (renderer_state.quad_count >= MAX_QUADS ||
-		renderer_state.texture_slot_count >= MAX_TEXTURE_SLOTS)
+		renderer_state.texture_slot_count >= LINCE_MAX_TEXTURE_UNITS)
 	{
 		LinceFlushRender();
 	}
