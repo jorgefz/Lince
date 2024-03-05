@@ -11,8 +11,8 @@ void LinceUninitAssetCache(LinceAssetCache* cache){
 }
 
 LinceBool LinceAssetCachePushDir(LinceAssetCache* cache, const char* dir){
-    uint32_t length = strlen(dir);
-    uint32_t exedir_length = strlen(cache->exe_dir);
+    uint32_t length = (uint32_t)strlen(dir);
+    uint32_t exedir_length = (uint32_t)strlen(cache->exe_dir);
     
     LINCE_ASSERT(length < LINCE_PATH_MAX - exedir_length - 1,
         "Asset directory is too long. Length %u but max is %u",
@@ -52,7 +52,7 @@ LinceBool LinceAssetCachePushDir(LinceAssetCache* cache, const char* dir){
 char* LinceAssetCacheFetchPath(LinceAssetCache* cache, const char* asset_filename){
     for(uint32_t i = 0; i != cache->asset_dirs.size; ++i){
         char* dir = array_get(&cache->asset_dirs, i);
-        uint32_t dir_len = strlen(dir);
+        uint32_t dir_len = (uint32_t)strlen(dir);
         
         if (dir_len + strlen(asset_filename) >= LINCE_PATH_MAX){
             LINCE_WARN("Skipping path, too long: '%s' + '%s'", dir, asset_filename);
