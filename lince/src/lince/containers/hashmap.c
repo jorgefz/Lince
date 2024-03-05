@@ -59,7 +59,7 @@ static hashmap_entry_t* hashmap_lookupb(hashmap_t* map, const void* key_bytes, u
 // Returns the hashmap element with the given string key
 static hashmap_entry_t* hashmap_lookup(hashmap_t* map, const char* key){
     if (!key) return NULL;
-    return hashmap_lookupb(map, key, strlen(key) + 1);
+    return hashmap_lookupb(map, key, (uint32_t)strlen(key) + 1);
 }
 
 
@@ -82,8 +82,8 @@ uint32_t hashmap_hashb(const void* key_bytes, uint32_t key_length, uint32_t map_
 }
 
 uint32_t hashmap_hash(const char* key, uint32_t map_size) {
-    if (!key) return NULL;
-    return hashmap_hashb(key, strlen(key)+1, map_size);
+    if (!key) return 0;
+    return hashmap_hashb(key, (uint32_t)strlen(key) + 1, map_size);
 }
 
 
@@ -131,7 +131,7 @@ Returns 1 if the hashmap contains the given byte key,
 and 0 otherwise.
 */
 int hashmap_has_keyb(hashmap_t* map, const void* key, uint32_t key_length) {
-    if (!key) return NULL;
+    if (!key) return 0;
     return (hashmap_lookupb(map, key, key_length) != NULL);
 }
 
@@ -141,8 +141,7 @@ Returns 1 if the hashmap contains the given key,
 and 0 otherwise.
 */
 int hashmap_has_key(hashmap_t* map, const char* key){
-    if (!key) return NULL;
-    return hashmap_has_keyb(map, key, strlen(key) + 1);
+    return hashmap_has_keyb(map, key, (uint32_t)strlen(key) + 1);
 }
 
 
@@ -157,7 +156,7 @@ void* hashmap_getb(hashmap_t* map, const void* key, uint32_t key_length) {
 /* Retrieves an entry using a key. If the entry does not exist, NULL is returned */
 void* hashmap_get(hashmap_t* map, const char* key){
     if (!key) return NULL;
-    return hashmap_getb(map, key, strlen(key) + 1);
+    return hashmap_getb(map, key, (uint32_t)(strlen(key) + 1));
 }
 
 
@@ -202,7 +201,7 @@ hashmap_t* hashmap_setb(hashmap_t* map, const void* key, uint32_t key_length, vo
 
 hashmap_t* hashmap_set(hashmap_t* map, const char* key, void* value){
     if (!key) return NULL;
-    return hashmap_setb(map, key, strlen(key) + 1, value);
+    return hashmap_setb(map, key, (uint32_t)strlen(key) + 1, value);
 }
 
 
@@ -271,6 +270,6 @@ void* hashmap_iterb(hashmap_t* map, const char* key, uint32_t key_length, uint32
 
 
 char* hashmap_iter(hashmap_t* map, const char* key){
-    size_t key_length = key ? (strlen(key) + 1) : 0;
-    return hashmap_iterb(map, key, key_length, NULL);
+    size_t sz = key ? (strlen(key) + 1) : 0;
+    return hashmap_iterb(map, key, (uint32_t)sz, NULL);
 }
