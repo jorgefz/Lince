@@ -57,7 +57,7 @@ void LinceUninitTilemap(LinceTilemap* map){
 void LinceDrawTilemap(LinceTilemap* map, LinceShader* shader){
     if(!map) return;
     for(size_t i = 0; i != map->sprites.size; ++i){
-        LinceSprite* sp = array_get(&map->sprites, i);
+        LinceSprite* sp = array_get(&map->sprites, (uint32_t)i);
         LinceDrawSprite(sp, shader);
     }
 }
