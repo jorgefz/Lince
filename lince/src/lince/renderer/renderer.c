@@ -18,6 +18,10 @@
 #define MAX_INDICES (MAX_QUADS * QUAD_INDEX_COUNT)   // max number of indices in a batch
 
 
+/* Global rendering state */
+static LinceRendererState renderer_state = {0};
+
+
 const char default_fragment_source[] =
 	"#version 450 core\n"
 	"layout(location = 0) out vec4 color;\n"
@@ -49,6 +53,13 @@ const char default_vertex_source[] =
 	"}\n";
 
 
+
+/** @brief Returns the global renderer state */
+LinceRendererState* LinceGetRenderer(){
+	return &renderer_state;
+}
+
+
 /* Calculates Z order from Y coordinate */
 float LinceYSortedZ(float y, vec2 ylim, vec2 zlim){
     float ynorm = (y - ylim[0]) / (ylim[1]-ylim[0]);
@@ -56,8 +67,6 @@ float LinceYSortedZ(float y, vec2 ylim, vec2 zlim){
     return z;
 }
 
-/* Global rendering state */
-static LinceRendererState renderer_state = {0};
 
 /* quad of size 1x1 centred on 0,0 */
 static const LinceQuadVertex quad_vertices[4] = {

@@ -47,6 +47,9 @@ typedef struct LinceRendererState {
 
 } LinceRendererState;
 
+/** @brief Returns the global renderer state */
+LinceRendererState* LinceGetRenderer();
+
 /** @brief Calculates the z-order based on the 'y' value of the position,
 * such that objects at lower 'y' are drawn objects at higher 'y'.
 * @param y y-coordinate
