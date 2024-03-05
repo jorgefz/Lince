@@ -16,33 +16,34 @@
 #include "lince/tiles/tileset.h"
 
 
-#define LINCE_MAX_TEXTURE_UNITS 32   // max number of textures the GPU can bind simultaneously
+/// Max number of textures the GPU can bind simultaneously
+#define LINCE_MAX_TEXTURE_UNITS 32 
 
 
-// stores information of one vertex
-// Should be packed because everything is a float
+/** @brief Stores information of one vertex */
 typedef struct LinceQuadVertex {
-	float x, y, z; 	   // position
-	float s, t; 	   // texture coordinates
-	float color[4];	   // rgba color
-	float texture_id;  // binding slot for the texture
+	float x, y, z; 	   ///< Position
+	float s, t; 	   ///< Texture coordinates
+	float color[4];	   ///< RGBA color
+	float texture_id;  ///< Binding unit for the texture
 } LinceQuadVertex;
 
+/** @brief Stores the state of the OpenGL renderer */
 typedef struct LinceRendererState {
-	LinceShader *default_shader, *shader;
-	LinceTexture* white_texture;
+	LinceShader *default_shader; ///< Default shader to use if none is provided
+	LinceShader *shader;		 ///< Shader to use when rendering
+	LinceTexture* white_texture; ///< Default texture to use when no texture is used
 	
-	LinceVertexArray* va;
-    LinceVertexBuffer vb;
-    LinceIndexBuffer ib;
+	LinceVertexArray* va; ///< Vertex array of batch
+    LinceVertexBuffer vb; ///< Vertex buffer of batch
+    LinceIndexBuffer ib;  ///< Index buffer of batch
 
-	// Batch rendering
-	unsigned int quad_count;       // number of quads in the batch
-	LinceQuadVertex* vertex_batch; // collection of vertices to render
-	unsigned int* index_batch;     // collection of indices to render
+	unsigned int quad_count;       ///< Number of quads in the batch
+	LinceQuadVertex* vertex_batch; ///< Quads to render
+	unsigned int* index_batch;     ///< Indices of batch
 
-	unsigned int texture_slot_count;
-	LinceTexture* texture_slots[LINCE_MAX_TEXTURE_UNITS];
+	unsigned int texture_slot_count;	///< Number of active texture units
+	LinceTexture* texture_slots[LINCE_MAX_TEXTURE_UNITS]; ///< Active textures
 
 } LinceRendererState;
 
