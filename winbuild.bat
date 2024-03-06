@@ -4,7 +4,6 @@ set "proj=%1"
 IF not defined proj GOTO error
 
 set "projfile=build/%proj%/%proj%.vcxproj"
-echo "%projfile%"
 IF NOT EXIST "%projfile%" GOTO error2
 
 echo Building %proj%
