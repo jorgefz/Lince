@@ -1,4 +1,5 @@
 #include "lince/core/core.h"
+#include "lince/core/logger.h"
 #include "lince/containers/array.h"
 #include "lince/utils/memory.h"
 #include "lince/utils/fileio.h"

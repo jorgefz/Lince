@@ -1,5 +1,5 @@
 #include "lince/ecs/ecs.h"
-
+#include "lince/core/logger.h"
 
 #ifdef LINCE_DEBUG
 	#define LINCE_STATIC

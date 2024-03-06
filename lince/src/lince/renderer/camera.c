@@ -1,10 +1,13 @@
-#include "renderer/camera.h"
-#include "core/core.h"
-#include "core/profiler.h"
-#include "utils/memory.h"
 #include <cglm/cam.h>
 #include <cglm/mat4.h>
 #include <cglm/affine.h>
+
+#include "lince/renderer/camera.h"
+#include "lince/core/core.h"
+#include "lince/core/profiler.h"
+#include "lince/core/logger.h"
+#include "lince/utils/memory.h"
+
 
 static const LinceCamera default_camera = {
 	.scale = 1.0,

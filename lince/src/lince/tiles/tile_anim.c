@@ -1,5 +1,6 @@
-#include "tiles/tile_anim.h"
-#include "utils/memory.h"
+#include "lince/tiles/tile_anim.h"
+#include "lince/utils/memory.h"
+#include "lince/core/logger.h"
 
 /*
 Returns a pointer to the current tile in the animation

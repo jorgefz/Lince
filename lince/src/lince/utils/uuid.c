@@ -1,4 +1,5 @@
-#include "utils/uuid.h"
+#include "lince/utils/uuid.h"
+#include "lince/core/logger.h"
 
 #ifdef LINCE_WINDOWS
     #include "rpc.h"

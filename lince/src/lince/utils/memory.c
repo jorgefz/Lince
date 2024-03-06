@@ -1,4 +1,5 @@
 #include "memory.h"
+#include "lince/core/logger.h"
 
 /* `malloc` with checks and assertion of return pointer */
 void* LinceMalloc(size_t nbytes){

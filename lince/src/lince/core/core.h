@@ -83,15 +83,23 @@ Note that these do not apply to the containers (e.g. array, hashmap, list).
 #endif
 
 /* Logging */
-#include "logger.h"
 
- ///< Logs a string message starting with `[INFO]`. Can be a formatted string followed by an argument list.
+/** Logs a string message starting with `[INFO]`.
+ * Can be a formatted string followed by an argument list.
+ * Requires including "logger.h" header to work!
+*/
 #define LINCE_INFO(msg, ...)  LinceLoggerInfo(msg, ##__VA_ARGS__)
 
- ///< Logs a string message starting with `[WARNING]`. Can be a formatted string followed by an argument list.
+/** Logs a string message starting with `[WARNING]`.
+ * Can be a formatted string followed by an argument list.
+ * Requires including "logger.h" header to work!
+*/
 #define LINCE_WARN(msg, ...)  LinceLoggerWarn(msg, ##__VA_ARGS__)
 
- ///< Logs a string message starting with `[ERROR]`. Can be a formatted string followed by an argument list.
+/** Logs a string message starting with `[ERROR]`.
+ * Can be a formatted string followed by an argument list.
+ * Requires including "logger.h" header to work!
+*/
 #define LINCE_ERROR(msg, ...) LinceLoggerError(msg, ##__VA_ARGS__)
 
 

@@ -1,11 +1,11 @@
-#include "core/profiler.h"
-#include "utils/memory.h"
-#include "utils/fileio.h"
-#include "renderer/shader.h"
 #include <string.h>
 #include <glad/glad.h>
-//#include <cglm>
 
+#include "lince/core/logger.h"
+#include "lince/core/profiler.h"
+#include "lince/utils/memory.h"
+#include "lince/utils/fileio.h"
+#include "lince/renderer/shader.h"
 
 
 

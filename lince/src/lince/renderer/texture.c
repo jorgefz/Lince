@@ -1,8 +1,10 @@
-#include "core/profiler.h"
-#include "utils/memory.h"
-#include "renderer/texture.h"
-#include "lince/utils/image.h"
 #include <glad/glad.h>
+
+#include "lince/core/logger.h"
+#include "lince/core/profiler.h"
+#include "lince/utils/memory.h"
+#include "lince/renderer/texture.h"
+#include "lince/utils/image.h"
 
 
 LinceTexture* LinceLoadTexture(const char* path, uint32_t flags){

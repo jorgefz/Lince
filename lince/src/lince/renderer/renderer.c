@@ -1,13 +1,16 @@
 #include <stdlib.h>
-#include "core/profiler.h"
-#include "utils/memory.h"
-#include "renderer/renderer.h"
-#include "renderer/camera.h"
 #include <glad/glad.h>
-#include "cglm/types.h"
-#include "cglm/vec4.h"
-#include "cglm/affine.h"
-#include "cglm/io.h"
+
+#include <cglm/types.h>
+#include <cglm/vec4.h>
+#include <cglm/affine.h>
+#include <cglm/io.h>
+
+#include "lince/core/profiler.h"
+#include "lince/utils/memory.h"
+#include "lince/renderer/renderer.h"
+#include "lince/renderer/camera.h"
+#include "lince/core/logger.h"
 
 
 #define QUAD_VERTEX_COUNT 4 // number of vertices in one quad

@@ -1,8 +1,10 @@
-#include "core/profiler.h"
-#include "utils/memory.h"
-#include "renderer/vertex_array.h"
-#include <glad/glad.h>
 #include <stdlib.h>
+#include <glad/glad.h>
+
+#include "lince/core/logger.h"
+#include "lince/core/profiler.h"
+#include "lince/utils/memory.h"
+#include "lince/renderer/vertex_array.h"
 
 /* Allocates new vertex array and generates OpenGL ID for it */
 LinceVertexArray* LinceCreateVertexArray(LinceIndexBuffer ib){

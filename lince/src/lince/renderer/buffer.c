@@ -1,7 +1,8 @@
 
 #include <stdarg.h>
-#include "renderer/buffer.h"
-#include "core/core.h"
+#include "lince/renderer/buffer.h"
+#include "lince/core/core.h"
+#include "lince/core/logger.h"
 
 #include <glad/glad.h>
 

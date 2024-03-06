@@ -2,6 +2,14 @@
 #ifndef LINCE_H
 #define LINCE_H
 
+// Avoids error with C linkage of C++ templates
+#include "nuklear_flags.h"
+#include "nuklear.h"
+
+#ifdef __cplusplus
+    extern "C" {
+#endif
+
 /* Core */
 #include "lince/core/core.h"
 #include "lince/core/window.h"
@@ -49,5 +57,9 @@
 /* Physics */
 #include "lince/physics/box2d.h"
 
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif //LINCE_H

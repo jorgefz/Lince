@@ -1,5 +1,6 @@
 #include <stb_image.h>
 #include "lince/core/core.h"
+#include "lince/core/logger.h"
 #include "lince/utils/memory.h"
 #include "lince/utils/image.h"
 

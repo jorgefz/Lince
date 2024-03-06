@@ -1,5 +1,6 @@
-#include "gui/gui.h"
-#include "utils/memory.h"
+#include "lince/gui/gui.h"
+#include "lince/utils/memory.h"
+#include "lince/core/logger.h"
 
 #include "event/event.h"
 #include "event/key_event.h"

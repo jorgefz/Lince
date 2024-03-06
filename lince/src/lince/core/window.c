@@ -2,14 +2,15 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
-#include "core/core.h"
-#include "core/window.h"
-#include "utils/memory.h"
+#include "lince/core/core.h"
+#include "lince/core/window.h"
+#include "lince/utils/memory.h"
+#include "lince/core/logger.h"
 
-#include "event/event.h"
-#include "event/key_event.h"
-#include "event/mouse_event.h"
-#include "event/window_event.h"
+#include "lince/event/event.h"
+#include "lince/event/key_event.h"
+#include "lince/event/mouse_event.h"
+#include "lince/event/window_event.h"
 
 /*
 Returns the OpenGL string name for an error code.

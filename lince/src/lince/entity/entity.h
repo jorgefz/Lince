@@ -4,6 +4,7 @@
 #include <lince/core/core.h>
 #include <lince/utils/memory.h>
 #include <lince/containers/array.h>
+#include "lince/core/logger.h"
 
 #ifndef LINCE_MAX_ENTITY_COMPONENTS_U64_COUNT
 /** @brief Maximum number of components,

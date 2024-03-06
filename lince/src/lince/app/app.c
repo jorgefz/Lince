@@ -1,14 +1,14 @@
 
 #include <stdio.h>
-
 #include <glad/glad.h>
 
-#include "app/app.h"
-#include "renderer/renderer.h"
-#include "gui/gui.h"
-#include "input/input.h"
-#include "core/profiler.h"
-#include "utils/memory.h"
+#include "lince/app/app.h"
+#include "lince/renderer/renderer.h"
+#include "lince/gui/gui.h"
+#include "lince/input/input.h"
+#include "lince/core/profiler.h"
+#include "lince/utils/memory.h"
+#include "lince/core/logger.h"
 
 
 /* ==== Macros ==== */
