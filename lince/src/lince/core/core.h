@@ -84,28 +84,46 @@ Note that these do not apply to the containers (e.g. array, hashmap, list).
 
 /* Logging */
 #include "logger.h"
-#define LINCE_INFO(...)  LinceLoggerInfo(__VA_ARGS__)  ///< Logs a message starting with `[INFO]`
-#define LINCE_WARN(...)  LinceLoggerWarn(__VA_ARGS__)  ///< Logs a message starting with `[WARNING]`
-#define LINCE_ERROR(...) LinceLoggerError(__VA_ARGS__) ///< Logs a message starting with `[ERROR]`
 
-/** @brief Quits the program if a given condition fails.
-*   @param condition Expression that resolves to 0 (false) or not 0 (true).
-*   @param msg  Formatted string printed if the condtion fails before quitting.
-*               It can be followed by variadic arguments for the formatted string.
-*/
-#define LINCE_ASSERT(condition, msg, ...) \
-    if(!(condition)) do { \
-        LINCE_ERROR(msg, ##__VA_ARGS__); \
-        LINCE_ERROR("at %s:%d in function '%s' ('%s' failed)", \
-            __FILE__, __LINE__, __func__, #condition); \
-        exit(-1); \
-    } while(0) \
+ ///< Logs a string message starting with `[INFO]`. Can be a formatted string followed by an argument list.
+#define LINCE_INFO(msg, ...)  LinceLoggerInfo(msg, ##__VA_ARGS__)
+
+ ///< Logs a string message starting with `[WARNING]`. Can be a formatted string followed by an argument list.
+#define LINCE_WARN(msg, ...)  LinceLoggerWarn(msg, ##__VA_ARGS__)
+
+ ///< Logs a string message starting with `[ERROR]`. Can be a formatted string followed by an argument list.
+#define LINCE_ERROR(msg, ...) LinceLoggerError(msg, ##__VA_ARGS__)
+
+
+#ifdef LINCE_DEBUG
+    /** @brief Logs an error message if a condition is not satisfied.
+    *       If LINCE_DEBUG is set, the program also exits.
+    *   @param condition Expression to verify.
+    *   @param msg  Error message to log. Can be a formatted string followed by an argument list.
+    *   @param ... Optional argument list for formatted string
+    */
+    #define LINCE_ASSERT(condition, msg, ...) \
+        if(!(condition)) do { \
+            LINCE_ERROR(msg, ##__VA_ARGS__); \
+            LINCE_ERROR("at %s:%d in function '%s' ('%s' failed)", \
+                __FILE__, __LINE__, __func__, #condition); \
+            exit(-1); \
+        } while(0)
+#else
+    #define LINCE_ASSERT(condition, msg, ...) \
+        if(!(condition)) do { \
+            LINCE_ERROR(msg, ##__VA_ARGS__); \
+            LINCE_ERROR("at %s:%d in function '%s' ('%s' failed)", \
+                __FILE__, __LINE__, __func__, #condition); \
+        } while(0)
+#endif
+
 
 /** @brief Quits the program if a given pointer is NULL. Used to check allocations.
 *   @param ptr The pointer to check
 *   @param size Size in bytes of the memory which failed to be allocated.
 */
-#define LINCE_ASSERT_ALLOC(ptr, size) LINCE_ASSERT(ptr, " Failed to allocate %ld bytes", (long int)(size))
+#define LINCE_ASSERT_ALLOC(ptr, size) LINCE_ASSERT(ptr, "Failed to allocate %ld bytes", (long int)(size))
 
 /* Constants & typedefs */
 #define LINCE_NAME_MAX 100  ///< Used for short names (e.g. shader uniforms)
