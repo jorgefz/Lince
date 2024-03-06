@@ -1,5 +1,6 @@
+#include <stdlib.h>
+#include <string.h>
 #include "containers/array.h"
-#include "utils/memory.h"
 
 /* Factor by which the capacity is increased */
 #define ARRAY_GROW_FACTOR 1.5
@@ -32,7 +33,7 @@ static array_t* extend_capacity(array_t* array){
 	if(capacity == 0) capacity++;
 	else capacity *= 2;
 
-	data = LinceRealloc(array->data, capacity * array->element_size);
+	data = realloc(array->data, capacity * array->element_size);
 	if(!data) return NULL;
 
 	array->data = data;
@@ -81,12 +82,13 @@ void array_destroy(array_t* array){
 array_t* array_copy(array_t* orig){
 	if(!orig) return NULL;
 	array_t* new = malloc(sizeof(array_t));
-	LINCE_ASSERT_ALLOC(new, sizeof(array_t));
+	if(!new) return NULL;
+
 	memmove(new, orig, sizeof(array_t));
 	if(orig->data){
 		size_t bytes = orig->capacity * orig->element_size;
 		new->data = malloc(bytes);
-		LINCE_ASSERT_ALLOC(new->data, bytes);
+		if(!new->data) return NULL;
 		memmove(new->data, orig->data, bytes);
 	}
 	return new;
@@ -106,7 +108,7 @@ array_t* array_resize(array_t* array, uint32_t size){
 	// Round up new capacity to the highest power of two closest to the size
 	uint32_t capacity = nearest_pow2(size);
 	if(capacity > array->capacity){
-		void* data = LinceRealloc(array->data, capacity * array->element_size);
+		void* data = realloc(array->data, capacity * array->element_size);
 		if(!data) return NULL;
 		array->capacity = capacity;
 		array->data = data;
