@@ -8,12 +8,11 @@ LinceImage* LinceLoadImage(LinceImage* image, const char* path){
 
     if(!image || !path) return NULL;
 
-    stbi_set_flip_vertically_on_load(1);
     static int rgba_channels = 4;
-
-    // Already heap-allocated by the library
     int width, height;
     int channels; // unused, forced to 4 channels (RGBA)
+
+    // Already heap-allocated by the library
     image->data = stbi_load(path, &width, &height, &channels, rgba_channels);
 
     // Error checking
@@ -63,4 +62,8 @@ uint8_t* LinceImageSetPixel(LinceImage* image, uint32_t x, uint32_t y, uint32_t 
     if(!pixel) return NULL;
     *((uint32_t*)(void*)pixel) = rgba;
     return pixel;
+}
+
+void LinceImageSetFlipVertical(LinceBool flip){
+    stbi_set_flip_vertically_on_load(flip);
 }

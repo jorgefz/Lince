@@ -43,5 +43,7 @@ uint8_t* LinceImageGetPixel(LinceImage* image, uint32_t x, uint32_t y);
 */
 uint8_t* LinceImageSetPixel(LinceImage* image, uint32_t x, uint32_t y, uint32_t rgba);
 
+/** @brief Switch to flip new loaded images vertically on load, so that the origin lies on the bottom left corner */
+void LinceImageSetFlipVertical(LinceBool flip);
 
 #endif /* LINCE_IMAGE_H */
