@@ -38,10 +38,11 @@ typedef struct LinceApp{
     LinceGameTerminateFn on_terminate; ///< User-defined callback called when the app closes.
 
     /* User settings */
+    char title[LINCE_TITLE_MAX]; ///< String displayed at the top of the window.
     void* user_data;             ///< Pointer that may be freely re-assiged by the user.      
     uint32_t screen_width;       ///< Width in pixels of the window.
     uint32_t screen_height;      ///< Height in pixels of the window.
-    char title[LINCE_TITLE_MAX]; ///< String displayed at the top of the window.
+    LinceBool show_debug_panel;  ///< Shows UI panel with debug info
 
     /* Internal state */
     LinceWindow     *window;        ///< Window state.

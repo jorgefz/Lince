@@ -258,6 +258,11 @@ static void LinceInit(){
     app.window = LinceCreateWindow(app.screen_width, app.screen_height, app.title);
     LinceSetMainEventCallback(app.window, LinceAppOnEvent);
     LinceInputSetWindow(app.window);
+    LinceInitRenderer(app.window);
+
+    // Create asset manager
+    LinceInitAssetCache(&app.asset_cache);
+    LinceAssetCachePushDir(&app.asset_cache, "../../../lince/assets");
 
     // Create layer stacks
     array_init(&app.layer_stack, sizeof(LinceLayer));
@@ -268,20 +273,15 @@ static void LinceInit(){
     void* success = hashmap_init(&app.scene_cache, 5);
     LINCE_ASSERT(success, "Failed to create scene cache");
 
-    // Create asset manager
-    LinceInitAssetCache(&app.asset_cache);
-    LinceAssetCachePushDir(&app.asset_cache, "../../../lince/assets");
-
-    LinceInitRenderer(app.window);
-
     /// TODO: improve font handling
     app.ui = LinceInitUI(app.window->handle);
     
     app.clock = LinceNewClock();
     app.runtime = 0;
-
     app.running = LinceTrue;
-    if (app.on_init) app.on_init(); // user may push layers onto stack
+
+    // Kickstart user application
+    if (app.on_init) app.on_init();
 
     // Delay loading fonts to give the user a chance to push custom asset paths on init
     LinceUILoadFonts(app.ui, &app.asset_cache);
@@ -292,6 +292,7 @@ static void LinceInit(){
     // Create panel with debug info
     LinceAppPushOverlay(&(LinceLayer){.on_update = LinceAppDrawDebugUIPanel});
     #endif
+
 }
 
 static void LinceAppOnUpdate(){
@@ -391,6 +392,8 @@ static void LinceAppOnEvent(LinceEvent* e){
 
 static void LinceAppDrawDebugUIPanel(LinceLayer* overlay, float dt){
     LINCE_UNUSED(overlay);
+
+    if(!app.show_debug_panel) return; // Panel hidden
     
     LinceUILayer* ui = LinceGetApp()->ui;
     struct nk_context *ctx = ui->ctx;
