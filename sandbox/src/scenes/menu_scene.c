@@ -1,3 +1,6 @@
+#include <nuklear_flags.h>
+#include <nuklear.h>
+
 #include "menu_scene.h"
 #include "gamedata.h"
 
@@ -21,7 +24,7 @@ void DrawMainMenu(LinceScene* scene){
         .text_alignment  = NK_TEXT_CENTERED,
     };
     
-    nk_style_set_font(ctx, &ui->fonts[LinceFont_Droid30]->handle);
+    nk_style_set_font(ctx, &((struct nk_font*)ui->fonts[LinceFont_Droid30])->handle);
     nk_style_push_color(
         ctx,
         &ctx->style.window.background,

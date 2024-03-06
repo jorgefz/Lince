@@ -1,6 +1,9 @@
 #include <stdio.h>
 #include <time.h>
 
+#include <nuklear_flags.h>
+#include <nuklear.h>
+
 #define LINCE_MAX_ENTITY_COMPONENTS_U64_COUNT 2
 
 #include <lince.h>
@@ -498,7 +501,7 @@ void GameStateUpdate(float dt){
     // Draw UI text
     LinceUILayer* ui = LinceGetApp()->ui;
     struct nk_context *ctx = ui->ctx;
-    nk_style_set_font(ctx, &ui->fonts[LinceFont_Droid15]->handle);
+    nk_style_set_font(ctx, &((struct nk_font*)ui->fonts[LinceFont_Droid15])->handle);
     if (nk_begin(ctx, "Demo", nk_rect(20, 20, 100, 100), 0)) {
         nk_layout_row_static(ctx, 25, 80, 1);
         nk_labelf(
@@ -563,7 +566,7 @@ void DrawSoundUI(){
     struct nk_context *ctx = ui->ctx;
     static LinceSoundConfig config = {.volume = 0.1f};
     
-    nk_style_set_font(ui->ctx, &ui->fonts[LinceFont_Droid15]->handle);
+    nk_style_set_font(ui->ctx, &((struct nk_font*)ui->fonts[LinceFont_Droid15])->handle);
     if (nk_begin(ctx, "Demo", nk_rect(20, 20, 300, 450),
         NK_WINDOW_BORDER|NK_WINDOW_MOVABLE|NK_WINDOW_SCALABLE|
         NK_WINDOW_MINIMIZABLE|NK_WINDOW_TITLE

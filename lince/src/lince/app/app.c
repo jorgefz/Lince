@@ -2,6 +2,9 @@
 #include <stdio.h>
 #include <glad/glad.h>
 
+#include <nuklear_flags.h>
+#include <nuklear.h>
+
 #include "lince/app/app.h"
 #include "lince/renderer/renderer.h"
 #include "lince/gui/gui.h"
@@ -288,7 +291,8 @@ static void LinceInit(){
 
     #ifdef LINCE_DEBUG
     // Default font
-    nk_style_set_font(app.ui->ctx, &app.ui->fonts[LinceFont_Droid8]->handle);
+    
+    nk_style_set_font(app.ui->ctx, &((struct nk_font*)app.ui->fonts[LinceFont_Droid8])->handle);
     // Create panel with debug info
     LinceAppPushOverlay(&(LinceLayer){.on_update = LinceAppDrawDebugUIPanel});
     #endif
@@ -397,7 +401,7 @@ static void LinceAppDrawDebugUIPanel(LinceLayer* overlay, float dt){
     
     LinceUILayer* ui = LinceGetApp()->ui;
     struct nk_context *ctx = ui->ctx;
-    nk_style_push_font(ctx, &ui->fonts[LinceFont_Droid20]->handle);
+    nk_style_push_font(ctx, &((struct nk_font*)ui->fonts[LinceFont_Droid20])->handle);
 
     if (nk_begin(ctx, "Debug", nk_rect(50, 50, 300, 250),
         NK_WINDOW_BORDER|NK_WINDOW_MOVABLE|NK_WINDOW_SCALABLE|

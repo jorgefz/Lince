@@ -2,10 +2,6 @@
 #ifndef LINCE_H
 #define LINCE_H
 
-// Avoids error with C linkage of C++ templates
-#include "nuklear_flags.h"
-#include "nuklear.h"
-
 #ifdef __cplusplus
     extern "C" {
 #endif

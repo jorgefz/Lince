@@ -4,9 +4,6 @@
 #include "lince/app/layer.h"
 #include "lince/app/asset_cache.h"
 
-#include "nuklear_flags.h"
-#include "nuklear.h"
-
 /** @enum LinceFonts
 * @brief Indices of preloaded fonts by the engine,
 * with their sizes in pt.
@@ -22,20 +19,26 @@ typedef enum LinceFonts {
 
 /** @struct LinceUILayer
 * @brief Holds Nuklear state allowing to draw GUI.
+* @note Nuklear pointers have been type erased to avoid propagating nuklear headers
 */
 typedef struct LinceUILayer {
-    struct nk_context *ctx; ///< Nuklear context
-    void *glfw;             ///< GLFW backend for Nuklear
-	void *glfw_window;      ///< GLFW window handle for Nuklear
-    struct nk_font* fonts[LinceFont_Count]; ///< Preloaded fonts
+    void* ctx;              ///< Nuklear context
+    void* glfw;             ///< GLFW backend for Nuklear
+	void* glfw_window;      ///< GLFW window handle for Nuklear
+    void* fonts[LinceFont_Count]; ///< Preloaded fonts
 } LinceUILayer;
 
 /** @brief Initialise UI state and Nuklear rendering context
-* @param glfw_window GLFw window handle from LinceWindow.
-* @param default_font_path Absolute path to TTF file with the default font
+* @param glfw_window GLFW window handle from LinceWindow.
 * @todo Change input handle to LinceWindow.
 */
 LinceUILayer* LinceInitUI(void* glfw_window);
+
+
+// void LinceUILoadFont(LinceUI* ui, const char* name, const char* file);
+
+// void* LinceUIGetFont(LinceUI* ui, const char* name, uint32_t fontsize);
+
 
 /** @brief Loads the predefined fonts using an initialised asset manager.
 * @param ui initialised ui state
