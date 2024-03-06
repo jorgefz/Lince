@@ -4,9 +4,10 @@ set "proj=%1"
 IF not defined proj GOTO error
 
 set "projfile=build/%proj%/%proj%.vcxproj"
-IF not exist projfile GOTO error2
+echo "%projfile%"
+IF NOT EXIST "%projfile%" GOTO error2
 
-echo Building project %proj%
+echo Building %proj%
 devenv lince.sln /Project build/%proj%/%proj%.vcxproj /Build "Debug|x64"
 exit /b
 
