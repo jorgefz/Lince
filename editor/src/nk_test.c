@@ -3,7 +3,7 @@
 
 static void NKLayerOnUpdate(LinceLayer* layer, float dt){
     
-    LinceUILayer* ui = LinceGetApp()->ui;
+    LinceUI* ui = LinceGetApp()->ui;
     struct nk_context *ctx = ui->ctx;
     static struct nk_colorf bg = {0.1, 0.18, 0.24, 1.0};
     // uint32_t window_width = LinceGetApp()->window->width;

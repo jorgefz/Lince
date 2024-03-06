@@ -399,7 +399,7 @@ static void LinceAppDrawDebugUIPanel(LinceLayer* overlay, float dt){
 
     if(!app.show_debug_panel) return; // Panel hidden
     
-    LinceUILayer* ui = LinceGetApp()->ui;
+    LinceUI* ui = LinceGetApp()->ui;
     struct nk_context *ctx = ui->ctx;
     nk_style_push_font(ctx, &((struct nk_font*)ui->fonts[LinceFont_Droid20])->handle);
 

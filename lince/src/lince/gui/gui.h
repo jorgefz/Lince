@@ -17,50 +17,52 @@ typedef enum LinceFonts {
     LinceFont_Count
 } LinceFonts;
 
-/** @struct LinceUILayer
+/** @struct LinceUI
 * @brief Holds Nuklear state allowing to draw GUI.
 * @note Nuklear pointers have been type erased to avoid propagating nuklear headers
 */
-typedef struct LinceUILayer {
+typedef struct LinceUI {
     void* ctx;              ///< Nuklear context
     void* glfw;             ///< GLFW backend for Nuklear
 	void* glfw_window;      ///< GLFW window handle for Nuklear
     void* fonts[LinceFont_Count]; ///< Preloaded fonts
-} LinceUILayer;
+} LinceUI;
 
 /** @brief Initialise UI state and Nuklear rendering context
 * @param glfw_window GLFW window handle from LinceWindow.
 * @todo Change input handle to LinceWindow.
 */
-LinceUILayer* LinceInitUI(void* glfw_window);
+LinceUI* LinceInitUI(void* glfw_window);
 
 
 // void LinceUILoadFont(LinceUI* ui, const char* name, const char* file);
 
-// void* LinceUIGetFont(LinceUI* ui, const char* name, uint32_t fontsize);
+// void LinceUISetFont(LinceUI* ui, const char* name, uint32_t fontsize);
 
+// void LinceUIPushFont
+// void LinceUIPopFont
 
 /** @brief Loads the predefined fonts using an initialised asset manager.
 * @param ui initialised ui state
 * @param am initialised asset manager to resolve paths to the fonts
 */
-void LinceUILoadFonts(LinceUILayer* ui, LinceAssetCache* am);
+void LinceUILoadFonts(LinceUI* ui, LinceAssetCache* am);
 
 /** @brief Initialise Nuklear's render queue.
 * Any GUI draw calls must be bracketed between LinceBeginUIRender and LinceEndUIRender.
 */
-void LinceBeginUIRender(LinceUILayer* ui);
+void LinceBeginUIRender(LinceUI* ui);
 
 /** @brief Close and submit Nuklear's render queue.
 * Any GUI draw calls must be bracketed between LinceBeginUIRender and LinceEndUIRender.
 */
-void LinceEndUIRender(LinceUILayer* ui);
+void LinceEndUIRender(LinceUI* ui);
 
 /** @brief Passes key and mouse input events to Nuklear */
-void LinceUIOnEvent(LinceUILayer* ui, LinceEvent* event);
+void LinceUIOnEvent(LinceUI* ui, LinceEvent* event);
 
 /** @brief Destroy Nuklear rendering context */
-void LinceTerminateUI(LinceUILayer* ui);
+void LinceTerminateUI(LinceUI* ui);
 
 
 #endif

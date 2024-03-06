@@ -22,7 +22,7 @@ void MyLayerOnUpdate(LinceLayer* layer, float dt){
 }
 ```
 
-## LinceUILayer
+## LinceUI
 Wrapper that saves Nuklear's context and its GLFW rendering state.
 
 - `struct nk_context *ctx`
@@ -58,7 +58,7 @@ void MyLayerOnUpdate(LinceLayer* layer, float dt){
 ## LinceUIText
 ```c
 void LinceUIText(
-    LinceUILayer* ui,
+    LinceUI* ui,
     const char* name,
     float x,
 	float y,
@@ -70,7 +70,7 @@ void LinceUIText(
 ```
 Wrapper function that renders plain text to the screen.
 Parameters:
-- `LinceUILayer* ui`
+- `LinceUI* ui`
 	- UI state, this can be retrieved from the application state `LinceGetApp()->ui`.
 - `const char* name`
 	- Unique string identifier for the Nuklear window.
@@ -89,7 +89,7 @@ This example renders the current delta-time and FPS to the upper left corner of 
 ```c
 void MyLayerOnUpdate(LinceLayer* layer, float dt){
 
-	LinceUILayer* ui = LinceGetApp()->ui;
+	LinceUI* ui = LinceGetApp()->ui;
 
 	/*          ui,  identifier,     x,  y,  font,              max, text,       format varargs */
 	LinceUIText(ui, "FPS_indicator", 10, 10, LinceFont_Droid30, 10,  "FPS %.0f", 1000.0/dt);

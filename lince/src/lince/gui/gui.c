@@ -17,9 +17,9 @@
 #define MAX_ELEMENT_BUFFER (128 * 1024)
 
 
-LinceUILayer* LinceInitUI(void* glfw_window){
+LinceUI* LinceInitUI(void* glfw_window){
 
-	LinceUILayer* ui = LinceCalloc(sizeof(LinceUILayer));
+	LinceUI* ui = LinceCalloc(sizeof(LinceUI));
 	ui->glfw_window = glfw_window;
 	ui->glfw = LinceCalloc(sizeof(struct nk_glfw));
 
@@ -35,7 +35,7 @@ LinceUILayer* LinceInitUI(void* glfw_window){
 }
 
 
-void LinceUILoadFonts(LinceUILayer* ui, LinceAssetCache* am){
+void LinceUILoadFonts(LinceUI* ui, LinceAssetCache* am){
 
     static const char* font_files[] = { "fonts/DroidSans.ttf" };
     const uint32_t font_num = sizeof(font_files) / sizeof(char**);
@@ -62,15 +62,15 @@ void LinceUILoadFonts(LinceUILayer* ui, LinceAssetCache* am){
     //nk_style_set_font(ui->ctx, ui->fonts[LinceFont_Droid20]);
 }
 
-void LinceBeginUIRender(LinceUILayer* ui){
+void LinceBeginUIRender(LinceUI* ui){
 	nk_glfw3_new_frame(ui->glfw);
 }
 
-void LinceEndUIRender(LinceUILayer* ui){
+void LinceEndUIRender(LinceUI* ui){
 	nk_glfw3_render(ui->glfw, NK_ANTI_ALIASING_ON, MAX_VERTEX_BUFFER, MAX_ELEMENT_BUFFER);
 }
 
-void LinceUIOnEvent(LinceUILayer* ui, LinceEvent* event){
+void LinceUIOnEvent(LinceUI* ui, LinceEvent* event){
     void* win = ui->glfw_window;
     if(event->handled == LinceTrue) return;
 
@@ -100,7 +100,7 @@ void LinceUIOnEvent(LinceUILayer* ui, LinceEvent* event){
     glfwSetWindowUserPointer(win, lince_window);
 }
 
-void LinceTerminateUI(LinceUILayer* ui){
+void LinceTerminateUI(LinceUI* ui){
 	if(!ui) return;
     nk_glfw3_shutdown(ui->glfw);
     LinceFree(ui->glfw);

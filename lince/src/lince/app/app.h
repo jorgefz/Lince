@@ -62,7 +62,7 @@ typedef struct LinceApp{
     int current_overlay; ///< Index of the active overlay, akin to the current layer.
     
     LinceAssetCache asset_cache; ///< Finds paths to assets
-    LinceUILayer* ui;   ///< State of the GUI, e.g. Nuklear's context.
+    LinceUI* ui;   ///< State of the GUI, e.g. Nuklear's context.
 
 } LinceApp;
 

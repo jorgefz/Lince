@@ -7,7 +7,7 @@
 void DrawMainMenu(LinceScene* scene){
     LINCE_UNUSED(scene);
 
-    LinceUILayer* ui = LinceGetApp()->ui;
+    LinceUI* ui = LinceGetApp()->ui;
     struct nk_context *ctx = ui->ctx;
     LinceApp* app = LinceGetApp();
 
