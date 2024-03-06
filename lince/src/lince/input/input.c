@@ -2,25 +2,32 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
-#include "input/input.h"
-#include "lince/app/app.h"
+#include "lince/input/input.h"
+#include "lince/core/window.h"
+#include "lince/core/logger.h"
+
+static LinceWindow* active_window = NULL;
+
+void LinceInputSetWindow(LinceWindow* window){
+    active_window = window;
+}
 
 LinceBool LinceIsKeyPressed(int key){
-    GLFWwindow* handle = LinceGetApp()->window->handle;
-    int state = glfwGetKey(handle, key);
+    LINCE_ASSERT(active_window, "Attempting to read input without setting an active window");
+    int state = glfwGetKey(active_window->handle, key);
     return (state == GLFW_PRESS || state == GLFW_REPEAT);
 }
 
 LinceBool LinceIsMouseButtonPressed(int button){
-    GLFWwindow* handle = LinceGetApp()->window->handle;
-    int state = glfwGetMouseButton(handle, button);
+    LINCE_ASSERT(active_window, "Attempting to read input without setting an active window");
+    int state = glfwGetMouseButton(active_window->handle, button);
 	return (state == GLFW_PRESS);
 }
 
 LincePoint LinceGetMousePos(void) {
+    LINCE_ASSERT(active_window, "Attempting to read input without setting an active window");
     double x, y;
-    GLFWwindow* handle = LinceGetApp()->window->handle;
-	glfwGetCursorPos(handle, &x, &y);
+	glfwGetCursorPos(active_window->handle, &x, &y);
     return (LincePoint){ (float)x, (float)y };
 }
 

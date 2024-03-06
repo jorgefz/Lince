@@ -2,7 +2,11 @@
 #define LINCE_INPUT_H
 
 #include "lince/core/core.h"
+#include "lince/core/window.h"
 #include "lince/renderer/transform.h"
+
+/** @brief Set the active window from which to receive mouse and keyboard input */
+void LinceInputSetWindow(LinceWindow* window);
 
 /** @brief Returns true if a keyboard key is held.
 *   @param key Enum value for a key. See `LinceKey`.

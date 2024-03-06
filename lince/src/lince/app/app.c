@@ -257,6 +257,7 @@ static void LinceInit(){
     // Create a windowed mode window and its OpenGL context
     app.window = LinceCreateWindow(app.screen_width, app.screen_height, app.title);
     LinceSetMainEventCallback(app.window, LinceAppOnEvent);
+    LinceInputSetWindow(app.window);
 
     // Create layer stacks
     array_init(&app.layer_stack, sizeof(LinceLayer));
