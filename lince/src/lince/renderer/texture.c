@@ -8,11 +8,15 @@
 LinceTexture* LinceLoadTexture(const char* path, uint32_t flags){
 	LINCE_PROFILER_START(timer);
 
+	LinceImageSetFlipVertical(flags & LinceTexture_FlipY);
+
 	LinceImage image;
 	void* result = LinceLoadImage(&image, path);
 	LINCE_ASSERT(result, "Failed to load texture from '%s'", path);
+	if(!result) return NULL;
 
 	LinceTexture* tex = LinceCreateEmptyTexture(image.width, image.height);
+	if(!tex) return NULL;
 	LinceSetTextureData(tex, image.data);
 	LinceDeleteImage(&image);
 
@@ -26,6 +30,9 @@ LinceTexture* LinceCreateEmptyTexture(uint32_t width, uint32_t height){
 	LINCE_PROFILER_START(timer);
 	
 	LinceTexture *tex = LinceCalloc(sizeof(LinceTexture));
+	LINCE_ASSERT_ALLOC(tex, sizeof(LinceTexture));
+	if(!tex) return NULL;
+
 	tex->width = width;
 	tex->height = height;
 
