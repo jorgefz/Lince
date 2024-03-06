@@ -1,31 +1,22 @@
 #include "core/profiler.h"
 #include "utils/memory.h"
 #include "renderer/texture.h"
-#include <stb_image.h>
+#include "lince/utils/image.h"
 #include <glad/glad.h>
+
 
 LinceTexture* LinceLoadTexture(const char* path, uint32_t flags){
 	LINCE_PROFILER_START(timer);
-	LINCE_INFO("Loading texture from '%s'", path);
-	
-	// Sets buffer to store data starting from image top-left
-	stbi_set_flip_vertically_on_load(flags & LinceTexture_FlipY);
-	unsigned char* data = NULL;
-	int width = 0, height = 0, channels = 0;
-	LinceTexture *tex = NULL;
 
-	// Retrieve texture data
-	data = stbi_load(path, &width, &height, &channels, 0);
-	LINCE_ASSERT(data, "Failed to load texture '%s'", path);
-	LINCE_ASSERT((width > 0) && (height > 0), "Empty texture '%s'", path);
-	LINCE_ASSERT(channels == 4,
-		"Error on image '%s'. Only 4-channel RGBA format supported", path);
-	
-	tex = LinceCreateEmptyTexture((uint32_t)(width), (uint32_t)(height));
-	LinceSetTextureData(tex, data);
-	stbi_image_free(data);
+	LinceImage image;
+	void* result = LinceLoadImage(&image, path);
+	LINCE_ASSERT(result, "Failed to load texture from '%s'", path);
 
-	LINCE_INFO("Loaded %dx%d texture", width, height);
+	LinceTexture* tex = LinceCreateEmptyTexture(image.width, image.height);
+	LinceSetTextureData(tex, image.data);
+	LinceDeleteImage(&image);
+
+	LINCE_INFO("Created texture with size %ux%u", tex->width, tex->height);
 	LINCE_PROFILER_END(timer);
 	return tex;
 }

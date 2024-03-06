@@ -31,10 +31,11 @@ Version codes follow [Semantic Versioning](https://semver.org/).
 - Fixed bug on `GetMousePos` with float pointers treated as double pointers.
 - Fixed `GetMouseX` and `GetMouseY` not returning a value.
 - Added LinceClock
+- Added LinceImage
 - Improved profiler
 - Renamed some App functions
 - Renamed asset manager to asset cache
-
+- Added batch script to quick build Visual Studio projects
 
 ## v0.8.0
 - Added CMocka as the testing framework.

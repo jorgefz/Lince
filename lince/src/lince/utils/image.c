@@ -30,6 +30,7 @@ LinceImage* LinceLoadImage(LinceImage* image, const char* path){
     image->width    = (uint32_t)width;
     image->height   = (uint32_t)height;
     image->channels = (uint32_t)rgba_channels;
+    LINCE_INFO("Loaded image of size %ux%u from '%s'", image->width, image->height, path);
     
     return image;
 }
@@ -38,6 +39,7 @@ void LinceDeleteImage(LinceImage* image){
     if(!image) return;
     if(image->data){
         stbi_image_free(image->data);
+        LINCE_INFO("Unloaded image of size %ux%u", image->width, image->height);
     }
     *image = (LinceImage){0};
 }
