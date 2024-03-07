@@ -7,8 +7,6 @@
 
 #define ARRAY_INITIAL_CAPACITY 1
 
-// Generic pointer type that allows for pointer arithmetic
-typedef char* addr_t;
 
 /*
 Returns the nearest highest power of two of an integer
@@ -122,7 +120,7 @@ array_t* array_resize(array_t* array, uint32_t size){
 /* Overwrites an element at the given index with the given data */
 void* array_set(array_t* array, void* element, uint32_t index){
 	if(!array || array->element_size == 0 || index >= array->size) return NULL;
-	addr_t addr = (addr_t)array->data + index * array->element_size;
+	char* addr = (char*)array->data + index * array->element_size;
 	if(!element){
 		memset(addr, 0, array->element_size);
 	} else {
@@ -135,7 +133,7 @@ void* array_set(array_t* array, void* element, uint32_t index){
 /* Returns a pointer to the element at the specified index */
 void* array_get(array_t* array, uint32_t index){
 	if(!array || array->element_size == 0 || index >= array->size) return NULL;
-	addr_t addr = (addr_t)array->data + index * array->element_size;
+	char* addr = (char*)array->data + index * array->element_size;
 	return addr;
 }
 
@@ -157,7 +155,7 @@ void* array_end(array_t* array){
 	if(array->size == 0){
 		return array_back(array);
 	} else {
-		return (addr_t)array_back(array) + array->element_size;
+		return (char*)array_back(array) + array->element_size;
 	}
 }
 
@@ -173,7 +171,7 @@ array_t* array_insert(array_t* array, void* element, uint32_t index){
 		if(!r) return NULL;
 	}
 	
-	addr_t addr = (addr_t)array->data + index * array->element_size;
+	char* addr = (char*)array->data + index * array->element_size;
 	uint32_t move_bytes = (array->size - index) * array->element_size;
 	
 	if(move_bytes > 0){
@@ -215,8 +213,8 @@ array_t* array_remove(array_t* array, uint32_t index){
 		return array;
 	}
 	
-	addr_t dest = (addr_t)array->data + index * array->element_size;
-	addr_t orig = dest + array->element_size;
+	char* dest = (char*)array->data + index * array->element_size;
+	char* orig = dest + array->element_size;
 	uint32_t move_bytes = (array->size - index) * array->element_size;
 
 	memmove(dest, orig, move_bytes);
