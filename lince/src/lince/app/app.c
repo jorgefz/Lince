@@ -277,7 +277,7 @@ static void LinceInit(){
     LINCE_ASSERT(success, "Failed to create scene cache");
 
     /// TODO: improve font handling
-    app.ui = LinceInitUI(app.window->handle);
+    app.ui = LinceInitUI(app.window, &app.asset_cache);
     
     app.clock = LinceNewClock();
     app.runtime = 0;
@@ -287,12 +287,11 @@ static void LinceInit(){
     if (app.on_init) app.on_init();
 
     // Delay loading fonts to give the user a chance to push custom asset paths on init
-    LinceUILoadFonts(app.ui, &app.asset_cache);
+    LinceUILoadFont(app.ui, "droid", "fonts/DroidSans.ttf", 5, (uint32_t[]){8,15,20,30,50});
+    LinceUIUseFont(app.ui, "droid20");
 
     #ifdef LINCE_DEBUG
-    // Default font
     
-    nk_style_set_font(app.ui->ctx, &((struct nk_font*)app.ui->fonts[LinceFont_Droid8])->handle);
     // Create panel with debug info
     LinceAppPushOverlay(&(LinceLayer){.on_update = LinceAppDrawDebugUIPanel});
     #endif
@@ -400,9 +399,11 @@ static void LinceAppDrawDebugUIPanel(LinceLayer* overlay, float dt){
     if(!app.show_debug_panel) return; // Panel hidden
     
     LinceUI* ui = LinceGetApp()->ui;
-    struct nk_context *ctx = ui->ctx;
-    nk_style_push_font(ctx, &((struct nk_font*)ui->fonts[LinceFont_Droid20])->handle);
-
+    // struct nk_context *ctx = ui->ctx;
+    // nk_style_push_font(ctx, &((struct nk_font*)ui->fonts[LinceFont_Droid20])->handle);
+    struct nk_context *ctx = LinceUIGetNkContext(ui);
+    nk_style_push_font(ctx, LinceUIGetFontHandle(ui, "droid20"));
+    
     if (nk_begin(ctx, "Debug", nk_rect(50, 50, 300, 250),
         NK_WINDOW_BORDER|NK_WINDOW_MOVABLE|NK_WINDOW_SCALABLE|
         NK_WINDOW_MINIMIZABLE|NK_WINDOW_TITLE

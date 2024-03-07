@@ -1,8 +1,9 @@
 #ifndef LINCE_UI_LAYER_H
 #define LINCE_UI_LAYER_H
 
-#include "lince/app/layer.h"
+#include "lince/core/window.h"
 #include "lince/app/asset_cache.h"
+#include "lince/containers/hashmap.h"
 
 /** @enum LinceFonts
 * @brief Indices of preloaded fonts by the engine,
@@ -18,29 +19,23 @@ typedef enum LinceFonts {
 } LinceFonts;
 
 /** @struct LinceUI
-* @brief Holds Nuklear state allowing to draw GUI.
-* @note Nuklear pointers have been type erased to avoid propagating nuklear headers
+* @brief Private struct that holds Nuklear state allowing to draw GUI.
+* @note It is only declared in the header to avoid propagating Nuklear headers
 */
-typedef struct LinceUI {
-    void* ctx;              ///< Nuklear context
-    void* glfw;             ///< GLFW backend for Nuklear
-	void* glfw_window;      ///< GLFW window handle for Nuklear
-    void* fonts[LinceFont_Count]; ///< Preloaded fonts
-} LinceUI;
+typedef struct LinceUI LinceUI;
+
+LinceBool LinceUILoadFont(LinceUI* ui, const char* name, const char* path, const uint32_t n, uint32_t* fontsizes);
+void* LinceUIGetFontHandle(LinceUI* ui, const char* name);
+void* LinceUIGetNkContext(LinceUI* ui);
+LinceBool LinceUIUseFont(LinceUI* ui, const char* name);
 
 /** @brief Initialise UI state and Nuklear rendering context
-* @param glfw_window GLFW window handle from LinceWindow.
+* @param window Application window handle.
+* @param ac Asset cache to resolve font paths
 * @todo Change input handle to LinceWindow.
 */
-LinceUI* LinceInitUI(void* glfw_window);
+LinceUI* LinceInitUI(LinceWindow* window, LinceAssetCache* ac);
 
-
-// void LinceUILoadFont(LinceUI* ui, const char* name, const char* file);
-
-// void LinceUISetFont(LinceUI* ui, const char* name, uint32_t fontsize);
-
-// void LinceUIPushFont
-// void LinceUIPopFont
 
 /** @brief Loads the predefined fonts using an initialised asset manager.
 * @param ui initialised ui state
