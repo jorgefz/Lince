@@ -12,6 +12,8 @@ typedef struct array_container {
 	uint32_t size;			///< Number of stored elements
 	uint32_t capacity;		///< Max number of elements allocated
 	uint32_t element_size;	///< Size in bytes of an element
+	void* begin;			///< Pointer to the beginning of the array
+	void* end;              ///< Pointer to the end of the array
 } array_t;
 
 /** @brief Initialises an array via a given pointer.

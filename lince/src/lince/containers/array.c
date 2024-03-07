@@ -83,12 +83,17 @@ array_t* array_copy(array_t* orig){
 	if(!new) return NULL;
 
 	memmove(new, orig, sizeof(array_t));
-	if(orig->data){
-		size_t bytes = orig->capacity * orig->element_size;
-		new->data = malloc(bytes);
-		if(!new->data) return NULL;
-		memmove(new->data, orig->data, bytes);
+	if(!orig->data){
+		return new;
 	}
+
+	size_t bytes = orig->capacity * orig->element_size;
+	new->data = malloc(bytes);
+	if(!new->data) return NULL;
+	memmove(new->data, orig->data, bytes);
+	new->begin = new->data;
+	new->end = array_end(new);
+
 	return new;
 }
 
@@ -100,6 +105,7 @@ array_t* array_resize(array_t* array, uint32_t size){
 		// Shrinking
 		// No need to delete anything. Old data will eventually be overwritten.
 		array->size = size;
+		array->end = array_end(array);
 		return array;
 	}
 	
@@ -113,6 +119,8 @@ array_t* array_resize(array_t* array, uint32_t size){
 	}
 
 	array->size = size;
+	array->begin = array->data;
+	array->end = array_end(array);
 	return array;
 }
 
@@ -154,9 +162,8 @@ void* array_end(array_t* array){
 	if(!array || !array->data || array->element_size == 0) return NULL;
 	if(array->size == 0){
 		return array_back(array);
-	} else {
-		return (char*)array_back(array) + array->element_size;
 	}
+	return (char*)array_back(array) + array->element_size;
 }
 
 // -- INSERTING
@@ -187,6 +194,8 @@ array_t* array_insert(array_t* array, void* element, uint32_t index){
 		memmove(addr, element, array->element_size);
 	}
 	array->size++;
+	array->begin = array->data;
+	array->end = array_end(array);
 	return array;
 }
 
@@ -218,8 +227,10 @@ array_t* array_remove(array_t* array, uint32_t index){
 	uint32_t move_bytes = (array->size - index) * array->element_size;
 
 	memmove(dest, orig, move_bytes);
-
 	array->size--;
+	array->begin = array->data;
+	array->end = array_end(array);
+
 	return array;
 }
 
@@ -238,6 +249,8 @@ array_t* array_pop_front(array_t* array){
 array_t* array_clear(array_t* array){
 	if(!array) return NULL;
 	array->size = 0;
+	array->begin = array->data;
+	array->end = array->begin;
 	return array;
 }
 
