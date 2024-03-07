@@ -28,18 +28,24 @@ void test_array(void** state){
 	assert_true(x.size==0);
 	assert_true(x.capacity==0);
 	assert_null(x.data);
+	assert_null(x.begin);
+	assert_null(x.end);
 
 	array_uninit(&x);
 	assert_true(x.size==0);
 	assert_true(x.capacity==0);
 	assert_null(x.data);
 	assert_true(x.element_size==0);
+	assert_null(x.begin);
+	assert_null(x.end);
 	
 	// Initialise with allocated memory
 	array_t* a = array_create(sizeof(int));
 	assert_non_null(a);
 	assert_true(a->element_size==sizeof(int));
 	assert_true(a->size==0);
+	assert_null(a->begin);
+	assert_null(a->end);
 
 	// Resize
 	r = array_resize(a, 10);
@@ -47,6 +53,8 @@ void test_array(void** state){
 	assert_true(a->size==10);
 	assert_true(a->capacity==16);
 	assert_non_null(a->data);
+	assert_ptr_equal(a->begin, a->data);
+	assert_ptr_equal(a->end, (char*)a->data + sizeof(int)*10);
 
 	// Setting elements
 	int res = 1;
@@ -82,6 +90,8 @@ void test_array(void** state){
 	res = r && (a->size == 11);
 	res = res && (*(int*)array_get(a,5)==value) && (*(int*)array_get(a,6)==prev);
 	assert_true(res);
+	assert_ptr_equal(a->begin, a->data);
+	assert_ptr_equal(a->end, (char*)a->data + sizeof(int)*a->size);
 
 	// Removing a value
 	r = array_remove(a, 1);
@@ -92,11 +102,15 @@ void test_array(void** state){
 			&& (*(int*)array_front(a)==2)
 			&& (*(int*)array_back(a)==8);
 	assert_true(res);
+	assert_ptr_equal(a->begin, a->data);
+	assert_ptr_equal(a->end, (char*)a->data + sizeof(int)*a->size);
 
 	// array_clear
 	r = array_clear(a);
 	assert_non_null(r);
 	assert_true(a->size==0);
+	assert_ptr_equal(a->begin, a->data);
+	assert_ptr_equal(a->end, a->data);
 
 	array_destroy(a);
 
