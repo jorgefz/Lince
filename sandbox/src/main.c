@@ -500,8 +500,8 @@ void GameStateUpdate(float dt){
 
     // Draw UI text
     LinceUI* ui = LinceGetApp()->ui;
-    struct nk_context *ctx = ui->ctx;
-    nk_style_set_font(ctx, &((struct nk_font*)ui->fonts[LinceFont_Droid15])->handle);
+    struct nk_context *ctx = LinceUIGetNkContext(ui);
+    LinceUIUseFont(ui, "droid15");
     if (nk_begin(ctx, "Demo", nk_rect(20, 20, 100, 100), 0)) {
         nk_layout_row_static(ctx, 25, 80, 1);
         nk_labelf(
@@ -563,10 +563,10 @@ void GameTerminate(){
 void DrawSoundUI(){
 
     LinceUI* ui = LinceGetApp()->ui;
-    struct nk_context *ctx = ui->ctx;
+    struct nk_context *ctx = LinceUIGetNkContext(ui);
     static LinceSoundConfig config = {.volume = 0.1f};
     
-    nk_style_set_font(ui->ctx, &((struct nk_font*)ui->fonts[LinceFont_Droid15])->handle);
+    LinceUIUseFont(ui, "droid15");
     if (nk_begin(ctx, "Demo", nk_rect(20, 20, 300, 450),
         NK_WINDOW_BORDER|NK_WINDOW_MOVABLE|NK_WINDOW_SCALABLE|
         NK_WINDOW_MINIMIZABLE|NK_WINDOW_TITLE

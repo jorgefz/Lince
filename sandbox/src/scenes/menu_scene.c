@@ -8,7 +8,7 @@ void DrawMainMenu(LinceScene* scene){
     LINCE_UNUSED(scene);
 
     LinceUI* ui = LinceGetApp()->ui;
-    struct nk_context *ctx = ui->ctx;
+    struct nk_context *ctx = LinceUIGetNkContext(ui);
     LinceApp* app = LinceGetApp();
 
     const struct nk_style_button button_style = {
@@ -24,7 +24,7 @@ void DrawMainMenu(LinceScene* scene){
         .text_alignment  = NK_TEXT_CENTERED,
     };
     
-    nk_style_set_font(ctx, &((struct nk_font*)ui->fonts[LinceFont_Droid30])->handle);
+    LinceUIUseFont(ui, "droid30");
     nk_style_push_color(
         ctx,
         &ctx->style.window.background,
