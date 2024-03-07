@@ -63,10 +63,18 @@ void test_array(void** state){
 	}
 	assert_true(res);
 
-	// Getting elements
+	// Getting elements with indices
 	res = 1;
 	for(int i = 0; i != (int)a->size; ++i){
 		res = res && (*(int*)array_get(a, i) == i);
+	}
+	assert_true(res);
+
+	// Getting elements with iterator
+	res = 1;
+	int counter = 0;
+	for(int* item = a->begin; item!=a->end; ++item){
+		res = res && (*item == counter++);
 	}
 	assert_true(res);
 

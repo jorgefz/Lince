@@ -14,7 +14,7 @@ Version codes follow [Semantic Versioning](https://semver.org/).
 - Nuklear UI wrapper and/or custom docs.
 
 
-## v0.8.1 (WIP)
+## v0.9 (WIP)
 - Added new ECS 
 - Added LinceTransform and transform functions
 - Added LincePoint and coordinate conversion functions
@@ -36,6 +36,9 @@ Version codes follow [Semantic Versioning](https://semver.org/).
 - Renamed some App functions
 - Renamed asset manager to asset cache
 - Added batch script to quick build Visual Studio projects
+- Improved font API
+- Enabled compiling as a C++ project by indciating C linkage
+- Added iterators to `array`
 
 ## v0.8.0
 - Added CMocka as the testing framework.
