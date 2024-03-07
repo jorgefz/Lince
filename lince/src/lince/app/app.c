@@ -287,8 +287,8 @@ static void LinceInit(){
     if (app.on_init) app.on_init();
 
     // Delay loading fonts to give the user a chance to push custom asset paths on init
-    LinceUILoadFont(app.ui, "droid", "fonts/DroidSans.ttf", 5, (uint32_t[]){8,15,20,30,50});
-    LinceUIUseFont(app.ui, "droid20");
+    LinceUILoadFont(app.ui, "droid", "fonts/DroidSans.ttf", 5, (uint32_t[]){8,12,15,20,30});
+    LinceUIUseFont(app.ui, "droid12");
 
     #ifdef LINCE_DEBUG
     

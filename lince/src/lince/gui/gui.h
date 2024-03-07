@@ -1,5 +1,5 @@
-#ifndef LINCE_UI_LAYER_H
-#define LINCE_UI_LAYER_H
+#ifndef LINCE_UI_H
+#define LINCE_UI_H
 
 #include "lince/core/window.h"
 #include "lince/app/asset_cache.h"
@@ -24,24 +24,12 @@ typedef enum LinceFonts {
 */
 typedef struct LinceUI LinceUI;
 
-LinceBool LinceUILoadFont(LinceUI* ui, const char* name, const char* path, const uint32_t n, uint32_t* fontsizes);
-void* LinceUIGetFontHandle(LinceUI* ui, const char* name);
-void* LinceUIGetNkContext(LinceUI* ui);
-LinceBool LinceUIUseFont(LinceUI* ui, const char* name);
-
 /** @brief Initialise UI state and Nuklear rendering context
 * @param window Application window handle.
 * @param ac Asset cache to resolve font paths
 * @todo Change input handle to LinceWindow.
 */
 LinceUI* LinceInitUI(LinceWindow* window, LinceAssetCache* ac);
-
-
-/** @brief Loads the predefined fonts using an initialised asset manager.
-* @param ui initialised ui state
-* @param am initialised asset manager to resolve paths to the fonts
-*/
-void LinceUILoadFonts(LinceUI* ui, LinceAssetCache* am);
 
 /** @brief Initialise Nuklear's render queue.
 * Any GUI draw calls must be bracketed between LinceBeginUIRender and LinceEndUIRender.
@@ -59,5 +47,35 @@ void LinceUIOnEvent(LinceUI* ui, LinceEvent* event);
 /** @brief Destroy Nuklear rendering context */
 void LinceTerminateUI(LinceUI* ui);
 
+/** @brief Loads a TTF font file with a pre-defined set of fontsizes
+ * @param ui UI state
+ * @param name Unique name for the font
+ * @param path Path to TTF file
+ * @param n Number of fontsizes to generate
+ * @param fontsizes Array of fontsizes to generate
+ * @returns LinceTrue if successful, and LinceFalse otherwise.
+*/
+LinceBool LinceUILoadFont(LinceUI* ui, const char* name, const char* path, const uint32_t n, uint32_t* fontsizes);
 
-#endif
+/** @brief Sets the current font.
+ * @param ui UI state
+ * @param name Unique name of the font followed by its fontsize, e.g. "droid15".
+ * @returns LinceTrue if successful, and LinceFalse otherwise.
+*/
+LinceBool LinceUIUseFont(LinceUI* ui, const char* name);
+
+/** @brief Retrieve the Nuklear handle for a font
+ * @param ui UI state
+ * @param name Unique name of the font followed by its fontsize, e.g. "droid15".
+ * @returns the font handle
+*/
+void* LinceUIGetFontHandle(LinceUI* ui, const char* name);
+
+/** @brief Retrieve the Nuklear context
+ * @param ui UI state
+ * @returns Nuklear context
+*/
+void* LinceUIGetNkContext(LinceUI* ui);
+
+
+#endif /* LINCE_UI_H */

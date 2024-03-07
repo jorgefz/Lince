@@ -55,33 +55,6 @@ LinceUI* LinceInitUI(LinceWindow* window, LinceAssetCache* ac){
 }
 
 
-void LinceUILoadFonts(LinceUI* ui, LinceAssetCache* am){
-
-    static const char* font_files[] = { "fonts/DroidSans.ttf" };
-    const uint32_t font_num = sizeof(font_files) / sizeof(char**);
-
-    struct nk_font_atlas *atlas;
-    nk_glfw3_font_stash_begin(&ui->backend, &atlas);
-    
-    for (uint32_t i = 0; i != font_num; ++i){
-        const char* font_path = LinceAssetCacheFetchPath(am, font_files[i]);
-        LINCE_ASSERT(font_path, "Could not find location of default font '%s'", font_files[i]);
-
-        ui->fonts[LinceFont_Droid8]  = nk_font_atlas_add_from_file(atlas, font_path, 8, 0);
-        ui->fonts[LinceFont_Droid15] = nk_font_atlas_add_from_file(atlas, font_path, 15, 0);
-        ui->fonts[LinceFont_Droid20] = nk_font_atlas_add_from_file(atlas, font_path, 20, 0);
-        ui->fonts[LinceFont_Droid30] = nk_font_atlas_add_from_file(atlas, font_path, 30, 0);
-        ui->fonts[LinceFont_Droid50] = nk_font_atlas_add_from_file(atlas, font_path, 50, 0);
-        
-        LINCE_ASSERT(ui->fonts[LinceFont_Droid15], "Failed to load font at '%s'", font_path);
-    }
-
-    nk_glfw3_font_stash_end(&ui->backend);
-    
-    //nk_style_load_all_cursors(data->ctx, atlas->cursors);
-    //nk_style_set_font(ui->ctx, ui->fonts[LinceFont_Droid20]);
-}
-
 void LinceBeginUIRender(LinceUI* ui){
 	nk_glfw3_new_frame(&ui->backend);
 }
@@ -139,13 +112,15 @@ LinceBool LinceUILoadFont(LinceUI* ui, const char* name, const char* path, const
 
     nk_glfw3_font_stash_begin(&ui->backend, &atlas);
     for(uint32_t i = 0; i != n; ++i){
-        font = nk_font_atlas_add_from_file(atlas, full_path, fontsizes[i], NULL);
+        font = nk_font_atlas_add_from_file(atlas, full_path, (float)fontsizes[i], NULL);
         LINCE_ASSERT(font, "Failed to load font '%s' from '%s'", name, full_path);
         if(!font) continue;
         snprintf(key, LINCE_NAME_MAX, "%s%u", name, fontsizes[i]);
         hashmap_set(&ui->font_cache, key, font);
     }
     nk_glfw3_font_stash_end(&ui->backend);
+    nk_font_atlas_cleanup(atlas);
+    return LinceTrue;
 }
 
 void* LinceUIGetFontHandle(LinceUI* ui, const char* name){
