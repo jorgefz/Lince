@@ -83,7 +83,7 @@ void LinceUpdateCamera(LinceCamera* cam) {
 	LINCE_PROFILER_END(timer);
 }
 
-void LinceResizeCameraView(LinceCamera* cam, float aspect_ratio){
+void LinceUpdateCameraProjection(LinceCamera* cam, float aspect_ratio){
 	cam->aspect_ratio = aspect_ratio;
 	LinceCalculateProjection(
 		 cam->proj,

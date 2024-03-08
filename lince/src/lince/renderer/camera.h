@@ -66,7 +66,7 @@ void LinceSetCameraProj(LinceCamera* cam, mat4 proj);
 void LinceUpdateCamera(LinceCamera* cam);
 
 /** @brief Adapts projection to changes in window size */
-void LinceResizeCameraView(LinceCamera* cam, float aspect_ratio);
+void LinceUpdateCameraProjection(LinceCamera* cam, float aspect_ratio);
 
 /** @brief Deallocates a camera */
 void LinceDeleteCamera(LinceCamera* cam);
