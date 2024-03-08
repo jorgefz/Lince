@@ -1,5 +1,5 @@
 
-project "platformer_demo"
+project "tutorial_demo"
     kind "ConsoleApp"
     language "C"
     staticruntime "on"
