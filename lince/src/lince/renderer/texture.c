@@ -5,6 +5,7 @@
 #include "lince/utils/memory.h"
 #include "lince/renderer/texture.h"
 
+
 LinceTexture* LinceLoadTexture(const char* path, uint32_t flags){
 	return LinceCreateTextureFromFile(path, flags);
 }
@@ -13,10 +14,12 @@ LinceTexture* LinceCreateTextureFromFile(const char* path, uint32_t flags){
 	LINCE_PROFILER_START(timer);
 
 	LinceImageSetFlipVertical(flags & LinceTexture_FlipY);
-
 	LinceImage image;
 	if(!LinceLoadImage(&image, path)){
 		return NULL;
+	}
+	if(flags & LinceTexture_WipeAlpha){
+		LinceWipeAlphaChannel(&image);
 	}
 
 	LinceTexture* tex = LinceCreateTextureFromImage(&image, flags);
@@ -30,9 +33,16 @@ LinceTexture* LinceCreateTextureFromFile(const char* path, uint32_t flags){
 }
 
 LinceTexture* LinceCreateTextureFromImage(LinceImage* image, uint32_t flags){
-	LINCE_UNUSED(flags);
 	LinceTexture* texture = LinceCreateEmptyTexture(image->width, image->height);
 	if(!texture) return NULL;
+
+	// Apply flags
+	// Note: flipping vertically can only be done before the image is loaded
+	// Setting `LinceTexture_FlipY` will do nothing in this function.
+	if(flags & LinceTexture_WipeAlpha){
+		LinceWipeAlphaChannel(image);
+	}
+
 	LinceSetTextureData(texture, image->data);
 	LINCE_INFO("Created texture from image with size %ux%u", image->width, image->height);
 	return texture;
