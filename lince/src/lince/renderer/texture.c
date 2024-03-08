@@ -40,7 +40,7 @@ LinceTexture* LinceCreateTextureFromImage(LinceImage* image, uint32_t flags){
 	// Note: flipping vertically can only be done before the image is loaded
 	// Setting `LinceTexture_FlipY` will do nothing in this function.
 	if(flags & LinceTexture_WipeAlpha){
-		LinceWipeAlphaChannel(image);
+		LinceImageWipeAlphaChannel(image);
 	}
 
 	LinceSetTextureData(texture, image->data);
