@@ -8,8 +8,8 @@
 * @brief Settings for loading a texture
 */
 typedef enum LinceTextureFlags {
-	LinceTexture_Default = 0x0,	///< Explicit default settings
-	LinceTexture_FlipY = 0x1,   ///< Flips texture vertically on load
+	LinceTexture_Default   = 0x0, ///< Explicit default settings
+	LinceTexture_FlipY     = 0x1, ///< Flips texture vertically on load, setting the origin to the upper left corner.
 	// LinceTexture_WipeAlpha = 0x2, ///< Removes transparency by setting the alpha channel to 1. 
 } LinceTextureFlags;
 

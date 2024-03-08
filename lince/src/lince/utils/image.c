@@ -66,5 +66,15 @@ uint8_t* LinceImageSetPixel(LinceImage* image, uint32_t x, uint32_t y, uint32_t 
 }
 
 void LinceImageSetFlipVertical(LinceBool flip){
-    stbi_set_flip_vertically_on_load(flip);
+    /*
+    The reason why the boolean is flipped before being
+    passed to `stbi_set_flip_vertically_on_load` is because
+    stb_image's default origin is on the upper left corner,
+    and this switch changes it to lower left corner.
+
+    The Lince default is the opposite, like OpenGL:
+    the origin is on the lower left corner,
+    and this function sets it to the upper left corner.
+    */
+    stbi_set_flip_vertically_on_load(!flip);
 }

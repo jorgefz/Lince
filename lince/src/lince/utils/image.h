@@ -43,7 +43,12 @@ uint8_t* LinceImageGetPixel(LinceImage* image, uint32_t x, uint32_t y);
 */
 uint8_t* LinceImageSetPixel(LinceImage* image, uint32_t x, uint32_t y, uint32_t rgba);
 
-/** @brief Flip new loaded images vertically on load, so that the origin lies on the bottom left corner */
+/** @brief Flip new loaded images vertically on load,
+ * so that the origin lies on the upper left corner.
+ * @note The default behaviour of stb_image is to have the origin
+ * on the upper left corner. The default has been changed to the lower left corner,
+ * like in OpenGL.
+*/
 void LinceImageSetFlipVertical(LinceBool flip);
 
 #endif /* LINCE_IMAGE_H */
