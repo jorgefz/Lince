@@ -3,31 +3,22 @@
 #include <GLFW/glfw3.h>
 
 #include "lince/input/input.h"
-#include "lince/core/window.h"
 #include "lince/core/logger.h"
-
-static LinceWindow* active_window = NULL;
-
-void LinceInputSetWindow(LinceWindow* window){
-    active_window = window;
-}
+#include "lince/app/app.h" // OK if its only included in the implementation file
 
 LinceBool LinceIsKeyPressed(int key){
-    LINCE_ASSERT(active_window, "Attempting to read input without setting an active window");
-    int state = glfwGetKey(active_window->handle, key);
+    int state = glfwGetKey(LinceGetApp()->window->handle, key);
     return (state == GLFW_PRESS || state == GLFW_REPEAT);
 }
 
 LinceBool LinceIsMouseButtonPressed(int button){
-    LINCE_ASSERT(active_window, "Attempting to read input without setting an active window");
-    int state = glfwGetMouseButton(active_window->handle, button);
+    int state = glfwGetMouseButton(LinceGetApp()->window->handle, button);
 	return (state == GLFW_PRESS);
 }
 
 LincePoint LinceGetMousePos(void) {
-    LINCE_ASSERT(active_window, "Attempting to read input without setting an active window");
     double x, y;
-	glfwGetCursorPos(active_window->handle, &x, &y);
+	glfwGetCursorPos(LinceGetApp()->window->handle, &x, &y);
     return (LincePoint){ (float)x, (float)y };
 }
 

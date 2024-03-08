@@ -19,6 +19,7 @@
 #include "lince/scene/scene.h"
 #include "lince/app/asset_cache.h"
 #include "lince/renderer/transform.h"
+#include "lince/input/input.h"
 
 /** Function pointer typedefs for user-defined application callbacks */
 typedef void (*LinceGameInitFn)();
