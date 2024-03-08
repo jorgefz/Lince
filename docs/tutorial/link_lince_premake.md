@@ -1,6 +1,6 @@
-# Create a project with Lince and Premake
+# Create a Lince project with Premake
 
-To create a new project with Premake:
+To create a new application that uses Lince with Premake:
 
 ### 1. Create a new folder where your project will be located
 
@@ -45,4 +45,7 @@ include "my_project/premake5.lua"
 
 ### 5. Run `premake5` again and build your project.
 
+Follow the instructions in [this tutorial](build_lince_premake.md) to compile your Premake5 project.
 You will find your project compiled into an executable in the folder `bin/{config}-{os}-{arch}/my_project/my_project.exe`.
+
+Additionally, the main Lince header file to include in your project is in `lince/src/lince.h`.

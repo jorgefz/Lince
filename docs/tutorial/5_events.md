@@ -40,7 +40,7 @@ Then tell the engine where to find it with the variable `app->on_event`:
 ```
 
 Since, we are only interested on the window being resized,
-we will check for the event type to be `LinceEventType_WindowResize`,
+we will check for the event of type `LinceEventType_WindowResize`,
 and, if so, recalculate the projection of the camera:
 ```c
 void OnEvent(LinceEvent* event){
@@ -54,5 +54,7 @@ doesn't stretch the square!
 
 
 The final code should look like this:
-
+```c
+// TO DO
+```
 
