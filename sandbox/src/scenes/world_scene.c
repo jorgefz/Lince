@@ -56,10 +56,7 @@ void WorldSceneInit(LinceScene* scene){
     char* map_path = LinceAppFetchAssetPath("textures/outside.png");
     
     world_scene->map =  (LinceTilemap){
-        .texture = LinceLoadTexture(
-            map_path,
-            LinceTexture_FlipY
-        ),
+        .texture = LinceLoadTexture(map_path, 0),
         .cellsize = {16,16},
         .scale = {1,1},
         .offset = {-2,0},

@@ -42,10 +42,7 @@ void HouseSceneInit(LinceScene* scene){
     char* map_path = LinceAppFetchAssetPath("textures/inside.png");
     
     house_scene->map =  (LinceTilemap){
-        .texture = LinceLoadTexture(
-            map_path,
-            LinceTexture_FlipY
-        ),
+        .texture = LinceLoadTexture(map_path, 0),
         .cellsize = {16,16},
         .scale = {1,1},
         .offset = {-1, 0},
