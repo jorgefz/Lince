@@ -4,27 +4,38 @@
 #include "lince/core/profiler.h"
 #include "lince/utils/memory.h"
 #include "lince/renderer/texture.h"
-#include "lince/utils/image.h"
-
 
 LinceTexture* LinceLoadTexture(const char* path, uint32_t flags){
+	return LinceCreateTextureFromFile(path, flags);
+}
+
+LinceTexture* LinceCreateTextureFromFile(const char* path, uint32_t flags){
 	LINCE_PROFILER_START(timer);
 
 	LinceImageSetFlipVertical(flags & LinceTexture_FlipY);
 
 	LinceImage image;
-	void* result = LinceLoadImage(&image, path);
-	LINCE_ASSERT(result, "Failed to load texture from '%s'", path);
-	if(!result) return NULL;
+	if(!LinceLoadImage(&image, path)){
+		return NULL;
+	}
 
-	LinceTexture* tex = LinceCreateEmptyTexture(image.width, image.height);
+	LinceTexture* tex = LinceCreateTextureFromImage(&image, flags);
 	if(!tex) return NULL;
-	LinceSetTextureData(tex, image.data);
 	LinceDeleteImage(&image);
 
-	LINCE_INFO("Created texture with size %ux%u", tex->width, tex->height);
+	LINCE_INFO("Created texture with size %ux%u from file '%s'",
+		tex->width, tex->height, path);
 	LINCE_PROFILER_END(timer);
 	return tex;
+}
+
+LinceTexture* LinceCreateTextureFromImage(LinceImage* image, uint32_t flags){
+	LINCE_UNUSED(flags);
+	LinceTexture* texture = LinceCreateEmptyTexture(image->width, image->height);
+	if(!texture) return NULL;
+	LinceSetTextureData(texture, image->data);
+	LINCE_INFO("Created texture from image with size %ux%u", image->width, image->height);
+	return texture;
 }
 
 /* Creates empty buffer with given dimensions */

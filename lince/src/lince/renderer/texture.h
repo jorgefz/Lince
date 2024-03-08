@@ -2,6 +2,7 @@
 #define LINCE_TEXTURE_H
 
 #include "lince/core/core.h"
+#include "lince/utils/image.h"
 
 /** @enum LinceTextureFlags
 * @brief Settings for loading a texture
@@ -21,11 +22,24 @@ typedef struct LinceTexture {
 	int32_t internal_format; 	///< Output format of data in OpenGL buffer
 } LinceTexture;
 
-/** @brief Loads a texture from file
+/** @brief Loads a texture from file.
+* @deprecated Deprecated in favour of LinceCreateTextureFromFile.
 * @param path Path to texture file
-* @param flags Settings.
+* @param flags Settings
 */
 LinceTexture* LinceLoadTexture(const char* path, uint32_t flags);
+
+/** @brief Loads a texture from file
+* @param path Path to texture file
+* @param flags Settings
+*/
+LinceTexture* LinceCreateTextureFromFile(const char* path, uint32_t flags);
+
+/** @brief Loads a texture from a loaded image
+* @param image Image loaded into memory 
+* @param flags Settings
+*/
+LinceTexture* LinceCreateTextureFromImage(LinceImage* image, uint32_t flags);
 
 /** @brief Creates empty texture buffer with given dimensions
 * @param width  Width in pixels
@@ -33,7 +47,13 @@ LinceTexture* LinceLoadTexture(const char* path, uint32_t flags);
 */
 LinceTexture* LinceCreateEmptyTexture(uint32_t width, uint32_t height);
 
-/** @brief Provides custom data to an existing texture buffer */
+/** @brief Provides custom data to an existing texture buffer.
+ * @param texture Existing texture
+ * @param data Image data to overwrite the texture
+ * @note You can also modify the dimensions of the texture by changing
+ * the width and height of the texture prior to calling this function.
+ * @note This is an expensive operation.
+*/
 void LinceSetTextureData(LinceTexture* texture, unsigned char* data);
 
 /** @brief Deallocates texture memory and destroys OpenGL texture object */
