@@ -275,7 +275,7 @@ void EditorInit(){
 
 void EditorOnUpdate(float dt){
     MoveCamera(dt);
-    LinceResizeCameraView(STATE.camera, LinceAppGetAspectRatio());
+    LinceUpdateCameraProjection(STATE.camera, LinceAppGetAspectRatio());
 	LinceUpdateCamera(STATE.camera);
     DrawGUI();
     DrawEntities();
