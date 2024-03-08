@@ -445,7 +445,7 @@ void GameStateInit(){
 void GameStateUpdate(float dt){
 
     // Rendering
-    LinceResizeCameraView(&game_data.camera, LinceAppGetAspectRatio());
+    LinceUpdateCameraProjection(&game_data.camera, LinceAppGetAspectRatio());
 	LinceUpdateCamera(&game_data.camera);
 
     // Tile animation test

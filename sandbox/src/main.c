@@ -31,7 +31,7 @@ void SandboxInit() {
 
 void SandboxUpdate(float dt){
     LINCE_UNUSED(dt);
-    LinceResizeCameraView(&DATA.camera, LinceAppGetAspectRatio());
+    LinceUpdateCameraProjection(&DATA.camera, LinceAppGetAspectRatio());
     LinceUpdateCamera(&DATA.camera);
 }
 
@@ -46,7 +46,7 @@ void SetupApplication(){
     app->on_init      = SandboxInit;
     app->on_update    = SandboxUpdate;
     app->on_terminate = SandboxTerminate;
-    
+    LinceAppSetTitle("Sandbox");
 }
 
 
