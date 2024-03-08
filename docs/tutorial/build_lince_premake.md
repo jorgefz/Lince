@@ -6,25 +6,23 @@ Premake5 is a tool to generate project files for different platforms and build s
 
 ### 2. Run premake to generate build files
 
-To build Lince into a static library with Premake, run `premake5` from the top-level directory with one of the following options:
+#### Windows
 
-* On Windows, run `premake5 vs2022` and open `lince.sln` with Visual Studio 2022.
-* On Linux, run `premake5 game2` to generate the Makefiles.
+1. Run `premake5 vs2022` from the top-level directory
+2. Open `lince.sln` with Visual Studio 2022
+3. Compile it
 
-### 3. Install dependencies
+You should find the 
 
-On Linux, you'll need to install the following libraries:
+#### Linux
+
+1. Install the following libraries:
 ```bash
 sudo apt-get install make libx11-dev libxcursor-dev libxrandr-dev libxinerama-dev libxtst-dev libgl-dev uuid-dev`
 ```
 
-On Windows, Visual Studio 2022 is required.
-
-### 4. Compile Lince
-
-On Windows, open `lince.sln` with Visual Studio 2022, right click on the `core/lince` project, and click Build.
-
-On Linux, execute the command `make lince`.
+2. Run `premake5 game2`
+3. Compile it with `make lince`
 
 After compilation, you will find the static library at `bin/{config}-{OS}-{architecture}/lince`
 as either `liblince.a` on Linux or `lince.lib` on Windows.
