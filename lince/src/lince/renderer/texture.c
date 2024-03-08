@@ -19,7 +19,7 @@ LinceTexture* LinceCreateTextureFromFile(const char* path, uint32_t flags){
 		return NULL;
 	}
 	if(flags & LinceTexture_WipeAlpha){
-		LinceWipeAlphaChannel(&image);
+		LinceImageWipeAlphaChannel(&image);
 	}
 
 	LinceTexture* tex = LinceCreateTextureFromImage(&image, flags);
