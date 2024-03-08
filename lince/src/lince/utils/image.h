@@ -51,4 +51,9 @@ uint8_t* LinceImageSetPixel(LinceImage* image, uint32_t x, uint32_t y, uint32_t 
 */
 void LinceImageSetFlipVertical(LinceBool flip);
 
+/** @brief Clears the alpha channel to be fully opaque
+ * @param image Image to make opaque
+**/ 
+void LinceImageWipeAlphaChannel(LinceImage* image);
+
 #endif /* LINCE_IMAGE_H */

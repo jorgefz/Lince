@@ -78,3 +78,16 @@ void LinceImageSetFlipVertical(LinceBool flip){
     */
     stbi_set_flip_vertically_on_load(!flip);
 }
+
+
+/** @brief Clears the alpha channel to be fully opaque
+ * @param image Image to make opaque
+**/ 
+void LinceImageWipeAlphaChannel(LinceImage* image){
+	for(uint32_t i = 0; i != image->width; ++i){
+		for(uint32_t j = 0; j != image->height; ++j){
+			uint8_t* pixel = LinceImageGetPixel(image, i, j);
+			pixel[3] = (uint8_t)(-1); // underflows to max
+		}
+	}
+}
