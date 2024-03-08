@@ -53,7 +53,7 @@ LinceTexture* LinceCreateEmptyTexture(uint32_t width, uint32_t height);
  * the width and height of the texture prior to calling this function.
  * @note This is an expensive operation.
 */
-void LinceSetTextureData(LinceTexture* texture, unsigned char* data);
+void LinceTextureSetData(LinceTexture* texture, unsigned char* data);
 
 /** @brief Deallocates texture memory and destroys OpenGL texture object */
 void LinceDeleteTexture(LinceTexture* texture);

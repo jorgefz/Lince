@@ -43,7 +43,7 @@ LinceTexture* LinceCreateTextureFromImage(LinceImage* image, uint32_t flags){
 		LinceImageWipeAlphaChannel(image);
 	}
 
-	LinceSetTextureData(texture, image->data);
+	LinceTextureSetData(texture, image->data);
 	LINCE_INFO("Created texture from image with size %ux%u", image->width, image->height);
 	return texture;
 }
@@ -80,7 +80,7 @@ LinceTexture* LinceCreateEmptyTexture(uint32_t width, uint32_t height){
 }
 
 /* Provides custom data to an existing texture buffer */
-void LinceSetTextureData(LinceTexture* texture, unsigned char* data){
+void LinceTextureSetData(LinceTexture* texture, unsigned char* data){
 	LINCE_PROFILER_START(timer);
 	glTextureSubImage2D(
 		texture->id,          // OpenGL ID
