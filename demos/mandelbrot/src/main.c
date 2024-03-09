@@ -1,20 +1,36 @@
-#include <lince.h>
-
 /*
+    =============================
+    === Mandelbrot Set Viewer ===
+    =============================
 
-TODO:
-    - Use LinceTransform instead of xlim/ylim
-    - Add LinceTransform functions to calculate bounds of rectangle
-    - Add colormap to shader
+    Author: Jorge Fernández
+    Date: 09/03/2024
+
+    Move up/down/left/right with WASD.
+    Zoom in with Q and zoom out with E.
+
 */
+
+
+#include <lince.h>
 
 struct AppState {
     LinceCamera cam;
     LinceSprite canvas;
     LinceShader* canvas_shader;
-    float xlim[2];
-    float ylim[2];
+    LinceTransform viewframe;
 } state;
+
+void LinceTransformGetBounds(LinceTransform* t, LincePoint* xbound, LincePoint* ybound){
+    if(xbound){
+        xbound->x = t->x - t->w/2.0f;
+        xbound->y = t->x + t->w/2.0f;
+    }
+    if(ybound){
+        ybound->x = t->y - t->h/2.0f;
+        ybound->y = t->y + t->h/2.0f;
+    }
+}
 
 void OnInit(){
     LinceInitCamera(&state.cam, LinceAppGetAspectRatio());
@@ -23,10 +39,11 @@ void OnInit(){
         .w = 2.0f*LinceAppGetAspectRatio(), .h = 2.0f,
         .color = {1,1,1,1}
     };
-    state.xlim[0] = -2.0f*LinceAppGetAspectRatio();
-    state.xlim[1] = 2.0f*LinceAppGetAspectRatio();
-    state.ylim[0] = -2.0f;
-    state.ylim[1] = 2.0f;
+    state.viewframe = (LinceTransform){
+        .x = 0.0f, .y = 0.0f,
+        .w = 2.0f*LinceAppGetAspectRatio(),
+        .h = 2.0f
+    };
     
     LinceAppPushAssetDir("../../../demos/mandelbrot/assets");
     char vert_path[LINCE_PATH_MAX];
@@ -39,71 +56,50 @@ void OnInit(){
 
     LinceBindShader(state.canvas_shader);
     LinceSetShaderUniformVec2(state.canvas_shader, "uScreen", (float[]){screen.x,screen.y});
-    LinceSetShaderUniformVec2(state.canvas_shader, "uXlim", state.xlim);
-    LinceSetShaderUniformVec2(state.canvas_shader, "uYlim", state.ylim);
+    
+    LincePoint xlim, ylim;
+    LinceTransformGetBounds(&state.viewframe, &xlim, &ylim);
+    LinceSetShaderUniformVec2(state.canvas_shader, "uXlim", &xlim.x);
+    LinceSetShaderUniformVec2(state.canvas_shader, "uYlim", &ylim.x);
 }
 
 void OnUpdate(float dt){
     LinceUpdateCamera(&state.cam);
 
-    LinceBindShader(state.canvas_shader);
-    static float speed = 0.005f;
+    static float speed = 0.0025f;
     const float zoom = 1.0f + 0.01f;
 
     // Move up/down
     if(LinceIsKeyPressed(LinceKey_w)){
-        state.ylim[0] += speed * dt;
-        state.ylim[1] += speed * dt;
-        LinceSetShaderUniformVec2(state.canvas_shader, "uYlim", state.ylim);
+        state.viewframe.y += speed * dt;
     } else if(LinceIsKeyPressed(LinceKey_s)){
-        state.ylim[0] -= speed * dt;
-        state.ylim[1] -= speed * dt;
-        LinceSetShaderUniformVec2(state.canvas_shader, "uYlim", state.ylim);
+        state.viewframe.y -= speed * dt;
     }
     
     // Move left/right
     if(LinceIsKeyPressed(LinceKey_d)){
-        state.xlim[0] += speed * dt;
-        state.xlim[1] += speed * dt;
-        LinceSetShaderUniformVec2(state.canvas_shader, "uXlim", state.xlim);
+        state.viewframe.x += speed * dt;
     } else if (LinceIsKeyPressed(LinceKey_a)){
-        state.xlim[0] -= speed * dt;
-        state.xlim[1] -= speed * dt;
-        LinceSetShaderUniformVec2(state.canvas_shader, "uXlim", state.xlim);
+        state.viewframe.x -= speed * dt;
     }
 
     // Zoom in/out
     if(LinceIsKeyPressed(LinceKey_q)){
         speed /= zoom;
-        float wx = fabsf(state.xlim[1] - state.xlim[0]);
-        float cx = (state.xlim[1] + state.xlim[0])/2.0f;
-        wx /= zoom;
-        state.xlim[0] = cx - wx/2.0f;
-        state.xlim[1] = cx + wx/2.0f;
-        LinceSetShaderUniformVec2(state.canvas_shader, "uXlim", state.xlim);
+        state.viewframe.w /= zoom;
+        state.viewframe.h /= zoom;
 
-        float wy = fabsf(state.ylim[1] - state.ylim[0]);
-        float cy = (state.ylim[1] + state.ylim[0])/2.0f;
-        wy /= zoom;
-        state.ylim[0] = cy - wy/2.0f;
-        state.ylim[1] = cy + wy/2.0f;
-        LinceSetShaderUniformVec2(state.canvas_shader, "uYlim", state.ylim);
     } else if(LinceIsKeyPressed(LinceKey_e)){
         speed *= zoom;
-        float wx = fabsf(state.xlim[1] - state.xlim[0]);
-        float cx = (state.xlim[1] + state.xlim[0])/2.0f;
-        wx *= zoom;
-        state.xlim[0] = cx - wx/2.0f;
-        state.xlim[1] = cx + wx/2.0f;
-        LinceSetShaderUniformVec2(state.canvas_shader, "uXlim", state.xlim);
-
-        float wy = fabsf(state.ylim[1] - state.ylim[0]);
-        float cy = (state.ylim[1] + state.ylim[0])/2.0f;
-        wy *= zoom;
-        state.ylim[0] = cy - wy/2.0f;
-        state.ylim[1] = cy + wy/2.0f;
-        LinceSetShaderUniformVec2(state.canvas_shader, "uYlim", state.ylim);
+        state.viewframe.w *= zoom;
+        state.viewframe.h *= zoom;
     }
+
+    LincePoint xlim, ylim;
+    LinceTransformGetBounds(&state.viewframe, &xlim, &ylim);
+    LinceBindShader(state.canvas_shader);
+    LinceSetShaderUniformVec2(state.canvas_shader, "uXlim", &xlim.x);
+    LinceSetShaderUniformVec2(state.canvas_shader, "uYlim", &ylim.x);
 
     LinceBeginRender(&state.cam);
     LinceDrawSprite(&state.canvas, state.canvas_shader);
@@ -115,7 +111,7 @@ void OnEvent(LinceEvent* event){
         LinceUpdateCameraProjection(&state.cam, LinceAppGetAspectRatio());
         LincePoint screen = LinceAppGetScreenSize();
         LinceBindShader(state.canvas_shader);
-        LinceSetShaderUniformVec2(state.canvas_shader, "uScreen", (float[]){screen.x,screen.y});
+        LinceSetShaderUniformVec2(state.canvas_shader, "uScreen", &screen.x);
     }
 }
 

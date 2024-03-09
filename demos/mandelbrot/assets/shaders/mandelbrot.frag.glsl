@@ -37,7 +37,7 @@ vec3 colormap(float f){
 	f = sqrt(f);
 	if(f > 0.75f) return vec3(f, f, 0.0f);
 	if(f > 0.5f)  return vec3(f, 0.0f, 0.0f);
-	if(f > 0.25f) return vec3(f, 0.0f, f);
+	if(f > 0.25f) return vec3(f/2.0f, 0.0f, f);
 	else          return vec3(0.0f, 0.0f, f);
 }
 
