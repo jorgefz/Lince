@@ -1,6 +1,8 @@
+#include <stdio.h>
+#include <string.h>
+#include <ctype.h>
 #include "lexer.h"
 #include "token.h"
-#include <ctype.h>
 
 static void lexer_init(struct lexer* lex, const char* source){
 	array_init(&lex->tokens, sizeof(struct token));
@@ -12,11 +14,11 @@ static void lexer_init(struct lexer* lex, const char* source){
 	lex->p = lex->source;
 	lex->length = strlen(source);
 	lex->line = 0;
-	lex->error = ERR_OK;
+	lex->error = LEX_ERR_OK;
 }
 
 static int lexer_end(struct lexer* lex){
-	if(lex->error != ERR_OK) return 1;
+	if(lex->error != LEX_ERR_OK) return 1;
 	return (lex->p >= lex->source + lex->length);
 }
 
@@ -50,7 +52,7 @@ static void lexer_add_token(struct lexer* lex, int type, const char* loc, size_t
 	struct token tok = {
 		.type = type,
 		.line = lex->line,
-		.location = lex->p - lex->source,
+		.location = loc - lex->source,
 		.length = length
 	};
 	memcpy(tok.lexeme, loc, length);
@@ -73,13 +75,15 @@ static void lexer_consume_comment_block(struct lexer* lex){
 	}
 
 	if(lexer_end(lex)){
-		lex->error = ERR_UNCLOSED_COMMENT_BLOCK;
+		lex->error = LEX_ERR_UNCLOSED_COMMENT_BLOCK;
 		lex->line = line; // Tells which line comment started
 	}
 }
 
 static void lexer_read_string(struct lexer* lex){
 	const char* start = lex->p;
+
+    lexer_add_token(lex, TOKEN_QUOTE, start-1, 1);
 
 	while(lexer_peek(lex) != '\"' && !lexer_end(lex)){
 
@@ -90,17 +94,18 @@ static void lexer_read_string(struct lexer* lex){
 
 		// End of line
 		if(lexer_peek(lex) == '\n'){
-			lex->error = ERR_UNFINISHED_STRING;
+			lex->error = LEX_ERR_UNTERMINATED_STRING;
 			return;
 		}
 
 		lexer_advance(lex);
 	}
 	if(lexer_end(lex)){
-		lex->error = ERR_UNFINISHED_STRING;
+		lex->error = LEX_ERR_UNTERMINATED_STRING;
 		return;
 	}
 	lexer_add_token(lex, TOKEN_STRING, start, lex->p - start);
+    lexer_add_token(lex, TOKEN_QUOTE, lex->p, 1);
 	lexer_advance(lex); // Consume closing quote
 }
 
@@ -125,20 +130,30 @@ static void lexer_read_identifier(struct lexer* lex){
 }
 
 static void lexer_read_pp_directive(struct lexer* lex){
-	lexer_read_identifier(lex);
-	struct token* tok = array_back(&lex->tokens);
-	if(hashmap_has_key(&lex->keywords, tok->lexeme)){
-		tok->type = (int)(size_t)hashmap_get(&lex->keywords, tok->lexeme);
-	} else {
-		array_pop_back(&lex->tokens);
+
+    // Read directive name
+    const char* start = lex->p;
+	while(lexer_is_alphanum(lexer_peek(lex))){
+		lexer_advance(lex);
 	}
+
+    // TODO: bounds check
+    static char directive[TOKEN_LEXEME_MAX] = {0};
+    memcpy(directive, start, lex->p - start);
+    directive[lex->p - start] = '\0';
+    
+    if(hashmap_has_key(&lex->keywords, directive)){
+        int type = (int)(size_t)hashmap_get(&lex->keywords, directive);
+        lexer_add_token(lex, TOKEN_HASH, start-1, 1);
+        lexer_add_token(lex, type, start, lex->p - start);
+    }
 }
 
 const char* lexer_get_error_string(int err){
 	switch(err){
-		case ERR_UNFINISHED_STRING:
-			return "Unfinished string";
-		case ERR_UNCLOSED_COMMENT_BLOCK:
+		case LEX_ERR_UNTERMINATED_STRING:
+			return "Unterminated string";
+		case LEX_ERR_UNCLOSED_COMMENT_BLOCK:
 			return "Unclosed comment block";
 		default:
 			return "";
@@ -185,9 +200,10 @@ int lexer_find_tokens(const char* src, array_t* tokens){
 	}
 
 	hashmap_uninit(&lex.keywords);
-	
-    if(lex.error != ERR_OK){
-		printf("Error on line %d: %s", lex.line, lexer_get_error_string(lex.error));
+	lexer_add_token(&lex, TOKEN_NONE, lex.source+lex.length, 0);
+
+    if(lex.error != LEX_ERR_OK){
+		printf("GLSL-EXT: Error on line %d: %s", lex.line, lexer_get_error_string(lex.error));
 		return lex.error;
 	}
 

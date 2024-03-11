@@ -6,9 +6,9 @@
 #include <ctype.h>
 
 enum lexer_error {
-	ERR_OK = 0,
-	ERR_UNFINISHED_STRING,
-	ERR_UNCLOSED_COMMENT_BLOCK
+	LEX_ERR_OK = 0,
+	LEX_ERR_UNTERMINATED_STRING,
+	LEX_ERR_UNCLOSED_COMMENT_BLOCK
 };
 
 struct lexer {

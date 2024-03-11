@@ -8,14 +8,18 @@ enum token_type	{
 	TOKEN_PP_INCLUDE,
 	TOKEN_PP_SHADERTYPE,
 	TOKEN_STRING,
+	TOKEN_QUOTE,
+	TOKEN_HASH,
 	TOKEN_IDENTIFIER
 };
+
+#define TOKEN_LEXEME_MAX 256
 
 struct token {
 	int type;
 	int line;
 	size_t location;
-	char lexeme[256];
+	char lexeme[TOKEN_LEXEME_MAX];
 	size_t length;
 };
 
