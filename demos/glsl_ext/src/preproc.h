@@ -18,14 +18,19 @@ enum pp_error {
 	PP_ERR_BAD_INCLUDE
 };
 
+enum pp_output {
+	PP_OUTPUT_VERTEX,
+	PP_OUTPUT_FRAGMENT
+};
+
+typedef void (*pp_write_fn)(const char* from, size_t length, void* user_data);
+
 struct preproc {
 	const char* source;
-	char* output;
-	size_t output_size;
-	size_t output_max;
-
 	const char* psrc;
-	char* pout;
+	
+	pp_write_fn write_callback;
+	void* user_data;
 
 	hashmap_t* headers;
 	array_t* tokens;
@@ -33,7 +38,12 @@ struct preproc {
 	struct token* tok;
 };
 
-int pp_run_includes(const char* source, char* output, array_t* tokens, hashmap_t* headers);
+
+int pp_run_includes(struct preproc* pp);
+
+struct preproc* pp_init(char* source, hashmap_t* headers, pp_write_fn write_callback, void* user_data);
+
+void pp_free(struct preproc* pp);
 
 const char* pp_get_error_string(int err);
 

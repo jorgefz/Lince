@@ -20,6 +20,12 @@ static void pp_println(const char* str){
 	printf("%.*s", (int)(p-str), str);
 }
 
+static void pp_write(struct preproc* pp, const char* from, size_t length){
+	if(pp->write_callback){
+		pp->write_callback(from, length, pp->user_data);
+	}
+}
+
 void pp_include(struct preproc* pp){
 	if(pp->tok->type != TOKEN_PP_INCLUDE){
 		pp->error = PP_ERR_BAD_INCLUDE;
@@ -45,41 +51,29 @@ void pp_include(struct preproc* pp){
 	}
 
 	size_t header_length = strlen(header_source);
-	memcpy(pp->pout, header_source, header_length);
-	pp->pout += header_length;
+	pp_write(pp, header_source, header_length);
 	pp->error = PP_ERR_OK;
 }
 
 void pp_copy_non_tokenized(struct preproc* pp){
 	const char* end = pp->source + pp->tok->location;
-	memcpy(pp->pout, pp->psrc, end-pp->psrc);
-	pp->pout += end - pp->psrc;
+	pp_write(pp, pp->psrc, end - pp->psrc);
 	pp->psrc = end + pp->tok->length;
 }
 
-int pp_run_includes(const char* source, char* output, array_t* tokens, hashmap_t* headers){
 
-	struct preproc pp = {
-		.source = source,
-		.output = output,
-		.pout = output,
-		.psrc = source,
-		.tok = NULL,
-		.error = PP_ERR_OK,
-		.headers = headers,
-		.tokens = tokens
-	};
+int pp_run_includes(struct preproc* pp){
 	
 	// Header pass
-	for(pp.tok = pp.tokens->begin; pp.tok != pp.tokens->end; ++pp.tok){
+	for(pp->tok = pp->tokens->begin; pp->tok != pp->tokens->end; ++pp->tok){
 
-		pp_copy_non_tokenized(&pp);
+		pp_copy_non_tokenized(pp);
 
-		if(pp.tok->type == TOKEN_NONE) break;
+		if(pp->tok->type == TOKEN_NONE) break;
 
-		switch(pp.tok->type){
+		switch(pp->tok->type){
 			case TOKEN_PP_INCLUDE:
-				pp_include(&pp);
+				pp_include(pp);
 				break;
 			case TOKEN_STRING: break;
 			case TOKEN_PP_SHADERTYPE: break;
@@ -87,16 +81,54 @@ int pp_run_includes(const char* source, char* output, array_t* tokens, hashmap_t
 				break;
 		}
 
-		if(pp.error != PP_ERR_OK) break;
+		if(pp->error != PP_ERR_OK) break;
 	}
 
-	if(pp.error != PP_ERR_OK){
+	if(pp->error != PP_ERR_OK){
 		printf("GLSL-EXT: Error on line %d: %s\n",
-			pp.tok->line, pp_get_error_string(pp.error));
+			pp->tok->line, pp_get_error_string(pp->error));
 		printf(" -> ");
-		pp_println(pp.source + pp.tok->location - 1);
-		return pp.error;
+		pp_println(pp->source + pp->tok->location - 1);
+		return pp->error;
 	}
 
-	return pp.error;
+	return pp->error;
 }
+
+struct preproc* pp_init(char* source, hashmap_t* headers, pp_write_fn write_callback, void* user_data){
+	struct preproc* pp = malloc(sizeof(struct preproc));
+	if(!pp) return NULL;
+
+	*pp = (struct preproc){
+		.source = source,
+		.psrc = source,
+		.write_callback = write_callback,
+		.user_data = user_data,
+		.tok = NULL,
+		.error = PP_ERR_OK,
+		.headers = headers,
+	};
+
+	pp->tokens = malloc(sizeof(struct token));
+	if(!pp->tokens){
+		free(pp);	
+		return NULL;
+	}
+
+	int err = lexer_find_tokens(source, pp->tokens);
+	if(err != LEX_ERR_OK){
+		free(pp->tokens);
+		free(pp);
+		return NULL;
+	}
+	return pp;
+}
+
+void pp_free(struct preproc* pp){
+	if(!pp) return;
+	if(pp->tokens) free(pp->tokens);
+	free(pp);
+}
+
+
+

@@ -42,37 +42,29 @@ char* Source = (
 );
 
 
+void write_callback(const char* from, size_t length, void* data){
+	char* output = *(char**)data;
+	memcpy(output, from, length);
+	*(char**)data = output + length;
+	// printf("%.*s", (int)length, from);
+}
+
 int main() {
 
-	printf("======= TOKENS =======\n");
-	array_t tokens;
-	int err = lexer_find_tokens(Source, &tokens);
-
-	if(err != 0) return err;
-
-	struct token* tok;
-	for(tok = tokens.begin; tok != tokens.end; tok++){
-		printf("Token '%-10s': type '%-15s', line %d, loc %d, len %d\n",
-			tok->lexeme, token_get_type_string(tok->type),
-			tok->line, (int)tok->location, (int)tok->length);
-	}
-
-
-	printf("\n======= PREPROCESSOR =======\n");
 	hashmap_t headers;
 	hashmap_init(&headers, 10);
 	hashmap_set(&headers, "header", Header);
-
 	char* output = calloc(1, 1000);
+	char* pout = output;
 
-	err = pp_run_includes(Source, output, &tokens, &headers);
+	void* pp = pp_init(Source, &headers, write_callback, &pout);
+	if(!pp) return -1;
 
-	if(err != 0) return 0;
-	
+	pp_run_includes(pp);
+	pp_free(pp);
+
 	printf("%s", output);
 
-	array_uninit(&tokens);
-	hashmap_uninit(&headers);
 	free(output);
 
 	return 0;
