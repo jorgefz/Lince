@@ -1,4 +1,8 @@
 #include "preproc.h"
+#include "token.h"
+#include "lexer.h"
+
+#define PP_STR_MAX 100
 
 struct preproc {
 	const char* source;
@@ -9,21 +13,38 @@ struct preproc {
 
 	hashmap_t* headers;
 	array_t* tokens;
-	int error;
 	struct token* tok;
+	
+	int error;
+	char error_string[PP_STR_MAX];
 };
 
 
-const char* pp_get_error_string(int err){
+static const char* pp_get_error_descr(int err){
 	switch(err){
-		case PP_ERR_NO_HEADER: return "Could not find header";
-		case PP_ERR_BAD_INCLUDE: return "Missing include target";
+		case PP_ERR_UNTERMINATED_STRING:
+			return lexer_get_error_string(LEX_ERR_UNTERMINATED_STRING);
+		case PP_ERR_UNCLOSED_COMMENT_BLOCK:
+			return lexer_get_error_string(PP_ERR_UNCLOSED_COMMENT_BLOCK);
+		case PP_ERR_NO_HEADER:
+			return "Could not find header";
+		case PP_ERR_BAD_INCLUDE:
+			return "Missing include target";
 		default: return "Unknown error";
 	}
 }
 
-static void pp_putsn(const char* str, size_t n){
-	printf("%.*s", (int)n, str);
+const char* pp_get_error_string(void* _pp){
+	struct preproc* pp = _pp;
+	return pp->error_string;
+}
+
+static size_t pp_get_line_length(const char* str){
+	const char* p = str;
+	while(*(p++) != '\0'){
+		if(*p == '\n') break;
+	}
+	return p - str;
 }
 
 static void pp_println(const char* str){
@@ -85,7 +106,7 @@ int pp_run_includes(void* _pp){
 		return err;
 	}
 	
-	// Header pass
+	// Process tokens
 	for(pp->tok = pp->tokens->begin; pp->tok != pp->tokens->end; ++pp->tok){
 
 		pp_copy_non_tokenized(pp);
@@ -106,10 +127,14 @@ int pp_run_includes(void* _pp){
 	}
 
 	if(pp->error != PP_ERR_OK){
-		printf("GLSL-EXT: Error on line %d: %s\n",
-			pp->tok->line, pp_get_error_string(pp->error));
-		printf(" -> ");
-		pp_println(pp->source + pp->tok->location - 1);
+		snprintf(pp->error_string, PP_STR_MAX,
+			"Error on line %d: %s.\n    %d | %.*s\n",
+			pp->tok->line, 
+			pp_get_error_descr(pp->error),
+			pp->tok->line,
+			(int)pp_get_line_length(pp->source + pp->tok->location - 1),
+			pp->source + pp->tok->location - 1
+		);
 		return pp->error;
 	}
 
@@ -125,9 +150,11 @@ void* pp_init(char* source, hashmap_t* headers, pp_write_fn write_callback, void
 		.psrc = source,
 		.write_callback = write_callback,
 		.user_data = user_data,
+		.headers = headers,
+		.tokens = NULL,
 		.tok = NULL,
 		.error = PP_ERR_OK,
-		.headers = headers,
+		.error_string = {0}
 	};
 
 	pp->tokens = malloc(sizeof(struct token));

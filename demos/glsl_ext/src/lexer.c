@@ -156,7 +156,7 @@ const char* lexer_get_error_string(int err){
 		case LEX_ERR_UNCLOSED_COMMENT_BLOCK:
 			return "Unclosed comment block";
 		default:
-			return "";
+			return "Unknown error";
 	}
 }
 

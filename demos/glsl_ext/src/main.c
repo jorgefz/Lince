@@ -14,8 +14,6 @@
 #include <stdio.h>
 #include <lince.h>
 
-#include "token.h"
-#include "lexer.h"
 #include "preproc.h"
 
 char* Header = (
@@ -60,7 +58,11 @@ int main() {
 	void* pp = pp_init(Source, &headers, write_callback, &pout);
 	if(!pp) return -1;
 
-	pp_run_includes(pp);
+	int err = pp_run_includes(pp);
+	if(err != 0){
+		printf("[GLSL-EXT] %s", pp_get_error_string(pp));
+	}
+
 	pp_free(pp);
 
 	printf("%s", output);

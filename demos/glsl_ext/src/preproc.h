@@ -8,12 +8,10 @@
 #include "lince/containers/array.h"
 #include "lince/containers/hashmap.h"
 
-#include "token.h"
-#include "lexer.h"
-
-
 enum pp_error {
-	PP_ERR_OK = LEX_ERR_OK,
+	PP_ERR_OK = 0,
+	PP_ERR_UNTERMINATED_STRING,
+	PP_ERR_UNCLOSED_COMMENT_BLOCK,
 	PP_ERR_NO_HEADER,
 	PP_ERR_BAD_INCLUDE
 };
@@ -31,6 +29,6 @@ int pp_run_includes(void* pp);
 
 void pp_free(void* pp);
 
-const char* pp_get_error_string(int err);
+const char* pp_get_error_string(void* pp);
 
 #endif /* LINCE_GLSL_EXT_PREPROC_H */
