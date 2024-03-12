@@ -77,6 +77,13 @@ static void pp_copy_non_tokenized(struct preproc* pp){
 
 int pp_run_includes(void* _pp){
 	struct preproc* pp = _pp;
+
+	// Fetch tokens
+	int err = lexer_find_tokens(pp->source, pp->tokens);
+	if(err != LEX_ERR_OK){
+		pp_free(pp);
+		return err;
+	}
 	
 	// Header pass
 	for(pp->tok = pp->tokens->begin; pp->tok != pp->tokens->end; ++pp->tok){
@@ -129,12 +136,6 @@ void* pp_init(char* source, hashmap_t* headers, pp_write_fn write_callback, void
 		return NULL;
 	}
 
-	int err = lexer_find_tokens(source, pp->tokens);
-	if(err != LEX_ERR_OK){
-		free(pp->tokens);
-		free(pp);
-		return NULL;
-	}
 	return pp;
 }
 
