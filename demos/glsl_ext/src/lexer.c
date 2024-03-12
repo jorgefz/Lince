@@ -4,6 +4,21 @@
 #include "lexer.h"
 #include "token.h"
 
+static size_t lexer_get_line_length(const char* str){
+	const char* p = str;
+	while(*(p++) != '\0'){
+		if(*p == '\n') break;
+	}
+	return p - str;
+}
+
+static const char* lexer_get_line_start(const char* p, const char* orig){
+	while(p-- >= orig){
+		if(*p == '\n') break;
+	}
+	return p+1;
+}
+
 static void lexer_init(struct lexer* lex, const char* source){
 	array_init(&lex->tokens, sizeof(struct token));
 	hashmap_init(&lex->keywords, 10);
@@ -149,7 +164,7 @@ static void lexer_read_pp_directive(struct lexer* lex){
     }
 }
 
-const char* lexer_get_error_string(int err){
+const char* lexer_get_error_descr(int err){
 	switch(err){
 		case LEX_ERR_UNTERMINATED_STRING:
 			return "Unterminated string";
@@ -161,7 +176,7 @@ const char* lexer_get_error_string(int err){
 }
 
 
-int lexer_find_tokens(const char* src, array_t* tokens){
+int lexer_find_tokens(const char* src, array_t* tokens, char* error_string, size_t error_string_max){
 	
 	struct lexer lex;
 	lexer_init(&lex, src);
@@ -201,12 +216,22 @@ int lexer_find_tokens(const char* src, array_t* tokens){
 
 	hashmap_uninit(&lex.keywords);
 	lexer_add_token(&lex, TOKEN_NONE, lex.source+lex.length, 0);
-
-    if(lex.error != LEX_ERR_OK){
-		printf("GLSL-EXT: Error on line %d: %s", lex.line, lexer_get_error_string(lex.error));
+	*tokens = lex.tokens;
+    
+	if(lex.error != LEX_ERR_OK){
+		if(error_string){
+			const char* line = lexer_get_line_start(lex.p, lex.source);
+			snprintf(error_string, error_string_max,
+				"Error on line %d: %s.\n    %d | %.*s\n",
+				(int)lex.line,
+				lexer_get_error_descr(lex.error),
+				(int)lex.line,
+				(int)lexer_get_line_length(line),
+				line
+			);
+		}
 		return lex.error;
 	}
 
-	*tokens = lex.tokens;
-	return 0;
+	return lex.error;
 }

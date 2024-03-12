@@ -21,8 +21,8 @@ struct lexer {
 	hashmap_t keywords; // Pre-defined keywords
 };
 
-int lexer_find_tokens(const char* src, array_t* tokens);
+int lexer_find_tokens(const char* src, array_t* tokens, char* error_string, size_t error_string_max);
 
-const char* lexer_get_error_string(int err);
+const char* lexer_get_error_descr(int err);
 
 #endif /* LINCE_GLSL_EXT_LEXER_H */

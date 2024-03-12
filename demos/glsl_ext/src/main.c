@@ -35,7 +35,7 @@ char* Source = (
 	"continues in the next line*/\n"
 	"#include \"header\"\n"
 	"void main(){\n"
-	"#include\n"
+	"#include\"\n"
 	"}\n"
 );
 
@@ -62,7 +62,6 @@ int main() {
 	if(err != 0){
 		printf("[GLSL-EXT] %s", pp_get_error_string(pp));
 	}
-
 	pp_free(pp);
 
 	printf("%s", output);

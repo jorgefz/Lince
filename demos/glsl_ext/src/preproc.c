@@ -23,9 +23,9 @@ struct preproc {
 static const char* pp_get_error_descr(int err){
 	switch(err){
 		case PP_ERR_UNTERMINATED_STRING:
-			return lexer_get_error_string(LEX_ERR_UNTERMINATED_STRING);
+			return lexer_get_error_descr(LEX_ERR_UNTERMINATED_STRING);
 		case PP_ERR_UNCLOSED_COMMENT_BLOCK:
-			return lexer_get_error_string(PP_ERR_UNCLOSED_COMMENT_BLOCK);
+			return lexer_get_error_descr(PP_ERR_UNCLOSED_COMMENT_BLOCK);
 		case PP_ERR_NO_HEADER:
 			return "Could not find header";
 		case PP_ERR_BAD_INCLUDE:
@@ -100,9 +100,8 @@ int pp_run_includes(void* _pp){
 	struct preproc* pp = _pp;
 
 	// Fetch tokens
-	int err = lexer_find_tokens(pp->source, pp->tokens);
+	int err = lexer_find_tokens(pp->source, pp->tokens, pp->error_string, PP_STR_MAX);
 	if(err != LEX_ERR_OK){
-		pp_free(pp);
 		return err;
 	}
 	
@@ -169,7 +168,10 @@ void* pp_init(char* source, hashmap_t* headers, pp_write_fn write_callback, void
 void pp_free(void* _pp){
 	struct preproc* pp = _pp;
 	if(!pp) return;
-	if(pp->tokens) free(pp->tokens);
+	if(pp->tokens){
+		array_uninit(pp->tokens);
+		free(pp->tokens);
+	}
 	free(pp);
 }
 
