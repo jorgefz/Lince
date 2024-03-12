@@ -161,6 +161,7 @@ void* pp_init(char* source, hashmap_t* headers, pp_write_fn write_callback, void
 		free(pp);	
 		return NULL;
 	}
+	array_init(pp->tokens, sizeof(struct token));
 
 	return pp;
 }

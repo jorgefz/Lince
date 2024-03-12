@@ -44,7 +44,6 @@ void write_callback(const char* from, size_t length, void* data){
 	char* output = *(char**)data;
 	memcpy(output, from, length);
 	*(char**)data = output + length;
-	// printf("%.*s", (int)length, from);
 }
 
 int main() {

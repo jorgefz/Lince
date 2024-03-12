@@ -12,7 +12,7 @@ enum lexer_error {
 };
 
 struct lexer {
-	array_t tokens;		// Token list
+	array_t* tokens;		// Token list
 	const char* source; // Source code
 	const char* p;      // Current pointer
 	size_t length;      // Source length

@@ -19,13 +19,13 @@ static const char* lexer_get_line_start(const char* p, const char* orig){
 	return p+1;
 }
 
-static void lexer_init(struct lexer* lex, const char* source){
-	array_init(&lex->tokens, sizeof(struct token));
+static void lexer_init(struct lexer* lex, const char* source, array_t* tokens){
 	hashmap_init(&lex->keywords, 10);
 	hashmap_set(&lex->keywords, "include", (void*)(size_t)TOKEN_PP_INCLUDE);
 	hashmap_set(&lex->keywords, "type",    (void*)(size_t)TOKEN_PP_SHADERTYPE);
 
 	lex->source = source;
+	lex->tokens = tokens;
 	lex->p = lex->source;
 	lex->length = strlen(source);
 	lex->line = 0;
@@ -72,7 +72,7 @@ static void lexer_add_token(struct lexer* lex, int type, const char* loc, size_t
 	};
 	memcpy(tok.lexeme, loc, length);
 	tok.lexeme[length] = '\0';
-	array_push_back(&lex->tokens, &tok);
+	array_push_back(lex->tokens, &tok);
 }
 
 static void lexer_consume_comment_block(struct lexer* lex){
@@ -167,7 +167,7 @@ static void lexer_read_pp_directive(struct lexer* lex){
 const char* lexer_get_error_descr(int err){
 	switch(err){
 		case LEX_ERR_UNTERMINATED_STRING:
-			return "Unterminated string";
+			return "Unterminated string literal";
 		case LEX_ERR_UNCLOSED_COMMENT_BLOCK:
 			return "Unclosed comment block";
 		default:
@@ -179,7 +179,7 @@ const char* lexer_get_error_descr(int err){
 int lexer_find_tokens(const char* src, array_t* tokens, char* error_string, size_t error_string_max){
 	
 	struct lexer lex;
-	lexer_init(&lex, src);
+	lexer_init(&lex, src, tokens);
 
 	while(!lexer_end(&lex)){
 		char c = lexer_advance(&lex);
@@ -216,8 +216,7 @@ int lexer_find_tokens(const char* src, array_t* tokens, char* error_string, size
 
 	hashmap_uninit(&lex.keywords);
 	lexer_add_token(&lex, TOKEN_NONE, lex.source+lex.length, 0);
-	*tokens = lex.tokens;
-    
+	
 	if(lex.error != LEX_ERR_OK){
 		if(error_string){
 			const char* line = lexer_get_line_start(lex.p, lex.source);
