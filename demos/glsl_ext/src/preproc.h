@@ -25,25 +25,11 @@ enum pp_output {
 
 typedef void (*pp_write_fn)(const char* from, size_t length, void* user_data);
 
-struct preproc {
-	const char* source;
-	const char* psrc;
-	
-	pp_write_fn write_callback;
-	void* user_data;
+void* pp_init(char* source, hashmap_t* headers, pp_write_fn write_callback, void* user_data);
 
-	hashmap_t* headers;
-	array_t* tokens;
-	int error;
-	struct token* tok;
-};
+int pp_run_includes(void* pp);
 
-
-int pp_run_includes(struct preproc* pp);
-
-struct preproc* pp_init(char* source, hashmap_t* headers, pp_write_fn write_callback, void* user_data);
-
-void pp_free(struct preproc* pp);
+void pp_free(void* pp);
 
 const char* pp_get_error_string(int err);
 

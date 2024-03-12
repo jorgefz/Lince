@@ -1,5 +1,19 @@
 #include "preproc.h"
 
+struct preproc {
+	const char* source;
+	const char* psrc;
+	
+	pp_write_fn write_callback;
+	void* user_data;
+
+	hashmap_t* headers;
+	array_t* tokens;
+	int error;
+	struct token* tok;
+};
+
+
 const char* pp_get_error_string(int err){
 	switch(err){
 		case PP_ERR_NO_HEADER: return "Could not find header";
@@ -25,8 +39,7 @@ static void pp_write(struct preproc* pp, const char* from, size_t length){
 		pp->write_callback(from, length, pp->user_data);
 	}
 }
-
-void pp_include(struct preproc* pp){
+static void pp_include(struct preproc* pp){
 	if(pp->tok->type != TOKEN_PP_INCLUDE){
 		pp->error = PP_ERR_BAD_INCLUDE;
 		return;
@@ -55,14 +68,15 @@ void pp_include(struct preproc* pp){
 	pp->error = PP_ERR_OK;
 }
 
-void pp_copy_non_tokenized(struct preproc* pp){
+static void pp_copy_non_tokenized(struct preproc* pp){
 	const char* end = pp->source + pp->tok->location;
 	pp_write(pp, pp->psrc, end - pp->psrc);
 	pp->psrc = end + pp->tok->length;
 }
 
 
-int pp_run_includes(struct preproc* pp){
+int pp_run_includes(void* _pp){
+	struct preproc* pp = _pp;
 	
 	// Header pass
 	for(pp->tok = pp->tokens->begin; pp->tok != pp->tokens->end; ++pp->tok){
@@ -95,7 +109,7 @@ int pp_run_includes(struct preproc* pp){
 	return pp->error;
 }
 
-struct preproc* pp_init(char* source, hashmap_t* headers, pp_write_fn write_callback, void* user_data){
+void* pp_init(char* source, hashmap_t* headers, pp_write_fn write_callback, void* user_data){
 	struct preproc* pp = malloc(sizeof(struct preproc));
 	if(!pp) return NULL;
 
@@ -124,7 +138,8 @@ struct preproc* pp_init(char* source, hashmap_t* headers, pp_write_fn write_call
 	return pp;
 }
 
-void pp_free(struct preproc* pp){
+void pp_free(void* _pp){
+	struct preproc* pp = _pp;
 	if(!pp) return;
 	if(pp->tokens) free(pp->tokens);
 	free(pp);
