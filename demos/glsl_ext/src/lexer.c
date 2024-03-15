@@ -128,18 +128,29 @@ static int lexer_is_valid_name(char c){
 	return lexer_is_alphanum(c) || c == '_';
 }
 
+static int lexer_is_valid_name_start(char c){
+	return lexer_is_alphabetic(c) || c == '_';
+}
+
 static void lexer_read_identifier(struct lexer* lex){
 	// Seek the beginning of the identifier
 	while(!lexer_end(lex)){
-		if(lexer_is_valid_name(lexer_peek(lex))){
+		char c = lexer_peek(lex);
+		if(lexer_is_valid_name_start(c)){
 			break;
-		}
-		if(lexer_peek(lex) == '\n'){
+		} else if (c == '\n'){
+			lex->error = LEX_ERR_EXPECTED_IDENTIFIER;
+			return;
+		} else if (!isspace(c)){
+			lex->error = LEX_ERR_INVALID_IDENTIFIER;
 			return;
 		}
 		lexer_advance(lex);
 	}
-	if(lexer_end(lex)) return;
+	if(lexer_end(lex)){
+		lex->error = LEX_ERR_EXPECTED_IDENTIFIER;
+		return;
+	}
 
 	// Read identifier
 	const char* start = lex->p;
@@ -175,12 +186,17 @@ static void lexer_read_pp_directive(struct lexer* lex){
 	// Read shader type name if relevant
 	if(type == TOKEN_PP_SHADERTYPE){
 		lexer_read_identifier(lex);
+		// if(lex->error != LEX_ERROR_OK) return;
 	}
-    
+   
 }
 
 const char* lexer_get_error_descr(int err){
 	switch(err){
+		case LEX_ERR_EXPECTED_IDENTIFIER:
+			return "Expected identifier";
+		case LEX_ERR_INVALID_IDENTIFIER:
+			return "Invalid identifier";
 		case LEX_ERR_UNTERMINATED_STRING:
 			return "Unterminated string literal";
 		case LEX_ERR_UNCLOSED_COMMENT_BLOCK:

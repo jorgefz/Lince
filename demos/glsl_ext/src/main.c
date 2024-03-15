@@ -26,6 +26,7 @@ char Header[] = (
 );
 
 char Source[] = (
+	"\n"
 	"#type header\n"
 	"#version 450 core\n"
 	"\"#include string\";\n"
