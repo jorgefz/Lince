@@ -10,9 +10,11 @@ struct preproc {
 	size_t source_length;
 	
 	pp_write_fn write_callback;
+	int shader_type;
 	void* user_data;
 
 	hashmap_t* headers;
+	hashmap_t shader_keywords;
 	array_t* tokens;
 	struct token* tok;
 	
@@ -31,6 +33,8 @@ static const char* pp_get_error_descr(int err){
 			return "Could not find header";
 		case PP_ERR_BAD_INCLUDE:
 			return "Missing include target";
+		case PP_BAD_SHADER_TYPE:
+			return "Invalid shader type";
 		default: return "Unknown error";
 	}
 }
@@ -58,8 +62,15 @@ static void pp_println(const char* str){
 
 static void pp_write(struct preproc* pp, const char* from, size_t length){
 	if(pp->write_callback){
-		pp->write_callback(from, length, pp->user_data);
+		pp->write_callback(from, length, pp->shader_type, pp->user_data);
 	}
+}
+
+
+static void pp_copy_non_tokenized(struct preproc* pp){
+	const char* end = pp->source + pp->tok->location;
+	pp_write(pp, pp->psrc, end - pp->psrc);
+	pp->psrc = end + pp->tok->length;
 }
 
 static void pp_include(struct preproc* pp){
@@ -70,7 +81,6 @@ static void pp_include(struct preproc* pp){
 
 	struct token* quote = pp->tok + 1;
 	if(quote->type != TOKEN_QUOTE){
-		// printf("TOKEN = '%s'\n", quote->lexeme);
 		pp->error = PP_ERR_BAD_INCLUDE;
 		return;
 	}
@@ -92,14 +102,29 @@ static void pp_include(struct preproc* pp){
 	pp->error = PP_ERR_OK;
 }
 
-static void pp_copy_non_tokenized(struct preproc* pp){
-	const char* end = pp->source + pp->tok->location;
-	pp_write(pp, pp->psrc, end - pp->psrc);
-	pp->psrc = end + pp->tok->length;
+void pp_shader_type(struct preproc* pp){
+	if(pp->tok->type != TOKEN_PP_SHADERTYPE){
+		pp->error = PP_BAD_SHADER_TYPE;
+		return;
+	}
+
+	struct token* kword = pp->tok + 1;
+
+	if(kword->type != TOKEN_IDENTIFIER){
+		pp->error = PP_BAD_SHADER_TYPE;
+		return;
+	}
+
+	if(!hashmap_has_key(&pp->shader_keywords, kword->lexeme)){
+		pp->error = PP_BAD_SHADER_TYPE;
+		return ;
+	}
+
+	pp->shader_type = (int)(size_t)hashmap_get(&pp->shader_keywords, kword->lexeme);
 }
 
 
-int pp_run_includes(void* _pp){
+int pp_run(void* _pp){
 	struct preproc* pp = _pp;
 
 	// Fetch tokens
@@ -124,7 +149,9 @@ int pp_run_includes(void* _pp){
 				pp_include(pp);
 				break;
 			case TOKEN_STRING: break;
-			case TOKEN_PP_SHADERTYPE: break;
+			case TOKEN_PP_SHADERTYPE:
+				pp_shader_type(pp);
+				break;
 			default:
 				break;
 		}
@@ -156,6 +183,7 @@ void* pp_init(char* source, size_t source_length, hashmap_t* headers, pp_write_f
 		.source_length = source_length,
 		.psrc = source,
 		.write_callback = write_callback,
+		.shader_type = PP_SHADER_NONE,
 		.user_data = user_data,
 		.headers = headers,
 		.tokens = NULL,
@@ -170,6 +198,17 @@ void* pp_init(char* source, size_t source_length, hashmap_t* headers, pp_write_f
 		return NULL;
 	}
 	array_init(pp->tokens, sizeof(struct token));
+
+	void* res = hashmap_init(&pp->shader_keywords, 10);
+	if(!res){
+		array_uninit(pp->tokens);
+		free(pp);
+		return NULL;
+	}
+
+	hashmap_set(&pp->shader_keywords, "header",   (void*)(size_t)PP_SHADER_HEADER);
+	hashmap_set(&pp->shader_keywords, "vertex",   (void*)(size_t)PP_SHADER_VERTEX);
+	hashmap_set(&pp->shader_keywords, "fragment", (void*)(size_t)PP_SHADER_FRAGMENT);
 
 	return pp;
 }

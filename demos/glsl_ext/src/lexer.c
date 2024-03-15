@@ -113,7 +113,7 @@ static void lexer_read_string(struct lexer* lex){
 }
 
 static int lexer_is_alphabetic(char c){
-	return (c >= 'A' && c <= 'z');
+	return (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z');
 }
 
 static int lexer_is_numeric(char c){
@@ -124,9 +124,26 @@ static int lexer_is_alphanum(char c){
 	return lexer_is_numeric(c) || lexer_is_alphabetic(c);
 }
 
+static int lexer_is_valid_name(char c){
+	return lexer_is_alphanum(c) || c == '_';
+}
+
 static void lexer_read_identifier(struct lexer* lex){
+	// Seek the beginning of the identifier
+	while(!lexer_end(lex)){
+		if(lexer_is_valid_name(lexer_peek(lex))){
+			break;
+		}
+		if(lexer_peek(lex) == '\n'){
+			return;
+		}
+		lexer_advance(lex);
+	}
+	if(lexer_end(lex)) return;
+
+	// Read identifier
 	const char* start = lex->p;
-	while(lexer_is_alphanum(lexer_peek(lex))){
+	while(lexer_is_valid_name(lexer_peek(lex))){
 		lexer_advance(lex);
 	}
 	lexer_add_token(lex, TOKEN_IDENTIFIER, start, lex->p - start);
@@ -145,11 +162,21 @@ static void lexer_read_pp_directive(struct lexer* lex){
     memcpy(directive, start, lex->p - start);
     directive[lex->p - start] = '\0';
     
-    if(hashmap_has_key(&lex->keywords, directive)){
-        int type = (int)(size_t)hashmap_get(&lex->keywords, directive);
-        lexer_add_token(lex, TOKEN_HASH, start-1, 1);
-        lexer_add_token(lex, type, start, lex->p - start);
-    }
+    if(!hashmap_has_key(&lex->keywords, directive)){
+		// Other preprocessor directive, e.g #define
+		// GPU GLSL compiler will take care of it
+		return;
+	}
+
+	int type = (int)(size_t)hashmap_get(&lex->keywords, directive);
+	lexer_add_token(lex, TOKEN_HASH, start-1, 1);
+	lexer_add_token(lex, type, start, lex->p - start);
+
+	// Read shader type name if relevant
+	if(type == TOKEN_PP_SHADERTYPE){
+		lexer_read_identifier(lex);
+	}
+    
 }
 
 const char* lexer_get_error_descr(int err){

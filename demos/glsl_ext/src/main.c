@@ -26,7 +26,7 @@ char Header[] = (
 );
 
 char Source[] = (
-	"#type \"vertex\"\n"
+	"#type header\n"
 	"#version 450 core\n"
 	"\"#include string\";\n"
 	"\"\\\"Escaped quotes within string\\\"\";\n"
@@ -40,7 +40,7 @@ char Source[] = (
 );
 
 
-void write_callback(const char* from, size_t length, void* data){
+void write_callback(const char* from, size_t length, int shader_type, void* data){
 	char* output = *(char**)data;
 	memcpy(output, from, length);
 	*(char**)data = output + length;
@@ -57,7 +57,7 @@ int main() {
 	void* pp = pp_init(Source, sizeof(Source), &headers, write_callback, &pout);
 	if(!pp) return -1;
 
-	int err = pp_run_includes(pp);
+	int err = pp_run(pp);
 	if(err != 0){
 		printf("[GLSL-EXT] %s", pp_get_error_string(pp));
 	}
