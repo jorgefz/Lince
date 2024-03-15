@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
 #include "lexer.h"
@@ -17,19 +18,6 @@ static const char* lexer_get_line_start(const char* p, const char* orig){
 		if(*p == '\n') break;
 	}
 	return p+1;
-}
-
-static void lexer_init(struct lexer* lex, const char* source, array_t* tokens){
-	hashmap_init(&lex->keywords, 10);
-	hashmap_set(&lex->keywords, "include", (void*)(size_t)TOKEN_PP_INCLUDE);
-	hashmap_set(&lex->keywords, "type",    (void*)(size_t)TOKEN_PP_SHADERTYPE);
-
-	lex->source = source;
-	lex->tokens = tokens;
-	lex->p = lex->source;
-	lex->length = strlen(source);
-	lex->line = 0;
-	lex->error = LEX_ERR_OK;
 }
 
 static int lexer_end(struct lexer* lex){
@@ -176,37 +164,34 @@ const char* lexer_get_error_descr(int err){
 }
 
 
-int lexer_find_tokens(const char* src, array_t* tokens, char* error_string, size_t error_string_max){
+int lexer_find_tokens(struct lexer* lex){
 	
-	struct lexer lex;
-	lexer_init(&lex, src, tokens);
-
-	while(!lexer_end(&lex)){
-		char c = lexer_advance(&lex);
+	while(!lexer_end(lex)){
+		char c = lexer_advance(lex);
 		switch(c){
 
 			case '/': // Comments
-				if(lexer_match(&lex, '/')){
-					lexer_seek_next(&lex, '\n');
-					lex.line++;
+				if(lexer_match(lex, '/')){
+					lexer_seek_next(lex, '\n');
+					lex->line++;
 					break;
 				}
-				if(lexer_match(&lex, '*')){
-					lexer_consume_comment_block(&lex);
+				if(lexer_match(lex, '*')){
+					lexer_consume_comment_block(lex);
 					break;
 				}
 				break;
 			
 			case '#': // Preprocessor directives
-				lexer_read_pp_directive(&lex);
+				lexer_read_pp_directive(lex);
 				break;
 
 			case '\"': // String literals
-				lexer_read_string(&lex);
+				lexer_read_string(lex);
 				break;
 
 			case '\n': // New line
-				lex.line++;
+				lex->line++;
 				break;
 
 			default: // Ignore all other tokens
@@ -214,23 +199,56 @@ int lexer_find_tokens(const char* src, array_t* tokens, char* error_string, size
 		}
 	}
 
-	hashmap_uninit(&lex.keywords);
-	lexer_add_token(&lex, TOKEN_NONE, lex.source+lex.length, 0);
+	lexer_add_token(lex, TOKEN_NONE, lex->source + lex->length, 0);
 	
-	if(lex.error != LEX_ERR_OK){
-		if(error_string){
-			const char* line = lexer_get_line_start(lex.p, lex.source);
-			snprintf(error_string, error_string_max,
-				"Error on line %d: %s.\n    %d | %.*s\n",
-				(int)lex.line,
-				lexer_get_error_descr(lex.error),
-				(int)lex.line,
-				(int)lexer_get_line_length(line),
-				line
-			);
-		}
-		return lex.error;
+	if(lex->error != LEX_ERR_OK){
+		const char* line = lexer_get_line_start(lex->p, lex->source);
+		int n = snprintf(lex->error_string, LEX_STR_MAX,
+			"Lexer error on line %d: %s.\n    %d | %.*s\n",
+			(int)lex->line,
+			lexer_get_error_descr(lex->error),
+			(int)lex->line,
+			(int)lexer_get_line_length(line),
+			line
+		);
+		lex->error_string_length = (size_t)n;
+		return lex->error;
 	}
 
-	return lex.error;
+	return lex->error;
 }
+
+
+
+struct lexer* lexer_init(const char* source, size_t source_length, array_t* tokens){
+	
+	struct lexer* lex = calloc(1, sizeof(struct lexer));
+	if(!lex) return NULL;
+
+	lex->source = source;
+	lex->p      = lex->source;
+	lex->length = source_length;
+	lex->tokens = tokens;
+	lex->line   = 1;
+	lex->error  = LEX_ERR_OK;
+
+	void* res = hashmap_init(&lex->keywords, 10);
+	if(!res){
+		free(lex);
+		return NULL;
+	}
+
+	hashmap_set(&lex->keywords, "include", (void*)(size_t)TOKEN_PP_INCLUDE);
+	hashmap_set(&lex->keywords, "type",    (void*)(size_t)TOKEN_PP_SHADERTYPE);
+	
+	return lex;
+}
+
+
+
+void lexer_free(struct lexer* lex){
+	if(!lex) return;
+	hashmap_uninit(&lex->keywords);
+	free(lex);
+}
+

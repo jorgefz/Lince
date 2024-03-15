@@ -2,11 +2,12 @@
 #include "token.h"
 #include "lexer.h"
 
-#define PP_STR_MAX 100
+#define PP_STR_MAX LEX_STR_MAX
 
 struct preproc {
 	const char* source;
 	const char* psrc;
+	size_t source_length;
 	
 	pp_write_fn write_callback;
 	void* user_data;
@@ -60,6 +61,7 @@ static void pp_write(struct preproc* pp, const char* from, size_t length){
 		pp->write_callback(from, length, pp->user_data);
 	}
 }
+
 static void pp_include(struct preproc* pp){
 	if(pp->tok->type != TOKEN_PP_INCLUDE){
 		pp->error = PP_ERR_BAD_INCLUDE;
@@ -68,6 +70,7 @@ static void pp_include(struct preproc* pp){
 
 	struct token* quote = pp->tok + 1;
 	if(quote->type != TOKEN_QUOTE){
+		// printf("TOKEN = '%s'\n", quote->lexeme);
 		pp->error = PP_ERR_BAD_INCLUDE;
 		return;
 	}
@@ -100,10 +103,14 @@ int pp_run_includes(void* _pp){
 	struct preproc* pp = _pp;
 
 	// Fetch tokens
-	int err = lexer_find_tokens(pp->source, pp->tokens, pp->error_string, PP_STR_MAX);
+	struct lexer* lex = lexer_init(pp->source, pp->source_length, pp->tokens);
+	int err = lexer_find_tokens(lex);
 	if(err != LEX_ERR_OK){
+		memcpy(pp->error_string, lex->error_string, PP_STR_MAX);
+		lexer_free(lex);
 		return err;
 	}
+	lexer_free(lex);
 	
 	// Process tokens
 	for(pp->tok = pp->tokens->begin; pp->tok != pp->tokens->end; ++pp->tok){
@@ -127,7 +134,7 @@ int pp_run_includes(void* _pp){
 
 	if(pp->error != PP_ERR_OK){
 		snprintf(pp->error_string, PP_STR_MAX,
-			"Error on line %d: %s.\n    %d | %.*s\n",
+			"Preprocessor error on line %d: %s.\n    %d | %.*s\n",
 			pp->tok->line, 
 			pp_get_error_descr(pp->error),
 			pp->tok->line,
@@ -140,12 +147,13 @@ int pp_run_includes(void* _pp){
 	return pp->error;
 }
 
-void* pp_init(char* source, hashmap_t* headers, pp_write_fn write_callback, void* user_data){
-	struct preproc* pp = malloc(sizeof(struct preproc));
+void* pp_init(char* source, size_t source_length, hashmap_t* headers, pp_write_fn write_callback, void* user_data){
+	struct preproc* pp = calloc(1, sizeof(struct preproc));
 	if(!pp) return NULL;
 
 	*pp = (struct preproc){
 		.source = source,
+		.source_length = source_length,
 		.psrc = source,
 		.write_callback = write_callback,
 		.user_data = user_data,

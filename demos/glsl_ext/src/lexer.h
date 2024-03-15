@@ -5,6 +5,8 @@
 #include "lince/containers/hashmap.h"
 #include <ctype.h>
 
+#define LEX_STR_MAX 100
+
 enum lexer_error {
 	LEX_ERR_OK = 0,
 	LEX_ERR_UNTERMINATED_STRING,
@@ -17,11 +19,17 @@ struct lexer {
 	const char* p;      // Current pointer
 	size_t length;      // Source length
 	int line;           // Current line
-	int error;          // Error code
 	hashmap_t keywords; // Pre-defined keywords
+	int error;          // Error code
+	char error_string[LEX_STR_MAX];
+	size_t error_string_length;
 };
 
-int lexer_find_tokens(const char* src, array_t* tokens, char* error_string, size_t error_string_max);
+struct lexer* lexer_init(const char* source, size_t source_length, array_t* tokens);
+
+void lexer_free(struct lexer* lex);
+
+int lexer_find_tokens(struct lexer* lex);
 
 const char* lexer_get_error_descr(int err);
 

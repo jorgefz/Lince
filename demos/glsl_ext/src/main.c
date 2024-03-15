@@ -16,7 +16,7 @@
 
 #include "preproc.h"
 
-char* Header = (
+char Header[] = (
 	"\n"
 	"#define macro\n"
 	"\n"
@@ -25,7 +25,7 @@ char* Header = (
 	"}\n"
 );
 
-char* Source = (
+char Source[] = (
 	"#type \"vertex\"\n"
 	"#version 450 core\n"
 	"\"#include string\";\n"
@@ -35,7 +35,7 @@ char* Source = (
 	"continues in the next line*/\n"
 	"#include \"header\"\n"
 	"void main(){\n"
-	"#include\"\n"
+	// "#include identifier\n"
 	"}\n"
 );
 
@@ -54,7 +54,7 @@ int main() {
 	char* output = calloc(1, 1000);
 	char* pout = output;
 
-	void* pp = pp_init(Source, &headers, write_callback, &pout);
+	void* pp = pp_init(Source, sizeof(Source), &headers, write_callback, &pout);
 	if(!pp) return -1;
 
 	int err = pp_run_includes(pp);

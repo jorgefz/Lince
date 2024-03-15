@@ -23,7 +23,7 @@ enum pp_output {
 
 typedef void (*pp_write_fn)(const char* from, size_t length, void* user_data);
 
-void* pp_init(char* source, hashmap_t* headers, pp_write_fn write_callback, void* user_data);
+void* pp_init(char* source, size_t source_length, hashmap_t* headers, pp_write_fn write_callback, void* user_data);
 
 int pp_run_includes(void* pp);
 
