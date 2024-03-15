@@ -27,7 +27,7 @@ char Header[] = (
 
 char Source[] = (
 	"\n"
-	"#type header\n"
+	"#type vertex\n"
 	"#version 450 core\n"
 	"\"#include string\";\n"
 	"\"\\\"Escaped quotes within string\\\"\";\n"
@@ -41,10 +41,25 @@ char Source[] = (
 );
 
 
+struct buffers {
+	char* vertex;
+	char* fragment;
+};
+
 void write_callback(const char* from, size_t length, int shader_type, void* data){
-	char* output = *(char**)data;
-	memcpy(output, from, length);
-	*(char**)data = output + length;
+	struct buffers* bufs = data;
+	switch(shader_type){
+		case PP_SHADER_VERTEX:
+			memcpy(bufs->vertex, from, length);
+			bufs->vertex += length;
+			break;
+		case PP_SHADER_FRAGMENT:
+			memcpy(bufs->fragment, from, length);
+			bufs->fragment += length;
+			break;
+		default:
+			printf("%.*s", (int)length, from);
+	}
 }
 
 int main() {
@@ -52,10 +67,12 @@ int main() {
 	hashmap_t headers;
 	hashmap_init(&headers, 10);
 	hashmap_set(&headers, "header", Header);
-	char* output = calloc(1, 1000);
-	char* pout = output;
 
-	void* pp = pp_init(Source, sizeof(Source), &headers, write_callback, &pout);
+	char* vertex_shader = calloc(1, 1000);
+	char* fragment_shader = calloc(1, 1000);
+	struct buffers bufs = {.vertex=vertex_shader, .fragment=fragment_shader};
+
+	void* pp = pp_init(Source, sizeof(Source), &headers, write_callback, &bufs);
 	if(!pp) return -1;
 
 	int err = pp_run(pp);
@@ -64,9 +81,17 @@ int main() {
 	}
 	pp_free(pp);
 
-	printf("%s", output);
+	printf("============= VERTEX =============\n");
+	printf(vertex_shader);
+	printf("\n");
 
-	free(output);
+	printf("============= FRAGMENT =============\n");
+	printf(fragment_shader);
+	printf("\n");
+
+
+	free(vertex_shader);
+	free(fragment_shader);
 
 	return 0;
 }
