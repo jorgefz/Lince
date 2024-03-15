@@ -1,27 +1,4 @@
 #include "preproc.h"
-#include "token.h"
-#include "lexer.h"
-
-#define PP_STR_MAX LEX_STR_MAX
-
-struct preproc {
-	const char* source;
-	const char* psrc;
-	size_t source_length;
-	
-	pp_write_fn write_callback;
-	int shader_type;
-	void* user_data;
-
-	hashmap_t* headers;
-	hashmap_t shader_keywords;
-	array_t* tokens;
-	struct token* tok;
-	
-	int error;
-	char error_string[PP_STR_MAX];
-};
-
 
 static const char* pp_get_error_descr(int err){
 	switch(err){
@@ -39,8 +16,7 @@ static const char* pp_get_error_descr(int err){
 	}
 }
 
-const char* pp_get_error_string(void* _pp){
-	struct preproc* pp = _pp;
+const char* pp_get_error_string(struct preproc* pp){
 	return pp->error_string;
 }
 
@@ -124,8 +100,7 @@ void pp_shader_type(struct preproc* pp){
 }
 
 
-int pp_run(void* _pp){
-	struct preproc* pp = _pp;
+int pp_run(struct preproc* pp){
 
 	// Fetch tokens
 	struct lexer* lex = lexer_init(pp->source, pp->source_length, pp->tokens);
@@ -174,7 +149,7 @@ int pp_run(void* _pp){
 	return pp->error;
 }
 
-void* pp_init(char* source, size_t source_length, hashmap_t* headers, pp_write_fn write_callback, void* user_data){
+struct preproc* pp_init(char* source, size_t source_length, hashmap_t* headers, pp_write_fn write_callback, void* user_data){
 	struct preproc* pp = calloc(1, sizeof(struct preproc));
 	if(!pp) return NULL;
 
@@ -213,8 +188,7 @@ void* pp_init(char* source, size_t source_length, hashmap_t* headers, pp_write_f
 	return pp;
 }
 
-void pp_free(void* _pp){
-	struct preproc* pp = _pp;
+void pp_free(struct preproc* pp){
 	if(!pp) return;
 	if(pp->tokens){
 		array_uninit(pp->tokens);

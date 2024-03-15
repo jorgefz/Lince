@@ -3,7 +3,6 @@
 #include <string.h>
 #include <ctype.h>
 #include "lexer.h"
-#include "token.h"
 
 static size_t lexer_get_line_length(const char* str){
 	const char* p = str;

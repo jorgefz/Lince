@@ -24,16 +24,18 @@
  * 
 */
 
-
 #ifndef LINCE_GLSL_EXT_PREPROC_H
 #define LINCE_GLSL_EXT_PREPROC_H
 
 
 #include <stdio.h>
 #include <lince.h>
-
 #include "lince/containers/array.h"
 #include "lince/containers/hashmap.h"
+#include <lexer.h>
+
+#define PP_STR_MAX LEX_STR_MAX
+
 
 enum pp_error {
 	PP_ERR_OK = 0,
@@ -53,12 +55,32 @@ enum pp_output {
 
 typedef void (*pp_write_fn)(const char* from, size_t length, int shader_type, void* user_data);
 
-void* pp_init(char* source, size_t source_length, hashmap_t* headers, pp_write_fn write_callback, void* user_data);
 
-int pp_run(void* pp);
+struct preproc {
+	const char* source;
+	const char* psrc;
+	size_t source_length;
+	
+	pp_write_fn write_callback;
+	int shader_type;
+	void* user_data;
 
-void pp_free(void* pp);
+	hashmap_t* headers;
+	hashmap_t shader_keywords;
+	array_t* tokens;
+	struct token* tok;
+	
+	int error;
+	char error_string[PP_STR_MAX];
+};
 
-const char* pp_get_error_string(void* pp);
+
+struct preproc* pp_init(char* source, size_t source_length, hashmap_t* headers, pp_write_fn write_callback, void* user_data);
+
+int pp_run(struct preproc* pp);
+
+void pp_free(struct preproc* pp);
+
+const char* pp_get_error_string(struct preproc* pp);
 
 #endif /* LINCE_GLSL_EXT_PREPROC_H */

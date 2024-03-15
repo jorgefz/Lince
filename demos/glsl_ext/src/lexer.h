@@ -1,9 +1,10 @@
 #ifndef LINCE_GLSL_EXT_LEXER_H
 #define LINCE_GLSL_EXT_LEXER_H
 
+#include <ctype.h>
 #include "lince/containers/array.h"
 #include "lince/containers/hashmap.h"
-#include <ctype.h>
+#include <token.h>
 
 #define LEX_STR_MAX 100
 

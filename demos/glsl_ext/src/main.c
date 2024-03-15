@@ -72,7 +72,7 @@ int main() {
 	char* fragment_shader = calloc(1, 1000);
 	struct buffers bufs = {.vertex=vertex_shader, .fragment=fragment_shader};
 
-	void* pp = pp_init(Source, sizeof(Source), &headers, write_callback, &bufs);
+	struct preproc* pp = pp_init(Source, sizeof(Source), &headers, write_callback, &bufs);
 	if(!pp) return -1;
 
 	int err = pp_run(pp);
@@ -88,7 +88,6 @@ int main() {
 	printf("============= FRAGMENT =============\n");
 	printf(fragment_shader);
 	printf("\n");
-
 
 	free(vertex_shader);
 	free(fragment_shader);
