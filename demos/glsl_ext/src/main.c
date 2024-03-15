@@ -18,7 +18,7 @@
 
 char Header[] = (
 	"\n"
-	"#define macro\n"
+	"#define header_macro\n"
 	"\n"
 	"int header(){\n"
 	"    return 0;\n"
@@ -27,17 +27,14 @@ char Header[] = (
 
 char Source[] = (
 	"\n"
-	"#type vertex\n"
 	"#version 450 core\n"
-	"\"#include string\";\n"
-	"\"\\\"Escaped quotes within string\\\"\";\n"
-	"// #include comment\n"
-	"/* #include comment \n"
-	"continues in the next line*/\n"
 	"#include \"header\"\n"
-	"void main(){\n"
-	// "#include identifier\n"
-	"}\n"
+	"\n"
+	"#type vertex\n"
+	"void main(){}\n"
+	"\n"
+	"#type fragment\n"
+	"void main(){}\n"
 );
 
 
@@ -49,16 +46,22 @@ struct buffers {
 void write_callback(const char* from, size_t length, int shader_type, void* data){
 	struct buffers* bufs = data;
 	switch(shader_type){
+		
 		case PP_SHADER_VERTEX:
 			memcpy(bufs->vertex, from, length);
 			bufs->vertex += length;
 			break;
+
 		case PP_SHADER_FRAGMENT:
 			memcpy(bufs->fragment, from, length);
 			bufs->fragment += length;
 			break;
-		default:
-			printf("%.*s", (int)length, from);
+
+		case PP_SHADER_HEADER:
+			memcpy(bufs->vertex, from, length);
+			bufs->vertex += length;
+			memcpy(bufs->fragment, from, length);
+			bufs->fragment += length;
 	}
 }
 
