@@ -26,6 +26,12 @@ struct LinceAssetStore {
     array_t data;
     // Custom arguments for textures loading?
     // Default asset in case requested one is not found?
+
+    union asset_refs {
+        LinceTexture* texture;
+        void* misc;
+    } ref;
+
 };
 
 */
@@ -47,7 +53,7 @@ typedef struct LinceAssetCache {
     // Stores raw asset data
     // array<LinceAssetStore>
     // e.g. textures_store = stores[LinceAssetType_Texture];
-    // array_t stores;           
+    // array_t stores;        
 
 } LinceAssetCache;
 
@@ -60,15 +66,6 @@ LinceAssetCachePushFolder(cache, "path_to_my_second_assets_folder");
 LinceTexture* player = LinceAssetCacheGet(cache, "textures/player.png");
 
 LinceAssetCacheUninit(cache);
-
-
-// Get the folder name of an asset type from its enum value
-static const char* LinceAssetCacheGetTypeName(int type){
-    switch(type){
-        case LinceAsset_Texture: return "textures";
-        default:                 return NULL;
-    };
-}
 
 
 // Identify the type of asset from its name, e.g. "textures/player.png" is a TextureType
