@@ -106,7 +106,7 @@ void LinceUninitAssetCache(LinceAssetCache* cache);
 * @param dir Zero-terminated string with the path to an asset folder to store.
 * @returns LinceTrue if the asset folder exists, LinceFalse otherwise.
 */
-LinceBool LinceAssetCachePushDir(LinceAssetCache* cache, const char* dir);
+LinceBool LinceAssetCachePushFolder(LinceAssetCache* cache, const char* dir);
 
 /** @brief Retrieves the full path of an asset file by searching in the stored asset folders
 * @param filename Location of the asset file within an asset folder

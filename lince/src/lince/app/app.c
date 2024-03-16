@@ -97,7 +97,7 @@ void LinceAppSetTitle(const char* title) {
 
 /** @brief Save the location of an assets folder relative to the executable */
 void LinceAppPushAssetDir(const char* dir){
-    LinceAssetCachePushDir(&app.asset_cache, dir);
+    LinceAssetCachePushFolder(&app.asset_cache, dir);
 }
 
 /** @brief Save the location of an assets folder relative to the executable */
@@ -265,7 +265,7 @@ static void LinceInit(){
 
     // Create asset manager
     LinceInitAssetCache(&app.asset_cache);
-    LinceAssetCachePushDir(&app.asset_cache, "../../../lince/assets");
+    LinceAssetCachePushFolder(&app.asset_cache, "../../../lince/assets");
 
     // Create layer stacks
     array_init(&app.layer_stack, sizeof(LinceLayer));

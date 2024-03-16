@@ -11,7 +11,7 @@ void LinceUninitAssetCache(LinceAssetCache* cache){
     array_uninit(&cache->asset_dirs);
 }
 
-LinceBool LinceAssetCachePushDir(LinceAssetCache* cache, const char* dir){
+LinceBool LinceAssetCachePushFolder(LinceAssetCache* cache, const char* dir){
     uint32_t length = (uint32_t)strlen(dir);
     uint32_t exedir_length = (uint32_t)strlen(cache->exe_dir);
     
