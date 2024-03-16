@@ -1,5 +1,6 @@
 #include "lince/app/asset_cache.h"
 #include "lince/utils/fileio.h"
+#include "lince/core/logger.h"
 
 void LinceInitAssetCache(LinceAssetCache* cache){
     array_init(&cache->asset_dirs, LINCE_PATH_MAX * sizeof(char));
