@@ -3,12 +3,12 @@
 #include "lince/core/logger.h"
 
 void LinceInitAssetCache(LinceAssetCache* cache){
-    array_init(&cache->asset_dirs, LINCE_PATH_MAX * sizeof(char));
+    array_init(&cache->asset_folders, LINCE_PATH_MAX * sizeof(char));
     LinceFetchExeDir(cache->exe_dir, LINCE_PATH_MAX);
 }
 
 void LinceUninitAssetCache(LinceAssetCache* cache){
-    array_uninit(&cache->asset_dirs);
+    array_uninit(&cache->asset_folders);
 }
 
 LinceBool LinceAssetCachePushFolder(LinceAssetCache* cache, const char* dir){
@@ -19,8 +19,8 @@ LinceBool LinceAssetCachePushFolder(LinceAssetCache* cache, const char* dir){
         "Asset directory is too long. Length %u but max is %u",
         length, LINCE_PATH_MAX-exedir_length-1);
     
-    array_push_front(&cache->asset_dirs, NULL);
-    char* p = array_front(&cache->asset_dirs);
+    array_push_front(&cache->asset_folders, NULL);
+    char* p = array_front(&cache->asset_folders);
 
     // Prepend directory of executable
     memmove(p, cache->exe_dir, exedir_length);
@@ -38,21 +38,21 @@ LinceBool LinceAssetCachePushFolder(LinceAssetCache* cache, const char* dir){
     }
     p[length] = '\0';
 
-    if(LinceIsDir(array_front(&cache->asset_dirs)) != 1){
+    if(LinceIsDir(array_front(&cache->asset_folders)) != 1){
         LINCE_WARN("Failed to add assets folder because it does not exist: '%s'",
-            (char*)array_front(&cache->asset_dirs));
-        array_pop_front(&cache->asset_dirs);
+            (char*)array_front(&cache->asset_folders));
+        array_pop_front(&cache->asset_folders);
         return LinceFalse;
     }
 
-    LINCE_INFO("Added assets folder '%s'", (char*)array_front(&cache->asset_dirs));
+    LINCE_INFO("Added assets folder '%s'", (char*)array_front(&cache->asset_folders));
     return LinceTrue;
 }
 
 
 char* LinceAssetCacheFetchPath(LinceAssetCache* cache, const char* asset_filename){
-    for(uint32_t i = 0; i != cache->asset_dirs.size; ++i){
-        char* dir = array_get(&cache->asset_dirs, i);
+    for(uint32_t i = 0; i != cache->asset_folders.size; ++i){
+        char* dir = array_get(&cache->asset_folders, i);
         uint32_t dir_len = (uint32_t)strlen(dir);
         
         if (dir_len + strlen(asset_filename) >= LINCE_PATH_MAX){

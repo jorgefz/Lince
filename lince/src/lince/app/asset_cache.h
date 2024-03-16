@@ -32,7 +32,7 @@ struct LinceAssetStore {
 
 typedef struct LinceAssetCache {
     char exe_dir[LINCE_PATH_MAX];   ///< Directory where the executable is located
-    array_t asset_dirs;             ///< Array of relative paths between executable and asset folders
+    array_t asset_folders;          ///< Array of relative paths between executable and asset folders
     char result_path[LINCE_PATH_MAX]; ///< Stores result of LinceFetchAssetPath
 
     // Maps resource name (e.g. "textures/player.png") to an asset pointer.
