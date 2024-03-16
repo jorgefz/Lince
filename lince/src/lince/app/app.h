@@ -80,7 +80,7 @@ LinceApp* LinceGetApp(void);
 void LinceAppSetTitle(const char* title);
 
 /** @brief Save the location of an assets folder relative to the executable */
-void LinceAppPushAssetDir(const char* dir);
+void LinceAppPushAssetFolder(const char* dir);
 
 /** @brief Save the location of an assets folder relative to the executable */
 char* LinceAppFetchAssetPath(const char* filename);

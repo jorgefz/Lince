@@ -45,7 +45,7 @@ void OnInit(){
         .h = 2.0f
     };
     
-    LinceAppPushAssetDir("../../../demos/mandelbrot/assets");
+    LinceAppPushAssetFolder("../../../demos/mandelbrot/assets");
     char vert_path[LINCE_PATH_MAX];
     char frag_path[LINCE_PATH_MAX];
     strcpy(vert_path, LinceAppFetchAssetPath("shaders/mandelbrot.vert.glsl"));

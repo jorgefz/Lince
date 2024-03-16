@@ -96,7 +96,7 @@ void LinceAppSetTitle(const char* title) {
 }
 
 /** @brief Save the location of an assets folder relative to the executable */
-void LinceAppPushAssetDir(const char* dir){
+void LinceAppPushAssetFolder(const char* dir){
     LinceAssetCachePushFolder(&app.asset_cache, dir);
 }
 

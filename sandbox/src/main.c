@@ -12,7 +12,7 @@ static const char* asset_dir = "../../../sandbox/assets";
 void SandboxInit() {
 
     LinceApp* app = LinceGetApp();
-    LinceAppPushAssetDir(asset_dir);
+    LinceAppPushAssetFolder(asset_dir);
     LinceInitCamera(&DATA.camera, LinceAppGetAspectRatio());
     DATA.camera.zoom = 3.0f;
     DATA.camera_speed = 0.003f;
