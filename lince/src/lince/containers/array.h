@@ -17,13 +17,12 @@ typedef struct array_container {
 } array_t;
 
 /** @brief Initialises an array via a given pointer.
-*   Allows the user to manage the memory of the struct itself.
-*   The memory pool will still be stored on the heap.
 *   Should be freed with `array_uninit`.
 *	@param array the return array.
-*	@param element_size size in bytes of an array element.
+*	@param element_size size in bytes of an array element, must be greater than zero
+*   @returns 1 if successful, and 0 otherwise.
 */
-void array_init(array_t* array, uint32_t element_size);
+int array_init(array_t* array, uint32_t element_size);
 
 /** @brief Resets the array state and frees the memory pool.
 *	@param array the array to uninitialise.

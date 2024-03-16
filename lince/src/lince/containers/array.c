@@ -46,10 +46,12 @@ static array_t* extend_capacity(array_t* array){
 Initialises an array via a given pointer.
 Should be later freed using `array_uninit`.
 */
-void array_init(array_t* array, uint32_t element_size){
-	if(!array) return;
+int array_init(array_t* array, uint32_t element_size){
+	if(!array) return 0;
 	*array = (array_t){0};
+	if(element_size == 0) return 0;
 	array->element_size = element_size;
+	return 1;
 }
 
 /*
