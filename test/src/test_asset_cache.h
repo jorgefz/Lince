@@ -7,7 +7,7 @@
     cmocka_unit_test(test_asset_cache_push_folder_fake), \
     cmocka_unit_test(test_asset_cache_fetch_path_real), \
     cmocka_unit_test(test_asset_cache_fetch_path_fake), \
-    cmocka_unit_test(test_asset_cache_asset_shadowing), \
+    cmocka_unit_test(test_asset_cache_asset_shadowing)
     
 
 

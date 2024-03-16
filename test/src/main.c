@@ -27,6 +27,7 @@ void test_ecs(void** state);
 int main() {
 
     const struct CMUnitTest tests[] = {
+        ASSET_CACHE_TESTS,
         cmocka_unit_test(test_array),
         cmocka_unit_test(test_hashmap),
         cmocka_unit_test(test_hashmap_byte_key),
@@ -40,7 +41,7 @@ int main() {
         cmocka_unit_test(test_ecs),
         cmocka_unit_test(test_ecs_system),
 
-        ASSET_CACHE_TESTS
+        
     };
     return cmocka_run_group_tests(tests, NULL, NULL);
 }
