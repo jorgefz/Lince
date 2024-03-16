@@ -8,22 +8,24 @@
 #include "lince/utils/fileio.h"
 
 /* Verifies the asset cache is successfully initialised */
-void test_asset_cache_init(){
+void test_asset_cache_init(void** state){
+    (void)state;
     LinceAssetCache assets;
     LinceInitAssetCache(&assets);
 
-    assert_true(LinceIsFile(&assets.exe_dir));
+    assert_true(LinceIsDir(assets.exe_dir));
 
     LinceUninitAssetCache(&assets);
 }
 
 /* Verifies adding an existing asset folder is successful */
-void test_asset_cache_push_folder_real(){
+void test_asset_cache_push_folder_real(void** state){
+    (void)state;
     LinceAssetCache assets;
     LinceInitAssetCache(&assets);
 
     int success;
-    const char folder[] =  "../../../lince/assets";
+    const char folder[] =  "../../../lince/assets/";
     size_t exe_path_len = strlen(assets.exe_dir);
     success = LinceAssetCachePushFolder(&assets, folder);
 
@@ -41,6 +43,24 @@ void test_asset_cache_push_folder_real(){
         folder,
         sizeof(folder)
     );
+
+    LinceUninitAssetCache(&assets);
+}
+
+
+/* Verifies adding an non-existent asset folder is unsuccessful */
+void test_asset_cache_push_folder_fake(void** state){
+    (void)state;
+    LinceAssetCache assets;
+    LinceInitAssetCache(&assets);
+
+    int success;
+    const char folder[] =  "FAKE/";
+    size_t exe_path_len = strlen(assets.exe_dir);
+    success = LinceAssetCachePushFolder(&assets, folder);
+
+    assert_int_equal(success, 0);
+    assert_int_equal(assets.asset_folders.size, 0);
 
     LinceUninitAssetCache(&assets);
 }

@@ -8,6 +8,8 @@
 #include <setjmp.h>
 #include <cmocka.h>
 
+#include "test_asset_cache.h"
+
 void test_array(void** state);
 void test_hashmap(void** state);
 void test_hashmap_byte_key(void** state);
@@ -36,7 +38,9 @@ int main() {
         cmocka_unit_test(test_box2d),
         cmocka_unit_test(test_ecs_mask),
         cmocka_unit_test(test_ecs),
-        cmocka_unit_test(test_ecs_system)
+        cmocka_unit_test(test_ecs_system),
+
+        ASSET_CACHE_TESTS
     };
     return cmocka_run_group_tests(tests, NULL, NULL);
 }
