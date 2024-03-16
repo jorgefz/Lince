@@ -51,10 +51,11 @@ LinceBool LinceAssetCachePushFolder(LinceAssetCache* cache, const char* dir){
 
 
 char* LinceAssetCacheFetchPath(LinceAssetCache* cache, const char* asset_filename){
-    for(uint32_t i = 0; i != cache->asset_folders.size; ++i){
-        char* dir = array_get(&cache->asset_folders, i);
+
+    array_t* folders = &cache->asset_folders;
+    for(uint32_t i = 0; i != folders->size; ++i){
+       char* dir = array_get(&cache->asset_folders, i);
         uint32_t dir_len = (uint32_t)strlen(dir);
-        
         if (dir_len + strlen(asset_filename) >= LINCE_PATH_MAX){
             LINCE_WARN("Skipping path, too long: '%s' + '%s'", dir, asset_filename);
             continue;
