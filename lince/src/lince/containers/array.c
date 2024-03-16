@@ -66,6 +66,7 @@ void array_uninit(array_t* array){
 
 /* Creates a new array of size zero */
 array_t* array_create(uint32_t element_size){
+	if(element_size == 0) return NULL;
 	array_t* array = calloc(1, sizeof(array_t));
 	if(!array) return NULL;
 	array->element_size = element_size;
