@@ -271,8 +271,8 @@ array_t* array_pop_front(array_t* array){
 array_t* array_clear(array_t* array){
 	if(!array) return NULL;
 	array->size = 0;
-	array->begin = array->data;
-	array->end = array->begin;
+	array->begin = NULL;
+	array->end   = NULL;
 	return array;
 }
 
