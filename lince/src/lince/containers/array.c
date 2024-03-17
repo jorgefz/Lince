@@ -162,9 +162,8 @@ void* array_back(array_t* array){
 
 /* Returns a pointer to first byte after the end of the array */
 void* array_end(array_t* array){
-	if(!array || !array->data || array->element_size == 0) return NULL;
-	if(array->size == 0){
-		return array_back(array);
+	if(!array || !array->data || array->element_size == 0 || array->size == 0){
+		return NULL;
 	}
 	return (char*)array_back(array) + array->element_size;
 }

@@ -84,14 +84,18 @@ void* array_set(array_t* array, void* data, uint32_t index);
 */
 void* array_get(array_t* array, uint32_t index);
 
-/** @brief Returns a pointer to the first element */
+/** @brief Returns a pointer to the first element.
+ * If the array has a size of zero, NULL is returned.
+*/
 void* array_front(array_t* array);
 
-/** @brief Returns a pointer to the last element */
+/** @brief Returns a pointer to the last element.
+ * If the array has a size of zero, NULL is returned.
+*/
 void* array_back(array_t* array);
 
 /** @brief Returns a pointer to first byte after the end of the array
-* Useful for C++ style (pointer-based) iteration.
+ * If the array has a size of zero, then NULL is returned.
 */
 void* array_end(array_t* array);
 
