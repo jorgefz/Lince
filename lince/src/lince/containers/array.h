@@ -10,10 +10,18 @@
 typedef struct array_container {
 	void *data;				///< Main memory pool
 	uint32_t size;			///< Number of stored elements
-	uint32_t capacity;		///< Max number of elements allocated
+	uint32_t capacity;		///< Number of elements allocated
 	uint32_t element_size;	///< Size in bytes of an element
-	void* begin;			///< Pointer to the beginning of the array
-	void* end;              ///< Pointer to the end of the array
+	
+	/** Pointer to the first element of the array.
+	 * If the array has a size of zero, then begin==end.
+	 */
+	void* begin;
+
+	/** Pointer to the element after the last element of the array.
+	 * If the array has a size of zero, then begin==end.
+	 */
+	void* end;
 } array_t;
 
 /** @brief Initialises an array via a given pointer.
