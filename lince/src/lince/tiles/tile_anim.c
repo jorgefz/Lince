@@ -22,7 +22,7 @@ void LinceCreateTileAnim(LinceTileAnim* anim){
 	);
 
 	// Allocate own array of frames
-	anim->frames = array_copy(anim->frames);
+	anim->frames = array_new_copy(anim->frames);
 	LINCE_ASSERT(anim->frames, "Failed to copy frames");
 
 	// Setup tile order

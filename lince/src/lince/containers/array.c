@@ -80,6 +80,29 @@ void array_destroy(array_t* array){
 	free(array);
 }
 
+/** @brief Copies an array into another.
+ * The source array must be initialised, and
+ * the destination array must *not* be already initialised.
+ *	@param dest the resulting copy.
+ *  @param src original array to copy.
+ *  @returns `dest` if successful, and NULL otherwise.
+*/
+array_t* array_copy(array_t* dest, array_t* src){
+	if(!dest || !src) return NULL;
+	
+	int success = array_init(dest, src->element_size);
+	if(!success) return NULL;
+	if(src->size == 0) return dest;
+
+	if(!array_resize(dest, src->size)){
+		array_uninit(dest);
+		return NULL;
+	}
+
+	memcpy(dest->data, src->data, dest->size * dest->element_size);
+	return dest;
+}
+
 array_t* array_new_copy(array_t* orig){
 	if(!orig) return NULL;
 

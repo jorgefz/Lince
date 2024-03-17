@@ -48,14 +48,14 @@ array_t* array_create(uint32_t element_size);
 */
 void array_destroy(array_t* array); // should also free array_t itself
 
-/** @brief Copies of an array into another.
+/** @brief Copies an array into another.
  * The source array must be initialised, and
- * the destination array must *not* be initialised.
+ * the destination array must *not* be already initialised.
  *	@param dest the resulting copy.
  *  @param src original array to copy.
  *  @returns `dest` if successful, and NULL otherwise.
 */
-// array_t* array_copy(array_t* dest, array_t* src);
+array_t* array_copy(array_t* dest, array_t* src);
 
 /** @brief Duplicates an array, allocating the new copy on the heap.
 *	@param array the array to copy.
