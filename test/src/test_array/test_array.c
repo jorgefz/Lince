@@ -288,9 +288,6 @@ void test_array_uninit(void** state){
 	assert_null(a.data);
 }
 
-// Verifies an array is deallocated and unitialised properly
-void test_array_destroy(void** state){}
-
 // Verifies an array element is set properly
 void test_array_set(void** state){}
 

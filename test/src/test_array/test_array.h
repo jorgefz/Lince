@@ -12,7 +12,6 @@
     cmocka_unit_test(test_array_resize_same), \
     cmocka_unit_test(test_array_resize_zero), \
     cmocka_unit_test(test_array_uninit), \
-    cmocka_unit_test(test_array_destroy), \
     cmocka_unit_test(test_array_set), \
     cmocka_unit_test(test_array_set_null), \
     cmocka_unit_test(test_array_set_out_of_bounds), \
@@ -77,9 +76,6 @@ void test_array_resize_zero(void** state);
 
 // Verifies an array is unitialised properly
 void test_array_uninit(void** state);
-
-// Verifies an array is deallocated and unitialised properly
-void test_array_destroy(void** state);
 
 // Verifies an array element is set properly
 void test_array_set(void** state);
