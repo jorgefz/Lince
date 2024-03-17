@@ -48,10 +48,19 @@ array_t* array_create(uint32_t element_size);
 */
 void array_destroy(array_t* array); // should also free array_t itself
 
+/** @brief Copies of an array into another.
+ * The source array must be initialised, and
+ * the destination array must *not* be initialised.
+ *	@param dest the resulting copy.
+ *  @param src original array to copy.
+ *  @returns `dest` if successful, and NULL otherwise.
+*/
+// array_t* array_copy(array_t* dest, array_t* src);
+
 /** @brief Duplicates an array, allocating the new copy on the heap.
 *	@param array the array to copy.
 */
-array_t* array_copy(array_t* orig);
+array_t* array_new_copy(array_t* orig);
 
 /* Initialises an array from existing data
 If a size of zero or empty data are provided, no elements are added to the array.
@@ -113,7 +122,6 @@ array_t* array_push_back(array_t* array, void* element);
 
 /** @brief Inserts an element at the beginning of the array */
 array_t* array_push_front(array_t* array, void* element);
-
 
 /** @brief Removes the element at the given index.
 * Note that, whilst the size of the array is reduced, its capacity is not.

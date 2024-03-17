@@ -80,7 +80,7 @@ void array_destroy(array_t* array){
 	free(array);
 }
 
-array_t* array_copy(array_t* orig){
+array_t* array_new_copy(array_t* orig){
 	if(!orig) return NULL;
 	array_t* new = malloc(sizeof(array_t));
 	if(!new) return NULL;
