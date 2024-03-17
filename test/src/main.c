@@ -8,7 +8,9 @@
 #include <setjmp.h>
 #include <cmocka.h>
 
-void test_array(void** state);
+#include "test_array/test_array.h"
+
+// void test_array(void** state);
 void test_hashmap(void** state);
 void test_hashmap_byte_key(void** state);
 void test_linkedlist(void** state);
@@ -25,7 +27,8 @@ void test_ecs(void** state);
 int main() {
 
     const struct CMUnitTest tests[] = {
-        cmocka_unit_test(test_array),
+        ARRAY_TESTS,
+        // cmocka_unit_test(test_array),
         cmocka_unit_test(test_hashmap),
         cmocka_unit_test(test_hashmap_byte_key),
         cmocka_unit_test(test_linkedlist),
