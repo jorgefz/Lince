@@ -229,7 +229,11 @@ LincePoint LinceGetMousePosWorld(LinceCamera* cam) {
 
 static void LinceInit(){
     // Open log file
-    LinceOpenLogger(LINCE_DIR"log.txt");
+    #ifdef LINCE_DEBUG
+        LinceLoggerDefaultToStderr(1);
+    #else
+        LinceOpenLogger(LINCE_DIR"log.txt");
+    #endif
 
     // Report platform and configuration
     LINCE_INFO("Lince version: "LINCE_VERSION);

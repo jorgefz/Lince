@@ -8,7 +8,11 @@
 #include <setjmp.h>
 #include <cmocka.h>
 
+<<<<<<< HEAD
 #include "test_asset_cache/test_asset_cache.h"
+=======
+#include "lince/core/logger.h"
+>>>>>>> dev
 #include "test_array/test_array.h"
 
 void test_hashmap(void** state);
@@ -25,6 +29,8 @@ void test_ecs(void** state);
 
 
 int main() {
+
+    LinceLoggerDefaultToStderr(0);
 
     const struct CMUnitTest tests[] = {
         TEST_GROUP_ARRAY,
