@@ -275,7 +275,18 @@ void test_array_resize_zero(void** state){
 }
 
 // Verifies an array is unitialised properly
-void test_array_uninit(void** state){}
+void test_array_uninit(void** state){
+	(void)state;
+	array_t a;
+	array_init(&a, sizeof(int));
+	array_resize(&a, 10);
+	array_uninit(&a);
+
+	assert_int_equal(a.size, 0);
+	assert_int_equal(a.capacity, 0);
+	assert_int_equal(a.element_size, 0);
+	assert_null(a.data);
+}
 
 // Verifies an array is deallocated and unitialised properly
 void test_array_destroy(void** state){}
@@ -312,8 +323,17 @@ void test_array_end(void** state){}
 // on an array with zero elements
 void test_array_end_zero(void** state){}
 
-// Verifies a heap-allocated copy of an array is returned
+// Verifies an array is copied
 void test_array_copy(void** state){}
+
+// Verifies an array is copied
+void test_array_copy_zero(void** state){}
+
+// Verifies a heap-allocated copy of an array is returned
+void test_array_new_copy(void** state){}
+
+// Verifies a heap-allocated copy of an array is returned
+void test_array_new_copy_zero(void** state){}
 
 // Verifies all elements of the array are removed
 void test_array_clear(void** state){}

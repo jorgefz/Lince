@@ -23,6 +23,9 @@
     cmocka_unit_test(test_array_end), \
     cmocka_unit_test(test_array_end_zero), \
     cmocka_unit_test(test_array_copy), \
+    cmocka_unit_test(test_array_copy_zero), \
+    cmocka_unit_test(test_array_new_copy), \
+    cmocka_unit_test(test_array_new_copy_zero), \
     cmocka_unit_test(test_array_clear), \
     cmocka_unit_test(test_array_iter_index), \
     cmocka_unit_test(test_array_iter_ptr), \
@@ -112,6 +115,15 @@ void test_array_end_zero(void** state);
 
 // Verifies a heap-allocated copy of an array is returned
 void test_array_copy(void** state);
+
+// Verifies an array is copied
+void test_array_copy_zero(void** state);
+
+// Verifies a heap-allocated copy of an array is returned
+void test_array_new_copy(void** state);
+
+// Verifies a heap-allocated copy of an array is returned
+void test_array_new_copy_zero(void** state);
 
 // Verifies all elements of the array are removed
 void test_array_clear(void** state);
