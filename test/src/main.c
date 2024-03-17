@@ -8,11 +8,8 @@
 #include <setjmp.h>
 #include <cmocka.h>
 
-<<<<<<< HEAD
-#include "test_asset_cache/test_asset_cache.h"
-=======
 #include "lince/core/logger.h"
->>>>>>> dev
+#include "test_asset_cache/test_asset_cache.h"
 #include "test_array/test_array.h"
 
 void test_hashmap(void** state);
