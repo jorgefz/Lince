@@ -82,21 +82,17 @@ void array_destroy(array_t* array){
 
 array_t* array_new_copy(array_t* orig){
 	if(!orig) return NULL;
-	array_t* new = malloc(sizeof(array_t));
-	if(!new) return NULL;
 
-	memmove(new, orig, sizeof(array_t));
-	if(!orig->data){
-		return new;
+	array_t* new = array_create(orig->element_size);
+	if(!new) return NULL;
+	if(orig->size == 0) return new;
+
+	if(!array_resize(new, orig->size)){
+		array_destroy(new);
+		return NULL;
 	}
 
-	size_t bytes = orig->capacity * orig->element_size;
-	new->data = malloc(bytes);
-	if(!new->data) return NULL;
-	memmove(new->data, orig->data, bytes);
-	new->begin = new->data;
-	new->end = array_end(new);
-
+	memcpy(new->data, orig->data, new->size * new->element_size);
 	return new;
 }
 
