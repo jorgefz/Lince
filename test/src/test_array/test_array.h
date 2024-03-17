@@ -17,10 +17,8 @@
     cmocka_unit_test(test_array_set_out_of_bounds), \
     cmocka_unit_test(test_array_get), \
     cmocka_unit_test(test_array_get_out_of_bounds), \
-    cmocka_unit_test(test_array_front), \
-    cmocka_unit_test(test_array_back), \
-    cmocka_unit_test(test_array_end), \
-    cmocka_unit_test(test_array_end_zero), \
+    cmocka_unit_test(test_array_front_back_end), \
+    cmocka_unit_test(test_array_front_back_end_zero), \
     cmocka_unit_test(test_array_copy), \
     cmocka_unit_test(test_array_copy_zero), \
     cmocka_unit_test(test_array_new_copy), \
@@ -95,19 +93,14 @@ void test_array_get(void** state);
 // when the given index is out of bounds
 void test_array_get_out_of_bounds(void** state);
 
-// Verifies the first element of the array is returned
-void test_array_front(void** state);
+// Verifies the front, back, and end of
+// an array are properly calculated
+void test_array_front_back_end(void** state);
 
-// Verifies the last element of the array is returned
-void test_array_back(void** state);
-
-// Verifies the element after the last one is returned
-void test_array_end(void** state);
-
-// Verifies NULL is returned when
-// when the element after the last is requested
-// on an array with zero elements
-void test_array_end_zero(void** state);
+// Verifies the front, back, and end of
+// an array are properly calculated
+// when the array is zero sized
+void test_array_front_back_end_zero(void** state);
 
 // Verifies a heap-allocated copy of an array is returned
 void test_array_copy(void** state);

@@ -289,36 +289,123 @@ void test_array_uninit(void** state){
 }
 
 // Verifies an array element is set properly
-void test_array_set(void** state){}
+void test_array_set(void** state){
+	(void)state;
+	array_t a;
+	int v = 8;
+	array_init(&a, sizeof(int));
+	array_resize(&a, 1);
+	int* item = array_set(&a, &v, 0);
+
+	assert_non_null(item);
+	assert_int_equal(*item, v);
+	assert_ptr_equal(item, a.data);
+
+	array_uninit(&a);
+}
 
 // Verifies an array element is zeroed properly
 // when the given pointer-to-value is null
-void test_array_set_null(void** state){}
+void test_array_set_null(void** state){
+	(void)state;
+	array_t a;
+	array_init(&a, sizeof(int));
+	array_resize(&a, 1);
+	int* item = array_set(&a, NULL, 0);
+
+	assert_non_null(item);
+	assert_int_equal(*item, 0);
+	assert_ptr_equal(item, a.data);
+
+	array_uninit(&a);
+}
 
 // Verifies an array element is not set
 // when the given index is out of bounds
-void test_array_set_out_of_bounds(void** state){}
+void test_array_set_out_of_bounds(void** state){
+	(void)state;
+	array_t a;
+	uint32_t size = 5;
+	int v = 8;
+	array_init(&a, sizeof(int));
+	array_resize(&a, size);
+	int* item = array_set(&a, &v, size);
+	assert_null(item);
+	array_uninit(&a);
+}
 
 // Verifies an array element is retrieved properly
-void test_array_get(void** state){}
+void test_array_get(void** state){
+	(void)state;
+	array_t a;
+	int v = 8;
+	array_init(&a, sizeof(int));
+	array_resize(&a, 1);
+	int* set = array_set(&a, &v, 0);
+	int* get = array_get(&a, 0);
+
+	assert_non_null(get);
+	assert_ptr_equal(get, set);
+	assert_int_equal(*get, v);
+	assert_ptr_equal(get, a.data);
+
+	array_uninit(&a);
+}
 
 // Verifies an array element is not retrieved
 // when the given index is out of bounds
-void test_array_get_out_of_bounds(void** state){}
+void test_array_get_out_of_bounds(void** state){
+	(void)state;
+	array_t a;
+	int v = 8;
+	uint32_t size = 1;
+	array_init(&a, sizeof(int));
+	array_resize(&a, size);
+	int* set = array_set(&a, &v, size-1);
+	int* get = array_get(&a, size);
+	assert_null(get);
+	array_uninit(&a);
+}
 
-// Verifies the first element of the array is returned
-void test_array_front(void** state){}
+// Verifies the front, back, and end of
+// an array are properly calculated
+void test_array_front_back_end(void** state){
+	(void)state;
+	array_t a;
+	uint32_t size = 5;
+	array_init(&a, sizeof(int));
+	array_resize(&a, size);
+	void* front = array_front(&a);
+	void* back = array_back(&a);
+	void* end = array_end(&a);
 
-// Verifies the last element of the array is returned
-void test_array_back(void** state){}
+	assert_non_null(front);
+	assert_ptr_equal(front, a.data);
+	assert_non_null(back);
+	assert_ptr_equal(back, (char*)a.data + (a.size - 1) * a.element_size);
+	assert_non_null(end);
+	assert_ptr_equal(end, (char*)a.data + a.size * a.element_size);
 
-// Verifies the element after the last one is returned
-void test_array_end(void** state){}
+	array_uninit(&a);
+}
 
-// Verifies NULL is returned when
-// when the element after the last is requested
-// on an array with zero elements
-void test_array_end_zero(void** state){}
+// Verifies the front, back, and end of
+// an array are properly calculated
+// when the array is zero sized
+void test_array_front_back_end_zero(void** state){
+(void)state;
+	array_t a;
+	array_init(&a, sizeof(int));
+	void* front = array_front(&a);
+	void* back = array_back(&a);
+	void* end = array_end(&a);
+
+	assert_null(front);
+	assert_null(back);
+	assert_null(end);
+
+	array_uninit(&a);
+}
 
 // Verifies an array is copied
 void test_array_copy(void** state){}
