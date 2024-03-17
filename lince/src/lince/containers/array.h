@@ -10,20 +10,27 @@
 typedef struct array_container {
 	void *data;				///< Main memory pool
 	uint32_t size;			///< Number of stored elements
-	uint32_t capacity;		///< Max number of elements allocated
+	uint32_t capacity;		///< Number of elements allocated
 	uint32_t element_size;	///< Size in bytes of an element
-	void* begin;			///< Pointer to the beginning of the array
-	void* end;              ///< Pointer to the end of the array
+	
+	/** Pointer to the first element of the array.
+	 * If the array has a size of zero, then begin==end.
+	 */
+	void* begin;
+
+	/** Pointer to the element after the last element of the array.
+	 * If the array has a size of zero, then begin==end.
+	 */
+	void* end;
 } array_t;
 
 /** @brief Initialises an array via a given pointer.
-*   Allows the user to manage the memory of the struct itself.
-*   The memory pool will still be stored on the heap.
 *   Should be freed with `array_uninit`.
 *	@param array the return array.
-*	@param element_size size in bytes of an array element.
+*	@param element_size size in bytes of an array element, must be greater than zero
+*   @returns 1 if successful, and 0 otherwise.
 */
-void array_init(array_t* array, uint32_t element_size);
+int array_init(array_t* array, uint32_t element_size);
 
 /** @brief Resets the array state and frees the memory pool.
 *	@param array the array to uninitialise.
@@ -41,10 +48,19 @@ array_t* array_create(uint32_t element_size);
 */
 void array_destroy(array_t* array); // should also free array_t itself
 
+/** @brief Copies an array into another.
+ * The source array must be initialised, and
+ * the destination array must *not* be already initialised.
+ *	@param dest the resulting copy.
+ *  @param src original array to copy.
+ *  @returns `dest` if successful, and NULL otherwise.
+*/
+array_t* array_copy(array_t* dest, array_t* src);
+
 /** @brief Duplicates an array, allocating the new copy on the heap.
 *	@param array the array to copy.
 */
-array_t* array_copy(array_t* orig);
+array_t* array_new_copy(array_t* orig);
 
 /* Initialises an array from existing data
 If a size of zero or empty data are provided, no elements are added to the array.
@@ -77,14 +93,18 @@ void* array_set(array_t* array, void* data, uint32_t index);
 */
 void* array_get(array_t* array, uint32_t index);
 
-/** @brief Returns a pointer to the first element */
+/** @brief Returns a pointer to the first element.
+ * If the array has a size of zero, NULL is returned.
+*/
 void* array_front(array_t* array);
 
-/** @brief Returns a pointer to the last element */
+/** @brief Returns a pointer to the last element.
+ * If the array has a size of zero, NULL is returned.
+*/
 void* array_back(array_t* array);
 
 /** @brief Returns a pointer to first byte after the end of the array
-* Useful for C++ style (pointer-based) iteration.
+ * If the array has a size of zero, then NULL is returned.
 */
 void* array_end(array_t* array);
 
@@ -93,29 +113,49 @@ void* array_end(array_t* array);
 * @param array Array object
 * @param element Value to insert
 * @param index Location where to insert the element.
+* @returns pointer to the inserted item, or NULL
 * 	A previous element at this index is displaced one position forward.
 */
-array_t* array_insert(array_t* array, void* element, uint32_t index);
+void* array_insert(array_t* array, void* element, uint32_t index);
 
-/** @brief Inserts an element at the end of the array */
-array_t* array_push_back(array_t* array, void* element);
+/** @brief Inserts an element at the end of the array
+ * @param array array
+ * @param element item to insert
+ * @returns pointer to the item or NULL
+*/
+void* array_push_back(array_t* array, void* element);
 
-/** @brief Inserts an element at the beginning of the array */
-array_t* array_push_front(array_t* array, void* element);
-
+/** @brief Inserts an element at the beginning of the array
+ * @param array array
+ * @param element item to insert
+ * @returns pointer to the item or NULL
+*/
+void* array_push_front(array_t* array, void* element);
 
 /** @brief Removes the element at the given index.
-* Note that, whilst the size of the array is reduced, its capacity is not.
+ * Note that, whilst the size of the array is reduced, its capacity is not.
+ * @param array array
+ * @param index index at which to remove an element
+ * @returns pointer to the array, or NULL.
 */
 array_t* array_remove(array_t* array, uint32_t index);
 
-/** @brief Removes the last element of the array */
+/** @brief Removes the last element of the array
+ * @param array array
+ * @returns pointer to the array, or NULL.
+*/
 array_t* array_pop_back(array_t* array);
 
-/** @brief Removes the element first element of the array */
+/** @brief Removes the element first element of the array
+ * @param array array
+ * @returns pointer to the array, or NULL.
+*/
 array_t* array_pop_front(array_t* array);
 
-/** @brief Removes all elements on the array */
+/** @brief Removes all elements on the array
+ * @param array array
+ * @returns pointer to the array, or NULL.
+*/
 array_t* array_clear(array_t* array);
 
 #endif /* ARRAY_H */

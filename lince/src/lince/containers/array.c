@@ -46,10 +46,12 @@ static array_t* extend_capacity(array_t* array){
 Initialises an array via a given pointer.
 Should be later freed using `array_uninit`.
 */
-void array_init(array_t* array, uint32_t element_size){
-	if(!array) return;
+int array_init(array_t* array, uint32_t element_size){
+	if(!array) return 0;
 	*array = (array_t){0};
+	if(element_size == 0) return 0;
 	array->element_size = element_size;
+	return 1;
 }
 
 /*
@@ -64,6 +66,7 @@ void array_uninit(array_t* array){
 
 /* Creates a new array of size zero */
 array_t* array_create(uint32_t element_size){
+	if(element_size == 0) return NULL;
 	array_t* array = calloc(1, sizeof(array_t));
 	if(!array) return NULL;
 	array->element_size = element_size;
@@ -77,23 +80,42 @@ void array_destroy(array_t* array){
 	free(array);
 }
 
-array_t* array_copy(array_t* orig){
-	if(!orig) return NULL;
-	array_t* new = malloc(sizeof(array_t));
-	if(!new) return NULL;
+/** @brief Copies an array into another.
+ * The source array must be initialised, and
+ * the destination array must *not* be already initialised.
+ *	@param dest the resulting copy.
+ *  @param src original array to copy.
+ *  @returns `dest` if successful, and NULL otherwise.
+*/
+array_t* array_copy(array_t* dest, array_t* src){
+	if(!dest || !src) return NULL;
+	
+	int success = array_init(dest, src->element_size);
+	if(!success) return NULL;
+	if(src->size == 0) return dest;
 
-	memmove(new, orig, sizeof(array_t));
-	if(!orig->data){
-		return new;
+	if(!array_resize(dest, src->size)){
+		array_uninit(dest);
+		return NULL;
 	}
 
-	size_t bytes = orig->capacity * orig->element_size;
-	new->data = malloc(bytes);
-	if(!new->data) return NULL;
-	memmove(new->data, orig->data, bytes);
-	new->begin = new->data;
-	new->end = array_end(new);
+	memcpy(dest->data, src->data, dest->size * dest->element_size);
+	return dest;
+}
 
+array_t* array_new_copy(array_t* orig){
+	if(!orig) return NULL;
+
+	array_t* new = array_create(orig->element_size);
+	if(!new) return NULL;
+	if(orig->size == 0) return new;
+
+	if(!array_resize(new, orig->size)){
+		array_destroy(new);
+		return NULL;
+	}
+
+	memcpy(new->data, orig->data, new->size * new->element_size);
 	return new;
 }
 
@@ -106,6 +128,7 @@ array_t* array_resize(array_t* array, uint32_t size){
 		// No need to delete anything. Old data will eventually be overwritten.
 		array->size = size;
 		array->end = array_end(array);
+		array->begin = array_front(array);
 		return array;
 	}
 	
@@ -159,16 +182,15 @@ void* array_back(array_t* array){
 
 /* Returns a pointer to first byte after the end of the array */
 void* array_end(array_t* array){
-	if(!array || !array->data || array->element_size == 0) return NULL;
-	if(array->size == 0){
-		return array_back(array);
+	if(!array || !array->data || array->element_size == 0 || array->size == 0){
+		return NULL;
 	}
 	return (char*)array_back(array) + array->element_size;
 }
 
 // -- INSERTING
 /* Inserts an element at the given index */
-array_t* array_insert(array_t* array, void* element, uint32_t index){
+void* array_insert(array_t* array, void* element, uint32_t index){
 	if(!array || array->element_size == 0 || index > array->size){
 		return NULL;
 	}
@@ -196,16 +218,16 @@ array_t* array_insert(array_t* array, void* element, uint32_t index){
 	array->size++;
 	array->begin = array->data;
 	array->end = array_end(array);
-	return array;
+	return addr;
 }
 
 /* Inserts the element to the end of the array */
-array_t* array_push_back(array_t* array, void* element){
+void* array_push_back(array_t* array, void* element){
 	return array_insert(array, element, array->size);
 }
 
 /* Inserts the element to the beginning of the array */
-array_t* array_push_front(array_t* array, void* element){
+void* array_push_front(array_t* array, void* element){
 	return array_insert(array, element, 0);
 }
 
@@ -249,8 +271,8 @@ array_t* array_pop_front(array_t* array){
 array_t* array_clear(array_t* array){
 	if(!array) return NULL;
 	array->size = 0;
-	array->begin = array->data;
-	array->end = array->begin;
+	array->begin = NULL;
+	array->end   = NULL;
 	return array;
 }
 
