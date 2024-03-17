@@ -1,7 +1,7 @@
 #ifndef TEST_ASSET_CACHE
 #define TEST_ASSET_CACHE
 
-#define ASSET_CACHE_TESTS \
+#define TEST_GROUP_ASSET_CACHE \
     cmocka_unit_test(test_asset_cache_init), \
     cmocka_unit_test(test_asset_cache_push_folder_real), \
     cmocka_unit_test(test_asset_cache_push_folder_fake), \

@@ -1,7 +1,7 @@
 #ifndef TEST_ARRAY
 #define TEST_ARRAY
 
-#define ARRAY_TESTS \
+#define TEST_GROUP_ARRAY \
     cmocka_unit_test(test_array_init), \
     cmocka_unit_test(test_array_init_zero_element_size), \
     cmocka_unit_test(test_array_init_null), \

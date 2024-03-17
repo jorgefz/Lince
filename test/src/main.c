@@ -27,9 +27,9 @@ void test_ecs(void** state);
 int main() {
 
     const struct CMUnitTest tests[] = {
-        ARRAY_TESTS,
-        ASSET_CACHE_TESTS,
-        
+        TEST_GROUP_ARRAY,
+        TEST_GROUP_ASSET_CACHE,
+
         cmocka_unit_test(test_hashmap),
         cmocka_unit_test(test_hashmap_byte_key),
         cmocka_unit_test(test_linkedlist),
