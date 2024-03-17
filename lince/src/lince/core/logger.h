@@ -10,6 +10,12 @@
 */
 int LinceOpenLogger(const char* filename);
 
+/** @brief Closes the file only if standard output is not being used */
+void LinceCloseLogger();
+
+/** @brief Default to stderr when no log file is open */
+void LinceLoggerDefaultToStderr(int flag);
+
 /** @brief Reports a message to the log file. */
 void LinceLoggerInfo(const char* fmt, ...);
 /** @brief Reports a warning to the log file. */
@@ -17,7 +23,5 @@ void LinceLoggerWarn(const char* fmt, ...);
 /** @brief Reports an error to the log file. */
 void LinceLoggerError(const char* fmt, ...);
 
-/** @brief Closes the file only if standard output is not being used */
-void LinceCloseLogger();
 
 #endif /* LINCE_LOGGER */
