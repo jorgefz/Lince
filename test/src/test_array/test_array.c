@@ -269,8 +269,8 @@ void test_array_resize_zero(void** state){
 	assert_int_equal(a.capacity, new_capacity);
 	assert_int_equal(a.element_size, sizeof(int));
 	assert_non_null(a.data);
-	assert_ptr_equal(a.begin, a.data);
-	assert_ptr_equal(a.end, a.data);
+	assert_null(a.begin);
+	assert_null(a.end);
 	array_uninit(&a);
 }
 
