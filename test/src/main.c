@@ -8,10 +8,9 @@
 #include <setjmp.h>
 #include <cmocka.h>
 
-#include "test_asset_cache.h"
+#include "test_asset_cache/test_asset_cache.h"
 #include "test_array/test_array.h"
 
-// void test_array(void** state);
 void test_hashmap(void** state);
 void test_hashmap_byte_key(void** state);
 void test_linkedlist(void** state);
@@ -28,7 +27,9 @@ void test_ecs(void** state);
 int main() {
 
     const struct CMUnitTest tests[] = {
-        cmocka_unit_test(test_array),
+        ARRAY_TESTS,
+        ASSET_CACHE_TESTS,
+        
         cmocka_unit_test(test_hashmap),
         cmocka_unit_test(test_hashmap_byte_key),
         cmocka_unit_test(test_linkedlist),
@@ -40,7 +41,6 @@ int main() {
         cmocka_unit_test(test_ecs_mask),
         cmocka_unit_test(test_ecs),
         cmocka_unit_test(test_ecs_system),
-
         
     };
     return cmocka_run_group_tests(tests, NULL, NULL);
