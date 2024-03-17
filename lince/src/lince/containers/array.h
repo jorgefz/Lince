@@ -133,17 +133,29 @@ void* array_push_back(array_t* array, void* element);
 void* array_push_front(array_t* array, void* element);
 
 /** @brief Removes the element at the given index.
-* Note that, whilst the size of the array is reduced, its capacity is not.
+ * Note that, whilst the size of the array is reduced, its capacity is not.
+ * @param array array
+ * @param index index at which to remove an element
+ * @returns pointer to the array, or NULL.
 */
 array_t* array_remove(array_t* array, uint32_t index);
 
-/** @brief Removes the last element of the array */
+/** @brief Removes the last element of the array
+ * @param array array
+ * @returns pointer to the array, or NULL.
+*/
 array_t* array_pop_back(array_t* array);
 
-/** @brief Removes the element first element of the array */
+/** @brief Removes the element first element of the array
+ * @param array array
+ * @returns pointer to the array, or NULL.
+*/
 array_t* array_pop_front(array_t* array);
 
-/** @brief Removes all elements on the array */
+/** @brief Removes all elements on the array
+ * @param array array
+ * @returns pointer to the array, or NULL.
+*/
 array_t* array_clear(array_t* array);
 
 #endif /* ARRAY_H */
