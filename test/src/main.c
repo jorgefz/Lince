@@ -8,6 +8,7 @@
 #include <setjmp.h>
 #include <cmocka.h>
 
+#include "lince/core/logger.h"
 #include "test_array/test_array.h"
 
 // void test_array(void** state);
@@ -25,6 +26,8 @@ void test_ecs(void** state);
 
 
 int main() {
+
+    LinceLoggerDefaultToStderr(0);
 
     const struct CMUnitTest tests[] = {
         ARRAY_TESTS,
