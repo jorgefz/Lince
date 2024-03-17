@@ -109,6 +109,7 @@ array_t* array_resize(array_t* array, uint32_t size){
 		// No need to delete anything. Old data will eventually be overwritten.
 		array->size = size;
 		array->end = array_end(array);
+		array->begin = array_front(array);
 		return array;
 	}
 	
