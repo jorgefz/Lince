@@ -190,7 +190,7 @@ void* array_end(array_t* array){
 
 // -- INSERTING
 /* Inserts an element at the given index */
-array_t* array_insert(array_t* array, void* element, uint32_t index){
+void* array_insert(array_t* array, void* element, uint32_t index){
 	if(!array || array->element_size == 0 || index > array->size){
 		return NULL;
 	}
@@ -218,16 +218,16 @@ array_t* array_insert(array_t* array, void* element, uint32_t index){
 	array->size++;
 	array->begin = array->data;
 	array->end = array_end(array);
-	return array;
+	return addr;
 }
 
 /* Inserts the element to the end of the array */
-array_t* array_push_back(array_t* array, void* element){
+void* array_push_back(array_t* array, void* element){
 	return array_insert(array, element, array->size);
 }
 
 /* Inserts the element to the beginning of the array */
-array_t* array_push_front(array_t* array, void* element){
+void* array_push_front(array_t* array, void* element){
 	return array_insert(array, element, 0);
 }
 

@@ -113,15 +113,24 @@ void* array_end(array_t* array);
 * @param array Array object
 * @param element Value to insert
 * @param index Location where to insert the element.
+* @returns pointer to the inserted item, or NULL
 * 	A previous element at this index is displaced one position forward.
 */
-array_t* array_insert(array_t* array, void* element, uint32_t index);
+void* array_insert(array_t* array, void* element, uint32_t index);
 
-/** @brief Inserts an element at the end of the array */
-array_t* array_push_back(array_t* array, void* element);
+/** @brief Inserts an element at the end of the array
+ * @param array array
+ * @param element item to insert
+ * @returns pointer to the item or NULL
+*/
+void* array_push_back(array_t* array, void* element);
 
-/** @brief Inserts an element at the beginning of the array */
-array_t* array_push_front(array_t* array, void* element);
+/** @brief Inserts an element at the beginning of the array
+ * @param array array
+ * @param element item to insert
+ * @returns pointer to the item or NULL
+*/
+void* array_push_front(array_t* array, void* element);
 
 /** @brief Removes the element at the given index.
 * Note that, whilst the size of the array is reduced, its capacity is not.
