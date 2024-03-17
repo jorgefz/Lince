@@ -30,6 +30,7 @@
     cmocka_unit_test(test_array_insert), \
     cmocka_unit_test(test_array_insert_out_of_bounds), \
     cmocka_unit_test(test_array_insert_null), \
+    cmocka_unit_test(test_array_insert_empty), \
     cmocka_unit_test(test_array_push_back), \
     cmocka_unit_test(test_array_push_front), \
     cmocka_unit_test(test_array_remove), \
@@ -137,6 +138,9 @@ void test_array_insert_out_of_bounds(void** state);
 // Verifies an element is inserted with a value of zero
 // when the given pointer-to-value is null
 void test_array_insert_null(void** state);
+
+// Verifies an element is inserted on an empty array
+void test_array_insert_empty(void** state);
 
 // Verifies an element is inserted
 // after the last item

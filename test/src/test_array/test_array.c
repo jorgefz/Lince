@@ -357,11 +357,9 @@ void test_array_get(void** state){
 void test_array_get_out_of_bounds(void** state){
 	(void)state;
 	array_t a;
-	int v = 8;
 	uint32_t size = 1;
 	array_init(&a, sizeof(int));
 	array_resize(&a, size);
-	int* set = array_set(&a, &v, size-1);
 	int* get = array_get(&a, size);
 	assert_null(get);
 	array_uninit(&a);
@@ -514,43 +512,248 @@ void test_array_clear(void** state){
 }
 
 // Verifies an array is iterated via index
-void test_array_iter_index(void** state){}
+void test_array_iter_index(void** state){
+	(void)state;
+	array_t a;
+	uint32_t size = 10;
+
+	array_init(&a, sizeof(uint32_t));
+	array_resize(&a, size);
+
+	for(uint32_t i = 0; i != size; ++i){
+		uint32_t* item = array_set(&a, &i, i);
+		assert_ptr_equal(item, (char*)a.data + i*a.element_size);
+		assert_int_equal(*item, i);
+	}
+
+	array_uninit(&a);
+}
 
 // Verifies an array is iterated via begin/end pointers
-void test_array_iter_ptr(void** state){}
+void test_array_iter_ptr(void** state){
+	(void)state;
+	array_t a;
+	uint32_t size = 10;
+
+	array_init(&a, sizeof(uint32_t));
+	array_resize(&a, size);
+	for(uint32_t i = 0; i != size; ++i) array_set(&a, &i, i);
+
+	uint32_t c = 0;
+	for(uint32_t *item = a.begin; item != a.end; ++item){
+		assert_ptr_equal(item, (char*)a.data + c * a.element_size);
+		assert_int_equal(*item, c);
+		assert_true((char*)item <= (char*)a.data + a.size * a.element_size);
+		c++;
+	}
+
+	array_uninit(&a);
+}
 
 // Verifies an array is iterated via begin/end pointers
 // on an array with zero elements
-void test_array_iter_ptr_zero(void** state){}
+void test_array_iter_ptr_zero(void** state){
+	(void)state;
+	array_t a;
+	array_init(&a, sizeof(uint32_t));
+
+	for(uint32_t *item = a.begin; item != a.end; ++item){
+		assert_true(0); // This code should never run
+	}
+
+	array_uninit(&a);
+}
 
 // Verifies an element is inserted
-void test_array_insert(void** state){}
+void test_array_insert(void** state){
+	(void)state;
+	array_t a;
+	uint32_t size = 10;
+	array_init(&a, sizeof(uint32_t));
+	array_resize(&a, size);
+
+	uint32_t v = 123;
+	uint32_t insert_index = 5;
+	uint32_t* result = array_insert(&a, &v, insert_index);
+
+	assert_non_null(result);
+	assert_ptr_equal(result, array_get(&a, insert_index));
+	assert_int_equal(*result, v);
+	assert_int_equal(a.size, size+1);
+
+	array_uninit(&a);
+}
 
 // Verifies an element is not inserted
 // when the given index is out of bounds
-void test_array_insert_out_of_bounds(void** state){}
+void test_array_insert_out_of_bounds(void** state){
+	(void)state;
+	array_t a;
+	uint32_t size = 10;
+	array_init(&a, sizeof(uint32_t));
+	array_resize(&a, size);
+
+	uint32_t v = 123;
+	uint32_t insert_index = size + 1;
+	uint32_t* result = array_insert(&a, &v, insert_index);
+
+	assert_null(result);
+	assert_int_equal(size, a.size);
+
+	array_uninit(&a);
+}
 
 // Verifies an element is inserted with a value of zero
 // when the given pointer-to-value is null
-void test_array_insert_null(void** state){}
+void test_array_insert_null(void** state){
+	(void)state;
+	array_t a;
+	uint32_t size = 10;
+	array_init(&a, sizeof(uint32_t));
+	array_resize(&a, size);
+
+	uint32_t insert_index = 5;
+	uint32_t* result = array_insert(&a, NULL, insert_index);
+
+	assert_non_null(result);
+	assert_ptr_equal(result, array_get(&a, insert_index));
+	assert_int_equal(*result, 0);
+	assert_int_equal(a.size, size+1);
+
+	array_uninit(&a);
+}
+
+// Verifies an element is inserted on an empty array
+void test_array_insert_empty(void** state){
+	(void)state;
+	array_t a;
+	array_init(&a, sizeof(uint32_t));
+
+	uint32_t v = 123;
+	uint32_t insert_index = 0;
+	uint32_t* result = array_insert(&a, &v, insert_index);
+
+	assert_non_null(result);
+	assert_ptr_equal(result, a.data);
+	assert_int_equal(a.size, 1);
+	assert_int_equal(*result, v);
+
+	array_uninit(&a);
+}
 
 // Verifies an element is inserted
 // after the last item
-void test_array_push_back(void** state){}
+void test_array_push_back(void** state){
+	(void)state;
+	array_t a;
+	uint32_t size = 5;
+	array_init(&a, sizeof(uint32_t));
+	array_resize(&a, size);
+
+	uint32_t v = 123;
+	uint32_t* result = array_push_back(&a, &v);
+
+	assert_non_null(result);
+	assert_ptr_equal(result, array_back(&a));
+	assert_int_equal(a.size, size + 1);
+	assert_int_equal(*result, v);
+
+	array_uninit(&a);
+}
 
 // Verifies an element is inserted
 // before the first item
-void test_array_push_front(void** state){}
+void test_array_push_front(void** state){
+	(void)state;
+	array_t a;
+	uint32_t size = 5;
+	array_init(&a, sizeof(uint32_t));
+	array_resize(&a, size);
+
+	uint32_t v = 123;
+	uint32_t* result = array_push_front(&a, &v);
+
+	assert_non_null(result);
+	assert_ptr_equal(result, array_front(&a));
+	assert_int_equal(a.size, size + 1);
+	assert_int_equal(*result, v);
+
+	array_uninit(&a);
+}
 
 // Verifies an element is removed from the array
-void test_array_remove(void** state){}
+void test_array_remove(void** state){
+	(void)state;
+	array_t a;
+	uint32_t size = 5;
+	array_init(&a, sizeof(uint32_t));
+	array_resize(&a, size);
+	for(uint32_t i=0, *item = a.begin; item != a.end; ++item) *item = i++;
+
+	uint32_t remove_index = 2;
+	uint32_t v_at_index = *(uint32_t*)array_get(&a, remove_index);
+	array_t* result = array_remove(&a, remove_index);
+
+	assert_non_null(result);
+	assert_ptr_equal(result, &a);
+	assert_int_equal(a.size, size - 1);
+	assert_int_equal(v_at_index, *(uint32_t*)array_get(&a, remove_index) - 1);
+
+	array_uninit(&a);
+}
 
 // Verifies an element is removed from the array
-void test_array_remove_zero(void** state){}
+void test_array_remove_zero(void** state){
+	(void)state;
+	array_t a;
+	array_init(&a, sizeof(uint32_t));
+	
+	uint32_t remove_index = 1;
+	array_t* result = array_remove(&a, remove_index);
+
+	assert_null(result);
+	assert_int_equal(a.size, 0);
+
+	array_uninit(&a);
+}
 
 // Verifies the last item is removed
-void test_array_pop_back(void** state){}
+void test_array_pop_back(void** state){
+	(void)state;
+	array_t a;
+	uint32_t size = 5;
+	array_init(&a, sizeof(uint32_t));
+	array_resize(&a, size);
+	for(uint32_t i=0, *item = a.begin; item != a.end; ++item) *item = i++;
+
+	uint32_t v_at_back = *(uint32_t*)array_back(&a);
+	array_t* result = array_pop_back(&a);
+	
+	assert_non_null(result);
+	assert_ptr_equal(result, &a);
+	assert_int_equal(a.size, size - 1);
+	assert_int_equal(v_at_back, *(uint32_t*)(array_back(&a)) + 1);
+
+	array_uninit(&a);
+}
 
 // Verifies the first item is removed
-void test_array_pop_front(void** state){}
+void test_array_pop_front(void** state){
+	(void)state;
+	array_t a;
+	uint32_t size = 5;
+	array_init(&a, sizeof(uint32_t));
+	array_resize(&a, size);
+	for(uint32_t i=0, *item = a.begin; item != a.end; ++item) *item = i++;
+
+	uint32_t v_at_front = *(uint32_t*)array_front(&a);
+	array_t* result = array_pop_front(&a);
+
+	assert_non_null(result);
+	assert_ptr_equal(result, &a);
+	assert_int_equal(a.size, size - 1);
+	assert_int_equal(v_at_front, *(uint32_t*)array_front(&a) - 1);
+
+	array_uninit(&a);
+}
 
