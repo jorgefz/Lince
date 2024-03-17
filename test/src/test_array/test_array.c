@@ -408,19 +408,110 @@ void test_array_front_back_end_zero(void** state){
 }
 
 // Verifies an array is copied
-void test_array_copy(void** state){}
+void test_array_copy(void** state){
+	(void)state;
+	array_t a, b;
+	uint32_t size = 2;
+	int v1 = 100, v2 = -100;
+
+	array_init(&a, sizeof(int));
+	array_resize(&a, size);
+	array_set(&a, &v1, 0);
+	array_set(&a, &v2, 1);
+
+	void* result = array_copy(&b, &a);
+
+	assert_non_null(result);
+	assert_ptr_equal(result, &b);
+	assert_int_equal(a.size, b.size);
+	assert_int_equal(a.element_size, b.element_size);
+	assert_ptr_equal((char*)a.begin-(char*)a.data, (char*)b.begin-(char*)b.data);
+	assert_ptr_equal((char*)a.end-(char*)a.data, (char*)b.end-(char*)b.data);
+	assert_memory_equal(a.data, b.data, b.size * b.element_size);
+
+	array_uninit(&a);
+	array_uninit(&b);
+}
 
 // Verifies an array is copied
-void test_array_copy_zero(void** state){}
+void test_array_copy_zero(void** state){
+	(void)state;
+	array_t a, b;
+
+	array_init(&a, sizeof(int));
+
+	void* result = array_copy(&b, &a);
+
+	assert_non_null(result);
+	assert_ptr_equal(result, &b);
+	assert_int_equal(a.size, b.size);
+	assert_int_equal(a.element_size, b.element_size);
+	assert_null(b.begin);
+	assert_null(b.end);
+
+	array_uninit(&a);
+	array_uninit(&b);
+}
 
 // Verifies a heap-allocated copy of an array is returned
-void test_array_new_copy(void** state){}
+void test_array_new_copy(void** state){
+	(void)state;
+	array_t a;
+	uint32_t size = 2;
+	int v1 = 100, v2 = -100;
+
+	array_init(&a, sizeof(int));
+	array_resize(&a, size);
+	array_set(&a, &v1, 0);
+	array_set(&a, &v2, 1);
+	array_t* b = array_new_copy(&a);
+
+	assert_non_null(b);
+	assert_int_equal(a.size, b->size);
+	assert_int_equal(a.element_size, b->element_size);
+	assert_ptr_equal((char*)a.begin-(char*)a.data, (char*)b->begin-(char*)b->data);
+	assert_ptr_equal((char*)a.end-(char*)a.data, (char*)b->end-(char*)b->data);
+	assert_memory_equal(a.data, b->data, b->size * b->element_size);
+
+	array_uninit(&a);
+	array_destroy(b);
+}
 
 // Verifies a heap-allocated copy of an array is returned
-void test_array_new_copy_zero(void** state){}
+void test_array_new_copy_zero(void** state){
+	(void)state;
+	array_t a;
+	array_init(&a, sizeof(int));
+	array_t* b = array_new_copy(&a);
+
+	assert_non_null(b);
+	assert_int_equal(a.size, b->size);
+	assert_int_equal(a.element_size, b->element_size);
+	assert_null(b->begin);
+	assert_null(b->end);
+
+	array_uninit(&a);
+	array_destroy(b);
+}
 
 // Verifies all elements of the array are removed
-void test_array_clear(void** state){}
+void test_array_clear(void** state){
+	(void)state;
+	array_t a;
+	uint32_t size = 2;
+
+	array_init(&a, sizeof(int));
+	array_resize(&a, size);
+	void* r = array_clear(&a);
+
+	assert_non_null(r);
+	assert_ptr_equal(r, &a);
+	assert_int_equal(a.size, 0);
+	assert_null(a.begin);
+	assert_null(a.end);
+
+	array_uninit(&a);
+}
 
 // Verifies an array is iterated via index
 void test_array_iter_index(void** state){}
