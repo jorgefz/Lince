@@ -11,13 +11,15 @@ void LinceUninitAssetCache(LinceAssetCache* cache){
     array_uninit(&cache->folders);
 }
 
-LinceBool LinceAssetCachePushFolder(LinceAssetCache* cache, const char* dir){
-    uint32_t length = (uint32_t)strlen(dir);
+LinceBool LinceAssetCachePushFolder(LinceAssetCache* cache, const char* folder){
+    size_t folder_len = strlen(folder);
     size_t exe_len = cache->exedir_length + 1;
+    size_t total_len = folder_len + exe_len;
     
-    LINCE_ASSERT(length < LINCE_PATH_MAX - exe_len - 1,
-        "Asset directory is too long. Length %u but max is %u",
-        length, LINCE_PATH_MAX - exe_len - 1);
+    if(total_len >= LINCE_PATH_MAX - 1){
+        LINCE_WARN("Failed to add assets folder because its path is too long");
+        return LinceFalse;
+    }
     
     array_push_front(&cache->folders, NULL);
     char* p = array_front(&cache->folders);
@@ -31,12 +33,12 @@ LinceBool LinceAssetCachePushFolder(LinceAssetCache* cache, const char* dir){
     p += exe_len;
 
     // Append relative directory to assets folder
-    memmove(p, dir, length);
-    if (p[length-1] != '\\' && p[length-1] != '/'){
-        p[length] = '/';
-        length++;
+    memmove(p, folder, folder_len);
+    if (p[folder_len-1] != '\\' && p[folder_len-1] != '/'){
+        p[folder_len] = '/';
+        folder_len++;
     }
-    p[length] = '\0';
+    p[folder_len] = '\0';
 
     if(LinceIsDir(array_front(&cache->folders)) != 1){
         LINCE_WARN("Failed to add assets folder because it does not exist: '%s'",
