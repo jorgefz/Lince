@@ -7,40 +7,22 @@
 
 enum LinceAssetType {
     LinceAsset_None = -1,
-    LinceAsset_Image,
-    LinceAsset_Texture,
-    LinceAsset_TextFile,
-    LinceAsset_ShaderHeader,
-    LinceAsset_ShaderProgram,
-    LinceAsset_Font,
-    LinceAsset_Misc, // Generic files
+    LinceAsset_Texture = 0,
+    // LinceAsset_Image,
+    // LinceAsset_TextFile,
+    // LinceAsset_ShaderHeader,
+    // LinceAsset_ShaderProgram,
+    // LinceAsset_Font,
+    // LinceAsset_Misc, // Generic files
     LinceAsset_Count // Number of asset types
 };
-
-typedef struct LinceAssetInfo {
-    // uuid?
-    int type;
-    void* handle;
-    LinceBool loaded;           ///< Whether the resource is loaded
-    char path[LINCE_PATH_MAX];  ///< Full path to the resource
-    char name[LINCE_NAME_MAX];  ///< Filename of the resource
-} LinceAssetInfo;
-
-// Stores data for assets of the same type
-typedef struct LinceAssetStore {
-    int type;
-    array_t info;            ///<
-    hashmap_t info_indices;  ///< 
-    hashmap_t handles; ///< Maps name to index
-    // ctor & dtor functions specific to this type
-} LinceAssetStore;
 
 typedef struct LinceAssetCache {
     char exedir[LINCE_PATH_MAX];     ///< Directory where the executable is located
     size_t exedir_length;
     char result_path[LINCE_PATH_MAX]; ///< Stores result of LinceFetchAssetPath
-    array_t folders;            ///< Array of relative paths between executable and asset folders
-    array_t stores; /**< Stores asset info and handles, indexed by enum LinceAssetType */
+    array_t folders;  ///< Array of relative paths between executable and asset folders
+    array_t stores;   ///< array<hashmap> Stores info and handles for each asset type, indexed by LinceAssetType
     
 } LinceAssetCache;
 

@@ -8,9 +8,10 @@ LinceBool LinceInitAssetCache(LinceAssetCache* cache){
         return LinceFalse;
     }
 
-    int ret = array_init(&cache->folders, LINCE_PATH_MAX * sizeof(char));
-    if(ret != 1){
-        return LinceFalse;
+    array_init(&cache->folders, LINCE_PATH_MAX * sizeof(char));
+    array_init(&cache->stores, LinceAsset_Count * sizeof(hashmap_t));
+    for(hashmap_t* map = cache->stores.begin; map != cache->stores.end; ++map){
+        hashmap_init(map, 10);
     }
 
     return LinceTrue;
@@ -18,6 +19,11 @@ LinceBool LinceInitAssetCache(LinceAssetCache* cache){
 
 void LinceUninitAssetCache(LinceAssetCache* cache){
     array_uninit(&cache->folders);
+    for(hashmap_t* map = cache->stores.begin; map != cache->stores.end; ++map){
+        hashmap_uninit(map);
+    }
+    array_uninit(&cache->stores);
+
 }
 
 LinceBool LinceAssetCachePushFolder(LinceAssetCache* cache, const char* folder){
