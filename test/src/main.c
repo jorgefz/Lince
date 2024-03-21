@@ -29,7 +29,7 @@ int main() {
 
     LinceLoggerDefaultToStderr(0);
 
-    const struct CMUnitTest tests[] = {
+    static const struct CMUnitTest tests[] = {
         TEST_GROUP_ARRAY,
         TEST_GROUP_ASSET_CACHE,
 
