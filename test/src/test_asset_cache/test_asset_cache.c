@@ -13,7 +13,7 @@ void test_asset_cache_init(void** state){
     LinceAssetCache assets;
     LinceInitAssetCache(&assets);
 
-    assert_true(LinceIsDir(assets.exe_dir));
+    assert_true(LinceIsDir(assets.exedir));
 
     LinceUninitAssetCache(&assets);
 }
@@ -26,16 +26,16 @@ void test_asset_cache_push_folder_real(void** state){
 
     int success;
     const char folder[] =  "../../../lince/assets/";
-    size_t exe_path_len = strlen(assets.exe_dir);
+    size_t exe_path_len = strlen(assets.exedir);
     success = LinceAssetCachePushFolder(&assets, folder);
     assert_int_equal(success, 1);
-    assert_int_equal(assets.asset_folders.size, 1);
+    assert_int_equal(assets.folders.size, 1);
 
     // First part of asset folder is path to executable
-    char* result = array_get(&assets.asset_folders, 0);
+    char* result = array_get(&assets.folders, 0);
     assert_memory_equal(
         result,
-        assets.exe_dir,
+        assets.exedir,
         exe_path_len
     );
     // Second part of asset folder is custom path pushed earlier
@@ -60,7 +60,7 @@ void test_asset_cache_push_folder_fake(void** state){
     success = LinceAssetCachePushFolder(&assets, folder);
 
     assert_int_equal(success, 0);
-    assert_int_equal(assets.asset_folders.size, 0);
+    assert_int_equal(assets.folders.size, 0);
 
     LinceUninitAssetCache(&assets);
 }
@@ -82,10 +82,10 @@ void test_asset_cache_fetch_path_real(void** state){
     assert_true(LinceIsFile(result));
 
     // Ensure path to asset was built successfully
-    size_t exe_len = strlen(assets.exe_dir);
+    size_t exe_len = strlen(assets.exedir);
     assert_memory_equal(
         result,
-        assets.exe_dir,
+        assets.exedir,
         exe_len
     );
     assert_memory_equal(
@@ -139,7 +139,7 @@ void test_asset_cache_asset_shadowing(void** state){
     assert_true(LinceIsFile(result));
 
     // Ensure folder 2 overshadows folder 1
-    size_t exe_len = strlen(assets.exe_dir);
+    size_t exe_len = strlen(assets.exedir);
     assert_memory_equal(
         result + exe_len,
         folder2,
