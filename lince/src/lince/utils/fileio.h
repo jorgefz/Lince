@@ -10,7 +10,7 @@
 * The output string will be null-terminated.
 * @param buf Buffer where the directory of executable is copied to.
 * @param max_size Maximum number of bytes to copy to the buffer.
-* @returns Number of bytes copied to the input buffer
+* @returns Number of bytes copied to the input buffer, excluding the terminating character
 */
 size_t LinceFetchExeDir(char* buf, size_t max_size);
 
