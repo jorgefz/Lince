@@ -15,27 +15,30 @@
 #endif
 
 
-void LinceFetchExeDir(char* exe_path, uint32_t max_size){
+size_t LinceFetchExeDir(char* buf, size_t max_size){
+
+	size_t n_bytes;
+	memset(buf, 0, max_size);
 
 #ifdef LINCE_WINDOWS
 	/// TODO: check return code
-	GetModuleFileNameA(NULL, exe_path, max_size); 
+	n_bytes = (size_t)GetModuleFileNameA(NULL, buf, (DWORD)max_size);
 #elif defined(LINCE_LINUX)
-	memset(exe_path, 0, max_size);
-	LINCE_ASSERT(
-		readlink("/proc/self/exe", exe_path, max_size) != -1,
-		"Failed to find executable"
-	);
+	ssize_t retval = readlink("/proc/self/exe", buf, max_size);
+	if(retval == -1){
+		return 0;
+	}
+	n_bytes = (size_t)retval;
 #endif
-
-	// Strip executable name to get directory alone
-	uint64_t len = strlen(exe_path);
-	char* end = exe_path + len;
-	while(*end != '/' && *end != '\\' && end != exe_path) end--;
-	LINCE_ASSERT(end != exe_path, "Invalid executable path '%s'", exe_path);
+	
+	// Strip filename from full path
+	char* end = buf + n_bytes;
+	while(*end != '/' && *end != '\\' && end != buf) end--;
+	if(end == buf){
+		return 0;
+	}
 	*(end+1) = '\0';
-
-	LINCE_INFO("Executable found at '%s'", exe_path);
+	return (size_t)(end - buf);
 }
 
 

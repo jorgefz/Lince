@@ -5,12 +5,14 @@
 #include "lince/core/core.h"
 #include "lince/containers/array.h"
 
-/** @brief Finds the directory (with the filename stripped) of the running executable 
-* @param exe_path Directory of executable is written to this location
-* @param max_size Size of the provided buffer
-* @note the output string will be null-terminated.
+/** @brief Returns the directory of the running executable with the filename stripped.
+* If the length of the requested path exceeds that of the buffer, zero is returned. 
+* The output string will be null-terminated.
+* @param buf Buffer where the directory of executable is copied to.
+* @param max_size Maximum number of bytes to copy to the buffer.
+* @returns Number of bytes copied to the input buffer
 */
-void LinceFetchExeDir(char* exe_path, uint32_t max_size);
+size_t LinceFetchExeDir(char* buf, size_t max_size);
 
 /** @brief Returns LinceTrue if a given file exists
 * @param path Path to file
