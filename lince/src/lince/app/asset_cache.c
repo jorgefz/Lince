@@ -2,9 +2,18 @@
 #include "lince/utils/fileio.h"
 #include "lince/core/logger.h"
 
-void LinceInitAssetCache(LinceAssetCache* cache){
-    array_init(&cache->folders, LINCE_PATH_MAX * sizeof(char));
+LinceBool LinceInitAssetCache(LinceAssetCache* cache){
     cache->exedir_length = LinceFetchExeDir(cache->exedir, LINCE_PATH_MAX);
+    if(cache->exedir_length == 0){
+        return LinceFalse;
+    }
+
+    int ret = array_init(&cache->folders, LINCE_PATH_MAX * sizeof(char));
+    if(ret != 1){
+        return LinceFalse;
+    }
+
+    return LinceTrue;
 }
 
 void LinceUninitAssetCache(LinceAssetCache* cache){

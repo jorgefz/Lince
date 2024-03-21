@@ -44,27 +44,12 @@ typedef struct LinceAssetCache {
     
 } LinceAssetCache;
 
-/*
-cache = LinceAssetCacheInit()
 
-LinceAssetCachePushFolder(cache, "path_to_my_assets_folder");
-LinceAssetCachePushFolder(cache, "path_to_my_second_assets_folder");
 
-LinceTexture* player = LinceAssetCacheGet(cache, "textures/player.png", LinceAsset_Texture);
-
-LinceAssetCacheUninit(cache);
-
-// Load an asset using a switch and its appropriate function
-void* LinceAssetCacheLoad(LinceAssetCache* cache, const char* filename, int type);
-
-// Fetch an asset. If not cached, load it.
-void* LinceAssetCacheGet(LinceAssetCache* cache, const char* name, int type);
-
+/** @brief Initialise asset cache
+ * @returns LinceTrue if successful, and LinceFalse otherwise
 */
-
-
-/** @brief Initialise asset cache */
-void LinceInitAssetCache(LinceAssetCache* cache);
+LinceBool LinceInitAssetCache(LinceAssetCache* cache);
 
 /** @brief Uninitialise asset cache, freeing internally allocated memory */
 void LinceUninitAssetCache(LinceAssetCache* cache);
