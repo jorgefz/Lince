@@ -47,9 +47,8 @@ typedef struct LinceAssetCache {
     /// Array of relative paths between the executable and the asset folders
     array_t folders;
     
-    /// Stores info and handles for each asset type
-    array_t stores; // array<LinceAssetStore> Cache stores for different asset types
-    // LinceAssetStore stores[LinceAssetType_Count];
+    /// array<LinceAssetStore> - Stores info and handles for each asset type
+    array_t stores;
 
 } LinceAssetCache;
 
@@ -83,16 +82,26 @@ char* LinceAssetCacheFetchPath(LinceAssetCache* cache, const char* filename);
 // int LinceAssetCacheAddType(LinceAssetCache* cache, LinceAssetOnLoad load, LinceAssetOnUnload unload);
 
 /** @brief Adds an existing asset to the cache
- * The asset must be heap-allocated. Passing it to the cache
- * will mean transfering ownership to it.
+ * The asset must be heap-allocated. Passing it to the cache will mean transfering ownership to it.
+ * @param name String identifier for the asset
+ * @param type Type of the input asset
+ * @param handle Raw pointer to the (heap-allocated) asset data
+ * @returns handle on success, and NULL otherwise
 */
-void* LinceAssetCacheAdd(LinceAssetCache* cache, int type, const char* name, void* handle);
+void* LinceAssetCacheAdd(LinceAssetCache* cache, const char* name, int type, void* handle);
 
-/** @brief Load an asset from memory */
+/** @brief Load an asset from memory
+ * @param name String identifier for the asset
+ * @param type Type of the asset to load
+ * @param args Custom argument passed to load function
+ * @returns pointer to loaded asset, or NULL if asset does not exist or is already loaded.
+*/
 void* LinceAssetCacheLoad(LinceAssetCache* cache, const char* name, int type, void* args);
 
 /** @brief Unload a cached asset */
 void LinceAssetCacheUnload(LinceAssetCache* cache, const char* name, int type);
+
+// void* LinceAssetCacheReload(LinceAssetCache* cache, const char* name, int type);
 
 /** @brief Retrieve a cached asset */
 void* LinceAssetCacheGet(LinceAssetCache* cache, const char* name, int type);

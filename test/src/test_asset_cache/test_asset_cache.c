@@ -166,7 +166,7 @@ void test_asset_cache_add(void** state){
     img->channels = 4;
     img->data = LinceNewCopy(img_data, sizeof(img_data));  ;
 
-    void* retval = LinceAssetCacheAdd(cache, LinceAssetType_Image, "image", img);
+    void* retval = LinceAssetCacheAdd(cache, "image", LinceAssetType_Image, img);
     
     assert_ptr_equal(retval, img);
     LinceAssetStore* st = array_get(&cache->stores, LinceAssetType_Image);

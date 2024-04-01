@@ -77,7 +77,7 @@ static void LinceUninitAssetCache(LinceAssetCache* cache) {
 }
 
 
-static void* LinceAssetCacheLoadImage(const char* path) {
+static void* LinceAssetCacheLoadImage(const char* path, void* args) {
     LinceImage* handle = LinceMalloc(sizeof(LinceImage));
     void* ret = LinceLoadImage(handle, path);
     if (!ret) {
@@ -92,7 +92,7 @@ static void LinceAssetCacheUnloadImage(void* handle) {
     LinceFree(handle);
 }
 
-static void* LinceAssetCacheLoadTexture(const char* path) {
+static void* LinceAssetCacheLoadTexture(const char* path, void* args) {
     return LinceCreateTextureFromFile(path, 0);
 }
 
@@ -186,7 +186,7 @@ char* LinceAssetCacheFetchPath(LinceAssetCache* cache, const char* asset_filenam
     return NULL;
 }
 
-void* LinceAssetCacheAdd(LinceAssetCache* cache, int type, const char* name, void* handle){
+void* LinceAssetCacheAdd(LinceAssetCache* cache, const char* name, int type, void* handle){
     if(!handle) return NULL;
     if (type < 0 || type >= LinceAssetType_Count) return NULL;
     
