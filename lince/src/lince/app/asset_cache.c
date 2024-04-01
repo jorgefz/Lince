@@ -1,30 +1,127 @@
 #include "lince/app/asset_cache.h"
 #include "lince/utils/fileio.h"
 #include "lince/core/logger.h"
+#include "lince/utils/memory.h"
 
-LinceBool LinceInitAssetCache(LinceAssetCache* cache){
+#include "lince/utils/image.h"
+#include "lince/renderer/texture.h"
+
+
+/* ============== STATIC VARIABLES ============== */
+
+
+
+
+/* ============== STATIC FUNCTION DECLARATIONS ============== */
+
+/** @brief Initialise asset cache
+ * The user is forced to use `LinceCreateAssetCache` because LinceAssetCache is large
+ * and it's a bad idea to keep it in the stack.
+ * @returns LinceTrue if successful, and LinceFalse otherwise
+ */
+static LinceBool LinceInitAssetCache(LinceAssetCache* cache);
+
+/** @brief Uninitialise asset cache, freeing internally allocated memory */
+static void LinceUninitAssetCache(LinceAssetCache* cache);
+
+static void* LinceAssetCacheLoadImage(const char* path);
+static void LinceAssetCacheUnloadImage(void* handle);
+
+static void* LinceAssetCacheLoadTexture(const char* path);
+static void LinceAssetCacheUnloadTexture(void* handle);
+
+
+static const LinceAssetCallbacks _asset_callbacks[LinceAssetType_Count] = {
+        [LinceAssetType_Image] = {LinceAssetCacheLoadImage, LinceAssetCacheUnloadImage},
+        [LinceAssetType_Texture] = {LinceAssetCacheLoadTexture, LinceAssetCacheUnloadTexture}
+};
+
+
+
+/* ============== STATIC FUNCTION DEFINITIONS ============== */
+
+
+static LinceBool LinceInitAssetCache(LinceAssetCache* cache) {
     cache->exedir_length = LinceFetchExeDir(cache->exedir, LINCE_PATH_MAX);
-    if(cache->exedir_length == 0){
+    if (cache->exedir_length == 0) {
         return LinceFalse;
     }
 
     array_init(&cache->folders, LINCE_PATH_MAX * sizeof(char));
-    array_init(&cache->stores, LinceAsset_Count * sizeof(hashmap_t));
-    for(hashmap_t* map = cache->stores.begin; map != cache->stores.end; ++map){
-        hashmap_init(map, 10);
+
+    // Initialise stores
+    array_init(&cache->stores, sizeof(LinceAssetStore));
+    array_resize(&cache->stores, LinceAssetType_Count);
+    for (uint32_t i = 0; i != LinceAssetType_Count; ++i) {
+        LinceAssetStore* st = array_get(&cache->stores, i);
+        st->type = (int)i;
+        st->callbacks = _asset_callbacks[i];
+        hashmap_init(&st->handles, 10);
     }
 
     return LinceTrue;
 }
 
-void LinceUninitAssetCache(LinceAssetCache* cache){
+
+static void LinceUninitAssetCache(LinceAssetCache* cache) {
     array_uninit(&cache->folders);
-    for(hashmap_t* map = cache->stores.begin; map != cache->stores.end; ++map){
-        hashmap_uninit(map);
+    for (int i = 0; i != LinceAssetType_Count; ++i) {
+        LinceAssetStore* st = array_get(&cache->stores, i);
+        char* key = NULL;
+        while ((key = hashmap_iter(&st->handles, key))) {
+            LinceAssetCacheUnload(cache, key, i);
+        }
+        hashmap_uninit(&st->handles);
     }
     array_uninit(&cache->stores);
-
 }
+
+
+static void* LinceAssetCacheLoadImage(const char* path) {
+    LinceImage* handle = LinceMalloc(sizeof(LinceImage));
+    void* ret = LinceLoadImage(handle, path);
+    if (!ret) {
+        LinceFree(handle);
+        return NULL;
+    }
+    return handle;
+}
+
+static void LinceAssetCacheUnloadImage(void* handle) {
+    LinceDeleteImage(handle);
+    LinceFree(handle);
+}
+
+static void* LinceAssetCacheLoadTexture(const char* path) {
+    return LinceCreateTextureFromFile(path, 0);
+}
+
+static void LinceAssetCacheUnloadTexture(void* handle) {
+    LinceDeleteTexture(handle);
+}
+
+
+
+/* ============== PUBLIC FUNCTION DEFINITIONS ============== */
+
+LinceAssetCache* LinceCreateAssetCache() {
+    LinceAssetCache* cache = LinceMalloc(sizeof(LinceAssetCache));
+    if (!cache) return NULL;
+
+    if (!LinceInitAssetCache(cache)) {
+        LinceFree(cache);
+        return NULL;
+    }
+    return cache;
+}
+
+void LinceDeleteAssetCache(LinceAssetCache* cache) {
+    LinceUninitAssetCache(cache);
+    LinceFree(cache);
+}
+
+
+
 
 LinceBool LinceAssetCachePushFolder(LinceAssetCache* cache, const char* folder){
     size_t folder_len = strlen(folder);
@@ -89,24 +186,45 @@ char* LinceAssetCacheFetchPath(LinceAssetCache* cache, const char* asset_filenam
     return NULL;
 }
 
-/*
-void LinceAssetCacheLoad(LinceAssetCache* cache, const char* filename, int type){
-
-    // Build full path
-    // path = cache->exedir + asset_folder + filename
-
-    void* handle;
-    char* path;
-
-    switch(type){
-        case LinceAsset_Texture:
-            handle = LinceLoadTexture(path, 0);
-            break;
-        case LinceAsset_Shader:
-            handle = LinceLoadShader(path, headers);
-        case LinceAsset_Font:
-            handle = LinceUILoadFonts(path, sizes);
-    }
-
+void* LinceAssetCacheAdd(LinceAssetCache* cache, int type, const char* name, void* handle){
+    if(!handle) return NULL;
+    if (type < 0 || type >= LinceAssetType_Count) return NULL;
+    
+    LinceAssetStore* st = array_get(&cache->stores, type);
+    hashmap_set(&st->handles, name, handle);
+    return handle;
 }
-*/
+
+
+void* LinceAssetCacheGet(LinceAssetCache* cache, const char* name, int type){
+    if(type < 0 || type >= LinceAssetType_Count) return NULL;
+
+    LinceAssetStore* st = array_get(&cache->stores, type);
+    hashmap_t* handles = &st->handles;
+    void* handle = hashmap_get(handles, name);
+    if(handle) return handle;
+
+    return LinceAssetCacheLoad(cache, name, type);
+}
+
+
+void* LinceAssetCacheLoad(LinceAssetCache* cache, const char* name, int type){
+    if (type < 0 || type >= LinceAssetType_Count) return NULL;
+    
+    char* path = LinceAssetCacheFetchPath(cache, name);
+    if(!path) return NULL;
+
+    LinceAssetStore* st = array_get(&cache->stores, type);
+    void* handle = st->callbacks.load(path);
+    hashmap_set(&st->handles, name, handle);
+    return handle;
+}
+
+void LinceAssetCacheUnload(LinceAssetCache* cache, const char* name, int type){
+    if (type < 0 || type >= LinceAssetType_Count) return;
+
+    LinceAssetStore* st = array_get(&cache->stores, type);
+    void* handle = hashmap_get(&st->handles, name);
+    st->callbacks.unload(handle);
+    hashmap_set(&st->handles, name, NULL);
+}
