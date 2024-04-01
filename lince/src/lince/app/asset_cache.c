@@ -215,6 +215,10 @@ void* LinceAssetCacheLoad(LinceAssetCache* cache, const char* name, int type, vo
     if(!path) return NULL;
 
     LinceAssetStore* st = array_get(&cache->stores, type);
+    if(hashmap_get(&st->handles, name)){
+        return NULL; // Asset already loaded
+    }
+
     void* handle = st->callbacks.load(path, args);
     hashmap_set(&st->handles, name, handle);
     return handle;
