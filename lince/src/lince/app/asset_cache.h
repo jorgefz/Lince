@@ -107,7 +107,14 @@ void* LinceAssetCacheLoad(LinceAssetCache* cache, const char* name, int type, vo
 */
 void LinceAssetCacheUnload(LinceAssetCache* cache, const char* name, int type);
 
-// void* LinceAssetCacheReload(LinceAssetCache* cache, const char* name, int type);
+/** Reloads an existing asset from disk, discarding the previous one
+ * @param name String identifier of the asset
+ * @param type Asset type
+ * @param args Custom extra arguments for load function
+ * @returns raw pointer to reloaded asset, or NULL if the asset does not exist.
+ * @note If the asset wasn't previously loaded, it simply loads it.
+*/
+void* LinceAssetCacheReload(LinceAssetCache* cache, const char* name, int type, void* args);
 
 /** @brief Retrieve a cached asset
  * @param name String identifier

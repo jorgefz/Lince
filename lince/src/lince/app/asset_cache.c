@@ -229,6 +229,16 @@ void LinceAssetCacheUnload(LinceAssetCache* cache, const char* name, int type){
 
     LinceAssetStore* st = array_get(&cache->stores, type);
     void* handle = hashmap_get(&st->handles, name);
+    if(!handle) return;
+
     st->callbacks.unload(handle);
     hashmap_set(&st->handles, name, NULL);
+}
+
+void* LinceAssetCacheReload(LinceAssetCache* cache, const char* name, int type, void* args){
+    if(type < 0 || type >= LinceAssetType_Count){
+        return NULL;
+    }
+    LinceAssetCacheUnload(cache, name, type); // Does nothing if asset wasn't loaded
+    return LinceAssetCacheLoad(cache, name, type, args);
 }
