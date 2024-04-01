@@ -24,10 +24,10 @@ static LinceBool LinceInitAssetCache(LinceAssetCache* cache);
 /** @brief Uninitialise asset cache, freeing internally allocated memory */
 static void LinceUninitAssetCache(LinceAssetCache* cache);
 
-static void* LinceAssetCacheLoadImage(const char* path);
+static void* LinceAssetCacheLoadImage(const char* path, void* args);
 static void LinceAssetCacheUnloadImage(void* handle);
 
-static void* LinceAssetCacheLoadTexture(const char* path);
+static void* LinceAssetCacheLoadTexture(const char* path, void* args);
 static void LinceAssetCacheUnloadTexture(void* handle);
 
 
@@ -204,18 +204,18 @@ void* LinceAssetCacheGet(LinceAssetCache* cache, const char* name, int type){
     void* handle = hashmap_get(handles, name);
     if(handle) return handle;
 
-    return LinceAssetCacheLoad(cache, name, type);
+    return LinceAssetCacheLoad(cache, name, type, NULL);
 }
 
 
-void* LinceAssetCacheLoad(LinceAssetCache* cache, const char* name, int type){
+void* LinceAssetCacheLoad(LinceAssetCache* cache, const char* name, int type, void* args){
     if (type < 0 || type >= LinceAssetType_Count) return NULL;
     
     char* path = LinceAssetCacheFetchPath(cache, name);
     if(!path) return NULL;
 
     LinceAssetStore* st = array_get(&cache->stores, type);
-    void* handle = st->callbacks.load(path);
+    void* handle = st->callbacks.load(path, args);
     hashmap_set(&st->handles, name, handle);
     return handle;
 }
