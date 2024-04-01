@@ -33,9 +33,12 @@ typedef struct LinceAssetCallbacks {
 
 /// Stores assets of a single type
 typedef struct LinceAssetStore {
-    int type;
-    LinceAssetCallbacks callbacks;
-    hashmap_t handles;
+    int type; ///< Index in the stores array
+    LinceAssetCallbacks callbacks; ///< Load and Unload functions
+
+    /// Asset names mapped to their raw pointers.
+    /// The map may have a key storing a NULL asset if said asset was loaded and then unloaded.
+    hashmap_t handles; 
 } LinceAssetStore;
 
 
@@ -98,12 +101,23 @@ void* LinceAssetCacheAdd(LinceAssetCache* cache, const char* name, int type, voi
 */
 void* LinceAssetCacheLoad(LinceAssetCache* cache, const char* name, int type, void* args);
 
-/** @brief Unload a cached asset */
+/** @brief Unload a cached asset
+ * @param name String identifier of the asset
+ * @param type Type of the asset to unload
+*/
 void LinceAssetCacheUnload(LinceAssetCache* cache, const char* name, int type);
 
 // void* LinceAssetCacheReload(LinceAssetCache* cache, const char* name, int type);
 
-/** @brief Retrieve a cached asset */
+/** @brief Retrieve a cached asset
+ * @param name String identifier
+ * @param type Asset type
+ * @returns Raw pointer to asset, or NULL if asset does not exist
+ * @note If an asset is requested but is not currently loaded,
+ * it will attempt to load it with no extra arguments (i.e. args = NULL in LinceAssetCacheLoad).
+ * If you want to ensure an asset is loaded with specific arguments,
+ * call LinceAssetCacheLoad once with the desired arguments, and then use LinceAssetCacheGet afterwards.
+*/
 void* LinceAssetCacheGet(LinceAssetCache* cache, const char* name, int type);
 
 // void* LinceAssetCacheLoadAsync(LinceAssetCache* cache, const char* name, int type);
