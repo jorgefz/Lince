@@ -25,7 +25,7 @@ void benchmark_new_ecs(uint64_t n_iter) {
 	}
 
 	/* Create entities */
-	printf("NewEntity:     ");
+	printf("New, NewEntity");
 	BENCHMARK_LOOP(uint64_t, counter, n_iter) {
 		LinceECSNewEntity(&ecs);
 	} BENCHMARK_END(uint64_t, counter, n_iter);
@@ -45,19 +45,19 @@ void benchmark_new_ecs(uint64_t n_iter) {
 		{ RandComp(), RandComp(), RandComp(), RandComp() }
 	};
 
-	printf("AddComponents: ");
+	printf("New, AddComponents");
 	BENCHMARK_LOOP(uint64_t, counter, n_iter) {
 		LinceECSAddComponents(&ecs, counter, 4, comp_ids[rand() % prefab_arch_count]);
 	} BENCHMARK_END(uint64_t, counter, n_iter);
 
 	/* Get components */
-	printf("GetComponent:  ");
+	printf("New, GetComponent");
 	BENCHMARK_LOOP(uint64_t, counter, n_iter) {
 		LinceECSGetComponent(&ecs, counter, RandComp());
 	} BENCHMARK_END(uint64_t, counter, n_iter);
 
 	/* Querying */
-	printf("Query:         ");
+	printf("New, Query");
 	BENCHMARK_LOOP(uint64_t, counter, n_iter) {
 		LinceECSQuery(&ecs, &ecs.query_result, 4, (uint32_t[]){RandComp(), RandComp(), RandComp(), RandComp()});
 		array_clear(&ecs.query_result);
@@ -83,7 +83,7 @@ void benchmark_old_ecs(uint64_t n_iter) {
 	);
 
 	/* Create entities */
-	printf("NewEntity:     ");
+	printf("Old, NewEntity");
 	BENCHMARK_LOOP(uint64_t, counter, n_iter) {
 		LinceCreateEntity(reg);
 	} BENCHMARK_END(uint64_t, counter, n_iter);
@@ -103,22 +103,22 @@ void benchmark_old_ecs(uint64_t n_iter) {
 		{ RandComp(), RandComp(), RandComp(), RandComp() }
 	};
 
-	printf("AddComponents: ");
+	printf("Old, AddComponents");
 	BENCHMARK_LOOP(uint64_t, counter, n_iter) {
 		uint32_t idx = rand() % 4;
 		for (uint32_t i = 0; i != 4; ++i) {
-			LinceAddEntityComponent(reg, (uint32_t)counter, comp_ids[idx][i], (int[]) { 1, 2, 3, 4 });
+			LinceAddEntityComponent(reg, (uint32_t)counter, comp_ids[idx][i], (int[]) { RandComp(), RandComp(), RandComp(), RandComp() });
 		}
 	} BENCHMARK_END(uint64_t, counter, n_iter);
 
 	/* Get components */
-	printf("GetComponent:  ");
+	printf("Old, GetComponent");
 	BENCHMARK_LOOP(uint64_t, counter, n_iter) {
 		LinceGetEntityComponent(reg, (uint32_t)counter, RandComp());
 	} BENCHMARK_END(uint64_t, counter, n_iter);
 
 	/* Querying */
-	printf("Query:         ");
+	printf("Old, Query");
 	array_t query;
 	array_init(&query, sizeof(uint32_t));
 	BENCHMARK_LOOP(uint64_t, counter, n_iter) {
