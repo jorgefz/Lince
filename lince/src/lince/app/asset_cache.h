@@ -20,15 +20,15 @@ typedef enum LinceAssetType {
 
 
 ///< Callback signature to load an asset from disk
-typedef void* (*LinceAssetOnLoad)(const char* path, void* args);
+typedef void* (*LinceAssetLoad)(const char* path, void* args);
 
 ///< Callback signature to free an asset from memory
-typedef void (*LinceAssetOnUnload)(void* obj);
+typedef void (*LinceAssetUnload)(void* obj);
 
 /// Callbacks to load, unload, and manage assets of a specific type
 typedef struct LinceAssetCallbacks {
-    LinceAssetOnLoad   load;   ///< Callback to load an asset from disk
-    LinceAssetOnUnload unload; ///< Callback to free an asset from memory
+    LinceAssetLoad   load;   ///< Callback to load an asset from disk
+    LinceAssetUnload unload; ///< Callback to free an asset from memory
 } LinceAssetCallbacks;
 
 /// Stores assets of a single type
@@ -82,7 +82,7 @@ LinceBool LinceAssetCachePushFolder(LinceAssetCache* cache, const char* folder);
 */
 char* LinceAssetCacheFetchPath(LinceAssetCache* cache, const char* filename);
 
-// int LinceAssetCacheAddType(LinceAssetCache* cache, LinceAssetOnLoad load, LinceAssetOnUnload unload);
+// int LinceAssetCacheAddType(LinceAssetCache* cache, LinceAssetLoad load, LinceAssetUnload unload);
 
 /** @brief Adds an existing asset to the cache
  * The asset must be heap-allocated. Passing it to the cache will mean transfering ownership to it.
