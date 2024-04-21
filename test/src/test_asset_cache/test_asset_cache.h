@@ -9,7 +9,10 @@
     cmocka_unit_test(test_asset_cache_fetch_path_fake), \
     cmocka_unit_test(test_asset_cache_asset_shadowing), \
     cmocka_unit_test(test_asset_cache_add_asset_type),  \
+    cmocka_unit_test(test_asset_cache_add_existing_asset_type),  \
     cmocka_unit_test(test_asset_cache_add), \
+    cmocka_unit_test(test_asset_cache_add_existing), \
+    cmocka_unit_test(test_asset_cache_add_with_invalid_type), \
     cmocka_unit_test(test_asset_cache_load)
     
 
@@ -35,8 +38,17 @@ void test_asset_cache_asset_shadowing(void** state);
 /* Verify a new asset type can be added to the asset cache */
 void test_asset_cache_add_asset_type(void** state);
 
+/* Verify a new asset type cannot be added if it has the same key as an existing one */
+void test_asset_cache_add_existing_asset_type(void** state);
+
+/* Verify asset cannot be added if its string type doe not exist */
+void test_asset_cache_add_with_invalid_type(void** state);
+
 /* Adds an asset to an existing cache */
 void test_asset_cache_add(void** state);
+
+/* Verify an asset cannot be added if it has the same path as an existing one */
+void test_asset_cache_add_existing(void** state);
 
 /* Verifies an asset is loaded from disk */
 void test_asset_cache_load(void** state);

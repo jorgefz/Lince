@@ -181,7 +181,6 @@ void test_asset_cache_asset_shadowing(void** state){
     LinceDeleteAssetCache(cache);
 }
 
-
 void test_asset_cache_add_asset_type(void** state){
     (void)state;
     LinceAssetCache* cache = LinceCreateAssetCache();
@@ -193,6 +192,25 @@ void test_asset_cache_add_asset_type(void** state){
     assert_true(hashmap_has_key(&cache->stores, "mock_asset_type"));
     LinceAssetStore* store = hashmap_get(&cache->stores, "mock_asset_type");
     assert_non_null(store);
+
+    LinceDeleteAssetCache(cache);
+}
+
+void test_asset_cache_add_existing_asset_type(void** state){
+    (void)state;
+    LinceAssetCache* cache = LinceCreateAssetCache();
+
+    void* success = LinceAssetCacheAddAssetType(
+        cache, "mock_asset_type",
+        mock_load_asset, mock_unload_asset
+    );
+    assert_non_null(success);
+
+    success = LinceAssetCacheAddAssetType(
+        cache, "mock_asset_type",
+        mock_load_asset, mock_unload_asset
+    );
+    assert_null(success);
 
     LinceDeleteAssetCache(cache);
 }
@@ -216,6 +234,39 @@ void test_asset_cache_add(void** state){
     
     LinceDeleteAssetCache(cache);
 }
+
+
+void test_asset_cache_add_existing(void** state){
+    (void)state;
+    LinceAssetCache* cache = LinceCreateAssetCache();
+    LinceAssetCacheAddAssetType(cache,
+        "mock_asset_type", mock_load_asset, mock_unload_asset);
+    int* asset1 = mock_load_asset("mock_path", NULL);
+    int* asset2 = mock_load_asset("mock_path", NULL);
+
+    void* success1 = LinceAssetCacheAdd(cache, "asset", "mock_asset_type", asset1);
+    void* success2 = LinceAssetCacheAdd(cache, "asset", "mock_asset_type", asset2);
+    
+    assert_non_null(success1);
+    assert_null(success2);
+
+    mock_unload_asset(asset2);
+    LinceDeleteAssetCache(cache);
+}
+
+
+void test_asset_cache_add_with_invalid_type(void** state){
+    (void)state;
+    LinceAssetCache* cache = LinceCreateAssetCache();
+    int* asset = mock_load_asset("mock_path", NULL);
+
+    void* success = LinceAssetCacheAdd(cache, "asset", "invalid_asset_type", asset);
+    assert_null(success);
+    
+    mock_unload_asset(asset);
+    LinceDeleteAssetCache(cache);
+}
+
 
 void test_asset_cache_load(void** state){
     (void)state;
