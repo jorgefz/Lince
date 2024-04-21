@@ -146,6 +146,7 @@ void* LinceAssetCacheAddAssetType(
         LinceAssetLoad load,
         LinceAssetUnload unload
     ){
+    if(!cache || !name || !load || !unload) return NULL;
     
     if (hashmap_has_key(&cache->stores, name)){
         LINCE_WARN("Failed to add asset type '%s' to asset cache because it already exists", name);
@@ -158,11 +159,10 @@ void* LinceAssetCacheAddAssetType(
     st->callbacks = (LinceAssetCallbacks){.load = load, .unload = unload};
     size_t name_size = strlen(name) + 1; // Copy terminator
     memcpy(st->type, name, name_size < LINCE_NAME_MAX ? name_size : LINCE_NAME_MAX);
-    hashmap_init(&st->handles, 10);
-
+    hashmap_init(&st->handles, 10); // Default init size
     hashmap_set(&cache->stores, name, st);
 
-    return NULL;
+    return cache;
 }
 
 void* LinceAssetCacheAdd(LinceAssetCache* cache, const char* name, const char* type, void* handle){
