@@ -3,15 +3,6 @@
 #include "lince/core/logger.h"
 #include "lince/utils/memory.h"
 
-#include "lince/utils/image.h"
-#include "lince/renderer/texture.h"
-
-
-/* ============== STATIC VARIABLES ============== */
-
-
-
-
 /* ============== STATIC FUNCTION DECLARATIONS ============== */
 
 /** @brief Initialise asset cache
@@ -24,19 +15,6 @@ static LinceBool LinceInitAssetCache(LinceAssetCache* cache);
 /** @brief Uninitialise asset cache, freeing internally allocated memory */
 static void LinceUninitAssetCache(LinceAssetCache* cache);
 
-static void* LinceAssetCacheLoadImage(const char* path, void* args);
-static void LinceAssetCacheUnloadImage(void* handle);
-
-static void* LinceAssetCacheLoadTexture(const char* path, void* args);
-static void LinceAssetCacheUnloadTexture(void* handle);
-
-
-static const LinceAssetCallbacks _asset_callbacks[LinceAssetType_Count] = {
-        [LinceAssetType_Image] = {LinceAssetCacheLoadImage, LinceAssetCacheUnloadImage},
-        [LinceAssetType_Texture] = {LinceAssetCacheLoadTexture, LinceAssetCacheUnloadTexture}
-};
-
-
 
 /* ============== STATIC FUNCTION DEFINITIONS ============== */
 
@@ -48,16 +26,7 @@ static LinceBool LinceInitAssetCache(LinceAssetCache* cache) {
     }
 
     array_init(&cache->folders, LINCE_PATH_MAX * sizeof(char));
-
-    // Initialise stores
-    array_init(&cache->stores, sizeof(LinceAssetStore));
-    array_resize(&cache->stores, LinceAssetType_Count);
-    for (uint32_t i = 0; i != LinceAssetType_Count; ++i) {
-        LinceAssetStore* st = array_get(&cache->stores, i);
-        st->type = (int)i;
-        st->callbacks = _asset_callbacks[i];
-        hashmap_init(&st->handles, 10);
-    }
+    hashmap_init(&cache->stores, 10);
 
     return LinceTrue;
 }
@@ -65,41 +34,22 @@ static LinceBool LinceInitAssetCache(LinceAssetCache* cache) {
 
 static void LinceUninitAssetCache(LinceAssetCache* cache) {
     array_uninit(&cache->folders);
-    for (int i = 0; i != LinceAssetType_Count; ++i) {
-        LinceAssetStore* st = array_get(&cache->stores, i);
-        char* key = NULL;
-        while ((key = hashmap_iter(&st->handles, key))) {
-            LinceAssetCacheUnload(cache, key, i);
+
+    char* type_key = NULL;
+    while ((type_key = hashmap_iter(&cache->stores, type_key))) {
+
+        LinceAssetStore* st = hashmap_get(&cache->stores, type_key);
+        
+        char* asset_key = NULL;
+        while ((asset_key = hashmap_iter(&st->handles, asset_key))) {
+            LinceAssetCacheUnload(cache, asset_key, type_key);
         }
         hashmap_uninit(&st->handles);
-    }
-    array_uninit(&cache->stores);
+        LinceFree(st);
+    
+	}
+    hashmap_uninit(&cache->stores);
 }
-
-
-static void* LinceAssetCacheLoadImage(const char* path, void* args) {
-    LinceImage* handle = LinceMalloc(sizeof(LinceImage));
-    void* ret = LinceLoadImage(handle, path);
-    if (!ret) {
-        LinceFree(handle);
-        return NULL;
-    }
-    return handle;
-}
-
-static void LinceAssetCacheUnloadImage(void* handle) {
-    LinceDeleteImage(handle);
-    LinceFree(handle);
-}
-
-static void* LinceAssetCacheLoadTexture(const char* path, void* args) {
-    return LinceCreateTextureFromFile(path, 0);
-}
-
-static void LinceAssetCacheUnloadTexture(void* handle) {
-    LinceDeleteTexture(handle);
-}
-
 
 
 /* ============== PUBLIC FUNCTION DEFINITIONS ============== */
@@ -119,8 +69,6 @@ void LinceDeleteAssetCache(LinceAssetCache* cache) {
     LinceUninitAssetCache(cache);
     LinceFree(cache);
 }
-
-
 
 
 LinceBool LinceAssetCachePushFolder(LinceAssetCache* cache, const char* folder){
@@ -186,35 +134,70 @@ char* LinceAssetCacheFetchPath(LinceAssetCache* cache, const char* asset_filenam
     return NULL;
 }
 
-void* LinceAssetCacheAdd(LinceAssetCache* cache, const char* name, int type, void* handle){
-    if(!handle) return NULL;
-    if (type < 0 || type >= LinceAssetType_Count) return NULL;
+/** @brief Registers a new type of asset on the asset cache.
+ * @param cache Asset cache
+ * @param name String identifier of the asset type. Must not be in use.
+ * @param load Function to load the asset given a file path.
+ * @param unload Function to free the asset from memory.
+*/
+void* LinceAssetCacheAddAssetType(
+        LinceAssetCache* cache,
+        const char* name,
+        LinceAssetLoad load,
+        LinceAssetUnload unload
+    ){
     
-    LinceAssetStore* st = array_get(&cache->stores, type);
+    if (hashmap_has_key(&cache->stores, name)){
+        LINCE_WARN("Failed to add asset type '%s' to asset cache because it already exists", name);
+        return NULL;
+    }
+
+    LinceAssetStore* st = LinceMalloc(sizeof(LinceAssetStore));
+    LINCE_ASSERT_ALLOC(st, sizeof(LinceAssetCache));
+
+    st->callbacks = (LinceAssetCallbacks){.load = load, .unload = unload};
+    size_t name_size = strlen(name) + 1; // Copy terminator
+    memcpy(st->type, name, name_size < LINCE_NAME_MAX ? name_size : LINCE_NAME_MAX);
+    hashmap_init(&st->handles, 10);
+
+    hashmap_set(&cache->stores, name, st);
+
+    return NULL;
+}
+
+void* LinceAssetCacheAdd(LinceAssetCache* cache, const char* name, const char* type, void* handle){
+    if(!name || !type || !handle) return NULL;
+
+    LinceAssetStore* st = hashmap_get(&cache->stores, type);
+    if(!st){
+        LINCE_WARN("Asset type '%s' does not exist in asset cache", type);
+        return NULL;
+    }
+
+    if(hashmap_get(&st->handles, name)){
+        LINCE_WARN("Failed to add asset '%s' to asset cache because it is already loaded", name);
+        return NULL;
+    }
+
     hashmap_set(&st->handles, name, handle);
     return handle;
 }
 
 
-void* LinceAssetCacheGet(LinceAssetCache* cache, const char* name, int type){
-    if(type < 0 || type >= LinceAssetType_Count) return NULL;
-
-    LinceAssetStore* st = array_get(&cache->stores, type);
-    hashmap_t* handles = &st->handles;
-    void* handle = hashmap_get(handles, name);
-    if(handle) return handle;
-
-    return LinceAssetCacheLoad(cache, name, type, NULL);
-}
-
-
-void* LinceAssetCacheLoad(LinceAssetCache* cache, const char* name, int type, void* args){
-    if (type < 0 || type >= LinceAssetType_Count) return NULL;
+void* LinceAssetCacheLoad(LinceAssetCache* cache, const char* name, const char* type, void* args){
+    if (!cache || !name || !type) return NULL;
     
     char* path = LinceAssetCacheFetchPath(cache, name);
     if(!path) return NULL;
 
-    LinceAssetStore* st = array_get(&cache->stores, type);
+    LinceAssetStore* st = hashmap_get(&cache->stores, type);
+
+    if(!st){
+        // Create asset store automatically?
+        LINCE_WARN("Asset type '%s' does not exist", type);
+        return NULL;
+    }
+
     if(hashmap_get(&st->handles, name)){
         return NULL; // Asset already loaded
     }
@@ -224,10 +207,15 @@ void* LinceAssetCacheLoad(LinceAssetCache* cache, const char* name, int type, vo
     return handle;
 }
 
-void LinceAssetCacheUnload(LinceAssetCache* cache, const char* name, int type){
-    if (type < 0 || type >= LinceAssetType_Count) return;
+void LinceAssetCacheUnload(LinceAssetCache* cache, const char* name, const char* type){
+    if (!cache || !name || !type) return;
 
-    LinceAssetStore* st = array_get(&cache->stores, type);
+    LinceAssetStore* st = hashmap_get(&cache->stores, type);
+    if(!st){
+        LINCE_WARN("Asset type '%s' does not exist", type);
+        return;
+    }
+
     void* handle = hashmap_get(&st->handles, name);
     if(!handle) return;
 
@@ -235,10 +223,25 @@ void LinceAssetCacheUnload(LinceAssetCache* cache, const char* name, int type){
     hashmap_set(&st->handles, name, NULL);
 }
 
-void* LinceAssetCacheReload(LinceAssetCache* cache, const char* name, int type, void* args){
-    if(type < 0 || type >= LinceAssetType_Count){
-        return NULL;
-    }
+void* LinceAssetCacheReload(LinceAssetCache* cache, const char* name, const char* type, void* args){
+    if (!cache || !name || !type) return NULL;
+
     LinceAssetCacheUnload(cache, name, type); // Does nothing if asset wasn't loaded
     return LinceAssetCacheLoad(cache, name, type, args);
 }
+
+
+void* LinceAssetCacheGet(LinceAssetCache* cache, const char* name, const char* type){
+    if(!cache || !name || !type) return NULL;
+
+    LinceAssetStore* st = hashmap_get(&cache->stores, type);
+    if(!st){
+        LINCE_WARN("Asset type '%s' does not exist", type);
+        return NULL;
+    }
+    void* handle = hashmap_get(&st->handles, name);
+    if(handle) return handle;
+
+    return LinceAssetCacheLoad(cache, name, type, NULL);
+}
+
