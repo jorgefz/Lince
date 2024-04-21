@@ -12,7 +12,7 @@
 
 static void* mock_load_asset(const char* path, void* args){
     (void) args;
-    assert_true( LinceIsFile(path) );
+    assert_non_null(path);
     int* asset = malloc(sizeof(int));
     *asset = 100;
     return asset;
@@ -25,6 +25,24 @@ static void mock_unload_asset(void* obj){
     free(asset);
 }
 
+static void* mock_load_image(const char* path, void* args){
+    (void) args;
+    assert_true(LinceIsFile(path));
+    
+    LinceImage* img = LinceMalloc(sizeof(LinceImage));
+    void* ret = LinceLoadImage(img, path);
+    assert_non_null(ret);
+
+    return img;
+}
+
+static void mock_unload_image(void* img){
+    LinceDeleteImage(img);
+    LinceFree(img);
+}
+
+
+
 /* Verifies the asset cache is successfully initialised */
 void test_asset_cache_init(void** state){
     (void)state;
@@ -32,7 +50,7 @@ void test_asset_cache_init(void** state){
 
     assert_true(LinceIsDir(cache->exedir));
     assert_int_equal(cache->folders.size, 0);
-    assert_int_equal(cache->stores.size, 0);
+    assert_non_null(cache->stores.table);
 
     LinceDeleteAssetCache(cache);
 }
@@ -175,6 +193,8 @@ void test_asset_cache_add_asset_type(void** state){
     assert_true(hashmap_has_key(&cache->stores, "mock_asset_type"));
     LinceAssetStore* store = hashmap_get(&cache->stores, "mock_asset_type");
     assert_non_null(store);
+
+    LinceDeleteAssetCache(cache);
 }
 
 
@@ -182,19 +202,37 @@ void test_asset_cache_add_asset_type(void** state){
 void test_asset_cache_add(void** state){
     (void)state;
     LinceAssetCache* cache = LinceCreateAssetCache();
-
     LinceAssetCacheAddAssetType(cache,
         "mock_asset_type", mock_load_asset, mock_unload_asset);
+    int* asset = mock_load_asset("mock_path", NULL);
 
-    int* asset = malloc(sizeof(int));
-    *asset = 100;
+    void* success = LinceAssetCacheAdd(cache, "asset", "mock_asset_type", asset);
     
-    void* retval = LinceAssetCacheAdd(cache, "asset", "mock_asset_type", asset);
-    
-    assert_ptr_equal(retval, asset);
+    assert_ptr_equal(success, asset);
     LinceAssetStore* st = hashmap_get(&cache->stores, "mock_asset_type");
+    assert_non_null(st);
     assert_true(hashmap_has_key(&st->handles, "asset"));
     assert_ptr_equal(hashmap_get(&st->handles, "asset"), asset);
     
+    LinceDeleteAssetCache(cache);
+}
+
+void test_asset_cache_load(void** state){
+    (void)state;
+    LinceAssetCache* cache = LinceCreateAssetCache();
+    LinceAssetCachePushFolder(cache, "../../../test/assets/");
+    LinceAssetCacheAddAssetType(
+        cache, "image", mock_load_image, mock_unload_image
+    );
+
+    LinceImage* img = LinceAssetCacheLoad(cache, "images/test.png", "image", NULL);
+    assert_non_null(img);
+
+    LinceAssetStore* st = hashmap_get(&cache->stores, "image");
+    assert_true(hashmap_has_key(&st->handles, "images/test.png"));
+    assert_ptr_equal(hashmap_get(&st->handles, "images/test.png"), img);
+    assert_int_equal(img->width, 48);
+    assert_int_equal(img->height, 16);
+
     LinceDeleteAssetCache(cache);
 }

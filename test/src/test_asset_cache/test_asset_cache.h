@@ -9,7 +9,8 @@
     cmocka_unit_test(test_asset_cache_fetch_path_fake), \
     cmocka_unit_test(test_asset_cache_asset_shadowing), \
     cmocka_unit_test(test_asset_cache_add_asset_type),  \
-    cmocka_unit_test(test_asset_cache_add)
+    cmocka_unit_test(test_asset_cache_add), \
+    cmocka_unit_test(test_asset_cache_load)
     
 
 
@@ -36,5 +37,8 @@ void test_asset_cache_add_asset_type(void** state);
 
 /* Adds an asset to an existing cache */
 void test_asset_cache_add(void** state);
+
+/* Verifies an asset is loaded from disk */
+void test_asset_cache_load(void** state);
 
 #endif /* TEST_ASSET_CACHE */
