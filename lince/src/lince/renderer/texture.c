@@ -14,17 +14,17 @@ LinceTexture* LinceCreateTextureFromFile(const char* path, uint32_t flags){
 	LINCE_PROFILER_START(timer);
 
 	LinceImageSetFlipVertical(flags & LinceTexture_FlipY);
-	LinceImage image;
-	if(!LinceLoadImage(&image, path)){
+	LinceImage* image = LinceLoadImage(path, NULL);
+	if(!image){
 		return NULL;
 	}
 	if(flags & LinceTexture_WipeAlpha){
-		LinceImageWipeAlphaChannel(&image);
+		LinceImageWipeAlphaChannel(image);
 	}
 
-	LinceTexture* tex = LinceCreateTextureFromImage(&image, flags);
+	LinceTexture* tex = LinceCreateTextureFromImage(image, flags);
 	if(!tex) return NULL;
-	LinceDeleteImage(&image);
+	LinceDeleteImage(image);
 
 	LINCE_INFO("Created texture with size %ux%u from file '%s'",
 		tex->width, tex->height, path);
