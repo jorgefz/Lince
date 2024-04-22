@@ -30,18 +30,30 @@ typedef struct LinceAssetStore {
 
 
 typedef struct LinceAssetCache {
+
     char exedir[LINCE_PATH_MAX];      ///< Directory where the executable is located
     size_t exedir_length;             ///< Number of characters in the path of the executable
     char result_path[LINCE_PATH_MAX]; ///< Stores result of LinceFetchAssetPath
 
+    /// array<char[LINCE_PATH_MAX]>
     /// Array of relative paths between the executable and the asset folders
     array_t folders;
     
-    /// array<LinceAssetStore> - Stores info and handles for each asset type
-    // array_t stores;
+    /// hashmap<LinceAssetStore>
+    /// Stores info and handles for each asset type
     hashmap_t stores;
 
 } LinceAssetCache;
+
+
+/** @brief Initialise asset cache via provided pointer.
+ * Must be deleted with `LinceUninitAssetCache`.
+ * @returns LinceTrue if successful, and LinceFalse otherwise
+ */
+LinceBool LinceInitAssetCache(LinceAssetCache* cache);
+
+/** @brief Uninitialise asset cache, freeing internally allocated memory */
+void LinceUninitAssetCache(LinceAssetCache* cache);
 
 
 /** @brief Create an asset cache

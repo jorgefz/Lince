@@ -3,23 +3,8 @@
 #include "lince/core/logger.h"
 #include "lince/utils/memory.h"
 
-/* ============== STATIC FUNCTION DECLARATIONS ============== */
 
-/** @brief Initialise asset cache
- * The user is forced to use `LinceCreateAssetCache` because LinceAssetCache is large
- * and it's a bad idea to keep it in the stack.
- * @returns LinceTrue if successful, and LinceFalse otherwise
- */
-static LinceBool LinceInitAssetCache(LinceAssetCache* cache);
-
-/** @brief Uninitialise asset cache, freeing internally allocated memory */
-static void LinceUninitAssetCache(LinceAssetCache* cache);
-
-
-/* ============== STATIC FUNCTION DEFINITIONS ============== */
-
-
-static LinceBool LinceInitAssetCache(LinceAssetCache* cache) {
+LinceBool LinceInitAssetCache(LinceAssetCache* cache) {
     cache->exedir_length = LinceFetchExeDir(cache->exedir, LINCE_PATH_MAX);
     if (cache->exedir_length == 0) {
         return LinceFalse;
@@ -32,7 +17,7 @@ static LinceBool LinceInitAssetCache(LinceAssetCache* cache) {
 }
 
 
-static void LinceUninitAssetCache(LinceAssetCache* cache) {
+void LinceUninitAssetCache(LinceAssetCache* cache) {
     array_uninit(&cache->folders);
 
     char* type_key = NULL;
@@ -51,8 +36,6 @@ static void LinceUninitAssetCache(LinceAssetCache* cache) {
     hashmap_uninit(&cache->stores);
 }
 
-
-/* ============== PUBLIC FUNCTION DEFINITIONS ============== */
 
 LinceAssetCache* LinceCreateAssetCache() {
     LinceAssetCache* cache = LinceMalloc(sizeof(LinceAssetCache));
