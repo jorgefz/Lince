@@ -13,8 +13,16 @@
     cmocka_unit_test(test_asset_cache_add), \
     cmocka_unit_test(test_asset_cache_add_existing), \
     cmocka_unit_test(test_asset_cache_add_with_invalid_type), \
-    cmocka_unit_test(test_asset_cache_load)
-    
+    cmocka_unit_test(test_asset_cache_load), \
+    cmocka_unit_test(test_asset_cache_load_invalid_path), \
+    cmocka_unit_test(test_asset_cache_unload), \
+    cmocka_unit_test(test_asset_cache_unload_invalid), \
+    cmocka_unit_test(test_asset_cache_reload), \
+    cmocka_unit_test(test_asset_cache_reload_invalid), \
+    cmocka_unit_test(test_asset_cache_reload_unloaded), \
+    cmocka_unit_test(test_asset_cache_get), \
+    cmocka_unit_test(test_asset_cache_get_invalid), \
+    cmocka_unit_test(test_asset_cache_get_unloaded)
 
 
 /* Verifies the asset cache is successfully initialised */
@@ -52,5 +60,36 @@ void test_asset_cache_add_existing(void** state);
 
 /* Verifies an asset is loaded from disk */
 void test_asset_cache_load(void** state);
+
+/* Verifies an asset is not loaded when it is not found at the specified path */
+void test_asset_cache_load_invalid_path(void** state);
+
+/* Verifies an asset is unloaded */
+void test_asset_cache_unload(void** state);
+
+/* Verifies an asset is not unloaded when it does not exist */
+void test_asset_cache_unload_invalid(void** state);
+
+/* Verifies an asset is reloaded */
+void test_asset_cache_reload(void** state);
+
+/* Verifies an asset is reloaded even when it has not yet been loaded */
+void test_asset_cache_reload_invalid(void** state);
+
+/* Verifies an asset is reloaded even when it has been unloaded */
+void test_asset_cache_reload_unloaded(void** state);
+
+/* Verifies an asset can be retrieved */
+void test_asset_cache_get(void** state);
+
+/* Verifies an asset can be retrieved */
+// void test_asset_cache_get_and_load(void** state);
+
+/* Verifies an asset is not retrieved when it does not exist */
+void test_asset_cache_get_invalid(void** state);
+
+/* Verifies an asset is not retrieved when it has been unloaded */
+void test_asset_cache_get_unloaded(void** state);
+
 
 #endif /* TEST_ASSET_CACHE */
