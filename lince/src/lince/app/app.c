@@ -270,9 +270,12 @@ static void LinceInit(){
     // Create asset cache
     LinceInitAssetCache(&app.asset_cache);
     LinceAssetCachePushFolder(&app.asset_cache, "../../../lince/assets");
-    // LinceAssetCacheAddAssetType(&app.asset_cache, "texture", LinceLoadTexture, LinceUnloadTexture);
-    // LinceAssetCacheAddAssetType(&app.asset_cache, "image", LinceLoadImage, LinceUnloadImage);
-    // LinceAssetCacheAddAssetType(&app.asset_cache, "texture", LinceLoadTexture, LinceUnloadTexture);
+    
+    // Register asset types
+    LinceAssetCacheAddAssetType(&app.asset_cache, "image", LinceLoadImage, LinceDeleteImage);
+    LinceAssetCacheAddAssetType(&app.asset_cache, "texture", LinceLoadTexture, LinceDeleteTexture);
+    // LinceAssetCacheAddAssetType(&app.asset_cache, "shader", LinceLoadShader, LinceUnloadShader);
+    // LinceAssetCacheAddAssetType(&app.asset_cache, "shader_header", LinceLoadShader, LinceUnloadShader);
     
     // Create layer stacks
     array_init(&app.layer_stack, sizeof(LinceLayer));
