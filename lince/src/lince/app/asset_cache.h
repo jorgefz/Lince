@@ -104,10 +104,12 @@ void* LinceAssetCacheAdd(LinceAssetCache* cache, const char* name, const char* t
 void* LinceAssetCacheLoad(LinceAssetCache* cache, const char* name, const char* type, void* args);
 
 /** @brief Unload a cached asset
+ * @param cache Asset cache
  * @param name String identifier of the asset
  * @param type String identifier of the asset type
+ * @returns Non-null pointer if asset was successfully unloaded, and null otherwise.
 */
-void LinceAssetCacheUnload(LinceAssetCache* cache, const char* name, const char* type);
+void* LinceAssetCacheUnload(LinceAssetCache* cache, const char* name, const char* type);
 
 /** Reloads an existing asset from disk, discarding the previous one
  * @param name String identifier of the asset

@@ -207,20 +207,22 @@ void* LinceAssetCacheLoad(LinceAssetCache* cache, const char* name, const char* 
     return handle;
 }
 
-void LinceAssetCacheUnload(LinceAssetCache* cache, const char* name, const char* type){
-    if (!cache || !name || !type) return;
+void* LinceAssetCacheUnload(LinceAssetCache* cache, const char* name, const char* type){
+    if (!cache || !name || !type) return NULL;
 
     LinceAssetStore* st = hashmap_get(&cache->stores, type);
     if(!st){
         LINCE_WARN("Asset type '%s' does not exist", type);
-        return;
+        return NULL;
     }
 
     void* handle = hashmap_get(&st->handles, name);
-    if(!handle) return;
+    if(!handle) return NULL;
 
     st->callbacks.unload(handle);
     hashmap_set(&st->handles, name, NULL);
+
+    return cache;
 }
 
 void* LinceAssetCacheReload(LinceAssetCache* cache, const char* name, const char* type, void* args){
