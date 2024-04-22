@@ -5,9 +5,13 @@
 #include "lince/utils/image.h"
 
 
-LinceImage* LinceLoadImage(LinceImage* image, const char* path){
+void* LinceLoadImage(const char* path, void* args){
+    (void) args;
+    
+    if(!path) return NULL;
 
-    if(!image || !path) return NULL;
+    LinceImage* image = LinceMalloc(sizeof(LinceImage));
+    if(!image) return NULL;
 
     static int rgba_channels = 4;
     int width, height;

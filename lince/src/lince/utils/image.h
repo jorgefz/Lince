@@ -15,16 +15,15 @@ typedef struct LinceImage {
 } LinceImage;
 
 /** @brief Loads an image from disk.
- * @param image 
  * @param path filename of the image to load
- * @returns input image if successful, or NULL otherwise.
+ * @returns loaded image if successful, or NULL otherwise.
 */
-LinceImage* LinceLoadImage(LinceImage* image, const char* path);
+void* LinceLoadImage(const char* path, void* args);
 
 /** @brief Unloads (frees) an image from memory.
  * @param image Image to free
 */
-void LinceDeleteImage(LinceImage* image);
+void LinceDeleteImage(void* image);
 
 /** @brief Returns a pointer to the pixel at location (x,y)
  * @param image Loaded image to probe
