@@ -95,14 +95,14 @@ void LinceAppSetTitle(const char* title) {
     app.title[LINCE_TITLE_MAX - 1] = '\0';
 }
 
-/** @brief Save the location of an assets folder relative to the executable */
-void LinceAppPushAssetFolder(const char* dir){
-    LinceAssetCachePushFolder(&app.asset_cache, dir);
+/** @brief Retrieve the asset cache of the application */
+LinceAssetCache* LinceAppGetAssetCache(){
+    return &app.asset_cache;
 }
 
 /** @brief Save the location of an assets folder relative to the executable */
-char* LinceAppFetchAssetPath(const char* filename){
-    return LinceAssetCacheFetchPath(&app.asset_cache, filename);
+void LinceAppPushAssetFolder(const char* dir){
+    LinceAssetCachePushFolder(&app.asset_cache, dir);
 }
 
 /** @brief Adds a rendering layer to the application.
@@ -185,8 +185,8 @@ void LinceAppLoadScene(const char* name) {
      LINCE_ASSERT(next_scene, "Could not load scene '%s'", name);
      app.current_scene = next_scene;
      if (!app.current_scene->loaded){
-         LinceInitScene(app.current_scene);
-         LINCE_INFO("Initialised scene '%s'", name);
+        LinceInitScene(app.current_scene);
+        LINCE_INFO("Initialised scene '%s'", name);
      }
      LINCE_INFO("Switched to scene '%s'", name);
 }
@@ -267,10 +267,13 @@ static void LinceInit(){
     // LinceInputSetWindow(app.window);
     LinceInitRenderer(app.window);
 
-    // Create asset manager
+    // Create asset cache
     LinceInitAssetCache(&app.asset_cache);
     LinceAssetCachePushFolder(&app.asset_cache, "../../../lince/assets");
-
+    // LinceAssetCacheAddAssetType(&app.asset_cache, "texture", LinceLoadTexture, LinceUnloadTexture);
+    // LinceAssetCacheAddAssetType(&app.asset_cache, "image", LinceLoadImage, LinceUnloadImage);
+    // LinceAssetCacheAddAssetType(&app.asset_cache, "texture", LinceLoadTexture, LinceUnloadTexture);
+    
     // Create layer stacks
     array_init(&app.layer_stack, sizeof(LinceLayer));
     array_init(&app.overlay_stack, sizeof(LinceLayer));

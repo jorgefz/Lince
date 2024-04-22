@@ -51,7 +51,7 @@ typedef struct LinceApp{
     array_t overlay_stack; ///< Array of rendering overlays (drawn after layers).
     
     // array_t scene_stack; ///< Stack of scenes. Only topmost is rendered.
-    hashmap_t scene_cache;   
+    hashmap_t scene_cache;
     LinceScene* current_scene; ///< Scene at the top of the stack.
 
     LinceBool running;   ///< True if the application is active.
@@ -62,7 +62,7 @@ typedef struct LinceApp{
     int current_layer;   ///< Index of the active layer (during OnUpdate or OnEvent). This is `-1` if no layer is active.
     int current_overlay; ///< Index of the active overlay, akin to the current layer.
     
-    LinceAssetCache asset_cache; ///< Finds paths to assets
+    LinceAssetCache asset_cache; ///< Caches data loaded from disk
     LinceUI* ui;   ///< State of the GUI, e.g. Nuklear's context.
 
 } LinceApp;
@@ -79,11 +79,11 @@ LinceApp* LinceGetApp(void);
 */
 void LinceAppSetTitle(const char* title);
 
-/** @brief Save the location of an assets folder relative to the executable */
-void LinceAppPushAssetFolder(const char* dir);
+/** @brief Retrieve the asset cache of the application */
+LinceAssetCache* LinceAppGetAssetCache();
 
 /** @brief Save the location of an assets folder relative to the executable */
-char* LinceAppFetchAssetPath(const char* filename);
+void LinceAppPushAssetFolder(const char* dir);
 
 /** @brief Adds a rendering layer to the application.
 * @param layer Rendering layer to push onto the application's layer stack.
