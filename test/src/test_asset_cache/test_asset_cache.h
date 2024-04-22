@@ -80,16 +80,16 @@ void test_asset_cache_reload_invalid(void** state);
 /* Verifies an asset is reloaded even when it has been unloaded */
 void test_asset_cache_reload_unloaded(void** state);
 
-/* Verifies an asset can be retrieved when it's already loaded */
+/* Verifies an asset is retrieved when it's already loaded */
 void test_asset_cache_get(void** state);
 
-/* Verifies an asset can be loaded and retrieved if it's not loaded */
+/* Verifies an asset is loaded and retrieved if it's not loaded */
 void test_asset_cache_get_and_load(void** state);
 
 /* Verifies an asset is not retrieved when it does not exist */
 void test_asset_cache_get_invalid(void** state);
 
-/* Verifies an asset is not retrieved when it has been unloaded */
+/* Verifies an asset is loaded and retrieved when it has been unloaded */
 void test_asset_cache_get_unloaded(void** state);
 
 

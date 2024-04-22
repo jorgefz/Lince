@@ -450,7 +450,7 @@ void test_asset_cache_get_invalid(void** state){
     LinceDeleteAssetCache(cache);
 }
 
-/* Verifies an asset is not retrieved when it has been unloaded */
+/* Verifies an asset is loaded and retrieved when it has been unloaded */
 void test_asset_cache_get_unloaded(void** state){
     (void)state;
 
