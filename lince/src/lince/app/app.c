@@ -105,6 +105,11 @@ void LinceAppPushAssetFolder(const char* dir){
     LinceAssetCachePushFolder(&app.asset_cache, dir);
 }
 
+/** @brief Retrieve (or load) an asset from the cache */
+void* LinceAppGetAsset(const char* path, const char* type){
+    return LinceAssetCacheGet(LinceAppGetAssetCache(), path, type);
+}
+
 /** @brief Adds a rendering layer to the application.
 * @param layer Rendering layer to push onto the application's layer stack.
 */

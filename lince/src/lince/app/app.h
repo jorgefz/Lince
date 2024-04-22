@@ -85,6 +85,9 @@ LinceAssetCache* LinceAppGetAssetCache();
 /** @brief Save the location of an assets folder relative to the executable */
 void LinceAppPushAssetFolder(const char* dir);
 
+/** @brief Retrieve (or load) an asset from the cache */
+void* LinceAppGetAsset(const char* path, const char* type);
+
 // hashmap_t* LinceAppGetShaderHeaders(); // For creating preprocessing shaders
 
 /** @brief Adds a rendering layer to the application.
