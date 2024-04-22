@@ -21,6 +21,7 @@
     cmocka_unit_test(test_asset_cache_reload_invalid), \
     cmocka_unit_test(test_asset_cache_reload_unloaded), \
     cmocka_unit_test(test_asset_cache_get), \
+    cmocka_unit_test(test_asset_cache_get_and_load), \
     cmocka_unit_test(test_asset_cache_get_invalid), \
     cmocka_unit_test(test_asset_cache_get_unloaded)
 
@@ -79,11 +80,11 @@ void test_asset_cache_reload_invalid(void** state);
 /* Verifies an asset is reloaded even when it has been unloaded */
 void test_asset_cache_reload_unloaded(void** state);
 
-/* Verifies an asset can be retrieved */
+/* Verifies an asset can be retrieved when it's already loaded */
 void test_asset_cache_get(void** state);
 
-/* Verifies an asset can be retrieved */
-// void test_asset_cache_get_and_load(void** state);
+/* Verifies an asset can be loaded and retrieved if it's not loaded */
+void test_asset_cache_get_and_load(void** state);
 
 /* Verifies an asset is not retrieved when it does not exist */
 void test_asset_cache_get_invalid(void** state);

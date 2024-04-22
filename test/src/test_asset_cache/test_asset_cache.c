@@ -314,6 +314,8 @@ void test_asset_cache_unload(void** state){
     LinceAssetStore* st = hashmap_get(&cache->stores, "image");
     assert_true(hashmap_has_key(&st->handles, "images/test.png"));
     assert_null(hashmap_get(&st->handles, "images/test.png"));
+
+    LinceDeleteAssetCache(cache);
 }
 
 /* Verifies an asset is not unloaded when it does not exist */
@@ -330,6 +332,8 @@ void test_asset_cache_unload_invalid(void** state){
     LinceAssetStore* st = hashmap_get(&cache->stores, "image");
     assert_false(hashmap_has_key(&st->handles, "images/test.png"));
     assert_null(hashmap_get(&st->handles, "images/test.png"));
+
+    LinceDeleteAssetCache(cache);
 }
 
 /* Verifies an asset is reloaded */
@@ -350,6 +354,8 @@ void test_asset_cache_reload(void** state){
     LinceAssetStore* st = hashmap_get(&cache->stores, "image");
     assert_true(hashmap_has_key(&st->handles, "images/test.png"));
     assert_non_null(hashmap_get(&st->handles, "images/test.png"));
+
+    LinceDeleteAssetCache(cache);
 }
 
 /* Verifies an asset is reloaded even when it has not yet been loaded */
@@ -366,6 +372,8 @@ void test_asset_cache_reload_invalid(void** state){
     LinceAssetStore* st = hashmap_get(&cache->stores, "image");
     assert_true(hashmap_has_key(&st->handles, "images/test.png"));
     assert_non_null(hashmap_get(&st->handles, "images/test.png"));
+
+    LinceDeleteAssetCache(cache);
 }
 
 /* Verifies an asset is reloaded even when it has been unloaded */
@@ -385,19 +393,76 @@ void test_asset_cache_reload_unloaded(void** state){
     LinceAssetStore* st = hashmap_get(&cache->stores, "image");
     assert_true(hashmap_has_key(&st->handles, "images/test.png"));
     assert_non_null(hashmap_get(&st->handles, "images/test.png"));
+
+    LinceDeleteAssetCache(cache);
 }
 
 /* Verifies an asset can be retrieved */
 void test_asset_cache_get(void** state){
+    (void)state;
 
+    LinceAssetCache* cache = LinceCreateAssetCache();
+    LinceAssetCachePushFolder(cache, "../../../test/assets/");
+    LinceAssetCacheAddAssetType(cache, "image", mock_load_image, mock_unload_image);
+
+    void* img = LinceAssetCacheLoad(cache, "images/test.png", "image", NULL);
+
+    void* img2 = LinceAssetCacheGet(cache, "images/test.png", "image");
+    assert_non_null(img2);
+    assert_ptr_equal(img, img2);
+
+    LinceDeleteAssetCache(cache);
+}
+
+/* Verifies an asset can be retrieved */
+void test_asset_cache_get_and_load(void** state){
+    (void)state;
+
+    LinceAssetCache* cache = LinceCreateAssetCache();
+    LinceAssetCachePushFolder(cache, "../../../test/assets/");
+    LinceAssetCacheAddAssetType(cache, "image", mock_load_image, mock_unload_image);
+
+    void* img = LinceAssetCacheGet(cache, "images/test.png", "image");
+    assert_non_null(img);
+
+    LinceAssetStore* st = hashmap_get(&cache->stores, "image");
+    assert_true(hashmap_has_key(&st->handles, "images/test.png"));
+    assert_non_null(hashmap_get(&st->handles, "images/test.png"));
+    
+    LinceDeleteAssetCache(cache);
 }
 
 /* Verifies an asset is not retrieved when it does not exist */
 void test_asset_cache_get_invalid(void** state){
+    (void)state;
 
+    LinceAssetCache* cache = LinceCreateAssetCache();
+    LinceAssetCachePushFolder(cache, "../../../test/assets/");
+    LinceAssetCacheAddAssetType(cache, "image", mock_load_image, mock_unload_image);
+
+    void* img = LinceAssetCacheGet(cache, "images/fake.png", "image");
+    assert_null(img);
+
+    LinceAssetStore* st = hashmap_get(&cache->stores, "image");
+    assert_false(hashmap_has_key(&st->handles, "images/fake.png"));
+    assert_null(hashmap_get(&st->handles, "images/fake.png"));
+    
+    LinceDeleteAssetCache(cache);
 }
 
 /* Verifies an asset is not retrieved when it has been unloaded */
 void test_asset_cache_get_unloaded(void** state){
+    (void)state;
 
+    LinceAssetCache* cache = LinceCreateAssetCache();
+    LinceAssetCachePushFolder(cache, "../../../test/assets/");
+    LinceAssetCacheAddAssetType(cache, "image", mock_load_image, mock_unload_image);
+
+    LinceAssetCacheLoad(cache, "images/test.png", "image", NULL);
+    LinceAssetCacheUnload(cache, "images/test.png", "image");
+
+    void* img = LinceAssetCacheGet(cache, "images/test.png", "image");
+    assert_non_null(img);
+    
+    LinceDeleteAssetCache(cache);
 }
