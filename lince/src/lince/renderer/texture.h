@@ -22,11 +22,11 @@ typedef struct LinceTexture {
 } LinceTexture;
 
 /** @brief Loads a texture from file.
-* @deprecated Deprecated in favour of LinceCreateTextureFromFile.
-* @param path Path to texture file
-* @param flags Settings
+* @param path Path to image on disk
+* @param flags Bitflag settings to change how the texture is loaded
+* @returns Loaded texture object
 */
-LinceTexture* LinceLoadTexture(const char* path, uint32_t flags);
+void* LinceLoadTexture(const char* path, void* flags);
 
 /** @brief Loads a texture from file
 * @param path Path to texture file
@@ -56,7 +56,7 @@ LinceTexture* LinceCreateEmptyTexture(uint32_t width, uint32_t height);
 void LinceTextureSetData(LinceTexture* texture, unsigned char* data);
 
 /** @brief Deallocates texture memory and destroys OpenGL texture object */
-void LinceDeleteTexture(LinceTexture* texture);
+void LinceDeleteTexture(void* texture);
 
 /**@brief Binds the given texture to a slot (there are at least 16 slots) */
 void LinceBindTexture(LinceTexture* texture, uint32_t slot);

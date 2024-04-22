@@ -6,8 +6,8 @@
 #include "lince/renderer/texture.h"
 
 
-LinceTexture* LinceLoadTexture(const char* path, uint32_t flags){
-	return LinceCreateTextureFromFile(path, flags);
+void* LinceLoadTexture(const char* path, void* flags){
+	return LinceCreateTextureFromFile(path, (uint32_t)(uint64_t)flags);
 }
 
 LinceTexture* LinceCreateTextureFromFile(const char* path, uint32_t flags){
@@ -95,8 +95,9 @@ void LinceTextureSetData(LinceTexture* texture, unsigned char* data){
 }
 
 /* Deallocates texture memory and destroys OpenGL texture object */
-void LinceDeleteTexture(LinceTexture* texture){
-	if(!texture) return;
+void LinceDeleteTexture(void* ptr){
+	if(!ptr) return;
+	LinceTexture* texture = ptr;
 	glDeleteTextures(1, &texture->id);
 	LinceFree(texture);
 }
