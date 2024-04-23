@@ -2,7 +2,7 @@
 #include "cglm/mat4.h"
 #include "transform.h"
 
-void LinceRectGetBounds(LinceRect rect, LincePoint* lo, LincePoint* up);{
+void LinceRectGetBounds(LinceRect rect, LincePoint* lo, LincePoint* up){
 	if(lo) *lo = (LincePoint){rect.x - rect.w/2.0f, rect.y - rect.h/2.0f};
 	if(up) *up = (LincePoint){rect.x + rect.w/2.0f, rect.y + rect.h/2.0f};
 }
