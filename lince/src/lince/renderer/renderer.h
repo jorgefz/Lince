@@ -13,8 +13,7 @@
 #include "lince/renderer/texture.h"
 #include "lince/renderer/camera.h"
 #include "lince/core/window.h"
-#include "lince/tiles/tileset.h"
-
+#include "lince/renderer/sprite.h"
 
 /// Max number of textures the GPU can bind simultaneously
 #define LINCE_MAX_TEXTURE_UNITS 32 
@@ -61,19 +60,6 @@ LinceRendererState* LinceGetRenderer();
 *   `xnorm = (bmax - bmin) * (x - amin) / (amax - amin) + bmin`
 */
 float LinceYSortedZ(float y, vec2 ylim, vec2 zlim);
-
-/** @struct LinceSprite
-* @brief Visual and spatial properties of a rectangle.
-*/
-typedef struct LinceSprite{
-	float x, y; 			///< 2D position
-	float w, h; 			///< Width and height
-	float zorder; 			///< Depth, order of rendering
-	float rotation; 		///< Clockwise rotation in degrees
-	float color[4]; 		///< Flat color in RGBA format
-	LinceTexture* texture;	///< LinceTexture object. If NULL, only colour is used.
-	LinceTile* tile;		///< LinceTile or subtexture. If NULL, full texture is used.
-} LinceSprite;
 
 /** @brief Initialises renderer state and openGL rendering settings */
 void LinceInitRenderer();

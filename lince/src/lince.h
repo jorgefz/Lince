@@ -15,6 +15,7 @@
 #include "lince/utils/uuid.h"
 #include "lince/utils/fileio.h"
 #include "lince/utils/clock.h"
+#include "lince/utils/image.h"
 
 /* Input */
 #include "lince/input/input.h"
@@ -35,6 +36,7 @@
 #include "lince/renderer/texture.h"
 #include "lince/renderer/camera.h"
 #include "lince/renderer/transform.h"
+#include "lince/renderer/sprite.h"
 
 /* Tilesets & tilemaps */
 #include "lince/tiles/tileset.h"
