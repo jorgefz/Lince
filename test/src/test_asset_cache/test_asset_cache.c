@@ -29,7 +29,7 @@ static void* mock_load_image(const char* path, void* args){
     (void) args;
     assert_true(LinceIsFile(path));
     
-    LinceImage* img = LinceLoadImage(path, args);
+    LinceImage* img = LinceLoadImage(path);
     assert_non_null(img);
 
     return img;
