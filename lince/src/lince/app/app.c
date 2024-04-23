@@ -277,7 +277,7 @@ static void LinceInit(){
     LinceAssetCachePushFolder(&app.asset_cache, "../../../lince/assets");
     
     // Register asset types
-    LinceAssetCacheAddAssetType(&app.asset_cache, "image", LinceLoadImage, LinceDeleteImage);
+    LinceAssetCacheAddAssetType(&app.asset_cache, "image", LinceLoadImageAsset, LinceUnloadImageAsset);
     LinceAssetCacheAddAssetType(&app.asset_cache, "texture", LinceLoadTexture, LinceDeleteTexture);
     // LinceAssetCacheAddAssetType(&app.asset_cache, "shader", LinceLoadShader, LinceUnloadShader);
     // LinceAssetCacheAddAssetType(&app.asset_cache, "shader_header", LinceLoadShader, LinceUnloadShader);
