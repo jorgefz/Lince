@@ -48,8 +48,8 @@ void OnInit(){
     LinceAppPushAssetFolder("../../../demos/mandelbrot/assets");
     char vert_path[LINCE_PATH_MAX];
     char frag_path[LINCE_PATH_MAX];
-    strcpy(vert_path, LinceAppFetchAssetPath("shaders/mandelbrot.vert.glsl"));
-    strcpy(frag_path, LinceAppFetchAssetPath("shaders/mandelbrot.frag.glsl"));
+    strcpy(vert_path, LinceAssetCacheFetchPath(LinceAppGetAssetCache(), "shaders/mandelbrot.vert.glsl"));
+    strcpy(frag_path, LinceAssetCacheFetchPath(LinceAppGetAssetCache(), "shaders/mandelbrot.frag.glsl"));
 
     state.canvas_shader = LinceCreateShader(vert_path, frag_path);
     LincePoint screen = LinceAppGetScreenSize();
