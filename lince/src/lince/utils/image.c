@@ -5,8 +5,16 @@
 #include "lince/utils/image.h"
 
 
-void* LinceLoadImage(const char* path, void* args){
-    (void) args;
+void* LinceLoadImageAsset(const char* path, void* args){
+    (void)args;
+    return LinceLoadImage(path);
+}
+
+void LinceUnloadImageAsset(void* img){
+    LinceDeleteImage(img);
+}
+
+LinceImage* LinceLoadImage(const char* path){
     
     if(!path) return NULL;
 

@@ -14,16 +14,22 @@ typedef struct LinceImage {
     uint8_t* data;      ///< Image data ordered as Y scanlines of X pixels, starting from top-left.
 } LinceImage;
 
+/** @brief Callback for asset cache to load image from disk */
+void* LinceLoadImageAsset(const char* path, void* args);
+
+/** @brief Callback for asset cache to unload image */
+void LinceUnloadImageAsset(void* img);
+
 /** @brief Loads an image from disk.
  * @param path filename of the image to load
  * @returns loaded image if successful, or NULL otherwise.
 */
-void* LinceLoadImage(const char* path, void* args);
+LinceImage* LinceLoadImage(const char* path);
 
 /** @brief Unloads (frees) an image from memory.
  * @param image Image to free
 */
-void LinceDeleteImage(void* image);
+void LinceDeleteImage(LinceImage* image);
 
 /** @brief Returns a pointer to the pixel at location (x,y)
  * @param image Loaded image to probe
