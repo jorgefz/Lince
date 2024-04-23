@@ -36,6 +36,12 @@ typedef struct LincePoint {
 	float x, y; ///> Cartesian coordinates of the point
 } LincePoint;
 
+/** @brief Defines 2D rectangle */
+typedef struct LinceRect {
+	float x, y; ///< 2D position
+	float w, h; ///< Width and height
+} LinceRect;
+
 /** @brief Calculate screen coordinates from pixel location
 * @param p point whose position is defined in pixel coordinates
 * @param sc_w screen width in pixels
