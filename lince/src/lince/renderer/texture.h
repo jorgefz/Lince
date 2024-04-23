@@ -21,12 +21,24 @@ typedef struct LinceTexture {
 	int32_t internal_format; 	///< Output format of data in OpenGL buffer
 } LinceTexture;
 
+/** @brief Callback to load texture via asset cache
+ * @param path Path to image
+ * @param args Flags to customize texture loading.
+ * 			   Must be an uint32_t converted to pointer.
+ * @returns loaded texture
+*/
+void* LinceLoadTextureAsset(const char* path, void* args);
+
+/** @brief Callback to unload texture via asset cache */
+void LinceUnloadTextureAsset(void* ptr);
+
 /** @brief Loads a texture from file.
+* Alias for `LinceCreateTextureFromFile`.
 * @param path Path to image on disk
 * @param flags Bitflag settings to change how the texture is loaded
 * @returns Loaded texture object
 */
-void* LinceLoadTexture(const char* path, void* flags);
+LinceTexture* LinceLoadTexture(const char* path, uint32_t flags);
 
 /** @brief Loads a texture from file
 * @param path Path to texture file
