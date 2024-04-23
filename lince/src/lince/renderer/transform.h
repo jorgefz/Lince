@@ -31,16 +31,11 @@
 
 #include "lince/renderer/camera.h"
 
+
 /** @brief Defines the location of a point in two dimensions */
 typedef struct LincePoint {
 	float x, y; ///> Cartesian coordinates of the point
 } LincePoint;
-
-/** @brief Defines 2D rectangle */
-typedef struct LinceRect {
-	float x, y; ///< 2D position
-	float w, h; ///< Width and height
-} LinceRect;
 
 /** @brief Calculate screen coordinates from pixel location
 * @param p point whose position is defined in pixel coordinates
@@ -73,6 +68,31 @@ LincePoint LincePointScreenToWorld(const LincePoint p, LinceCamera* cam);
 * @returns point with position in screen coordinates
 */
 LincePoint LincePointWorldToScreen(const LincePoint p, LinceCamera* cam);
+
+
+
+/** @brief Defines 2D rectangle */
+typedef struct LinceRect {
+	float x, y; ///< 2D position
+	float w, h; ///< Width and height
+} LinceRect;
+
+/** @brief Get the bounds of a rectangle, e.g. (xmin,xmax) and (ymin,ymax)
+ * @param rect Rectangle
+ * @param lo Lower bounds (xmin, ymin). If NULL, no bounds for the axis are calculated.
+ * @param up Upper bounds (xmax, ymax). If NULL, no bounds for the axis are calculated.
+*/
+void LinceRectGetBounds(LinceRect rect, LincePoint* lo, LincePoint* up);
+
+/** @brief Get the coordinates of the four vertices of a rectangle
+ * @param rect Rectangle
+ * @param bounds Returns array of vertices, counter-clockwiss
+ * 				 and starting from bottom left corner.
+ * @returns Pointer to bounds cast to float.
+*/
+float* LinceRectGetVertices(LinceRect rect, LincePoint bounds[4]);
+
+
 
 
 /** @brief Supported coordinate systems */
