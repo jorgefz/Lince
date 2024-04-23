@@ -14,7 +14,7 @@ LinceTexture* LinceCreateTextureFromFile(const char* path, uint32_t flags){
 	LINCE_PROFILER_START(timer);
 
 	LinceImageSetFlipVertical(flags & LinceTexture_FlipY);
-	LinceImage* image = LinceLoadImage(path, NULL);
+	LinceImage* image = LinceLoadImage(path);
 	if(!image){
 		return NULL;
 	}
