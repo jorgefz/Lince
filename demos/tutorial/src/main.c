@@ -2,9 +2,9 @@
 
 LinceCamera camera;
 LinceSprite square = {
-    .x = 0, .y = 0,       // position at the centre of the screen
-    .w = 1, .h = 1,       // size in "world coordinates"
-    .color = {1, 0, 0, 1} // rgba, red and fully opaque
+    .x = 0, .y = 0,  // position at the centre of the screen
+    .w = 1, .h = 1,  // size in "world coordinates"
+    .color = {1, 0, 0, 1} // Red RGB color, fully opaque
 };
 
 void OnInit() {
