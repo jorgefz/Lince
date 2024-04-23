@@ -27,6 +27,13 @@ typedef struct LinceQuadVertex {
 	float texture_id;  ///< Binding unit for the texture
 } LinceQuadVertex;
 
+typedef struct LinceQuadData {
+	float zorder;	///< Depth value
+	float rotation;	///< Rotation in degrees
+	float color[4];	///< RGBA color
+	float uv[8];	///< Texture coordinates
+} LinceQuadData;
+
 /** @brief Stores the state of the OpenGL renderer */
 typedef struct LinceRendererState {
 	LinceShader *default_shader; ///< Default shader to use if none is provided
@@ -80,11 +87,18 @@ void LinceEndRender();
 */
 void LinceFlushRender();
 
-/** @brief Submits a recangle sprite for rendering
-* @param sprite Sprite to render
-* @param shader LinceShader to bind. If NULL, a default minimal shader is used.
+/** @brief Submits a quad for rendering 
+ * @param data Graphical properties of the quad
+ * @param transform Size and location
+ * @param texture Texture to apply to the quad. If NULL, a white texture is used.
+ * @param shader Shader to apply. If NULL, a default shader is used.
 */
-void LinceDrawSprite(LinceSprite* sprite, LinceShader* shader);
+void LinceDrawQuad(
+	LinceTransform *transform,
+	LinceQuadData  *data,
+	LinceTexture   *texture,
+	LinceShader    *shader
+);
 
 /** @brief Draws provided vertices directly */
 void LinceDrawIndexed(

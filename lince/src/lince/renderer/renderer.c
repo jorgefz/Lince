@@ -279,75 +279,74 @@ void LinceFlushRender(){
 	renderer_state.texture_slot_count = 1;
 }
 
-void LinceDrawSprite(LinceSprite* sprite, LinceShader* shader) {
+void LinceDrawQuad(
+		LinceTransform *transform,
+		LinceQuadData  *data,
+		LinceTexture   *texture,
+		LinceShader    *shader
+	){
 	LINCE_PROFILER_START(timer);
 
 	// Choose shader
 	if(!shader){
 		shader = renderer_state.default_shader;
-		LinceBindShader(renderer_state.default_shader);
-	} else if (shader != renderer_state.shader){
-		LinceFlushRender();
-		// LinceBindShader(renderer_state.shader);
-		LinceBindShader(shader);
 	}
-	renderer_state.shader = shader;
+	if (shader != renderer_state.shader){
+		LinceFlushRender(); // Required when switching shaders
+		renderer_state.shader = shader;
+	}
+	LinceBindShader(shader);
 
-	// batch size check
+	// Check if batch is too large
 	if (renderer_state.quad_count >= MAX_QUADS ||
 		renderer_state.texture_slot_count >= LINCE_MAX_TEXTURE_UNITS)
 	{
 		LinceFlushRender();
 	}
-	
-	// calculate texture index
-	float texture_index = 0.0f;
-	
-	if(sprite->texture){
+
+	// Calculate texture index
+	int texture_index = 0.0f;
+	if(texture){
 		uint32_t slots = renderer_state.texture_slot_count;
 		
 		// check if texture already in slots
 		for(uint32_t i = 0; i != slots; ++i){
-			if(sprite->texture != renderer_state.texture_slots[i]) continue;
-			texture_index = (float)i;
+			if(texture != renderer_state.texture_slots[i]){
+				continue;
+			}
+			texture_index = (int)i;
 			break;
  		}
 		// otherwise add texture
 		if(texture_index <= 0.5f){
-			renderer_state.texture_slots[slots] = sprite->texture;
+			renderer_state.texture_slots[slots] = texture;
 			renderer_state.texture_slot_count++;
-			texture_index = (float)slots;
+			texture_index = (int)slots;
 		}
 	}
 
-	// calculate transform
-	mat4 transform = GLM_MAT4_IDENTITY_INIT;
-	vec4 pos = {sprite->x, sprite->y, sprite->zorder, 1.0};
-	vec3 scale = {sprite->w, sprite->h, 1.0};
-    glm_translate(transform, pos);
-	glm_rotate(transform, glm_rad(sprite->rotation), (vec3){0.0, 0.0, -1.0});
-    glm_scale(transform, scale);
+	// Calculate transform
+	mat4 tmatrix = GLM_MAT4_IDENTITY_INIT;
+	vec4 pos = {transform->x, transform->y, data->zorder, 1.0};
+	vec3 scale = {transform->w, transform->h, 1.0};
+    glm_translate(tmatrix, pos);
+	glm_rotate(tmatrix, glm_rad(data->rotation), (vec3){0.0, 0.0, -1.0});
+    glm_scale(tmatrix, scale);
 
-	// append transformed vertices to batch
+	// Transform vertices and add to batch
 	for (uint32_t i = 0; i != QUAD_VERTEX_COUNT; ++i) {
 		LinceQuadVertex vertex = {0};
 		vec4 vpos = {quad_vertices[i].x, quad_vertices[i].y, 0.0, 1.0};
 		vec4 res;
-		glm_mat4_mulv(transform, vpos, res);
+		glm_mat4_mulv(tmatrix, vpos, res);
 		vertex.x = res[0];
 		vertex.y = res[1];
 		vertex.z = res[2];
+		vertex.s = data->uv[i*2];
+		vertex.t = data->uv[i*2 + 1];
 
-		if(sprite->tile){
-			vertex.s = sprite->tile->coords[i*2];
-			vertex.t = sprite->tile->coords[i*2 + 1];
-		} else {
-			vertex.s = quad_vertices[i].s;
-			vertex.t = quad_vertices[i].t;
-		}
-
-		vertex.texture_id = texture_index;
-		memcpy(vertex.color, sprite->color, sizeof(float)*4);
+		vertex.texture_id = (float)texture_index;
+		memcpy(vertex.color, data->color, sizeof(float)*4);
 		size_t offset = renderer_state.quad_count * QUAD_VERTEX_COUNT + i;
 		memcpy(renderer_state.vertex_batch + offset, &vertex, sizeof(vertex));
 	}
