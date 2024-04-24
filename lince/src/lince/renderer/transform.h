@@ -37,6 +37,29 @@ typedef struct LincePoint {
 	float x, y; ///> Cartesian coordinates of the point
 } LincePoint;
 
+
+/** @brief Defines 2D rectangle */
+typedef struct LinceRect {
+	float x, y; ///< 2D position
+	float w, h; ///< Width and height
+} LinceRect;
+
+
+/** @brief Supported coordinate systems */
+typedef enum LinceCoordSystem {
+	LinceCoordSystem_World = 0, ///< World coordinates, default.
+	LinceCoordSystem_Screen,    ///< Screen coordinates (-1 to 1)
+	LinceCoordSystem_Pixel,     ///< Pixel coordinates (0 to screen width/height)
+} LinceCoordSystem;
+
+/** @brief Holds the position and scale of an object */
+typedef struct LinceTransform {
+	float x, y;				 ///> Position
+	float w, h;				 ///> Scale
+	LinceCoordSystem coords; ///> Coordinate system of the transform 
+} LinceTransform;
+
+
 /** @brief Calculate screen coordinates from pixel location
 * @param p point whose position is defined in pixel coordinates
 * @param sc_w screen width in pixels
@@ -70,13 +93,6 @@ LincePoint LincePointScreenToWorld(const LincePoint p, LinceCamera* cam);
 LincePoint LincePointWorldToScreen(const LincePoint p, LinceCamera* cam);
 
 
-
-/** @brief Defines 2D rectangle */
-typedef struct LinceRect {
-	float x, y; ///< 2D position
-	float w, h; ///< Width and height
-} LinceRect;
-
 /** @brief Get the bounds of a rectangle, e.g. (xmin,xmax) and (ymin,ymax)
  * @param rect Rectangle
  * @param lo Lower bounds (xmin, ymin). If NULL, no bounds for the axis are calculated.
@@ -91,23 +107,6 @@ void LinceRectGetBounds(LinceRect rect, LincePoint* lo, LincePoint* up);
  * @returns Pointer to bounds cast to float.
 */
 float* LinceRectGetVertices(LinceRect rect, LincePoint bounds[4]);
-
-
-
-
-/** @brief Supported coordinate systems */
-typedef enum LinceCoordSystem {
-	LinceCoordSystem_World = 0, ///> Default value using zero initialization
-	LinceCoordSystem_Screen,
-	LinceCoordSystem_Pixel,
-} LinceCoordSystem;
-
-/** @brief Holds the position and scale of an object */
-typedef struct LinceTransform {
-	float x, y;				 ///> Position
-	float w, h;				 ///> Scale
-	LinceCoordSystem coords; ///> Coordinate system of the transform 
-} LinceTransform;
 
 
 /** @brief Converts a transform to world coordinates
