@@ -305,7 +305,7 @@ void LinceDrawQuad(
 	}
 
 	// Calculate texture index
-	int texture_index = 0.0f;
+	int texture_index = 0;
 	if(texture){
 		uint32_t slots = renderer_state.texture_slot_count;
 		
