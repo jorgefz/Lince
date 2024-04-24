@@ -2,9 +2,9 @@
 #include "cglm/mat4.h"
 #include "transform.h"
 
-void LinceRectGetBounds(LinceRect rect, LincePoint* lo, LincePoint* up){
-	if(lo) *lo = (LincePoint){rect.x - rect.w/2.0f, rect.y - rect.h/2.0f};
-	if(up) *up = (LincePoint){rect.x + rect.w/2.0f, rect.y + rect.h/2.0f};
+void LinceRectGetBounds(LinceRect rect, LincePoint* lower, LincePoint* upper){
+	if(lower) *lower = (LincePoint){rect.x - rect.w/2.0f, rect.y - rect.h/2.0f};
+	if(upper) *upper = (LincePoint){rect.x + rect.w/2.0f, rect.y + rect.h/2.0f};
 }
 
 float* LinceRectGetVertices(LinceRect rect, LincePoint bounds[4]){
@@ -12,10 +12,10 @@ float* LinceRectGetVertices(LinceRect rect, LincePoint bounds[4]){
 	LincePoint lower, upper;
 	LinceRectGetBounds(rect, &lower, &upper);
 
-	bounds[0] = (LincePoint){lower.x, lower.y };
-	bounds[1] = (LincePoint){upper.x, lower.y };
-	bounds[2] = (LincePoint){upper.x, upper.y };
-	bounds[3] = (LincePoint){lower.x, upper.y };
+	bounds[0] = (LincePoint){ lower.x, lower.y };
+	bounds[1] = (LincePoint){ upper.x, lower.y };
+	bounds[2] = (LincePoint){ upper.x, upper.y };
+	bounds[3] = (LincePoint){ lower.x, upper.y };
 	
 	return (float*)(bounds);
 }

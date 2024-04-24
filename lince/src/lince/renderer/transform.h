@@ -95,10 +95,10 @@ LincePoint LincePointWorldToScreen(const LincePoint p, LinceCamera* cam);
 
 /** @brief Get the bounds of a rectangle, e.g. (xmin,xmax) and (ymin,ymax)
  * @param rect Rectangle
- * @param lo Lower bounds (xmin, ymin). If NULL, no bounds for the axis are calculated.
- * @param up Upper bounds (xmax, ymax). If NULL, no bounds for the axis are calculated.
+ * @param lower Lower bounds (xmin, ymin). If NULL, no bounds for the axis are calculated.
+ * @param upper Upper bounds (xmax, ymax). If NULL, no bounds for the axis are calculated.
 */
-void LinceRectGetBounds(LinceRect rect, LincePoint* lo, LincePoint* up);
+void LinceRectGetBounds(LinceRect rect, LincePoint* lower, LincePoint* upper);
 
 /** @brief Get the coordinates of the four vertices of a rectangle
  * @param rect Rectangle
