@@ -1,14 +1,14 @@
 #include <lince.h>
 
 LinceCamera camera;
-LinceSprite square = {
-    .x = 0, .y = 0,  // position at the centre of the screen
-    .w = 1, .h = 1,  // size in "world coordinates"
-    .color = {1, 0, 0, 1} // Red RGB color, fully opaque
+LinceSprite sprite = { .color = {1,0,0} }; // Red colour (RGB)
+LinceTransform transform = {
+    .x = 0, .y = 0, // Position at the centre of the screen
+    .w = 1, .h = 1  // Square of one unit in size (in world coordinates)
 };
 
 void OnInit() {
-    LinceInitCamera(&camera, 800.0 / 500.0);
+    LinceInitCamera(&camera, 800.0f / 500.0f);
 }
 
 void OnUpdate(float dt) {
@@ -24,7 +24,7 @@ void OnUpdate(float dt) {
     LinceUpdateCamera(&camera);
     
     LinceBeginRender(&camera);
-    LinceDrawSprite(&square, NULL);
+    LinceDrawSprite(&sprite, &transform, NULL);
     LinceEndRender();
 }
 
