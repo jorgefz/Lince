@@ -1,64 +1,41 @@
 #include "tiles/tileset.h"
 
-void LinceGetTileCoords(
-	LinceTile* tile,
-	vec2 texsize,
-	vec2 xy,
-	vec2 cellsize,
-	vec2 tilesize
-) {
-	const float texw = texsize[0], texh = texsize[1];
-	vec2 min = { xy[0]*cellsize[0]/texw, xy[1]*cellsize[1]/texh};
-	vec2 max = {
-		(xy[0]+tilesize[0])*cellsize[0]/texw,
-		(xy[1]+tilesize[1])*cellsize[1]/texh
-	};
+/** @brief Calculates the texture coordinates of all cells in a tileset.
+ * @param tileset Tileset
+*/
+static void LinceTilesetCalculateCoords(LinceTileset* tileset){
+	float cellw = tileset->cellsize.x / tileset->texsize.x;
+	float cellh = tileset->cellsize.y / tileset->texsize.y;
+	uint32_t xcells = tileset->xcells;
+	uint32_t ycells = tileset->ycells;
+	
+	array_init(&tileset->coords, sizeof(LinceRect));
+	array_resize(&tileset->coords, xcells*ycells);
 
-	*tile = (LinceTile){
-		.texsize  = {texw, texh},
-		.pos = {xy[0], xy[1]},
-		.cellsize = {cellsize[0], cellsize[1]},
-		.tilesize = {tilesize[0], tilesize[1]},
-		.coords = {
-			min[0], min[1],
-			max[0], min[1],
-			max[0], max[1],
-			min[0], max[1]
+	for (uint32_t x = 0; x != xcells; ++x){
+		for (uint32_t y = 0; y != ycells; ++y){
+			LinceRect tile = {.x=(float)x*cellw, .y=(float)y*cellh, .w=cellw, .h=cellh};
+			array_set(&tileset->coords, &tile, xcells * y + x);
 		}
-	};
-}
-
-void LinceGetTilesFromTexture(
-	LinceTexture* texture,	// Texture filename
-	vec2 cellsize,			// Size of a cell in pixels 
-	array_t* tiles			// array<LinceTile>, returns collected tiles.
-) {
-	if(!texture || !tiles) return;
-
-	vec2 texsize = {(float)texture->width, (float)texture->height};
-	vec2 tilesize = {1,1};
-	uint32_t xtiles = texture->width/(uint32_t)cellsize[0];
-    uint32_t ytiles = texture->height/(uint32_t)cellsize[1];
-	array_init(tiles, sizeof(LinceTile));
-
-	/* Adds tiles from left to right, and then top to bottom */
-	for(size_t y = 0; y != ytiles; ++y){
-        for(size_t x = 0; x != xtiles; ++x){
-			LinceTile tile;
-			vec2 pos = {(float)x, (float)(ytiles-y-1)};
-            LinceGetTileCoords(&tile, texsize, pos, cellsize, tilesize);
-			array_push_back(tiles, &tile);
-        }
-    }
+	}
 }
 
 
-LinceTexture* LinceLoadTextureWithTiles(
-	const char* fname,	// Texture filename
-	vec2 cellsize,		// Size of a tile/cell in pixels
-	array_t* tiles		// array<LinceTile>, returns collected tiles. Must be uninitialised.
-) {
-	LinceTexture* tex = LinceLoadTexture(fname, 0);
-	LinceGetTilesFromTexture(tex, cellsize, tiles);
-	return tex;
+LinceTileset* LinceTilesetInit(LinceTileset* tileset, LinceTexture* tex, uint32_t cell_width, uint32_t cell_height){
+	tileset->texture = tex;
+	tileset->texsize = (LincePoint){.x = (float)tex->width, .y = (float)tex->height};
+	tileset->cellsize = (LincePoint){.x = (float)cell_width, .y = (float)cell_height};
+	tileset->xcells = tex->width / cell_width;
+	tileset->ycells = tex->height / cell_height;
+	LinceTilesetCalculateCoords(tileset);
+	return tileset;
 }
+
+void LinceTilesetUninit(LinceTileset* tset){
+	array_uninit(&tset->coords);
+}
+
+LinceRect LinceTilesetGetTileCoords(LinceTileset* tileset, uint32_t x, uint32_t y){
+	return *(LinceRect*)array_get(&tileset->coords, tileset->xcells * y + x);
+}
+
