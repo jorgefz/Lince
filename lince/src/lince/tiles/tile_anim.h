@@ -8,70 +8,84 @@
 * @brief Settings for LinceTileAnim
 */
 typedef enum LinceTileAnimFlags {
-    // Defaults set to zero, useless but reassuring
-    LinceTileAnimFlag_Repeat       	= 0x0,  ///< Default. Repeats tile animation.
-	LinceTileAnimFlag_EndWithFirst 	= 0x0,  ///< Default. Last frame is the first one.
-    // Non-defaults
-    LinceTileAnimFlag_Once        	= 0x1,  ///< Run animation only once
-	LinceTileAnimFlag_EndWithLast 	= 0x2,  ///< (unused) Ends animation on the last frame
-    // LinceTileAnimFlag_OneFrame // Set frametime to one frame
+    LinceTileAnim_Repeat       	= 0x1,  ///< Repeats the animation on finish
 } LinceTileAnimFlags;
-
 
 struct LinceTileAnim; // forward declaration
 
 /** @typedef LinceTileAnimFn
 * Function signatures for LinceTileAnim callbacks.
 */
-typedef void LinceTileAnimFn(struct LinceTileAnim* anim, void* params);
+typedef void (*LinceTileAnimFn)(struct LinceTileAnim* anim, void* args);
 
 /** @struct LinceTileAnim
 * @brief Stores the state of a tile animation
 */
 typedef struct LinceTileAnim {
-    array_t* frames;        ///< array<LinceTile>, list of tiles or subtexture coordinates. See tileset.h
-    float frame_time;		///< Duration of each frame in millisec.
 
-    uint32_t start;			///< Index of frame at which to start the animation.
-    uint32_t repeats;		///< Number of repeats to animate. Repeats forever if zero.
-	uint32_t* order;		///< Array of indices - order in which to render the tiles. If set, start index refers to an element of the order array.
-    uint32_t order_count;	///< Number of indices in the order array.
+    // User-defined parameters
+    float frame_time; ///< Duration of each frame in ms. Must be greater than zero.
+    int flags;        ///< Bitflags, LinceTileAnimFlags
+    LinceTileAnimFn on_finish; ///< Callback called when animation ends or repeats.
+    void* args;       ///< Arguments passed to callback
 
-    LinceTileAnimFn* on_finish;	  ///< Called when animation has finished
-    LinceTileAnimFn* on_repeat;	  ///< Called when animation loops over
-    // LinceTileAnimFn* on_frame  // Called when frame changes
-    void* callback_args;		  ///< Generic data to pass onto callbacks
+    // Internal data
+    float     time;	    ///< Countdown until next frame
+    uint32_t  frame;    ///< Index of current frame in tileset
+    uint32_t  index;    ///< Index of current frame in frame array
+    LinceBool finished; ///< Indicates whether animation has finished running
 
-    LinceTileAnimFlags flags;     ///< Settings
-
-    // Internal
-    float time;					///< Countdown until next frame
-    uint32_t current_frame;		///< Index of current frame
-    LinceTile* current_tile;	///< Pointer to current tile in the buffer
-	uint32_t repeat_count;		///< Number of times the animation has been looped
-	LinceBool finished; 		///< Indicates whether animation has finished running
+    LinceTileset* tileset;  ///< Tileset with tiles to animate
+    array_t frames; ///< Order in which to display tiles,
+                    /// defaults to all tiles in tileset in order.
 
 } LinceTileAnim;
 
 
-/** @brief Initialises the animation.
-* Settings and options should be pre-defined on the object
-* before passing it as an argument.
+/** @brief Initialise a tile animation.
+ * @param anim TileAnim with user-defined parameters.
+ * @param tileset Tileset containing tiles to animate.
+ * @param frame_time Duration of each frame in ms.
+ * @returns Input anim if successful, and null otherwise.
 */
-void LinceCreateTileAnim(LinceTileAnim* anim);
+LinceTileAnim* LinceTileAnimInit(LinceTileAnim* anim, LinceTileset* tileset, float frame_time);
 
-/** @brief Updates animation by one timestep */
-void LinceUpdateTileAnim(LinceTileAnim* anim, float dt);
+/** @brief Frees allocated memory */
+void LinceTileAnimUninit(LinceTileAnim* anim);
 
-/** @brief Resets clock and frames to initial conditions */
-void LinceResetTileAnim(LinceTileAnim* anim);
-
-/** @brief Frees allocated data within the object,
-* but the user is responsible for deallocating the object itself
-* if it was allocated.
+/** @brief Updates the internal timer and advances the animation
+ * @param anim Tile animation
+ * @param dt Time elapsed in ms
 */
-void LinceDeleteTileAnim(LinceTileAnim* anim);
+void LinceTileAnimUpdate(LinceTileAnim* anim, float dt);
 
+/** @brief Sets which tileset frames are displayed and their order
+ * @param anim Tile animation
+ * @param count Number of frames
+ * @param frames Indices of the tiles in the tileset to animate
+*/
+void LinceTileAnimSetFrames(LinceTileAnim* anim, uint32_t count, uint32_t* frames);
+
+/** @brief Sets the current frame of the animation
+ * @param anim Tile animation
+ * @param index Index for the array of frames
+*/
+void LinceTileAnimSetCurrentFrame(LinceTileAnim* anim, uint32_t index);
+
+/** @brief Returns the UV coordinates of the current tile in the animation.
+ * Pass this to `LinceDrawSpriteTile` to render the animation.
+ * @param anim Tile animation
+ * @returns Bounds of current animation tile in the tileset
+*/
+LinceRect* LinceTileAnimGetFrameCoords(LinceTileAnim* anim);
+
+/** @brief Resets the animation to the first frame */
+void LinceTileAnimReset(LinceTileAnim* anim);
+
+/** @brief Returns true if the animation has finished.
+ * If the animation is set to repeat, it will
+*/
+LinceBool LinceTileAnimFinished(LinceTileAnim* anim);
 
 
 #endif /* LINCE_TILE_ANIM_H */

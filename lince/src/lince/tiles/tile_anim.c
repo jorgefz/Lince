@@ -2,106 +2,86 @@
 #include "lince/utils/memory.h"
 #include "lince/core/logger.h"
 
-/*
-Returns a pointer to the current tile in the animation
-*/
-static LinceTile* GetCurrentTile(LinceTileAnim* anim){
-	return array_get(anim->frames, anim->order[anim->current_frame]);
-}
-
-void LinceCreateTileAnim(LinceTileAnim* anim){
-	
-	LINCE_ASSERT(anim && anim->frames, "Animation is missing tile array");
-	LINCE_ASSERT(anim->frames->size > 0, "Animation cannot have zero frames");
-	LINCE_ASSERT(anim->frame_time > 0.0f,
-		"Animation cannot have a frame time of zero ms");
-	LINCE_ASSERT(anim->start < anim->frames->size,
-		"Animation start frame is out of bounds"
-		"(start at frame index %u but there are only %u frames)",
-		anim->start, anim->frames->size
-	);
-
-	// Allocate own array of frames
-	anim->frames = array_new_copy(anim->frames);
-	LINCE_ASSERT(anim->frames, "Failed to copy frames");
-
-	// Setup tile order
-	if(anim->order){
-		LINCE_ASSERT(anim->order_count > 0,
-			"Order indices length must be greater than zero");
-
-		// Check all indices are allowed
-		for(uint32_t i = 0; i != anim->order_count; ++i){
-			LINCE_ASSERT(anim->order[i] < anim->frames->size,
-				"Order index out of bounds"
-				"(%uth index is %u but there are only %u frames)",
-				i, anim->order[i], anim->frames->size);
-		}
-		anim->order = LinceNewCopy(anim->order, sizeof(uint32_t)*anim->order_count);
-	} else {
-		// Setup default order: 0 to number of frames
-		anim->order_count = anim->frames->size;
-		anim->order = LinceMalloc(sizeof(uint32_t) * anim->order_count);
-		for(uint32_t i = 0; i != anim->order_count; ++i){
-			anim->order[i] = i;
-		}
+/* Set default frame order -> cycle through all tiles in tileset */
+static void LinceTileAnimSetDefaultFrames(LinceTileAnim* anim){
+	uint32_t frame_count = anim->tileset->coords.size;
+	array_resize(&anim->frames, frame_count);
+	for(uint32_t i = 0; i != frame_count; ++i){
+		array_set(&anim->frames, &i, i);
 	}
-	
-	// Setup initial conditions
-	LinceResetTileAnim(anim);
 }
 
 
-void LinceUpdateTileAnim(LinceTileAnim* anim, float dt){
+LinceTileAnim* LinceTileAnimInit(LinceTileAnim* anim, LinceTileset* tileset, float frame_time){
+	if(frame_time <= 0.0f){
+		LINCE_WARN("TileAnim: invalid frame time (%f)\n", frame_time);
+		return NULL;
+	}
+
+	anim->tileset = tileset;
+	anim->frame_time = frame_time;
+	array_init(&anim->frames, sizeof(uint32_t));
+	LinceTileAnimSetDefaultFrames(anim); // Default frames -> cycle through all tiles
+	LinceTileAnimReset(anim);
+	return anim;
+}
+
+void LinceTileAnimUninit(LinceTileAnim* anim){
+	array_uninit(&anim->frames);
+}
+
+void LinceTileAnimUpdate(LinceTileAnim* anim, float dt){
 	if(anim->finished) return;
 
-	anim->time -= dt;
+	anim->time += dt;
+	if(anim->time < anim->frame_time) return;
 
-	// Time is still ongoing - continue with current frame
-	if(anim->time > 0.0f) return;
+	// Timer is finished - next frame
+	anim->time = 0.0f;
+	anim->index++;
 
-	// Timer is finished - change of frame
-	anim->current_frame++;
-	// if(anim->on_frame) anim->on_frame(anim, anim->callback_args);
-
-	// Reached end of frame list
-	if(anim->current_frame >= anim->order_count){
-		anim->current_frame = 0;
-		anim->repeat_count++;
-
-		// Reached max number of repeats - end animation
-		if(anim->repeats > 0 && anim->repeats == anim->repeat_count){
-			anim->finished = LinceTrue;
-			if(anim->on_finish){
-				anim->on_finish(anim, anim->callback_args);
-			}
-		}
-		// Or just loop over once more
-		else if(anim->on_repeat){
-			anim->on_repeat(anim, anim->callback_args);
-		}
+	if(anim->index < anim->frames.size){
+		anim->frame = *(uint32_t*)array_get(&anim->frames, anim->index);
+		// if(anim->on_frame) anim->on_frame(anim, anim->callback_args);
+		return;
 	}
 
-	anim->time = anim->frame_time; // reset countdown
-	anim->current_tile = GetCurrentTile(anim);
-	
+	// Animation finished - stop or loop back
+	LinceTileAnimReset(anim);
+	if(anim->on_finish){
+		anim->on_finish(anim, anim->args);	
+	}
+	if(!(anim->flags & LinceTileAnim_Repeat)){
+		anim->finished = LinceTrue;
+	}
 }
 
+void LinceTileAnimSetFrames(LinceTileAnim* anim, uint32_t count, uint32_t* frames){
+	if(!frames || count == 0){
+		LinceTileAnimSetDefaultFrames(anim);
+	}
+	array_resize(&anim->frames, count);
+	memcpy(anim->frames.data, frames, count * sizeof(uint32_t));
+	LinceTileAnimReset(anim);
+}
 
-void LinceResetTileAnim(LinceTileAnim* anim){
-	anim->time = anim->frame_time;
-	
-	// anim->current_frame = 0;
-	anim->current_frame = anim->start;
-	
-	anim->current_tile = GetCurrentTile(anim);
-	anim->repeat_count = 0;
+void LinceTileAnimSetCurrentFrame(LinceTileAnim* anim, uint32_t index){
+	if(index >= anim->frames.size) return;
+	anim->index = index;
+}
+
+LinceRect* LinceTileAnimGetFrameCoords(LinceTileAnim* anim){
+	return array_get(&anim->tileset->coords, anim->frame);
+}
+
+void LinceTileAnimReset(LinceTileAnim* anim){
+	anim->index = 0;
+	anim->time  = 0;
 	anim->finished = LinceFalse;
+	anim->frame = *(uint32_t*)array_get(&anim->frames, 0);
 }
 
-
-void LinceDeleteTileAnim(LinceTileAnim* anim){
-	if(!anim) return;
-	if(anim->frames) array_destroy(anim->frames);
-	if(anim->order)  LinceFree(anim->order);
+LinceBool LinceTileAnimFinished(LinceTileAnim* anim){
+	return anim->finished;
 }
+
