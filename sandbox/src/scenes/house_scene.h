@@ -7,6 +7,7 @@
 typedef struct HouseScene {
     LinceEntityRegistry* reg;
     LinceCamera camera;
+    LinceTileset tileset;
     LinceTilemap map;
     DoorLink house_door;
 } HouseScene;

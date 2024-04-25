@@ -29,8 +29,8 @@ static void MoveCamera(LinceCamera* cam, float ds){
 static void UpdatePlayer(GameData* game_data){
     game_data->player_box.x = game_data->camera.pos[0];
     game_data->player_box.y = game_data->camera.pos[1];
-    game_data->player_sprite.x = game_data->camera.pos[0];
-    game_data->player_sprite.y = game_data->camera.pos[1];
+    game_data->player_transform.x = game_data->camera.pos[0];
+    game_data->player_transform.y = game_data->camera.pos[1];
 }
 
 
@@ -39,17 +39,15 @@ void HouseSceneInit(LinceScene* scene){
     scene->data = house_scene;
     
     // Town map
+    LinceTexture* tex = LinceAppGetAsset("textures/inside.png", "texture");
+    LinceTilesetInit(&house_scene->tileset, tex, 16, 16);
     
     house_scene->map =  (LinceTilemap){
-        .texture = LinceAppGetAsset("textures/inside.png", "texture"),
-        .cellsize = {16,16},
-        .scale = {1,1},
-        .offset = {-1, 0},
-        .width = 7,
-        .height = 8,
-        .grid = HOUSE_GRID
+        .width = 7, .height = 8,
+        .scale = {1,1}, .pos = {-1,0},
     };
-    LinceInitTilemap(&house_scene->map);
+    LinceTilemapInit(&house_scene->map, HOUSE_GRID);
+    LinceTilemapUseTileset(&house_scene->map, &house_scene->tileset);
 
     house_scene->house_door = (DoorLink){
         .box = (LinceBox2D){.x=3-0.5, .y=1-0.5, .w=1, .h=1},
@@ -68,18 +66,23 @@ void HouseSceneUpdate(LinceScene* scene, float dt){
     LinceBeginRender(&game_data->camera);
     LinceDrawTilemap(&house_scene->map, NULL);
 
-    LinceDrawSprite(&game_data->player_sprite, NULL);
+    LinceDrawSprite(&game_data->player_sprite, &game_data->player_transform, NULL);
     UpdatePlayer(game_data);
 
     // Debug - show location of door link
-    LinceDrawSprite(&(LinceSprite){
-        .x = house_scene->house_door.box.x,
-        .y = house_scene->house_door.box.y,
-        .w = house_scene->house_door.box.w,
-        .h = house_scene->house_door.box.h,
-        .color = {1,0,0,0.5},
-        .zorder = 1
-    }, NULL);
+    LinceDrawSprite(
+        &(LinceSprite){
+            .color = {1,0,0}, .zorder = 1,
+            .alpha=0.5, .flags = LinceSprite_UseAlpha
+        },
+        &(LinceTransform){
+            .x = house_scene->house_door.box.x,
+            .y = house_scene->house_door.box.y,
+            .w = house_scene->house_door.box.w,
+            .h = house_scene->house_door.box.h,
+        },
+        NULL
+    );
 
 
     LinceEndRender();
@@ -98,6 +101,7 @@ void HouseSceneUpdate(LinceScene* scene, float dt){
 
 void HouseSceneDestroy(LinceScene* scene){
     HouseScene* house_scene = scene->data;
-    LinceUninitTilemap(&house_scene->map);
+    LinceTilemapUninit(&house_scene->map);
+    LinceTilesetUninit(&house_scene->tileset);
     LinceFree(scene->data);
 }

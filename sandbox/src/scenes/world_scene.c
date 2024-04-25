@@ -43,8 +43,8 @@ static void MoveCamera(LinceCamera* cam, float ds){
 static void UpdatePlayer(GameData* game_data){
     game_data->player_box.x = game_data->camera.pos[0];
     game_data->player_box.y = game_data->camera.pos[1];
-    game_data->player_sprite.x = game_data->camera.pos[0];
-    game_data->player_sprite.y = game_data->camera.pos[1];
+    game_data->player_transform.x = game_data->camera.pos[0];
+    game_data->player_transform.y = game_data->camera.pos[1];
 }
 
 
@@ -53,23 +53,20 @@ void WorldSceneInit(LinceScene* scene){
     scene->data = world_scene;
     
     // Town map
+    LinceTexture* tex = LinceAppGetAsset("textures/outside.png", "texture");
+    LinceTilesetInit(&world_scene->tileset, tex, 16, 16);
     
     world_scene->map =  (LinceTilemap){
-        .texture = LinceAppGetAsset("textures/outside.png", "texture"),
-        .cellsize = {16,16},
-        .scale = {1,1},
-        .offset = {-2,0},
-        .width = 15,
-        .height = 15,
-        .grid = OUTSIDE_GRID
+        .width = 15, .height = 15,
+        .scale = {1,1}, .pos = {-2,0},
     };
-    LinceInitTilemap(&world_scene->map);
+    LinceTilemapInit(&world_scene->map, OUTSIDE_GRID);
+    LinceTilemapUseTileset(&world_scene->map, &world_scene->tileset);
  
     world_scene->house_door = (DoorLink){
         .box = (LinceBox2D){.x=6-0.5, .y=6-0.5, .w=1, .h=1},
         .to_scene = "House",
-        .to_x = 3,
-        .to_y = 2,
+        .to_x = 3, .to_y = 2,
     };
 
     // world_scene->door_link  = (LinceBox2D){.x=7-0.5, .y=6-0.5, .w=1, .h=1};
@@ -85,18 +82,23 @@ void WorldSceneUpdate(LinceScene* scene, float dt){
     
     LinceBeginRender(&game_data->camera);
     LinceDrawTilemap(&world_scene->map, NULL);
-    LinceDrawSprite(&game_data->player_sprite, NULL);
+    LinceDrawSprite(&game_data->player_sprite, &game_data->player_transform, NULL);
     UpdatePlayer(game_data);
 
     // Debug - show location of door link
-    LinceDrawSprite(&(LinceSprite){
-        .x = world_scene->house_door.box.x,
-        .y = world_scene->house_door.box.y,
-        .w = world_scene->house_door.box.w,
-        .h = world_scene->house_door.box.h,
-        .color = {1,0,0,0.5},
-        .zorder = 1
-    }, NULL);
+    LinceDrawSprite(
+        &(LinceSprite){
+            .color = {1,0,0}, .zorder = 1,
+            .alpha=0.5, .flags = LinceSprite_UseAlpha
+        },
+        &(LinceTransform){
+            .x = world_scene->house_door.box.x,
+            .y = world_scene->house_door.box.y,
+            .w = world_scene->house_door.box.w,
+            .h = world_scene->house_door.box.h,
+        },
+        NULL
+    );
 
     // Wait for interact key to enter door
     if(LinceBox2DCollides(&game_data->player_box, &world_scene->house_door.box)){
@@ -113,6 +115,7 @@ void WorldSceneUpdate(LinceScene* scene, float dt){
 
 void WorldSceneDestroy(LinceScene* scene){
     WorldScene* world_scene = scene->data;
-    LinceUninitTilemap(&world_scene->map);
+    LinceTilemapUninit(&world_scene->map);
+    LinceTilesetUninit(&world_scene->tileset);
     LinceFree(scene->data);
 }

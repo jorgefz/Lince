@@ -7,6 +7,7 @@ typedef struct GameData {
     LinceCamera camera;
     float camera_speed;
     LinceSprite player_sprite;
+    LinceTransform player_transform;
     LinceBox2D player_box;
 } GameData;
 
@@ -20,9 +21,10 @@ typedef struct DoorLink {
 
 typedef enum Component {
     Component_Sprite,
+    Component_Transform,
     Component_Tilemap,
     Component_TileAnim,
-    Component_BoxCollider,
+    Component_Box2D,
 
     Component_Count
 } Component;
@@ -30,6 +32,7 @@ typedef enum Component {
 
 #define COMPONENT_SIZES             \
         sizeof(LinceSprite),        \
+        sizeof(LinceTransform),     \
         sizeof(LinceTilemap),       \
         sizeof(LinceTileAnim),      \
         sizeof(LinceBox2D)

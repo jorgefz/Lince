@@ -18,8 +18,9 @@ void SandboxInit() {
     DATA.camera_speed = 0.003f;
 
     DATA.player_box = (LinceBox2D){.x=0, .y=0, .w=0.7f, .h=0.7f};
-    DATA.player_sprite = (LinceSprite){.x=0, .y=0, .w=0.7f, .h=0.7f, .color={0,0,1,1}, .zorder=1};
-    
+    DATA.player_sprite = (LinceSprite){ .color={0,0,1}, .zorder=1};
+    DATA.player_transform = (LinceTransform){.x=0, .y=0, .w=0.7f, .h=0.7f};
+
     app->user_data = &DATA;
 
     LinceAppRegisterScene("MainMenu", &SCENE_CALLBACKS[Scene_MainMenu]);
@@ -46,6 +47,7 @@ void SetupApplication(){
     app->on_init      = SandboxInit;
     app->on_update    = SandboxUpdate;
     app->on_terminate = SandboxTerminate;
+    app->show_debug_panel = LinceTrue;
     LinceAppSetTitle("Sandbox");
 }
 
