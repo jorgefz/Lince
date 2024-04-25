@@ -93,20 +93,37 @@ LincePoint LincePointScreenToWorld(const LincePoint p, LinceCamera* cam);
 LincePoint LincePointWorldToScreen(const LincePoint p, LinceCamera* cam);
 
 
-/** @brief Get the bounds of a rectangle, e.g. (xmin,xmax) and (ymin,ymax)
+/** @brief Get the bounds of a rectangle with origin on its center.
  * @param rect Rectangle
  * @param lower Lower bounds (xmin, ymin). If NULL, no bounds for the axis are calculated.
  * @param upper Upper bounds (xmax, ymax). If NULL, no bounds for the axis are calculated.
 */
-void LinceRectGetBounds(LinceRect rect, LincePoint* lower, LincePoint* upper);
+void LinceRectGetBounds(LinceRect* rect, LincePoint* lower, LincePoint* upper);
+
+/** @brief Get the bounds of a rectangle with origin on its lower left corner.
+ * @param rect Rectangle
+ * @param lower Lower bounds (xmin, ymin). If NULL, no bounds for the axis are calculated.
+ * @param upper Upper bounds (xmax, ymax). If NULL, no bounds for the axis are calculated.
+*/
+void LinceRectGetBoundsLL(LinceRect* rect, LincePoint* lower, LincePoint* upper);
 
 /** @brief Get the coordinates of the four vertices of a rectangle
+ * 	with origin on its center.
  * @param rect Rectangle
  * @param bounds Returns array of vertices, counter-clockwiss
  * 				 and starting from bottom left corner.
  * @returns Pointer to bounds cast to float.
 */
-float* LinceRectGetVertices(LinceRect rect, LincePoint bounds[4]);
+float* LinceRectGetVertices(LinceRect* rect, LincePoint bounds[4]);
+
+/** @brief Get the coordinates of the four vertices of a rectangle
+ * 	with origin on its lower left corner.
+ * @param rect Rectangle
+ * @param bounds Returns array of vertices, counter-clockwiss
+ * 				 and starting from bottom left corner.
+ * @returns Pointer to bounds cast to float.
+*/
+float* LinceRectGetVerticesLL(LinceRect* rect, LincePoint bounds[4]);
 
 
 /** @brief Converts a transform to world coordinates

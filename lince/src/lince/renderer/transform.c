@@ -2,13 +2,17 @@
 #include "cglm/mat4.h"
 #include "transform.h"
 
-void LinceRectGetBounds(LinceRect rect, LincePoint* lower, LincePoint* upper){
-	if(lower) *lower = (LincePoint){rect.x - rect.w/2.0f, rect.y - rect.h/2.0f};
-	if(upper) *upper = (LincePoint){rect.x + rect.w/2.0f, rect.y + rect.h/2.0f};
+void LinceRectGetBounds(LinceRect* rect, LincePoint* lower, LincePoint* upper){
+	if(lower) *lower = (LincePoint){rect->x - rect->w/2.0f, rect->y - rect->h/2.0f};
+	if(upper) *upper = (LincePoint){rect->x + rect->w/2.0f, rect->y + rect->h/2.0f};
 }
 
-float* LinceRectGetVertices(LinceRect rect, LincePoint bounds[4]){
+void LinceRectGetBoundsLL(LinceRect* rect, LincePoint* lower, LincePoint* upper){
+	if(lower) *lower = (LincePoint){rect->x,           rect->y};
+	if(upper) *upper = (LincePoint){rect->x + rect->w, rect->y + rect->h};
+}
 
+float* LinceRectGetVertices(LinceRect* rect, LincePoint bounds[4]){
 	LincePoint lower, upper;
 	LinceRectGetBounds(rect, &lower, &upper);
 
@@ -19,6 +23,19 @@ float* LinceRectGetVertices(LinceRect rect, LincePoint bounds[4]){
 	
 	return (float*)(bounds);
 }
+
+float* LinceRectGetVerticesLL(LinceRect* rect, LincePoint bounds[4]){
+	LincePoint lower, upper;
+	LinceRectGetBoundsLL(rect, &lower, &upper);
+
+	bounds[0] = (LincePoint){ lower.x, lower.y };
+	bounds[1] = (LincePoint){ upper.x, lower.y };
+	bounds[2] = (LincePoint){ upper.x, upper.y };
+	bounds[3] = (LincePoint){ lower.x, upper.y };
+	
+	return (float*)(bounds);
+}
+
 
 /* Calculate screen coordinates from pixel location */
 LincePoint LincePointPixelToScreen(const LincePoint p, const float sc_w, const float sc_h) {
