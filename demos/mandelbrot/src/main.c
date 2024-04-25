@@ -19,6 +19,7 @@ struct AppState {
     LinceSprite canvas;
     LinceShader* canvas_shader;
     LinceTransform viewframe;
+    LinceTransform transform;
 } state;
 
 void LinceTransformGetBounds(LinceTransform* t, LincePoint* xbound, LincePoint* ybound){
@@ -34,16 +35,12 @@ void LinceTransformGetBounds(LinceTransform* t, LincePoint* xbound, LincePoint* 
 
 void OnInit(){
     LinceInitCamera(&state.cam, LinceAppGetAspectRatio());
-    state.canvas = (LinceSprite){
-        .x = 0.0f, .y = 0.0f,
-        .w = 2.0f*LinceAppGetAspectRatio(), .h = 2.0f,
-        .color = {1,1,1,1}
-    };
+    state.canvas = (LinceSprite){ .color = {1,1,1} };
     state.viewframe = (LinceTransform){
-        .x = 0.0f, .y = 0.0f,
+        .x = 0.0f, .y = 0.0f, .h = 2.0f,
         .w = 2.0f*LinceAppGetAspectRatio(),
-        .h = 2.0f
     };
+    state.transform = state.viewframe;
     
     LinceAppPushAssetFolder("../../../demos/mandelbrot/assets");
     char vert_path[LINCE_PATH_MAX];
@@ -102,7 +99,7 @@ void OnUpdate(float dt){
     LinceSetShaderUniformVec2(state.canvas_shader, "uYlim", &ylim.x);
 
     LinceBeginRender(&state.cam);
-    LinceDrawSprite(&state.canvas, state.canvas_shader);
+    LinceDrawSprite(&state.canvas, &state.transform, state.canvas_shader);
     LinceEndRender();
 }
 
