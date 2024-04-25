@@ -6,31 +6,41 @@
 #include "lince/renderer/transform.h"
 #include "lince/renderer/shader.h"
 
+/** @brief Defines a RGB color */
+typedef struct LinceColor {
+	float r, g, b; ///< Red, green, and blue channels
+} LinceColor;
+
 typedef enum LinceSpriteFlags {
-	LinceSprite_UseAlpha = 0x1,
-	LinceSprite_UseUV    = 0x2
+	LinceSprite_UseAlpha = 0x1 ///< Enable transparency
 } LinceSpriteFlags;
 
 /** @struct LinceSprite
 * @brief Visual and spatial properties of a rectangle.
 */
 typedef struct LinceSprite{
-	float x, y;
-	float w, h;
-
 	float zorder; 			///< Depth, order of rendering
 	float rotation; 		///< Clockwise rotation in degrees
-	float color[4]; 		///< Flat color in RGB format
-	// float alpha;            ///< Transparency, only used if flag is set
-	// float uv[8];			///< Texture coordinates, only used if flag is set
+	LinceColor color; 		///< Flat color in RGB format
+	float alpha;            ///< Transparency, only used if flag is set
 	LinceTexture* texture;	///< Texture to apply. If NULL, only color is used.
-	LinceTile* tile;        ///< Texture coordinates
-	// LinceSpriteFlags flags; ///< Config flags
+	LinceSpriteFlags flags; ///< Config flags
 } LinceSprite;
 
-// void LinceDrawSprite(LinceSprite* sprite, LinceTransform* transform, LinceShader* shader);
+/** @brief Submits a sprite to the renderer.
+ * @param sprite Sprite
+ * @param transform Transform (e.g. position and scale)
+ * @param shader Shader to apply. If null, default is used.
+*/
+void LinceDrawSprite(LinceSprite* sprite, LinceTransform* transform, LinceShader* shader);
 
-void LinceDrawSprite(LinceSprite* sprite, LinceShader* shader);
+/** @brief Submits a region of a sprite to the renderer, defined by texture coordinates.
+ * @param sprite Sprite
+ * @param transform Transform (e.g. position and scale)
+ * @param uv Rect defining the bounds of the region within the texture to draw
+ * @param shader Shader to apply. If null, default is used.
+*/
+void LinceDrawSpriteTile(LinceSprite* sprite, LinceTransform* transform, LinceRect* uv, LinceShader* shader);
 
 
 #endif /* LINCE_SPRITE_H */
