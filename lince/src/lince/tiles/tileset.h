@@ -26,7 +26,7 @@ void LinceTilesetUninit(LinceTileset* tset);
  * @param x X location of the tile in the tileset in units of cells.
  * @param y Y location of the tile in the tileset in units of cells.
 */
-LinceRect LinceTilesetGetTileCoords(LinceTileset* tileset, uint32_t x, uint32_t y);
+LinceRect* LinceTilesetGetTileCoords(LinceTileset* tileset, uint32_t x, uint32_t y);
 
 
 #endif /* LINCE_TILESET_H */

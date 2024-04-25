@@ -62,8 +62,8 @@ void OnUpdate(float dt) {
                 .x = (float)(x+2)/2.0f, .y = (float)(y+2)/2.0f,
                 .w = 0.4f, .h = 0.4f
             };
-            LinceRect uv = LinceTilesetGetTileCoords(&tileset, x, y);
-            LinceDrawSpriteTile(&sprite, &tile_transform, &uv, NULL);
+            LinceRect* uv = LinceTilesetGetTileCoords(&tileset, x, y);
+            LinceDrawSpriteTile(&sprite, &tile_transform, uv, NULL);
         }
     }
 

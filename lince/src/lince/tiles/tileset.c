@@ -35,7 +35,7 @@ void LinceTilesetUninit(LinceTileset* tset){
 	array_uninit(&tset->coords);
 }
 
-LinceRect LinceTilesetGetTileCoords(LinceTileset* tileset, uint32_t x, uint32_t y){
-	return *(LinceRect*)array_get(&tileset->coords, tileset->xcells * y + x);
+LinceRect* LinceTilesetGetTileCoords(LinceTileset* tileset, uint32_t x, uint32_t y){
+	return array_get(&tileset->coords, tileset->xcells * y + x);
 }
 
