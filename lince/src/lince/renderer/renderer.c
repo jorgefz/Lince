@@ -72,13 +72,13 @@ float LinceYSortedZ(float y, vec2 ylim, vec2 zlim){
 
 
 /* quad of size 1x1 centred on 0,0 */
-static const LinceQuadVertex quad_vertices[4] = {
+static const LinceQuadVertex QUAD_VERTICES[4] = {
 	{.x=-0.5f, .y=-0.5f, .z=0, .s=0.0, .t=0.0, .color={0.0, 0.0, 0.0, 1.0}, .texture_id=0.0},
 	{.x= 0.5f, .y=-0.5f, .z=0, .s=1.0, .t=0.0, .color={0.0, 0.0, 0.0, 1.0}, .texture_id=0.0},
 	{.x= 0.5f, .y= 0.5f, .z=0, .s=1.0, .t=1.0, .color={0.0, 0.0, 0.0, 1.0}, .texture_id=0.0},
 	{.x=-0.5f, .y= 0.5f, .z=0, .s=0.0, .t=1.0, .color={0.0, 0.0, 0.0, 1.0}, .texture_id=0.0},
 };
-static const unsigned int quad_indices[] = {0,1,2,2,3,0};
+static const unsigned int QUAD_INDICES[] = {0,1,2,2,3,0};
 
 
 void LinceDrawIndexed(
@@ -139,7 +139,7 @@ void LinceInitRenderer() {
 	unsigned int offset = 0;
 	for (unsigned int i = 0; i != MAX_INDICES; i += QUAD_INDEX_COUNT) {
 		for (unsigned int j = 0; j != QUAD_INDEX_COUNT; ++j) {
-			RENDER_STATE.index_batch[i + j] = offset + quad_indices[j];
+			RENDER_STATE.index_batch[i + j] = offset + QUAD_INDICES[j];
 		}
 		offset += QUAD_VERTEX_COUNT;
 	}
@@ -336,7 +336,7 @@ void LinceDrawQuad(
 	// Transform vertices and add to batch
 	for (uint32_t i = 0; i != QUAD_VERTEX_COUNT; ++i) {
 		LinceQuadVertex vertex = {0};
-		vec4 vpos = {quad_vertices[i].x, quad_vertices[i].y, 0.0, 1.0};
+		vec4 vpos = {QUAD_VERTICES[i].x, QUAD_VERTICES[i].y, 0.0, 1.0};
 		vec4 res;
 		glm_mat4_mulv(tmatrix, vpos, res);
 		vertex.x = res[0];
