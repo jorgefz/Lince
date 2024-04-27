@@ -47,7 +47,7 @@
 #include "lince/audio/audio.h"
 
 /* ECS */
-#include "lince/entity/entity.h"
+#include "lince/ecs/ecs.h"
 
 /* Scene */
 #include "lince/scene/scene.h"
