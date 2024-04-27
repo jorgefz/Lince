@@ -431,7 +431,7 @@ static void LinceAppDrawDebugUIPanel(LinceLayer* overlay, float dt){
         nk_labelf(ctx, NK_TEXT_LEFT, "Runtime: %.2f s", app.runtime/1000.0f);
 
         nk_layout_row_static(ctx, 30, 250, 1);
-        LinceRendererState* renderer = LinceGetRenderer();
+        LinceRenderState* renderer = LinceGetRenderer();
         nk_labelf(ctx, NK_TEXT_LEFT, "Active texture units: %u", renderer->texture_slot_count);
         nk_labelf(ctx, NK_TEXT_LEFT, "Sprites: %u", renderer->quad_count);
 

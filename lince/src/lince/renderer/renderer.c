@@ -22,7 +22,7 @@
 
 
 /* Global rendering state */
-static LinceRendererState RENDER_STATE = {0};
+static LinceRenderState RENDER_STATE = {0};
 
 
 const char default_fragment_source[] =
@@ -58,7 +58,7 @@ const char default_vertex_source[] =
 
 
 /** @brief Returns the global renderer state */
-LinceRendererState* LinceGetRenderer(){
+LinceRenderState* LinceGetRenderer(){
 	return &RENDER_STATE;
 }
 

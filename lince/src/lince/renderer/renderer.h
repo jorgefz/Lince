@@ -35,7 +35,7 @@ typedef struct LinceQuadData {
 } LinceQuadData;
 
 /** @brief Stores the state of the OpenGL renderer */
-typedef struct LinceRendererState {
+typedef struct LinceRenderState {
 	LinceShader *default_shader; ///< Default shader to use if none is provided
 	LinceShader *shader;		 ///< Shader to use when rendering
 	LinceTexture* white_texture; ///< Default texture to use when no texture is used
@@ -51,10 +51,10 @@ typedef struct LinceRendererState {
 	unsigned int texture_slot_count;	///< Number of active texture units
 	LinceTexture* texture_slots[LINCE_MAX_TEXTURE_UNITS]; ///< Active textures
 
-} LinceRendererState;
+} LinceRenderState;
 
 /** @brief Returns the global renderer state */
-LinceRendererState* LinceGetRenderer();
+LinceRenderState* LinceGetRenderer();
 
 /** @brief Calculates the z-order based on the 'y' value of the position,
 * such that objects at lower 'y' are drawn objects at higher 'y'.
