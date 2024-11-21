@@ -169,7 +169,11 @@ void LinceInitRenderer() {
 
 	int samplers[LINCE_MAX_TEXTURE_UNITS] = { 0 };
 	for (int i = 0; i != LINCE_MAX_TEXTURE_UNITS; ++i) samplers[i] = i;
-	LinceSetShaderUniformIntN(RENDER_STATE.default_shader, "uTextureSlots", samplers, LINCE_MAX_TEXTURE_UNITS);
+	LinceSetShaderUniformIntN(
+		RENDER_STATE.default_shader,
+		"uTextureSlots", sizeof("uTextureSlots")-1,
+		samplers, LINCE_MAX_TEXTURE_UNITS
+	);
 	RENDER_STATE.shader = RENDER_STATE.default_shader;
 
 	LINCE_PROFILER_END(timer);
@@ -207,8 +211,11 @@ void LinceBeginRender(LinceCamera* cam) {
 	LinceEnableDepthTest();
 
 	/* Update camera */
-	LinceSetShaderUniformMat4(RENDER_STATE.default_shader,
-		"u_view_proj", cam->view_proj);
+	LinceSetShaderUniformMat4(
+		RENDER_STATE.default_shader,
+		"u_view_proj", sizeof("u_view_proj")-1,
+		cam->view_proj
+	);
 	
 	/* Reset batch */
 	RENDER_STATE.quad_count = 0;

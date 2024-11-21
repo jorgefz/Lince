@@ -52,12 +52,12 @@ void OnInit(){
     LincePoint screen = LinceAppGetScreenSize();
 
     LinceBindShader(state.canvas_shader);
-    LinceSetShaderUniformVec2(state.canvas_shader, "uScreen", (float[]){screen.x,screen.y});
+    LinceSetShaderUniformVec2(state.canvas_shader, "uScreen", sizeof("uScreen")-1, (float[]){screen.x,screen.y});
     
     LincePoint xlim, ylim;
     LinceTransformGetBounds(&state.viewframe, &xlim, &ylim);
-    LinceSetShaderUniformVec2(state.canvas_shader, "uXlim", &xlim.x);
-    LinceSetShaderUniformVec2(state.canvas_shader, "uYlim", &ylim.x);
+    LinceSetShaderUniformVec2(state.canvas_shader, "uXlim", sizeof("uXlim")-1, &xlim.x);
+    LinceSetShaderUniformVec2(state.canvas_shader, "uYlim", sizeof("uYlim")-1, &ylim.x);
 }
 
 void OnUpdate(float dt){
@@ -95,8 +95,8 @@ void OnUpdate(float dt){
     LincePoint xlim, ylim;
     LinceTransformGetBounds(&state.viewframe, &xlim, &ylim);
     LinceBindShader(state.canvas_shader);
-    LinceSetShaderUniformVec2(state.canvas_shader, "uXlim", &xlim.x);
-    LinceSetShaderUniformVec2(state.canvas_shader, "uYlim", &ylim.x);
+    LinceSetShaderUniformVec2(state.canvas_shader, "uXlim", sizeof("uXlim")-1, &xlim.x);
+    LinceSetShaderUniformVec2(state.canvas_shader, "uYlim", sizeof("uYlim")-1, &ylim.x);
 
     LinceBeginRender(&state.cam);
     LinceDrawSprite(&state.canvas, &state.transform, state.canvas_shader);
@@ -108,7 +108,7 @@ void OnEvent(LinceEvent* event){
         LinceUpdateCameraProjection(&state.cam, LinceAppGetAspectRatio());
         LincePoint screen = LinceAppGetScreenSize();
         LinceBindShader(state.canvas_shader);
-        LinceSetShaderUniformVec2(state.canvas_shader, "uScreen", &screen.x);
+        LinceSetShaderUniformVec2(state.canvas_shader, "uScreen", sizeof("uScreen")-1, &screen.x);
     }
 }
 
