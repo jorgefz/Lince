@@ -111,14 +111,14 @@ int LinceGetShaderUniformID(LinceShader* shader, const char* name, size_t len){
 	*/
 
 	uint64_t location;
-	if(hashmap_has_key(&shader->uniforms, name)){
-		location = (uint64_t)hashmap_get(&shader->uniforms, name);
+	if(hashmap_has_keyb(&shader->uniforms, name, (uint32_t)len)){
+		location = (uint64_t)hashmap_getb(&shader->uniforms, name, (uint32_t)len);
 		LINCE_PROFILER_END(timer);
 		return (int)location;
 	}
 	
 	location = (uint64_t)glGetUniformLocation(shader->id, name);
-	hashmap_set(&shader->uniforms, name, (void*)location);
+	hashmap_setb(&shader->uniforms, name, (uint32_t)len, (void*)location);
 	
 	// Implementation without hashmap - slower?
 	// int location =  glGetUniformLocation(shader->id, name);
