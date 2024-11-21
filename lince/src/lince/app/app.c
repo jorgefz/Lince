@@ -39,7 +39,7 @@
 
 /* ==== Static variables ==== */
 
-/** @brief Private application state - stack allocated */
+/** @brief Private application state */
 static LinceApp app = {0};
 
 
@@ -89,10 +89,13 @@ LinceApp* LinceGetApp(){
 
 /** @brief Set the window title. Only works before the window is initialised.
 */
-void LinceAppSetTitle(const char* title) {
-    size_t len = strlen(title) + 1;
-    memcpy(app.title, title, (len > LINCE_TITLE_MAX) ? LINCE_TITLE_MAX : len);
-    app.title[LINCE_TITLE_MAX - 1] = '\0';
+void LinceAppSetTitle(const char* title, size_t len) {
+    
+    if (len > LINCE_TITLE_MAX){
+        len = LINCE_TITLE_MAX; // Truncate title
+    }
+
+    app.title = string_from_chars(title, len);
 }
 
 /** @brief Retrieve the asset cache of the application */
@@ -265,9 +268,10 @@ static void LinceInit(){
     // Check user settings and set defaults
     if (app.screen_width == 0) app.screen_width = 500;
     if (app.screen_height == 0) app.screen_height = 500;
+    if (!app.title.str) app.title = string_from_literal("Lince App");
     
     // Create a windowed mode window and its OpenGL context
-    app.window = LinceCreateWindow(app.screen_width, app.screen_height, app.title);
+    app.window = LinceCreateWindow(app.screen_width, app.screen_height, app.title.str);
     LinceSetMainEventCallback(app.window, LinceAppOnEvent);
     // LinceInputSetWindow(app.window);
     LinceInitRenderer(app.window);
@@ -378,6 +382,7 @@ static void LinceAppTerminate(){
     LinceDestroyWindow(app.window);
     app.window = NULL;
     app.running = 0;
+    string_free(&app.title);
     
     LinceCloseProfiler();
     LinceCloseLogger();
