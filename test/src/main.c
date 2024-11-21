@@ -11,6 +11,7 @@
 #include "lince/core/logger.h"
 #include "test_asset_cache/test_asset_cache.h"
 #include "test_array/test_array.h"
+#include "test_string/test_string.h"
 
 void test_hashmap(void** state);
 void test_hashmap_byte_key(void** state);
@@ -31,6 +32,7 @@ int main() {
 
     static const struct CMUnitTest tests[] = {
         TEST_GROUP_ARRAY,
+        TEST_GROUP_STRING,
         TEST_GROUP_ASSET_CACHE,
 
         cmocka_unit_test(test_hashmap),
