@@ -25,12 +25,12 @@ Then, modify the `screen_width` and `screen_height` attributes:
 app->screen_width = 800; // Window width in pixels
 app->screen_height = 500; // Window height in pixels
 ```
-Finally, set the window title with `LinceAppSetTitle`.
+Finally, set the window title with `LinceAppSetTitle`. You must also provide its length.
 This will appear on the top bar of your window.
 ```c
-LinceAppSetTitle("My Window");
+LinceAppSetTitle("My Window", sizeof("My Window")-1);
 ```
-Note that the title must be shorter than 256 characters.
+Note that the title must not be longer than 256 characters.
 
 You should end up with the following code:
 ```c
@@ -41,7 +41,7 @@ int main() {
 	LinceApp* app = LinceGetApp();
 	app->screen_width = 800;
 	app->screen_height = 500;
-	LinceAppSetTitle("My Window");
+	LinceAppSetTitle("My Window", sizeof("My Window")-1);
 
 	LinceRun();
 

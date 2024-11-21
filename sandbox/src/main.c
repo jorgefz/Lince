@@ -48,7 +48,7 @@ void SetupApplication(){
     app->on_update    = SandboxUpdate;
     app->on_terminate = SandboxTerminate;
     app->show_debug_panel = LinceTrue;
-    LinceAppSetTitle("Sandbox");
+    LinceAppSetTitle("Sandbox", sizeof("Sandbox")-1);
 }
 
 

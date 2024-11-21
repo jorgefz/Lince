@@ -313,7 +313,7 @@ int main() {
     srand(time(NULL));
 
     LinceApp* app = LinceGetApp();
-    LinceAppSetTitle("Pong");
+    LinceAppSetTitle("Pong", sizeof("Pong")-1);
     app->screen_width = 800;
     app->screen_height = 500;
     app->on_init   = OnInit;
