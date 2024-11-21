@@ -19,7 +19,7 @@ typedef struct string {
  * @param LIT charcter array literal
  * @returns string container storing copy of string literal
 */
-#define string_from_literal(LIT) string_from_cstr((LIT), sizeof(LIT))
+#define string_from_literal(LIT) string_from_chars((LIT), sizeof(LIT)-1)
 
 /** @brief Creates a string from a character array
  * @param str Character array 
