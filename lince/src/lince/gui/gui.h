@@ -3,6 +3,7 @@
 
 #include "lince/core/window.h"
 #include "lince/app/asset_cache.h"
+#include "lince/containers/str.h"
 #include "lince/containers/hashmap.h"
 
 /** @enum LinceFonts
@@ -63,7 +64,7 @@ LinceBool LinceUILoadFont(LinceUI* ui, const char* name, const char* path, const
  * @param len Length of the unique font name
  * @returns LinceTrue if successful, and LinceFalse otherwise.
 */
-LinceBool LinceUIUseFont(LinceUI* ui, const char* name, size_t len);
+LinceBool LinceUIUseFont(LinceUI* ui, string_t name);
 
 /** @brief Retrieve the Nuklear handle for a font
  * @param ui UI state
@@ -71,7 +72,7 @@ LinceBool LinceUIUseFont(LinceUI* ui, const char* name, size_t len);
  * @param len Length of the unique font name
  * @returns the font handle
 */
-void* LinceUIGetFontHandle(LinceUI* ui, const char* name, size_t len);
+void* LinceUIGetFontHandle(LinceUI* ui, string_t name);
 
 /** @brief Retrieve the Nuklear context
  * @param ui UI state
