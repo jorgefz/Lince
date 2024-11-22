@@ -106,7 +106,7 @@ void WorldSceneUpdate(LinceScene* scene, float dt){
         if(LinceIsKeyPressed(LinceKey_e)){
             game_data->camera.pos[0] = world_scene->house_door.to_x;
             game_data->camera.pos[1] = world_scene->house_door.to_y;
-            LinceAppLoadScene(world_scene->house_door.to_scene);
+            LinceAppLoadScene(world_scene->house_door.to_scene, strlen(world_scene->house_door.to_scene));
         }
     }
 
