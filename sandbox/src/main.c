@@ -23,11 +23,11 @@ void SandboxInit() {
 
     app->user_data = &DATA;
 
-    LinceAppRegisterScene("MainMenu", sizeof("MainMenu")-1, &SCENE_CALLBACKS[Scene_MainMenu]);
-    LinceAppRegisterScene("World", sizeof("World")-1, &SCENE_CALLBACKS[Scene_World]);
-    LinceAppRegisterScene("House", sizeof("House")-1, &SCENE_CALLBACKS[Scene_House]);
+    LinceAppRegisterScene(string_scoped_lit("MainMenu"), &SCENE_CALLBACKS[Scene_MainMenu]);
+    LinceAppRegisterScene(string_scoped_lit("World"), &SCENE_CALLBACKS[Scene_World]);
+    LinceAppRegisterScene(string_scoped_lit("House"), &SCENE_CALLBACKS[Scene_House]);
 
-    LinceAppLoadScene("MainMenu", sizeof("MainMenu")-1);
+    LinceAppLoadScene(string_scoped_lit("MainMenu"));
 }
 
 void SandboxUpdate(float dt){

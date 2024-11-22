@@ -65,7 +65,7 @@ void WorldSceneInit(LinceScene* scene){
  
     world_scene->house_door = (DoorLink){
         .box = (LinceBox2D){.x=6-0.5, .y=6-0.5, .w=1, .h=1},
-        .to_scene = "House",
+        .to_scene = "House", .to_scene_len = sizeof("House") - 1,
         .to_x = 3, .to_y = 2,
     };
 
@@ -106,7 +106,7 @@ void WorldSceneUpdate(LinceScene* scene, float dt){
         if(LinceIsKeyPressed(LinceKey_e)){
             game_data->camera.pos[0] = world_scene->house_door.to_x;
             game_data->camera.pos[1] = world_scene->house_door.to_y;
-            LinceAppLoadScene(world_scene->house_door.to_scene, strlen(world_scene->house_door.to_scene));
+            LinceAppLoadScene(string_scoped(world_scene->house_door.to_scene, world_scene->house_door.to_scene_len));
         }
     }
 

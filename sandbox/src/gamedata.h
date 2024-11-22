@@ -12,10 +12,14 @@ typedef struct GameData {
 } GameData;
 
 
+/// TODO: rename
 typedef struct DoorLink {
     LinceBox2D box; // Collider box that triggers teleport
-    char to_scene[LINCE_NAME_MAX]; // Which scene to load
     float to_x, to_y; // Set camera to this position when teleport
+
+    /// TODO: replace with string_t
+    char to_scene[LINCE_NAME_MAX]; // Name of scene to load
+    size_t to_scene_len; // Number of characters in the scene name
 } DoorLink;
 
 
