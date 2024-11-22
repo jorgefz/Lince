@@ -177,21 +177,19 @@ LinceLayer* LinceAppGetCurrentOverlay(){
 }
 
 /** @brief Creates new scene in cache with defined callbacks. Will not call `on_init`.
-* @param name Name to assign to scene
-* @param len Length of scene string name
+* @param name Name to assign to the scene
 * @param callbacks scene struct with callbacks defined
 */
-void LinceAppRegisterScene(const char* name, size_t len, LinceScene* callbacks) {
-    hashmap_setb(&app.scene_cache, name, (uint32_t)len, LinceNewCopy(callbacks, sizeof(LinceScene)) );
+void LinceAppRegisterScene(string_t name, LinceScene* callbacks) {
+    hashmap_setb(&app.scene_cache, name.str, (uint32_t)name.len, LinceNewCopy(callbacks, sizeof(LinceScene)) );
 }
 
 /** @brief Sets a scene as the current scene. Calls its on_init method if uninitialised.
 * Must have been registered with `LinceRegisterScene`.
 * @param name Name of scene to load
-* @param len Length of scene string name
 */
-void LinceAppLoadScene(const char* name, size_t len) {
-     LinceScene* next_scene = hashmap_getb(&app.scene_cache, name, (uint32_t)len);
+void LinceAppLoadScene(string_t name) {
+     LinceScene* next_scene = hashmap_getb(&app.scene_cache, name.str, (uint32_t)name.len);
      LINCE_ASSERT(next_scene, "Could not load scene '%s'", name);
      app.current_scene = next_scene;
      if (!app.current_scene->loaded){
@@ -203,11 +201,10 @@ void LinceAppLoadScene(const char* name, size_t len) {
 
 /** @brief Return the scene with a given string identifier, or NULL if the scene has not been registered.
 * @param name Scene identifier to load
-* @param len Length of scene string name
-* @returns Scene with matching identifier
+* @returns Scene with matching identifier, or NULL if none found
 */
-LinceScene* LinceAppGetScene(const char* name, size_t len) {
-    return hashmap_getb(&app.scene_cache, name, (uint32_t)len);
+LinceScene* LinceAppGetScene(string_t name) {
+    return hashmap_getb(&app.scene_cache, name.str, (uint32_t)name.len);
 }
 
 /** @brief Returns aspect ratio of the window.

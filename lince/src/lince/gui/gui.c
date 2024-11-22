@@ -116,7 +116,6 @@ LinceBool LinceUILoadFont(LinceUI* ui, const char* name, const char* path, const
         LINCE_ASSERT(font, "Failed to load font '%s' from '%s'", name, full_path);
         if(!font) continue;
         
-        // TODO: replace with `string_from_fmt`
         uint32_t len = snprintf(key, LINCE_NAME_MAX, "%s%u", name, fontsizes[i]);
         if(len > LINCE_NAME_MAX) len = LINCE_NAME_MAX;
         hashmap_setb(&ui->font_cache, key, len, font);

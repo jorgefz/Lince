@@ -132,21 +132,19 @@ LinceLayer* LinceAppGetCurrentOverlay();
 * @param len Length of scene string name
 * @param callbacks scene struct with callbacks defined
 */
-void LinceAppRegisterScene(const char* name, size_t len, LinceScene* callbacks);
+void LinceAppRegisterScene(string_t name, LinceScene* callbacks);
 
 /** @brief Sets a scene as the current scene. Calls its on_init method if uninitialised.
 * Must have been registered with `LinceRegisterScene`.
-* @param name Name of scene to load
-* @param len Length of scene string name
+* @param name String name of scene to load
 */
-void LinceAppLoadScene(const char* name, size_t len);
+void LinceAppLoadScene(string_t name);
 
 /** @brief Return the scene with a given string identifier, or NULL if the scene has not been registered.
-* @param name Scene identifier to load
-* @param len Length of scene string name
-* @returns Scene with matching identifier
+* @param name String name of scene to fetch
+* @returns Scene with matching identifier, or NULL if not found
 */
-LinceScene* LinceAppGetScene(const char* name, size_t len);
+LinceScene* LinceAppGetScene(string_t name);
 
 /** @brief Returns aspect ratio of the window.
 */
