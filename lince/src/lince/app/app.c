@@ -177,19 +177,21 @@ LinceLayer* LinceAppGetCurrentOverlay(){
 }
 
 /** @brief Creates new scene in cache with defined callbacks. Will not call `on_init`.
-* @param name Scene identifier
-* @callbacks scene struct with callbacks defined
+* @param name Name to assign to scene
+* @param len Length of scene string name
+* @param callbacks scene struct with callbacks defined
 */
-void LinceAppRegisterScene(const char* name, LinceScene* callbacks) {
-    hashmap_set(&app.scene_cache, name, LinceNewCopy(callbacks, sizeof(LinceScene)) );
+void LinceAppRegisterScene(const char* name, size_t len, LinceScene* callbacks) {
+    hashmap_setb(&app.scene_cache, name, (uint32_t)len, LinceNewCopy(callbacks, sizeof(LinceScene)) );
 }
 
 /** @brief Sets a scene as the current scene. Calls its on_init method if uninitialised.
 * Must have been registered with `LinceRegisterScene`.
-* @param name Scene identifier to load
+* @param name Name of scene to load
+* @param len Length of scene string name
 */
-void LinceAppLoadScene(const char* name) {
-     LinceScene* next_scene = hashmap_get(&app.scene_cache, name);
+void LinceAppLoadScene(const char* name, size_t len) {
+     LinceScene* next_scene = hashmap_getb(&app.scene_cache, name, (uint32_t)len);
      LINCE_ASSERT(next_scene, "Could not load scene '%s'", name);
      app.current_scene = next_scene;
      if (!app.current_scene->loaded){
@@ -201,10 +203,11 @@ void LinceAppLoadScene(const char* name) {
 
 /** @brief Return the scene with a given string identifier, or NULL if the scene has not been registered.
 * @param name Scene identifier to load
+* @param len Length of scene string name
 * @returns Scene with matching identifier
 */
-LinceScene* LinceAppGetScene(const char* name) {
-    return hashmap_get(&app.scene_cache, name);
+LinceScene* LinceAppGetScene(const char* name, size_t len) {
+    return hashmap_getb(&app.scene_cache, name, (uint32_t)len);
 }
 
 /** @brief Returns aspect ratio of the window.
@@ -362,8 +365,9 @@ static void LinceAppTerminate(){
     
     // Destroy scene cache
     char* key = NULL;
-    while ((key = hashmap_iter(&app.scene_cache, key))) {
-        LinceScene* scene = hashmap_get(&app.scene_cache, key);
+    uint32_t key_len = 0;
+    while ((key = hashmap_iterb(&app.scene_cache, key, key_len, &key_len))) {
+        LinceScene* scene = hashmap_getb(&app.scene_cache, key, key_len);
         if (scene) {
             if (scene->loaded) {
                 LinceUninitScene(scene);
@@ -372,17 +376,16 @@ static void LinceAppTerminate(){
         }
     }
     hashmap_uninit(&app.scene_cache);
-    
-    LinceTerminateUI(app.ui);
+    app.window = NULL;
+    app.running = 0;
+    string_free(&app.title);
 
+    LinceTerminateUI(app.ui);
     LinceUninitAssetCache(&app.asset_cache);
 
     /* shutdown window last, as it destroys opengl context
     and all its functions */
     LinceDestroyWindow(app.window);
-    app.window = NULL;
-    app.running = 0;
-    string_free(&app.title);
     
     LinceCloseProfiler();
     LinceCloseLogger();
