@@ -95,6 +95,11 @@ void LinceAppSetTitle(const char* title, size_t len) {
         len = LINCE_TITLE_MAX; // Truncate title
     }
 
+    if(app.title.str){
+        LINCE_WARN("Can't change window title, already set to '%s'", app.title.str);
+        return;
+    }
+
     app.title = string_from_chars(title, len);
 }
 
