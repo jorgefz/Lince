@@ -115,3 +115,20 @@ void test_string_from_literal_empty(void** state){
 
     string_free(&s);
 }
+
+void test_string_from_fmt(void** state){
+    (void)state;
+    
+    int fmt_int = 42;
+    const char* fmt_str = "hello";
+    const char result[] = "42 hello";
+    size_t result_len = sizeof(result) - 1;
+
+    string_t s = string_from_fmt("%d %s", fmt_int, fmt_str);
+
+    assert_non_null(s.str);
+    assert_int_equal(s.len, result_len);
+    assert_memory_equal(s.str, result, result_len);
+
+    string_free(&s);
+}

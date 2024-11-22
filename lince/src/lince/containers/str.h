@@ -46,6 +46,13 @@ string_t string_from_chars(const char* chars, size_t len);
 */
 string_t string_from_len(size_t len);
 
+/** @brief Create a string from a format char array.
+ * @param fmt Format string
+ * @param args Arguments for string format 
+ * @returns string with arguments composed following input format
+**/
+string_t string_from_fmt(const char fmt[], ...);
+
 /** @brief Frees character array in string container. Sets `str` to NULL and `len` to zero */
 void string_free(string_t* str);
 

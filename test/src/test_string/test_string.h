@@ -10,7 +10,8 @@
     cmocka_unit_test(test_string_from_chars_null), \
     cmocka_unit_test(test_string_from_chars_null), \
     cmocka_unit_test(test_string_from_literal), \
-    cmocka_unit_test(test_string_from_literal_empty)
+    cmocka_unit_test(test_string_from_literal_empty), \
+    cmocka_unit_test(test_string_from_fmt)
 
 
 void test_string_scoped(void** state);
@@ -22,5 +23,6 @@ void test_string_from_chars_null(void** state);
 void test_string_free(void** state);
 void test_string_from_literal(void** state);
 void test_string_from_literal_empty(void** state);
+void test_string_from_fmt(void** state);
 
 #endif /* TEST_STRING_H */

@@ -1,5 +1,9 @@
 #include "str.h"
+
+#include <stdio.h>
 #include <stdlib.h>
+#include <stdarg.h>
+
 
 /** @brief Creates a string from a character array
  * @param str Character array. If NULL, an empty string is created with given size
@@ -49,6 +53,29 @@ string_t string_from_len(size_t len){
         s.str[i] = (char)0;
     }
 
+    return s;
+}
+
+string_t string_from_fmt(const char fmt[], ...){
+    // Two va_list objects needed:
+    //  (1) for calculating the maximum number of bytes written to the buffer
+    //  (2) for writing to the buffer
+    // Cannot reuse only one since it is consumed after use
+    va_list arg1, arg2;
+    va_start(arg1, fmt);
+    va_copy(arg2, arg1);
+
+    size_t len = vsnprintf(NULL, 0, fmt, arg1); // Fetch expected length without writing to a buffer
+    va_end(arg1);
+
+    if(len < 0) return (string_t){0};
+
+    string_t s = string_from_len(len);
+    if(!s.str) return s;
+
+    vsnprintf(s.str, s.len + 1, fmt, arg2); // Takes length including null-terminator, but returns length without it
+    va_end(arg2);
+    
     return s;
 }
 
