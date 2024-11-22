@@ -5,6 +5,7 @@
 #include "lince/core/core.h"
 #include "cglm/types.h"
 
+#include "lince/containers/str.h"
 #include "lince/containers/hashmap.h"
 
 /** @struct shader */
@@ -44,90 +45,81 @@ void LinceDeleteShader(LinceShader* shader);
 * Requires shader to be bound.
 * @param shader Shader
 * @param name Uniform string name
-* @param len Length of uniform name
 * @returns ID of uniform, or -1 if it doesn't exists
 **/
-int LinceGetShaderUniformID(LinceShader* shader, const char* name, size_t len);
+int LinceGetShaderUniformID(LinceShader* shader, string_t name);
 
 /** @brief Set an uniform of integer type.
 * If the uniform was already set, its value is overwritten.
 * Requires shader to be bound.
 * @param sh shader for which to modify uniform.
 * @param name Uniform string name
-* @param len Length of uniform name
 * @param val Value of the uniform
 */
-void LinceSetShaderUniformInt(LinceShader* sh, const char* name, size_t len, int val);
+void LinceSetShaderUniformInt(LinceShader* sh, string_t name, int val);
 
 /** @brief Set an uniform with an array of integers.
 * If the uniform was already set, its value is overwritten.
 * Requires shader to be bound.
 * @param sh shader for which to modify uniform.
 * @param name Uniform string name
-* @param len Length of uniform name
 * @param arr Array of values
 * @param count Number of values in the array
 */
-void LinceSetShaderUniformIntN( LinceShader* sh, const char* name, size_t len, int* arr, uint32_t count);
+void LinceSetShaderUniformIntN( LinceShader* sh, string_t name, int* arr, uint32_t count);
 
 /** @brief Set an uniform with a float value.
 * If the uniform was already set, its value is overwritten.
 * Requires shader to be bound.
 * @param sh shader for which to modify uniform.
 * @param name Uniform string name
-* @param len Length of uniform name
 * @param val Value of the uniform
 */
-void LinceSetShaderUniformFloat(LinceShader* sh, const char* name, size_t len, float val);
+void LinceSetShaderUniformFloat(LinceShader* sh, string_t name, float val);
 
 /** @brief Set an uniform with a 2-float vector.
 * If the uniform was already set, its value is overwritten.
 * Requires shader to be bound.
 * @param sh shader for which to modify uniform.
 * @param name Uniform string name
-* @param len Length of uniform name
 * @param v Value of the uniform using cglm `vec2`.
 */
-void LinceSetShaderUniformVec2(LinceShader* sh, const char* name, size_t len, vec2 v);
+void LinceSetShaderUniformVec2(LinceShader* sh, string_t name, size_t len, vec2 v);
 
 /** @brief Set an uniform with a 3-float vector.
 * If the uniform was already set, its value is overwritten.
 * Requires shader to be bound.
 * @param sh shader for which to modify uniform.
 * @param name Uniform string name
-* @param len Length of uniform name
 * @param v Value of the uniform using cglm `vec3`.
 */
-void LinceSetShaderUniformVec3(LinceShader* sh, const char* name, size_t len, vec3 v);
+void LinceSetShaderUniformVec3(LinceShader* sh, string_t name, vec3 v);
 
 /** @brief Set an uniform with a 4-float vector.
 * If the uniform was already set, its value is overwritten.
 * Requires shader to be bound.
 * @param sh shader for which to modify uniform.
 * @param name Uniform string name
-* @param len Length of uniform name
 * @param v Value of the uniform using cglm `vec4`.
 */
-void LinceSetShaderUniformVec4(LinceShader* sh, const char* name, size_t len, vec4 v);
+void LinceSetShaderUniformVec4(LinceShader* sh, string_t name, vec4 v);
 
 /** @brief Set an uniform with a 3x3 float matrix.
 * If the uniform was already set, its value is overwritten.
 * Requires shader to be bound.
 * @param sh shader for which to modify uniform.
 * @param name Uniform string name
-* @param len Length of uniform name
 * @param v Value of the uniform using cglm `mat3`.
 */
-void LinceSetShaderUniformMat3(LinceShader* sh, const char* name, size_t len, mat3 m);
+void LinceSetShaderUniformMat3(LinceShader* sh, string_t name, mat3 m);
 
 /** @brief Set an uniform with a 4x4 float matrix.
 * If the uniform was already set, its value is overwritten.
 * Requires shader to be bound.
 * @param sh shader for which to modify uniform.
 * @param name Uniform string name
-* @param len Length of uniform name
 * @param v Value of the uniform using cglm `mat4`.
 */
-void LinceSetShaderUniformMat4(LinceShader* sh, const char* name, size_t len, mat4 m);
+void LinceSetShaderUniformMat4(LinceShader* sh, string_t name, mat4 m);
 
 #endif /* LINCE_SHADER_H */
