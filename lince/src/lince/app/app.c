@@ -190,13 +190,13 @@ void LinceAppRegisterScene(string_t name, LinceScene* callbacks) {
 */
 void LinceAppLoadScene(string_t name) {
      LinceScene* next_scene = hashmap_getb(&app.scene_cache, name.str, (uint32_t)name.len);
-     LINCE_ASSERT(next_scene, "Could not load scene '%s'", name);
+     LINCE_ASSERT(next_scene, "Could not load scene '%s'", name.str);
      app.current_scene = next_scene;
      if (!app.current_scene->loaded){
         LinceInitScene(app.current_scene);
-        LINCE_INFO("Initialised scene '%s'", name);
+        LINCE_INFO("Initialised scene '%s'", name.str);
      }
-     LINCE_INFO("Switched to scene '%s'", name);
+     LINCE_INFO("Switched to scene '%s'", name.str);
 }
 
 /** @brief Return the scene with a given string identifier, or NULL if the scene has not been registered.
