@@ -7,6 +7,26 @@
 #include "lince/containers/str.h"
 #include "test_string.h"
 
+void test_string_scoped(void** state){
+    (void)state;
+    const char* chars = "test string";
+    size_t len = sizeof(chars) - 1;
+    string_t s = string_scoped(chars, len);
+
+    assert_ptr_equal(s.str, chars);
+    assert_int_equal(s.len, len);
+}
+
+void test_string_scoped_lit(void** state){
+    (void)state;
+    const char literal[] = "test string";
+    size_t len = sizeof(literal) - 1;
+    string_t s = string_scoped_lit(literal);
+
+    assert_ptr_equal(s.str, literal);
+    assert_int_equal(s.len, len);
+}
+
 void test_string_from_len(void** state){
     (void)state;
     size_t len = 10;

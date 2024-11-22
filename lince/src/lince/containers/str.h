@@ -15,6 +15,18 @@ typedef struct string {
     size_t len; ///< Number of characters in the array
 } string_t;
 
+/** @brief Creates a string_t from a string literal valid for the current scope
+ *  @note no copy of the string data is made, `str` will simply point to the input character array.
+ *  @note do not call `string_free` on the result of this macro
+*/
+#define string_scoped_lit(LIT) (string_t){.str = (char*)(LIT), .len = (sizeof(LIT)-1)}
+
+/** @brief Creates a string_t from a character array valid for the current scope
+ *  @note no copy of the string data is made, `str` will simply point to the input character array.
+ *  @note do not call `string_free` on the result of this macro
+*/
+#define string_scoped(PTR, LEN) (string_t){.str = (char*)(PTR), .len = (LEN)}
+
 /** @brief Creates string from a string literal
  * @param LIT charcter array literal
  * @returns string container storing copy of string literal
