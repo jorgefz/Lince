@@ -60,16 +60,18 @@ LinceBool LinceUILoadFont(LinceUI* ui, const char* name, const char* path, const
 /** @brief Sets the current font.
  * @param ui UI state
  * @param name Unique name of the font followed by its fontsize, e.g. "droid15".
+ * @param len Length of the unique font name
  * @returns LinceTrue if successful, and LinceFalse otherwise.
 */
-LinceBool LinceUIUseFont(LinceUI* ui, const char* name);
+LinceBool LinceUIUseFont(LinceUI* ui, const char* name, size_t len);
 
 /** @brief Retrieve the Nuklear handle for a font
  * @param ui UI state
  * @param name Unique name of the font followed by its fontsize, e.g. "droid15".
+ * @param len Length of the unique font name
  * @returns the font handle
 */
-void* LinceUIGetFontHandle(LinceUI* ui, const char* name);
+void* LinceUIGetFontHandle(LinceUI* ui, const char* name, size_t len);
 
 /** @brief Retrieve the Nuklear context
  * @param ui UI state

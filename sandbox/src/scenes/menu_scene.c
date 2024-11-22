@@ -24,7 +24,7 @@ void DrawMainMenu(LinceScene* scene){
         .text_alignment  = NK_TEXT_CENTERED,
     };
     
-    LinceUIUseFont(ui, "droid30");
+    LinceUIUseFont(ui, "droid30", sizeof("droid30")-1);
     nk_style_push_color(
         ctx,
         &ctx->style.window.background,

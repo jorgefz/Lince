@@ -310,7 +310,7 @@ static void LinceInit(){
 
     // Delay loading fonts to give the user a chance to push custom asset paths on init
     LinceUILoadFont(app.ui, "droid", "fonts/DroidSans.ttf", 5, (uint32_t[]){8,12,15,20,30});
-    LinceUIUseFont(app.ui, "droid12");
+    LinceUIUseFont(app.ui, "droid12", sizeof("droid12")-1);
 
     #ifdef LINCE_DEBUG
     
@@ -425,7 +425,7 @@ static void LinceAppDrawDebugUIPanel(LinceLayer* overlay, float dt){
     // struct nk_context *ctx = ui->ctx;
     // nk_style_push_font(ctx, &((struct nk_font*)ui->fonts[LinceFont_Droid20])->handle);
     struct nk_context *ctx = LinceUIGetNkContext(ui);
-    nk_style_push_font(ctx, LinceUIGetFontHandle(ui, "droid20"));
+    nk_style_push_font(ctx, LinceUIGetFontHandle(ui, "droid20", sizeof("droid20")-1));
     
     if (nk_begin(ctx, "Debug", nk_rect(50, 50, 300, 250),
         NK_WINDOW_BORDER|NK_WINDOW_MOVABLE|NK_WINDOW_SCALABLE|

@@ -115,16 +115,17 @@ LinceBool LinceUILoadFont(LinceUI* ui, const char* name, const char* path, const
         font = nk_font_atlas_add_from_file(atlas, full_path, (float)fontsizes[i], NULL);
         LINCE_ASSERT(font, "Failed to load font '%s' from '%s'", name, full_path);
         if(!font) continue;
-        snprintf(key, LINCE_NAME_MAX, "%s%u", name, fontsizes[i]);
-        hashmap_set(&ui->font_cache, key, font);
+        uint32_t len = snprintf(key, LINCE_NAME_MAX, "%s%u", name, fontsizes[i]);
+        if(len > LINCE_NAME_MAX) len = LINCE_NAME_MAX;
+        hashmap_setb(&ui->font_cache, key, len, font);
     }
     nk_glfw3_font_stash_end(&ui->backend);
     nk_font_atlas_cleanup(atlas);
     return LinceTrue;
 }
 
-void* LinceUIGetFontHandle(LinceUI* ui, const char* name){
-    struct nk_font* font = hashmap_get(&ui->font_cache, name);
+void* LinceUIGetFontHandle(LinceUI* ui, const char* name, size_t len){
+    struct nk_font* font = hashmap_getb(&ui->font_cache, name, (uint32_t)len);
     if(!font) return LinceFalse;
     return &font->handle;
 }
@@ -133,8 +134,8 @@ void* LinceUIGetNkContext(LinceUI* ui){
     return ui->ctx;
 }
 
-LinceBool LinceUIUseFont(LinceUI* ui, const char* name){
-    void* font_handle = LinceUIGetFontHandle(ui, name);
+LinceBool LinceUIUseFont(LinceUI* ui, const char* name, size_t len){
+    void* font_handle = LinceUIGetFontHandle(ui, name, len);
     nk_style_set_font(ui->ctx, font_handle);
     return LinceTrue;
 }
