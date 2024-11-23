@@ -50,13 +50,14 @@ string_t string_from_len(size_t len);
  * @param fmt Format string
  * @param args Arguments for string format 
  * @returns string with arguments composed following input format
+ * @note When using %s (string) arguments on formatted strings,
+ * it is recommended to also specify the maximum number of characters to write:
+ *      string_from_fmt("%.*s", len, str);
 **/
 string_t string_from_fmt(const char fmt[], ...);
 
 /** @brief Frees character array in string container. Sets `str` to NULL and `len` to zero */
 void string_free(string_t* str);
-
-
 
 
 #endif /* STR_H */
