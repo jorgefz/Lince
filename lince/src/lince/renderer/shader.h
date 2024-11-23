@@ -84,7 +84,7 @@ void LinceSetShaderUniformFloat(LinceShader* sh, string_t name, float val);
 * @param name Uniform string name
 * @param v Value of the uniform using cglm `vec2`.
 */
-void LinceSetShaderUniformVec2(LinceShader* sh, string_t name, size_t len, vec2 v);
+void LinceSetShaderUniformVec2(LinceShader* sh, string_t name, vec2 v);
 
 /** @brief Set an uniform with a 3-float vector.
 * If the uniform was already set, its value is overwritten.

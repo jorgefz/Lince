@@ -171,7 +171,7 @@ void LinceInitRenderer() {
 	for (int i = 0; i != LINCE_MAX_TEXTURE_UNITS; ++i) samplers[i] = i;
 	LinceSetShaderUniformIntN(
 		RENDER_STATE.default_shader,
-		"uTextureSlots", sizeof("uTextureSlots")-1,
+		string_scoped_lit("uTextureSlots"),
 		samplers, LINCE_MAX_TEXTURE_UNITS
 	);
 	RENDER_STATE.shader = RENDER_STATE.default_shader;
@@ -213,7 +213,7 @@ void LinceBeginRender(LinceCamera* cam) {
 	/* Update camera */
 	LinceSetShaderUniformMat4(
 		RENDER_STATE.default_shader,
-		"u_view_proj", sizeof("u_view_proj")-1,
+		string_scoped_lit("u_view_proj"),
 		cam->view_proj
 	);
 	
