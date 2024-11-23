@@ -14,7 +14,7 @@
 #endif
 
 
-size_t LinceFetchExeDir(char* buf, size_t max_size){
+size_t LinceFetchExecutablePath(char* buf, size_t max_size){
 
 	size_t n_bytes;
 	memset(buf, 0, max_size);

@@ -5,11 +5,13 @@
 
 
 LinceBool LinceInitAssetCache(LinceAssetCache* cache) {
-    cache->exedir_length = LinceFetchExeDir(cache->exedir, LINCE_PATH_MAX);
-    if (cache->exedir_length == 0) {
+    static char exedir_buf[LINCE_PATH_MAX];
+    size_t exedir_len = LinceFetchExecutablePath(exedir_buf, LINCE_PATH_MAX);
+    if (exedir_len == 0) {
         return LinceFalse;
     }
 
+    cache->exedir = string_from_chars(exedir_buf, exedir_len);
     array_init(&cache->folders, LINCE_PATH_MAX * sizeof(char));
     hashmap_init(&cache->stores, 10);
 
@@ -18,6 +20,7 @@ LinceBool LinceInitAssetCache(LinceAssetCache* cache) {
 
 
 void LinceUninitAssetCache(LinceAssetCache* cache) {
+    string_free(&cache->exedir);
     array_uninit(&cache->folders);
 
     char* type_key = NULL;
@@ -56,7 +59,7 @@ void LinceDeleteAssetCache(LinceAssetCache* cache) {
 
 LinceBool LinceAssetCachePushFolder(LinceAssetCache* cache, const char* folder){
     size_t folder_len = strlen(folder);
-    size_t exe_len = cache->exedir_length + 1;
+    size_t exe_len = cache->exedir.len;
     size_t total_len = folder_len + exe_len;
     
     if(total_len >= LINCE_PATH_MAX - 1){
@@ -68,7 +71,7 @@ LinceBool LinceAssetCachePushFolder(LinceAssetCache* cache, const char* folder){
     char* p = array_front(&cache->folders);
 
     // Prepend directory of executable
-    memmove(p, cache->exedir, exe_len);
+    memmove(p, cache->exedir.str, exe_len);
     if (p[exe_len-1] != '\\' && p[exe_len-1] != '/'){
         p[exe_len] = '/';
         exe_len++;
@@ -105,6 +108,8 @@ char* LinceAssetCacheFetchPath(LinceAssetCache* cache, const char* asset_filenam
             LINCE_WARN("Skipping path, too long: '%s' + '%s'", dir, asset_filename);
             continue;
         }
+
+        LINCE_INFO("Checking asset folder '%s'", dir);
         
         memmove(cache->result_path, dir, dir_len);
         memmove(cache->result_path + dir_len, asset_filename, strlen(asset_filename)+1);

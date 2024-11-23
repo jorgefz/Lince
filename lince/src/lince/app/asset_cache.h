@@ -3,6 +3,7 @@
 
 #include "lince/core/core.h"
 #include "lince/containers/array.h"
+#include "lince/containers/str.h"
 #include "lince/containers/hashmap.h"
 
 
@@ -31,8 +32,10 @@ typedef struct LinceAssetStore {
 
 typedef struct LinceAssetCache {
 
-    char exedir[LINCE_PATH_MAX];      ///< Directory where the executable is located
-    size_t exedir_length;             ///< Number of characters in the path of the executable
+    // char exedir[LINCE_PATH_MAX];      ///< Directory where the executable is located
+    // size_t exedir_length;             ///< Number of characters in the path of the executable
+    string_t exedir; ///< Directory where the executable is located
+    
     char result_path[LINCE_PATH_MAX]; ///< Stores result of LinceFetchAssetPath
 
     /// array<char[LINCE_PATH_MAX]>

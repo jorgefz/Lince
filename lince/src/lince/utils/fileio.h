@@ -13,7 +13,7 @@
  * @param max_size Maximum number of bytes to copy to the buffer.
  * @returns Number of bytes copied to the input buffer, excluding the terminating character
  */
-size_t LinceFetchExeDir(char* buf, size_t max_size);
+size_t LinceFetchExecutablePath(char* buf, size_t max_size);
 
 /** @brief Returns LinceTrue if a given file exists
  * @param path Path to file
@@ -25,7 +25,7 @@ LinceBool LinceIsFile(const char* path);
  */
 LinceBool LinceIsDir(const char* path);
 
-/** @brief Loads a file's contents into memory
+/** @brief Loads a file's contents into memory.
  * On fail, the returning string will have the field `str` set to NULL and its size set to zero.
  * @note Returned string must be freed with `string_free`.
  * @param path path to file to load
