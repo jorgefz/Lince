@@ -21,7 +21,7 @@ LinceSoundConfig LinceGetDefaultSoundConfig(void){
 
 // Creates ma_sound handle from filename and config passed through provided object
 void LinceInitSound(LinceAudioEngine* audio, LinceSound* s){
-    LINCE_ASSERT(s && s->filename, "NULL pointer");
+    LINCE_ASSERT(s && s->filename.str, "NULL pointer");
 
     ma_result result;
     uint32_t flags = MA_SOUND_FLAG_DECODE;
@@ -33,16 +33,16 @@ void LinceInitSound(LinceAudioEngine* audio, LinceSound* s){
     s->handle = LinceMalloc(sizeof(ma_sound));
     LINCE_ASSERT_ALLOC(s->handle, sizeof(ma_sound));
     
-    result = ma_sound_init_from_file(audio->handle, s->filename, flags, NULL, NULL, s->handle);
-    LINCE_ASSERT(result == MA_SUCCESS, "Failed to load sound '%s'", s->filename);
+    result = ma_sound_init_from_file(audio->handle, s->filename.str, flags, NULL, NULL, s->handle);
+    LINCE_ASSERT(result == MA_SUCCESS, "Failed to load sound '%s'", s->filename.str);
 
     LinceUpdateSound(s);
 }
 
 
-LinceSound* LinceLoadSound(LinceAudioEngine* audio, const char* filename, LinceSoundConfig* config){
+LinceSound* LinceLoadSound(LinceAudioEngine* audio, string_t filename, LinceSoundConfig* config){
     LinceSound sound = {
-        .filename = LinceNewCopy(filename, (strlen(filename)+1)*sizeof(char)),
+        .filename = string_from_chars(filename.str, filename.len),
         .type = LinceSound_Buffer,
         .config = config ? (*config) : default_sound_config,
     };
@@ -50,9 +50,9 @@ LinceSound* LinceLoadSound(LinceAudioEngine* audio, const char* filename, LinceS
     return LinceNewCopy(&sound, sizeof(LinceSound));
 }
 
-LinceSound* LinceLoadStream(LinceAudioEngine* audio, const char* filename, LinceSoundConfig* config){
+LinceSound* LinceLoadStream(LinceAudioEngine* audio, string_t filename, LinceSoundConfig* config){
     LinceSound sound = {
-        .filename = LinceNewCopy(filename, (strlen(filename)+1)*sizeof(char)),
+        .filename = string_from_chars(filename.str, filename.len),
         .type = LinceSound_Stream,
         .config = config ? (*config) : default_sound_config,
     };
@@ -63,7 +63,7 @@ LinceSound* LinceLoadStream(LinceAudioEngine* audio, const char* filename, Lince
 // Uninitialises provided sound object
 void LinceDeleteSound(LinceSound* s){
     LINCE_ASSERT(s, "NULL pointer");
-    if(s->filename) LinceFree(s->filename);
+    if(s->filename.str) string_free(&s->filename);
     if(s->handle) LinceFree(s->handle);
 }
 
@@ -123,18 +123,18 @@ void LinceDeleteAudioEngine(LinceAudioEngine* engine){
     LinceFree(engine);
 }
 
-LinceSoundManager* LinceCreateSoundManager(LinceAudioEngine* audio, LinceSoundType type, const char* filename){
+LinceSoundManager* LinceCreateSoundManager(LinceAudioEngine* audio, LinceSoundType type, string_t filename){
     
     LinceSoundManager manager = {
         .type = type,
-        .filename = LinceNewCopy(filename, strlen(filename) + 1),
+        .filename = string_from_chars(filename.str, filename.len)
     };
     array_init(&manager.sound_cache, sizeof(LinceSound));
 
     // Pre-load sound file
     LinceSound first = {
         .handle = LinceMalloc(sizeof(ma_sound)),
-        .filename = manager.filename,
+        .filename = manager.filename, // No need to copy full path, original stored in manager
         .type = type,
         .config = default_sound_config,
     };
@@ -147,8 +147,8 @@ LinceSoundManager* LinceCreateSoundManager(LinceAudioEngine* audio, LinceSoundTy
 
 void LinceDeleteSoundManager(LinceSoundManager* manager){
     LINCE_ASSERT(manager, "NULL pointer");
-    if(manager->filename){
-        LinceFree(manager->filename);
+    if(manager->filename.str){
+        string_free(&manager->filename);
     }
     for(uint32_t i = 0; i != manager->sound_cache.size; ++i){
         LinceSound* s = array_get(&manager->sound_cache, i);
@@ -163,7 +163,7 @@ void LinceDeleteSoundManager(LinceSoundManager* manager){
 }
 
 void LinceSpawnSound(LinceAudioEngine* audio, LinceSoundManager* manager, LinceSoundConfig* config){
-    LINCE_ASSERT(manager && manager->filename, "NULL pointer");
+    LINCE_ASSERT(manager && manager->filename.str, "NULL pointer");
 
     // Reuse cached sound that is stopped or finished
     for(uint32_t i = 0; i != manager->sound_cache.size; ++i){

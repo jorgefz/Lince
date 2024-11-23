@@ -48,6 +48,7 @@ void OnTerminate(){
 #define LINCE_AUDIO_H
 
 #include <lince/core/core.h>
+#include <lince/containers/str.h>
 #include <lince/containers/array.h>
 
 /** @enum LinceSoundType
@@ -75,7 +76,7 @@ typedef struct LinceSoundConfig {
 */
 typedef struct LinceSound{
     void* handle;             ///< miniaudio handle for `ma_sound`
-    char* filename;           ///< File from which sound was loaded
+    string_t filename;        ///< File from which sound was loaded
     LinceSoundType type;      ///< Sound type: streamed or buffered 
     LinceSoundConfig config;  ///< Sound settings
 } LinceSound;
@@ -92,7 +93,7 @@ typedef struct LinceSound{
 */
 typedef struct LinceSoundManager{
     array_t sound_cache;      ///< array_t<LinceSound>, sound instances
-    char* filename;           ///< Origin audio file
+    string_t filename;           ///< Origin audio file
     enum LinceSoundType type; ///< Sound type: streamed or buffered
 } LinceSoundManager;
 
@@ -140,7 +141,7 @@ void LinceInitSound(LinceAudioEngine* audio, LinceSound* s);
 * @param filename File from which to load audio
 * @param config Settings for the sound
 */
-LinceSound* LinceLoadSound(LinceAudioEngine* audio, const char* filename, LinceSoundConfig* config);
+LinceSound* LinceLoadSound(LinceAudioEngine* audio, string_t filename, LinceSoundConfig* config);
 
 /** @brief Allocates and returns a streamed sound from file.
 * Akin to `LinceLoadSound`.
@@ -148,7 +149,7 @@ LinceSound* LinceLoadSound(LinceAudioEngine* audio, const char* filename, LinceS
 * @param filename File from which to stream audio
 * @param config Settings for the sound
 */
-LinceSound* LinceLoadStream(LinceAudioEngine* audio, const char* filename, LinceSoundConfig* config);
+LinceSound* LinceLoadStream(LinceAudioEngine* audio, string_t filename, LinceSoundConfig* config);
 
 /** @brief Uninitialises and deallocates a sound instance, either buffered or streamed.
 */
@@ -195,7 +196,7 @@ void LinceUpdateSound(LinceSound* s);
 * @param type Streamed or buffered. It works best for buffered sounds.
 * @param filename File from which to load audio.
 */
-LinceSoundManager* LinceCreateSoundManager(LinceAudioEngine* audio, LinceSoundType type, const char* filename);
+LinceSoundManager* LinceCreateSoundManager(LinceAudioEngine* audio, LinceSoundType type, string_t filename);
 
 /** @brief Deallocates a sound manager */
 void LinceDeleteSoundManager(LinceSoundManager* manager);
