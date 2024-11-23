@@ -39,7 +39,7 @@ void HouseSceneInit(LinceScene* scene){
     scene->data = house_scene;
     
     // Town map
-    LinceTexture* tex = LinceAppGetAsset("textures/inside.png", "texture");
+    LinceTexture* tex = LinceAppGetAsset(string_scoped_lit("textures/inside.png"), string_scoped_lit("texture"));
     LinceTilesetInit(&house_scene->tileset, tex, 16, 16);
     
     house_scene->map =  (LinceTilemap){

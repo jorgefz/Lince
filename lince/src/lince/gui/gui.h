@@ -56,7 +56,7 @@ void LinceTerminateUI(LinceUI* ui);
  * @param fontsizes Array of fontsizes to generate
  * @returns LinceTrue if successful, and LinceFalse otherwise.
 */
-LinceBool LinceUILoadFont(LinceUI* ui, const char* name, const char* path, const uint32_t n, uint32_t* fontsizes);
+LinceBool LinceUILoadFont(LinceUI* ui, string_t name, string_t path, const uint32_t n, uint32_t* fontsizes);
 
 /** @brief Sets the current font.
  * @param ui UI state

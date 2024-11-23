@@ -101,27 +101,28 @@ void LinceTerminateUI(LinceUI* ui){
 	LINCE_INFO("Nuklear UI Terminated");
 }
 
-LinceBool LinceUILoadFont(LinceUI* ui, const char* name, const char* path, const uint32_t n, uint32_t* fontsizes){
+LinceBool LinceUILoadFont(LinceUI* ui, string_t name, string_t path, const uint32_t n, uint32_t* fontsizes){
     struct nk_font_atlas *atlas;
     struct nk_font* font;
-    static char key[LINCE_NAME_MAX] = {0};
+    char key[LINCE_NAME_MAX] = {0};
     
-    const char* full_path = LinceAssetCacheFetchPath(ui->asset_cache, path);
-    LINCE_ASSERT(full_path, "Could not find font '%s' from '%s'", name, full_path);
-    if(!full_path) return LinceFalse;
+    string_t full_path = LinceAssetCacheFetchPath(ui->asset_cache, path);
+    LINCE_ASSERT(full_path.str, "Could not find font '%s' from '%s'", name.str, full_path.str);
+    if(!full_path.str) return LinceFalse;
 
     nk_glfw3_font_stash_begin(&ui->backend, &atlas);
     for(uint32_t i = 0; i != n; ++i){
-        font = nk_font_atlas_add_from_file(atlas, full_path, (float)fontsizes[i], NULL);
-        LINCE_ASSERT(font, "Failed to load font '%s' from '%s'", name, full_path);
+        font = nk_font_atlas_add_from_file(atlas, full_path.str, (float)fontsizes[i], NULL);
+        LINCE_ASSERT(font, "Failed to load font '%s' from '%s'", name.str, full_path.str);
         if(!font) continue;
         
-        uint32_t len = snprintf(key, LINCE_NAME_MAX, "%s%u", name, fontsizes[i]);
+        uint32_t len = snprintf(key, LINCE_NAME_MAX, "%s%u", name.str, fontsizes[i]);
         if(len > LINCE_NAME_MAX) len = LINCE_NAME_MAX;
         hashmap_setb(&ui->font_cache, key, len, font);
     }
     nk_glfw3_font_stash_end(&ui->backend);
     nk_font_atlas_cleanup(atlas);
+    string_free(&full_path);
     return LinceTrue;
 }
 

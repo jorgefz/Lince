@@ -114,7 +114,7 @@ void LinceAppPushAssetFolder(string_t dir){
 }
 
 /** @brief Retrieve (or load) an asset from the cache */
-void* LinceAppGetAsset(const char* path, const char* type){
+void* LinceAppGetAsset(string_t path, string_t type){
     return LinceAssetCacheGet(LinceAppGetAssetCache(), path, type);
 }
 
@@ -286,10 +286,10 @@ static void LinceInit(){
     LinceAssetCachePushFolder(&app.asset_cache, string_scoped_lit("../../../lince/assets"));
     
     // Register asset types
-    LinceAssetCacheAddAssetType(&app.asset_cache, "image", LinceLoadImageAsset, LinceUnloadImageAsset);
-    LinceAssetCacheAddAssetType(&app.asset_cache, "texture", LinceLoadTextureAsset, LinceUnloadTextureAsset);
-    // LinceAssetCacheAddAssetType(&app.asset_cache, "shader", LinceLoadShader, LinceUnloadShader);
-    // LinceAssetCacheAddAssetType(&app.asset_cache, "shader_header", LinceLoadShader, LinceUnloadShader);
+    LinceAssetCacheAddType(&app.asset_cache, string_scoped_lit("image"), LinceLoadImageAsset, LinceUnloadImageAsset);
+    LinceAssetCacheAddType(&app.asset_cache, string_scoped_lit("texture"), LinceLoadTextureAsset, LinceUnloadTextureAsset);
+    // LinceAssetCacheAddType(&app.asset_cache, "shader", LinceLoadShader, LinceUnloadShader);
+    // LinceAssetCacheAddType(&app.asset_cache, "shader_header", LinceLoadShader, LinceUnloadShader);
     
     // Create layer stacks
     array_init(&app.layer_stack, sizeof(LinceLayer));
@@ -311,7 +311,7 @@ static void LinceInit(){
     if (app.on_init) app.on_init();
 
     // Delay loading fonts to give the user a chance to push custom asset paths on init
-    LinceUILoadFont(app.ui, "droid", "fonts/DroidSans.ttf", 5, (uint32_t[]){8,12,15,20,30});
+    LinceUILoadFont(app.ui, string_scoped_lit("droid"), string_scoped_lit("fonts/DroidSans.ttf"), 5, (uint32_t[]){8,12,15,20,30});
     LinceUIUseFont(app.ui, string_scoped_lit("droid12"));
 
     #ifdef LINCE_DEBUG

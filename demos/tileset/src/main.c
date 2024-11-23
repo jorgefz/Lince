@@ -21,7 +21,7 @@ void OnInit() {
     LinceInitCamera(&camera, 800.0f / 500.0f);
 
     LinceAppPushAssetFolder(string_scoped_lit("../../../demos/tileset/assets"));
-    texture = LinceAppGetAsset("outside.png", "texture");
+    texture = LinceAppGetAsset(string_scoped_lit("outside.png"), string_scoped_lit("texture"));
     sprite.texture = texture;
 
     LinceTilesetInit(&tileset, texture, 16, 16);

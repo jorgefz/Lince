@@ -5,9 +5,9 @@
 #include "lince/utils/image.h"
 
 
-void* LinceLoadImageAsset(const char* path, void* args){
+void* LinceLoadImageAsset(string_t path, void* args){
     (void)args;
-    return LinceLoadImage(path);
+    return LinceLoadImage(path.str);
 }
 
 void LinceUnloadImageAsset(void* img){

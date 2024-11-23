@@ -5,8 +5,8 @@
 #include "lince/utils/memory.h"
 #include "lince/renderer/texture.h"
 
-void* LinceLoadTextureAsset(const char* path, void* args){
-	return LinceCreateTextureFromFile(path, (uint32_t)(uint64_t)args);
+void* LinceLoadTextureAsset(string_t path, void* args){
+	return LinceCreateTextureFromFile(path.str, (uint32_t)(uint64_t)args);
 }
 
 void LinceUnloadTextureAsset(void* ptr){

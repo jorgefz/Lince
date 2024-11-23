@@ -90,7 +90,7 @@ LinceAssetCache* LinceAppGetAssetCache();
 void LinceAppPushAssetFolder(string_t dir);
 
 /** @brief Retrieve (or load) an asset from the cache */
-void* LinceAppGetAsset(const char* path, const char* type);
+void* LinceAppGetAsset(string_t path, string_t type);
 
 // hashmap_t* LinceAppGetShaderHeaders(); // For creating preprocessing shaders
 

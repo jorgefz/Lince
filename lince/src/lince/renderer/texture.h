@@ -27,7 +27,7 @@ typedef struct LinceTexture {
  * 			   Must be an uint32_t converted to pointer.
  * @returns loaded texture
 */
-void* LinceLoadTextureAsset(const char* path, void* args);
+void* LinceLoadTextureAsset(string_t path, void* args);
 
 /** @brief Callback to unload texture via asset cache */
 void LinceUnloadTextureAsset(void* ptr);
