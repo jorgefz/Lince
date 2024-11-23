@@ -195,12 +195,14 @@ int LinceCompileShader(const char* source, int type){
 	if (compile_sucess != GL_TRUE) {
 		// Retrieve GLSL compiler error message
 		int length = 0;
-		char msg[LINCE_TEXT_MAX] = {0};
+		string_t msg = string_from_len(LINCE_TEXT_MAX);
 		glGetShaderiv(id, GL_INFO_LOG_LENGTH, &length);
-		glGetShaderInfoLog(id, LINCE_TEXT_MAX, &length, &msg[0]);
+		glGetShaderInfoLog(id, LINCE_TEXT_MAX, &length, msg.str);
 		glDeleteShader(id);
 		LINCE_ERROR("Failed to compile shader source");
-		LINCE_ASSERT(0, "%s", msg);
+		LINCE_ERROR("%.*s", length, msg.str);
+		string_free(&msg);
+		LINCE_ASSERT(0, "Shader compilation failed");
 	}
 	
 	LINCE_PROFILER_END(timer);

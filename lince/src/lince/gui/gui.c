@@ -104,7 +104,7 @@ void LinceTerminateUI(LinceUI* ui){
 LinceBool LinceUILoadFont(LinceUI* ui, string_t name, string_t path, const uint32_t n, uint32_t* fontsizes){
     struct nk_font_atlas *atlas;
     struct nk_font* font;
-    char key[LINCE_NAME_MAX] = {0};
+    char key[LINCE_NAME_MAX] = {0}; // Only 64 bytes long
     
     string_t full_path = LinceAssetCacheFetchPath(ui->asset_cache, path);
     LINCE_ASSERT(full_path.str, "Could not find font '%s' from '%s'", name.str, full_path.str);
