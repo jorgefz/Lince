@@ -134,9 +134,9 @@ Note that these do not apply to the containers (e.g. array, hashmap, list).
 #define LINCE_ASSERT_ALLOC(ptr, size) LINCE_ASSERT(ptr, "Failed to allocate %ld bytes", (long int)(size))
 
 /* Constants & typedefs */
-#define LINCE_NAME_MAX 100  ///< Used for short names (e.g. shader uniforms)
+#define LINCE_NAME_MAX  64  ///< Used for short names (e.g. shader uniforms)
 #define LINCE_TITLE_MAX 256 ///< Limit to the number of characters in the title
-#define LINCE_TEXT_MAX 1000 ///< Used for longer string (e.g. descriptions)
+#define LINCE_TEXT_MAX 1024 ///< Used for longer string (e.g. descriptions)
 #define LINCE_PATH_MAX 1024 ///< Max number of characters in a path
 
 /** @enum LinceBool
