@@ -378,16 +378,18 @@ static void LinceAppTerminate(){
         }
     }
     hashmap_uninit(&app.scene_cache);
-    app.window = NULL;
-    app.running = 0;
-    string_free(&app.title);
 
     LinceTerminateUI(app.ui);
     LinceUninitAssetCache(&app.asset_cache);
-
+    
     /* shutdown window last, as it destroys opengl context
     and all its functions */
     LinceDestroyWindow(app.window);
+    LINCE_INFO("Destroyed window and GLFW context");
+    
+    app.window = NULL;
+    app.running = 0;
+    string_free(&app.title);
     
     LinceCloseProfiler();
     LinceCloseLogger();
