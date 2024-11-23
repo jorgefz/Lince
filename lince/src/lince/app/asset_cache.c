@@ -82,6 +82,8 @@ LinceBool LinceAssetCachePushFolder(LinceAssetCache* cache, string_t path){
     if (end[-1] != '\\' && end[-1] != '/'){
         end[0] = '/';
         end[1] = '\0';
+    } else {
+        end[0] = '\0';
     }
     
     if(LinceIsDir(assets_dir.str) != LinceTrue){
@@ -114,6 +116,7 @@ string_t LinceAssetCacheFetchPath(LinceAssetCache* cache, string_t filename){
         }
         
         string_t full_path = string_from_fmt("%s%s", dir->str, filename.str);
+
         if (LinceIsFile(full_path.str)){
             LINCE_INFO("Located asset '%s' at '%s'", filename.str, full_path.str);
             return full_path;
