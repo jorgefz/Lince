@@ -8,7 +8,7 @@
 
 
 ///< Callback signature to load an asset from disk
-typedef void* (*LinceAssetLoad)(const char* path, void* args);
+typedef void* (*LinceAssetLoad)(string_t path, void* args);
 
 ///< Callback signature to free an asset from memory
 typedef void (*LinceAssetUnload)(void* obj);
@@ -21,31 +21,16 @@ typedef struct LinceAssetCallbacks {
 
 /// Stores assets of a single type
 typedef struct LinceAssetStore {
-    char type[LINCE_NAME_MAX];     ///< Index in the stores array
-    LinceAssetCallbacks callbacks; ///< Load and Unload functions
-
-    /// Asset names mapped to their raw pointers.
-    /// The map may have a key storing a NULL asset if said asset was loaded and then unloaded.
-    hashmap_t handles; 
+    LinceAssetCallbacks callbacks; ///< Load and Unload functions for the asset type
+    hashmap_t handles; /// Raw pointers to loaded assets, mapped by their filenames
+                       /// A key may map to a NULL asset pointer if the asset was loaded and then unloaded.
 } LinceAssetStore;
 
 
 typedef struct LinceAssetCache {
-
-    // char exedir[LINCE_PATH_MAX];      ///< Directory where the executable is located
-    // size_t exedir_length;             ///< Number of characters in the path of the executable
     string_t exedir; ///< Directory where the executable is located
-    
-    char result_path[LINCE_PATH_MAX]; ///< Stores result of LinceFetchAssetPath
-
-    /// array<char[LINCE_PATH_MAX]>
-    /// Array of relative paths between the executable and the asset folders
-    array_t folders;
-    
-    /// hashmap<LinceAssetStore>
-    /// Stores info and handles for each asset type
-    hashmap_t stores;
-
+    array_t folders; /// array<string_t>, relative paths between the executable and the asset folders
+    hashmap_t stores; /// hashmap<LinceAssetStore>, stores info and handles for each asset type
 } LinceAssetCache;
 
 
@@ -81,10 +66,9 @@ LinceBool LinceAssetCachePushFolder(LinceAssetCache* cache, string_t path);
 
 /** @brief Retrieves the full path of an asset file by searching in the stored asset folders
 * @param filename Location of the asset file within an asset folder
-* @returns a pointer to the resulting path, or NULL if the asset could not be found
-* @note the path returned is saved internally and will be overwritten the next time the function is called.
+* @returns the full path of the asset; which needs to be freed with `string_free`.
 */
-char* LinceAssetCacheFetchPath(LinceAssetCache* cache, const char* filename);
+string_t LinceAssetCacheFetchPath(LinceAssetCache* cache, string_t filename);
 
 /** @brief 
  * Registers a new type of asset on the asset cache.
@@ -94,12 +78,7 @@ char* LinceAssetCacheFetchPath(LinceAssetCache* cache, const char* filename);
  * @param unload Function to free the asset from memory.
  * @returns Non-null pointer on success, and null otherwise.
 */
-void* LinceAssetCacheAddAssetType(
-    LinceAssetCache* cache,
-    const char* name,
-    LinceAssetLoad load,
-    LinceAssetUnload unload
-);
+void* LinceAssetCacheAddType(LinceAssetCache* cache, string_t name, LinceAssetLoad load, LinceAssetUnload unload);
 
 /** @brief Adds an existing asset to the cache
  * The asset must be heap-allocated.
@@ -109,7 +88,7 @@ void* LinceAssetCacheAddAssetType(
  * @param handle Raw pointer to the (heap-allocated) asset data
  * @returns handle on success, and NULL otherwise
 */
-void* LinceAssetCacheAdd(LinceAssetCache* cache, const char* name, const char* type, void* handle);
+void* LinceAssetCacheAdd(LinceAssetCache* cache, string_t name, string_t type, void* handle);
 
 /** @brief Load an asset from memory
  * @param name String identifier for the asset
@@ -117,7 +96,7 @@ void* LinceAssetCacheAdd(LinceAssetCache* cache, const char* name, const char* t
  * @param args Custom argument passed to load function
  * @returns pointer to loaded asset, or NULL if asset does not exist or is already loaded.
 */
-void* LinceAssetCacheLoad(LinceAssetCache* cache, const char* name, const char* type, void* args);
+void* LinceAssetCacheLoad(LinceAssetCache* cache, string_t name, string_t type, void* args);
 
 /** @brief Unload a cached asset
  * @param cache Asset cache
@@ -125,7 +104,7 @@ void* LinceAssetCacheLoad(LinceAssetCache* cache, const char* name, const char* 
  * @param type String identifier of the asset type
  * @returns Non-null pointer if asset was successfully unloaded, and null otherwise.
 */
-void* LinceAssetCacheUnload(LinceAssetCache* cache, const char* name, const char* type);
+void* LinceAssetCacheUnload(LinceAssetCache* cache, string_t name, string_t type);
 
 /** Reloads an existing asset from disk, discarding the previous one
  * @param name String identifier of the asset
@@ -134,7 +113,7 @@ void* LinceAssetCacheUnload(LinceAssetCache* cache, const char* name, const char
  * @returns raw pointer to reloaded asset, or NULL if the asset does not exist.
  * @note If the asset wasn't previously loaded, it simply loads it.
 */
-void* LinceAssetCacheReload(LinceAssetCache* cache, const char* name, const char* type, void* args);
+void* LinceAssetCacheReload(LinceAssetCache* cache, string_t name, string_t type, void* args);
 
 /** @brief Retrieve a cached asset
  * @param name String identifier
@@ -145,7 +124,7 @@ void* LinceAssetCacheReload(LinceAssetCache* cache, const char* name, const char
  * If you want to ensure an asset is loaded with specific arguments,
  * call LinceAssetCacheLoad once with the desired arguments, and then use LinceAssetCacheGet afterwards.
 */
-void* LinceAssetCacheGet(LinceAssetCache* cache, const char* name, const char* type);
+void* LinceAssetCacheGet(LinceAssetCache* cache, string_t name, string_t type);
 
 // void* LinceAssetCacheLoadAsync(LinceAssetCache* cache, const char* name, int type);
 

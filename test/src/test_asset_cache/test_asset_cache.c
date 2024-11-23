@@ -185,7 +185,7 @@ void test_asset_cache_add_asset_type(void** state){
     (void)state;
     LinceAssetCache* cache = LinceCreateAssetCache();
 
-    void* success = LinceAssetCacheAddAssetType(cache,
+    void* success = LinceAssetCacheAddType(cache,
         "mock_asset_type", mock_load_asset, mock_unload_asset);
 
     assert_non_null(success);
@@ -200,13 +200,13 @@ void test_asset_cache_add_existing_asset_type(void** state){
     (void)state;
     LinceAssetCache* cache = LinceCreateAssetCache();
 
-    void* success = LinceAssetCacheAddAssetType(
+    void* success = LinceAssetCacheAddType(
         cache, "mock_asset_type",
         mock_load_asset, mock_unload_asset
     );
     assert_non_null(success);
 
-    success = LinceAssetCacheAddAssetType(
+    success = LinceAssetCacheAddType(
         cache, "mock_asset_type",
         mock_load_asset, mock_unload_asset
     );
@@ -220,7 +220,7 @@ void test_asset_cache_add_existing_asset_type(void** state){
 void test_asset_cache_add(void** state){
     (void)state;
     LinceAssetCache* cache = LinceCreateAssetCache();
-    LinceAssetCacheAddAssetType(cache,
+    LinceAssetCacheAddType(cache,
         "mock_asset_type", mock_load_asset, mock_unload_asset);
     int* asset = mock_load_asset("mock_path", NULL);
 
@@ -239,7 +239,7 @@ void test_asset_cache_add(void** state){
 void test_asset_cache_add_existing(void** state){
     (void)state;
     LinceAssetCache* cache = LinceCreateAssetCache();
-    LinceAssetCacheAddAssetType(cache,
+    LinceAssetCacheAddType(cache,
         "mock_asset_type", mock_load_asset, mock_unload_asset);
     int* asset1 = mock_load_asset("mock_path", NULL);
     int* asset2 = mock_load_asset("mock_path", NULL);
@@ -272,7 +272,7 @@ void test_asset_cache_load(void** state){
     (void)state;
     LinceAssetCache* cache = LinceCreateAssetCache();
     LinceAssetCachePushFolder(cache, string_scoped_lit("../../../test/assets/"));
-    LinceAssetCacheAddAssetType(cache, "image", mock_load_image, mock_unload_image);
+    LinceAssetCacheAddType(cache, "image", mock_load_image, mock_unload_image);
 
     LinceImage* img = LinceAssetCacheLoad(cache, "images/test.png", "image", NULL);
     assert_non_null(img);
@@ -292,7 +292,7 @@ void test_asset_cache_load_invalid_path(void** state){
 
     LinceAssetCache* cache = LinceCreateAssetCache();
     LinceAssetCachePushFolder(cache, string_scoped_lit("../../../test/assets/"));
-    LinceAssetCacheAddAssetType(cache, "image", mock_load_image, mock_unload_image);
+    LinceAssetCacheAddType(cache, "image", mock_load_image, mock_unload_image);
 
     LinceImage* img = LinceAssetCacheLoad(cache, "fake/fake.png", "image", NULL);
     assert_null(img);
@@ -307,7 +307,7 @@ void test_asset_cache_unload(void** state){
 
     LinceAssetCache* cache = LinceCreateAssetCache();
     LinceAssetCachePushFolder(cache, string_scoped_lit("../../../test/assets/"));
-    LinceAssetCacheAddAssetType(cache, "image", mock_load_image, mock_unload_image);
+    LinceAssetCacheAddType(cache, "image", mock_load_image, mock_unload_image);
     LinceAssetCacheLoad(cache, "images/test.png", "image", NULL);
     LinceAssetCacheUnload(cache, "images/test.png", "image");
 
@@ -324,7 +324,7 @@ void test_asset_cache_unload_invalid(void** state){
 
     LinceAssetCache* cache = LinceCreateAssetCache();
     LinceAssetCachePushFolder(cache, string_scoped_lit("../../../test/assets/"));
-    LinceAssetCacheAddAssetType(cache, "image", mock_load_image, mock_unload_image);
+    LinceAssetCacheAddType(cache, "image", mock_load_image, mock_unload_image);
 
     void* success = LinceAssetCacheUnload(cache, "images/test.png", "image");
 
@@ -342,7 +342,7 @@ void test_asset_cache_reload(void** state){
 
     LinceAssetCache* cache = LinceCreateAssetCache();
     LinceAssetCachePushFolder(cache, string_scoped_lit("../../../test/assets/"));
-    LinceAssetCacheAddAssetType(cache, "image", mock_load_image, mock_unload_image);
+    LinceAssetCacheAddType(cache, "image", mock_load_image, mock_unload_image);
 
     void* img = LinceAssetCacheLoad(cache, "images/test.png", "image", NULL);
     assert_non_null(img);
@@ -364,7 +364,7 @@ void test_asset_cache_reload_invalid(void** state){
 
     LinceAssetCache* cache = LinceCreateAssetCache();
     LinceAssetCachePushFolder(cache, string_scoped_lit("../../../test/assets/"));
-    LinceAssetCacheAddAssetType(cache, "image", mock_load_image, mock_unload_image);
+    LinceAssetCacheAddType(cache, "image", mock_load_image, mock_unload_image);
 
     void* img = LinceAssetCacheReload(cache, "images/test.png", "image", NULL);
     assert_non_null(img);
@@ -382,7 +382,7 @@ void test_asset_cache_reload_unloaded(void** state){
 
     LinceAssetCache* cache = LinceCreateAssetCache();
     LinceAssetCachePushFolder(cache, string_scoped_lit("../../../test/assets/"));
-    LinceAssetCacheAddAssetType(cache, "image", mock_load_image, mock_unload_image);
+    LinceAssetCacheAddType(cache, "image", mock_load_image, mock_unload_image);
 
     LinceAssetCacheLoad(cache, "images/test.png", "image", NULL);
     LinceAssetCacheUnload(cache, "images/test.png", "image");
@@ -403,7 +403,7 @@ void test_asset_cache_get(void** state){
 
     LinceAssetCache* cache = LinceCreateAssetCache();
     LinceAssetCachePushFolder(cache, string_scoped_lit("../../../test/assets/"));
-    LinceAssetCacheAddAssetType(cache, "image", mock_load_image, mock_unload_image);
+    LinceAssetCacheAddType(cache, "image", mock_load_image, mock_unload_image);
 
     void* img = LinceAssetCacheLoad(cache, "images/test.png", "image", NULL);
 
@@ -420,7 +420,7 @@ void test_asset_cache_get_and_load(void** state){
 
     LinceAssetCache* cache = LinceCreateAssetCache();
     LinceAssetCachePushFolder(cache, string_scoped_lit("../../../test/assets/"));
-    LinceAssetCacheAddAssetType(cache, "image", mock_load_image, mock_unload_image);
+    LinceAssetCacheAddType(cache, "image", mock_load_image, mock_unload_image);
 
     void* img = LinceAssetCacheGet(cache, "images/test.png", "image");
     assert_non_null(img);
@@ -438,7 +438,7 @@ void test_asset_cache_get_invalid(void** state){
 
     LinceAssetCache* cache = LinceCreateAssetCache();
     LinceAssetCachePushFolder(cache, string_scoped_lit("../../../test/assets/"));
-    LinceAssetCacheAddAssetType(cache, "image", mock_load_image, mock_unload_image);
+    LinceAssetCacheAddType(cache, "image", mock_load_image, mock_unload_image);
 
     void* img = LinceAssetCacheGet(cache, "images/fake.png", "image");
     assert_null(img);
@@ -456,7 +456,7 @@ void test_asset_cache_get_unloaded(void** state){
 
     LinceAssetCache* cache = LinceCreateAssetCache();
     LinceAssetCachePushFolder(cache, string_scoped_lit("../../../test/assets/"));
-    LinceAssetCacheAddAssetType(cache, "image", mock_load_image, mock_unload_image);
+    LinceAssetCacheAddType(cache, "image", mock_load_image, mock_unload_image);
 
     LinceAssetCacheLoad(cache, "images/test.png", "image", NULL);
     LinceAssetCacheUnload(cache, "images/test.png", "image");
