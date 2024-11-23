@@ -22,14 +22,17 @@ size_t LinceFetchExecutablePath(char* buf, size_t max_size){
 #ifdef LINCE_WINDOWS
 	/// TODO: check return code
 	n_bytes = (size_t)GetModuleFileNameA(NULL, buf, (DWORD)max_size);
+
 #elif defined(LINCE_LINUX)
+	
 	ssize_t retval = readlink("/proc/self/exe", buf, max_size);
 	if(retval == -1){
 		return 0;
 	}
 	n_bytes = (size_t)retval;
+
 #endif
-	
+
 	// Strip filename from full path
 	char* end = buf + n_bytes;
 	while(*end != '/' && *end != '\\' && end != buf){
@@ -45,58 +48,78 @@ size_t LinceFetchExecutablePath(char* buf, size_t max_size){
 }
 
 
-LinceBool LinceIsFile(const char* path){
+LinceBool LinceIsFile(string_t path){
+	LinceBool is_file = LinceFalse;
 
 #ifdef LINCE_WINDOWS
-	// Extend path length limit from 256 to 32767
+
+	// Extend path length limit from 260 to 32767 by appending \\?\ to path.
+	// Only works when using GetFileAttributesW, which takes a wchar string.
+	// Also requires all slashes to be backwards, e.g. "\\"
 	// https://learn.microsoft.com/en-us/windows/win32/fileio/maximum-file-path-limitation
-	char long_path[1024] = {'\\','\\','?','\\'}; // use a new LINCE_PATH_MAX
-	memmove(long_path + 4, path, strlen(path) + 1);
+	/*
+	string_t long_path = string_from_fmt("\\\\?\\%.*s", (int)path.len, path.str);
+	for(size_t i = 0; i != long_path.len; ++i){
+		char* p = long_path.str + i;
+		if(*p == '/') *p = '\\';
+	}
+	DWORD attrib = GetFileAttributesA(long_path.str);
+	string_free(&long_path);
+	*/
 	
-	// Path length limit extension only works with backward slashes
-	char* p = long_path + 4;
-	while(*(p++)) if(*p == '/') *p = '\\';
-	
-	DWORD attrib = GetFileAttributesA(path);
-	return (
-		attrib != INVALID_FILE_ATTRIBUTES && 
-        !(attrib & FILE_ATTRIBUTE_DIRECTORY)
-	);
+	DWORD attrib = GetFileAttributesA(path.str);
+	is_file = (attrib != INVALID_FILE_ATTRIBUTES) && !(attrib & FILE_ATTRIBUTE_DIRECTORY);
 
 #elif defined(LINCE_LINUX)
+
 	struct stat path_stat;
     stat(path, &path_stat);
-    return S_ISREG(path_stat.st_mode);
+    is_file = S_ISREG(path_stat.st_mode);
+
 #endif
+
+	return is_file;
 }
 
 
-/** @brief Checks if a directory exists
-* @param path Directory path
-*/
-LinceBool LinceIsDir(const char* path){
+LinceBool LinceIsDir(string_t path){
+	LinceBool is_dir = LinceFalse;
 
 #ifdef LINCE_WINDOWS
-	// Extend path length limit from 256 to 32767
+
+	// Extend path length limit from 260 to 32767 by appending \\?\ to path.
+	// Only works when using GetFileAttributesW, which takes a wchar string.
+	// Also requires all slashes to be backwards, e.g. "\\"
 	// https://learn.microsoft.com/en-us/windows/win32/fileio/maximum-file-path-limitation
-	char long_path[1024] = {'\\','\\','?','\\'}; // use a new LINCE_PATH_MAX
-	memmove(long_path + 4, path, strlen(path) + 1);
+	/*
+	string_t long_path = string_from_fmt("\\\\?\\%.*s", (int)path.len, path.str);
+	for(size_t i = 0; i != long_path.len; ++i){
+		char* p = long_path.str + i;
+		if(*p == '/') *p = '\\';
+	}
+	DWORD attrib = GetFileAttributesA(long_path.str);
+	string_free(&long_path);
+	*/
 	
-	// Path length limit extension only works with backward slashes
-	char* p = long_path + 4;
-	while(*(p++)) if(*p == '/') *p = '\\';
-	
-	DWORD attrib = GetFileAttributesA(path);
-	return (
-		attrib != INVALID_FILE_ATTRIBUTES && 
-        (attrib & FILE_ATTRIBUTE_DIRECTORY)
-	);
+	DWORD attrib = GetFileAttributesA(path.str);
+	is_dir = attrib != INVALID_FILE_ATTRIBUTES && (attrib & FILE_ATTRIBUTE_DIRECTORY);
 
 #elif defined(LINCE_LINUX)
+
 	struct stat path_stat;
-    if(stat(path, &path_stat) != 0) return LinceFalse;
-    return (path_stat.st_mode & S_IFDIR) != 0;
+	
+    if(stat(path, &path_stat) != 0){
+		is_dir = LinceFalse;
+	} else {
+		is_dir = (path_stat.st_mode & S_IFDIR) != 0;
+	}
+
+	// if(stat(path, &path_stat) != 0) return LinceFalse;
+    // return (path_stat.st_mode & S_IFDIR) != 0;
+
 #endif
+
+	return is_dir;
 }
 
 

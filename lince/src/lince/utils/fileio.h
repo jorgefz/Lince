@@ -18,13 +18,15 @@ size_t LinceFetchExecutablePath(char* buf, size_t max_size);
 
 /** @brief Returns LinceTrue if a given file exists
  * @param path Path to file
+ * @returns LinceTrue if the file exists, and LinceFalse otherwise
  */
-LinceBool LinceIsFile(const char* path);
+LinceBool LinceIsFile(string_t path);
 
 /** @brief Returns LinceTrue if a given path exists
  * @param path Directory path
+ * @returns LinceTrue if the directory exists, and LinceFalse otherwise
  */
-LinceBool LinceIsDir(const char* path);
+LinceBool LinceIsDir(string_t path);
 
 /** @brief Loads a file's contents into memory.
  * On fail, the returning string will have the field `str` set to NULL and its size set to zero.
