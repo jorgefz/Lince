@@ -5,17 +5,19 @@
 
 
 LinceBool LinceInitAssetCache(LinceAssetCache* cache) {
-    char exedir_buf[LINCE_PATH_MAX];
-    size_t exedir_len = LinceFetchExecutablePath(exedir_buf, LINCE_PATH_MAX);
+
+    string_t buf = string_from_len(LINCE_PATH_MAX);
+    
+    size_t exedir_len = LinceFetchExecutablePath(buf.str, buf.len);
     if (exedir_len == 0) {
+        string_free(&buf);
         return LinceFalse;
     }
 
-    cache->exedir = string_from_len(exedir_len + 1);
-
-    cache->exedir = string_from_chars(exedir_buf, exedir_len);
+    cache->exedir = string_from_chars(buf.str, exedir_len);
     LINCE_INFO("Located executable at '%s'", cache->exedir.str);
 
+    string_free(&buf);
     array_init(&cache->folders, sizeof(string_t));
     hashmap_init(&cache->stores, 10);
 
@@ -85,9 +87,9 @@ LinceBool LinceAssetCachePushFolder(LinceAssetCache* cache, string_t path){
     } else {
         end[0] = '\0';
     }
-    
-    if(LinceIsDir(assets_dir.str) != LinceTrue){
-        LINCE_WARN("Failed to add assets folder because it does not exist: '%s'", assets_dir);
+
+    if(!LinceIsDir(assets_dir)){
+        LINCE_WARN("Failed to add assets folder because it does not exist: '%s'", assets_dir.str);
         string_free(&assets_dir);
         return LinceFalse;
     }
@@ -117,7 +119,7 @@ string_t LinceAssetCacheFetchPath(LinceAssetCache* cache, string_t filename){
         
         string_t full_path = string_from_fmt("%s%s", dir->str, filename.str);
 
-        if (LinceIsFile(full_path.str)){
+        if (LinceIsFile(full_path)){
             LINCE_INFO("Located asset '%s' at '%s'", filename.str, full_path.str);
             return full_path;
         }

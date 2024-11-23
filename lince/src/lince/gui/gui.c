@@ -107,7 +107,7 @@ LinceBool LinceUILoadFont(LinceUI* ui, string_t name, string_t path, const uint3
     char key[LINCE_NAME_MAX] = {0}; // Only 64 bytes long
     
     string_t full_path = LinceAssetCacheFetchPath(ui->asset_cache, path);
-    LINCE_ASSERT(full_path.str, "Could not find font '%s' from '%s'", name.str, full_path.str);
+    LINCE_ASSERT(full_path.str, "Could not find font '%s' from '%s'", name.str, path.str);
     if(!full_path.str) return LinceFalse;
 
     nk_glfw3_font_stash_begin(&ui->backend, &atlas);

@@ -28,7 +28,7 @@ static void mock_unload_asset(void* obj){
 
 static void* mock_load_image(string_t path, void* args){
     (void) args;
-    assert_true(LinceIsFile(path.str));
+    assert_true(LinceIsFile(path));
     
     LinceImage* img = LinceLoadImage(path.str);
     assert_non_null(img);
@@ -47,7 +47,7 @@ void test_asset_cache_init(void** state){
     (void)state;
     LinceAssetCache* cache = LinceCreateAssetCache();
 
-    assert_true(LinceIsDir(cache->exedir.str));
+    assert_true(LinceIsDir(cache->exedir));
     assert_int_equal(cache->folders.size, 0);
     assert_non_null(cache->stores.table);
 
@@ -114,7 +114,7 @@ void test_asset_cache_fetch_path_real(void** state){
 
     string_t result = LinceAssetCacheFetchPath(cache, name);
     assert_non_null(result.str);
-    assert_true(LinceIsFile(result.str));
+    assert_true(LinceIsFile(result));
 
     // Ensure path to asset was built successfully
     size_t exe_len = cache->exedir.len;
@@ -162,7 +162,7 @@ void test_asset_cache_asset_shadowing(void** state){
     const char asset[] = "fonts/DroidSans.ttf";
     string_t result = LinceAssetCacheFetchPath(cache, string_scoped_lit(asset));
     assert_non_null(result.str);
-    assert_true(LinceIsFile(result.str));
+    assert_true(LinceIsFile(result));
 
     // Ensure folder 2 overshadows folder 1
     size_t exe_len = cache->exedir.len;
