@@ -27,14 +27,14 @@ LinceShader* LinceCreateShader(
 	LINCE_INFO(" ---> Vertex filepath:   '%s'", vertex_path);
 	LINCE_INFO(" ---> Fragment filepath: '%s'", fragment_path);
 	LinceShader* shader;
-	char *vsrc, *fsrc;
+	string_t vsrc, fsrc;
 
-	vsrc = LinceLoadTextFile(vertex_path);
-	fsrc = LinceLoadTextFile(fragment_path);
-	shader = LinceCreateShaderFromSrc(vsrc, fsrc);
-
-	LinceFree(vsrc);
-	LinceFree(fsrc);
+	/* Using placeholder length because it is not used in the function */
+	vsrc = LinceReadFile(string_scoped(vertex_path,1));
+	fsrc = LinceReadFile(string_scoped(fragment_path,1));
+	shader = LinceCreateShaderFromSrc(vsrc.str, fsrc.str);
+	string_free(&vsrc);
+	string_free(&fsrc);
 
 	LINCE_PROFILER_END(timer);
 	return shader;
