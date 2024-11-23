@@ -6,7 +6,8 @@
 #include "lince/containers/array.h"
 #include "lince/containers/str.h"
 
-/** @brief Returns the directory of the running executable, with the filename stripped.
+/** @brief Returns the directory of the running executable, with the filename stripped,
+ * and ending in a slash (forward or backward).
  * If the length of the requested path exceeds that of the buffer, zero is returned. 
  * The output string will be null-terminated.
  * @param buf Buffer where the directory of executable is copied to.

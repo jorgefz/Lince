@@ -16,7 +16,7 @@
 
 size_t LinceFetchExecutablePath(char* buf, size_t max_size){
 
-	size_t n_bytes;
+	size_t n_bytes = 0;
 	memset(buf, 0, max_size);
 
 #ifdef LINCE_WINDOWS
@@ -32,10 +32,14 @@ size_t LinceFetchExecutablePath(char* buf, size_t max_size){
 	
 	// Strip filename from full path
 	char* end = buf + n_bytes;
-	while(*end != '/' && *end != '\\' && end != buf) end--;
+	while(*end != '/' && *end != '\\' && end != buf){
+		end--;
+	}
 	if(end == buf){
 		return 0;
 	}
+
+	end++; // keep last slash
 	*(end+1) = '\0';
 	return (size_t)(end - buf);
 }
