@@ -87,7 +87,7 @@ void LinceAppSetTitle(const char* title, size_t len);
 LinceAssetCache* LinceAppGetAssetCache();
 
 /** @brief Save the location of an assets folder relative to the executable */
-void LinceAppPushAssetFolder(const char* dir);
+void LinceAppPushAssetFolder(string_t dir);
 
 /** @brief Retrieve (or load) an asset from the cache */
 void* LinceAppGetAsset(const char* path, const char* type);

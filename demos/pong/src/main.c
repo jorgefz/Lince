@@ -197,7 +197,7 @@ static void OnInit() {
     LinceGetApp()->user_data = data;
     data->key_start = LinceKey_Space;
 
-    LinceAppPushAssetFolder("../../../demos/pong/assets");
+    LinceAppPushAssetFolder(string_scoped_lit("../../../demos/pong/assets"));
 
     LinceInitCamera(&data->cam, LinceAppGetAspectRatio());
     LinceECSInit(&data->ecs);

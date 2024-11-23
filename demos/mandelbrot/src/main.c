@@ -42,7 +42,7 @@ void OnInit(){
     };
     state.transform = state.viewframe;
     
-    LinceAppPushAssetFolder("../../../demos/mandelbrot/assets");
+    LinceAppPushAssetFolder(string_scoped_lit("../../../demos/mandelbrot/assets"));
     char vert_path[LINCE_PATH_MAX];
     char frag_path[LINCE_PATH_MAX];
     strcpy(vert_path, LinceAssetCacheFetchPath(LinceAppGetAssetCache(), "shaders/mandelbrot.vert.glsl"));

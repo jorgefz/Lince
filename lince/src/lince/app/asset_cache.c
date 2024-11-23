@@ -11,7 +11,11 @@ LinceBool LinceInitAssetCache(LinceAssetCache* cache) {
         return LinceFalse;
     }
 
+    cache->exedir = string_from_len(exedir_len + 1);
+
     cache->exedir = string_from_chars(exedir_buf, exedir_len);
+    LINCE_INFO("Located executable at '%s'", cache->exedir.str);
+
     array_init(&cache->folders, LINCE_PATH_MAX * sizeof(char));
     hashmap_init(&cache->stores, 10);
 
@@ -57,43 +61,35 @@ void LinceDeleteAssetCache(LinceAssetCache* cache) {
 }
 
 
-LinceBool LinceAssetCachePushFolder(LinceAssetCache* cache, const char* folder){
-    size_t folder_len = strlen(folder);
-    size_t exe_len = cache->exedir.len;
-    size_t total_len = folder_len + exe_len;
-    
-    if(total_len >= LINCE_PATH_MAX - 1){
-        LINCE_WARN("Failed to add assets folder because its path is too long");
+LinceBool LinceAssetCachePushFolder(LinceAssetCache* cache, string_t path){
+
+    if(path.len + cache->exedir.len + 1 >= LINCE_PATH_MAX){ // Extra space for terminating char
+        LINCE_WARN("Failed to add assets folder because its full path is longer than %ld", LINCE_PATH_MAX);
         return LinceFalse;
     }
     
-    array_push_front(&cache->folders, NULL);
-    char* p = array_front(&cache->folders);
+    char* assets_dir = array_push_front(&cache->folders, NULL);
 
-    // Prepend directory of executable
-    memmove(p, cache->exedir.str, exe_len);
-    if (p[exe_len-1] != '\\' && p[exe_len-1] != '/'){
-        p[exe_len] = '/';
-        exe_len++;
+    // Concatenate executable path and asset folder path
+    memmove(assets_dir, cache->exedir.str, cache->exedir.len);
+    memmove(assets_dir + cache->exedir.len, path.str, path.len);
+
+    size_t total_len = path.len + cache->exedir.len;
+    char* end = assets_dir + total_len ;
+
+    // Add slash separator at the end if missing
+    if (end[-1] != '\\' && end[-1] != '/'){
+        end[0] = '/';
+        end[1] = '\0';
     }
-    p += exe_len;
-
-    // Append relative directory to assets folder
-    memmove(p, folder, folder_len);
-    if (p[folder_len-1] != '\\' && p[folder_len-1] != '/'){
-        p[folder_len] = '/';
-        folder_len++;
-    }
-    p[folder_len] = '\0';
-
+    
     if(LinceIsDir(array_front(&cache->folders)) != 1){
-        LINCE_WARN("Failed to add assets folder because it does not exist: '%s'",
-            (char*)array_front(&cache->folders));
+        LINCE_WARN("Failed to add assets folder because it does not exist: '%s'", assets_dir);
         array_pop_front(&cache->folders);
         return LinceFalse;
     }
 
-    LINCE_INFO("Added assets folder '%s'", (char*)array_front(&cache->folders));
+    LINCE_INFO("Added assets folder '%s'", assets_dir);
     return LinceTrue;
 }
 

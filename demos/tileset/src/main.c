@@ -20,7 +20,7 @@ static LinceTileAnim tile_anim = { .flags = LinceTileAnim_Repeat };
 void OnInit() {
     LinceInitCamera(&camera, 800.0f / 500.0f);
 
-    LinceAppPushAssetFolder("../../../demos/tileset/assets");
+    LinceAppPushAssetFolder(string_scoped_lit("../../../demos/tileset/assets"));
     texture = LinceAppGetAsset("outside.png", "texture");
     sprite.texture = texture;
 

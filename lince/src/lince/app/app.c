@@ -109,7 +109,7 @@ LinceAssetCache* LinceAppGetAssetCache(){
 }
 
 /** @brief Save the location of an assets folder relative to the executable */
-void LinceAppPushAssetFolder(const char* dir){
+void LinceAppPushAssetFolder(string_t dir){
     LinceAssetCachePushFolder(&app.asset_cache, dir);
 }
 
@@ -283,7 +283,7 @@ static void LinceInit(){
 
     // Create asset cache
     LinceInitAssetCache(&app.asset_cache);
-    LinceAssetCachePushFolder(&app.asset_cache, "../../../lince/assets");
+    LinceAssetCachePushFolder(&app.asset_cache, string_scoped_lit("../../../lince/assets"));
     
     // Register asset types
     LinceAssetCacheAddAssetType(&app.asset_cache, "image", LinceLoadImageAsset, LinceUnloadImageAsset);
