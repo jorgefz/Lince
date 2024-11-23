@@ -43,8 +43,8 @@ void OnInit(){
     state.transform = state.viewframe;
     
     LinceAppPushAssetFolder(string_scoped_lit("../../../demos/mandelbrot/assets"));
-    string_t vert_path = LinceAssetCacheFetchPath(LinceAppGetAssetCache(), string_scoped_lit("shaders/mandelbrot.vert.glsl")));
-    string_t frag_path = LinceAssetCacheFetchPath(LinceAppGetAssetCache(), string_scoped_lit("shaders/mandelbrot.frag.glsl")));
+    string_t vert_path = LinceAssetCacheFetchPath(LinceAppGetAssetCache(), string_scoped_lit("shaders/mandelbrot.vert.glsl"));
+    string_t frag_path = LinceAssetCacheFetchPath(LinceAppGetAssetCache(), string_scoped_lit("shaders/mandelbrot.frag.glsl"));
 
     state.canvas_shader = LinceCreateShader(vert_path.str, frag_path.str);
     string_free(&vert_path);
