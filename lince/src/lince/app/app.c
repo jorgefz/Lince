@@ -258,9 +258,9 @@ static void LinceInit(){
 #endif
 
 #ifdef LINCE_DEBUG
-    LINCE_INFO("Debug configuration");
+    LINCE_INFO("Configuration: Debug");
 #else
-    LINCE_INFO("Release configuration");
+    LINCE_INFO("Configuration: Release");
 #endif
 
     // Open profiling file
@@ -270,6 +270,9 @@ static void LinceInit(){
     LinceOpenProfiler(LINCE_DIR"profiler.txt");
 #endif
 
+    LINCE_INFO("Output path for logs: '%s'", LINCE_DIR);
+    LINCE_INFO("Path to Lince's assets folder: '%s'", LINCE_ASSETS_PATH);
+    
     // Check user settings and set defaults
     if (app.screen_width == 0) app.screen_width = 500;
     if (app.screen_height == 0) app.screen_height = 500;
@@ -283,7 +286,7 @@ static void LinceInit(){
 
     // Create asset cache
     LinceInitAssetCache(&app.asset_cache);
-    LinceAssetCachePushFolder(&app.asset_cache, string_scoped_lit("../../../lince/assets"));
+    LinceAssetCachePushFolder(&app.asset_cache, string_scoped_lit(LINCE_ASSETS_PATH));
     
     // Register asset types
     LinceAssetCacheAddType(&app.asset_cache, string_scoped_lit("image"), LinceLoadImageAsset, LinceUnloadImageAsset);

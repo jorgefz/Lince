@@ -18,9 +18,11 @@ workspace "lince"
     startproject "lince"
     warnings "Extra"
     
+    -- ## YOUR DEFINES HERE ## --
     -- defines{"LINCE_PROFILE"}
+    -- defines {"LINCE_ASSETS_PATH=\"../../../lince/assets\""}
     defines {"LINCE_DIR=\"" .. os.getcwd() .. "/\""}
-    print("LINCE_DIR=\"" .. os.getcwd() .. "/\"")
+    -----------------------------
     
     configurations {"Debug", "Release"}
     flags {"MultiProcessorCompile"}
