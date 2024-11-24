@@ -186,7 +186,7 @@ LinceLayer* LinceAppGetCurrentOverlay(){
 * @param callbacks scene struct with callbacks defined
 */
 void LinceAppRegisterScene(string_t name, LinceScene* callbacks) {
-    hashmap_setb(&app.scene_cache, name.str, (uint32_t)name.len, LinceNewCopy(callbacks, sizeof(LinceScene)) );
+    hashmap_set(&app.scene_cache, name, LinceNewCopy(callbacks, sizeof(LinceScene)) );
 }
 
 /** @brief Sets a scene as the current scene. Calls its on_init method if uninitialised.
@@ -194,7 +194,7 @@ void LinceAppRegisterScene(string_t name, LinceScene* callbacks) {
 * @param name Name of scene to load
 */
 void LinceAppLoadScene(string_t name) {
-     LinceScene* next_scene = hashmap_getb(&app.scene_cache, name.str, (uint32_t)name.len);
+     LinceScene* next_scene = hashmap_get(&app.scene_cache, name);
      LINCE_ASSERT(next_scene, "Could not load scene '%s'", name.str);
      app.current_scene = next_scene;
      if (!app.current_scene->loaded){
@@ -209,7 +209,7 @@ void LinceAppLoadScene(string_t name) {
 * @returns Scene with matching identifier, or NULL if none found
 */
 LinceScene* LinceAppGetScene(string_t name) {
-    return hashmap_getb(&app.scene_cache, name.str, (uint32_t)name.len);
+    return hashmap_get(&app.scene_cache, name);
 }
 
 /** @brief Returns aspect ratio of the window.
@@ -366,10 +366,9 @@ static void LinceAppTerminate(){
     array_uninit(&app.overlay_stack);
     
     // Destroy scene cache
-    char* key = NULL;
-    uint32_t key_len = 0;
-    while ((key = hashmap_iterb(&app.scene_cache, key, key_len, &key_len))) {
-        LinceScene* scene = hashmap_getb(&app.scene_cache, key, key_len);
+    string_t key = (string_t){0};
+    while ((key = hashmap_iter(&app.scene_cache, key)).str) {
+        LinceScene* scene = hashmap_get(&app.scene_cache, key);
         if (scene) {
             if (scene->loaded) {
                 LinceUninitScene(scene);

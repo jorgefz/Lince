@@ -118,7 +118,7 @@ LinceBool LinceUILoadFont(LinceUI* ui, string_t name, string_t path, const uint3
         
         uint32_t len = snprintf(key, LINCE_NAME_MAX, "%s%u", name.str, fontsizes[i]);
         if(len > LINCE_NAME_MAX) len = LINCE_NAME_MAX;
-        hashmap_setb(&ui->font_cache, key, len, font);
+        hashmap_setb(&ui->font_cache, key, len+1, font);
     }
     nk_glfw3_font_stash_end(&ui->backend);
     nk_font_atlas_cleanup(atlas);
@@ -127,7 +127,7 @@ LinceBool LinceUILoadFont(LinceUI* ui, string_t name, string_t path, const uint3
 }
 
 void* LinceUIGetFontHandle(LinceUI* ui, string_t name){
-    struct nk_font* font = hashmap_getb(&ui->font_cache, name.str, (uint32_t)name.len);
+    struct nk_font* font = hashmap_get(&ui->font_cache, name);
     if(!font) return LinceFalse;
     return &font->handle;
 }
