@@ -24,8 +24,8 @@ LinceShader* LinceCreateShader(
 ){
 	LINCE_PROFILER_START(timer);
 	LINCE_INFO("Creating shader from file");
-	LINCE_INFO(" ---> Vertex filepath:   '%s'", vertex_path);
-	LINCE_INFO(" ---> Fragment filepath: '%s'", fragment_path);
+	LINCE_INFO("   Vertex filepath:   '%s'", vertex_path);
+	LINCE_INFO("   Fragment filepath: '%s'", fragment_path);
 	LinceShader* shader;
 	string_t vsrc, fsrc;
 
@@ -50,14 +50,14 @@ LinceShader* LinceCreateShaderFromSrc(
 
 	LinceShader* shader = LinceCalloc(sizeof(LinceShader));
 	shader->id = glCreateProgram();
-	LINCE_INFO(" ---> ID: %d", shader->id);
+	LINCE_INFO("   ID: %d", shader->id);
 
-	LINCE_INFO(" ---> Compiling ...");
+	LINCE_INFO("   Compiling ...");
 	int vs, fs;
 	vs = LinceCompileShader(vertex_src, GL_VERTEX_SHADER);
 	fs = LinceCompileShader(fragment_src, GL_FRAGMENT_SHADER);
 
-	LINCE_INFO(" ---> Linking and validating ...");
+	LINCE_INFO("   Linking and validating ...");
 	glAttachShader(shader->id, vs);
 	glAttachShader(shader->id, fs);
 	glLinkProgram(shader->id);
@@ -73,7 +73,7 @@ LinceShader* LinceCreateShaderFromSrc(
 	LINCE_ASSERT(ret,
 		"Failed to create hashmap for shader %d uniforms", shader->id);
 
-	LINCE_INFO(" ---> Done!");
+	LINCE_INFO("   Finished");
 
 	LINCE_PROFILER_END(timer);
     return shader;

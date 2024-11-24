@@ -53,11 +53,11 @@ void LinceAddVertexArrayAttributes(
 
 	// Logging
 	LINCE_INFO("Adding Vertex Array Attributes...");
-	LINCE_INFO(" --> Stride: %d bytes", (int)stride);
-	LINCE_INFO(" --> Attribute : Size  Ncomp Offset");
-	LINCE_INFO(" --> ----------  ----  ----- ------");
+	LINCE_INFO("   Stride: %d bytes", (int)stride);
+	LINCE_INFO("   Attribute : Size  Ncomp Offset");
+	LINCE_INFO("   ----------  ----  ----- ------");
 	for(i=0; i != layout_elements; ++i){
-		LINCE_INFO(" --> %-10s: %-5d %-5d %-5d",
+		LINCE_INFO("   %-10s: %-5d %-5d %-5d",
 			layout[i].name,
 			(int)layout[i].bytes,
 			(int)layout[i].comps,

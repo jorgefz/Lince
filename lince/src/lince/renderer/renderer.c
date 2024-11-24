@@ -176,6 +176,7 @@ void LinceInitRenderer() {
 	);
 	RENDER_STATE.shader = RENDER_STATE.default_shader;
 
+	LINCE_INFO("Renderer initialised");
 	LINCE_PROFILER_END(timer);
 }
 
