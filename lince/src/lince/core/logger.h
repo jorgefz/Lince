@@ -1,6 +1,6 @@
 #ifndef LINCE_LOGGER
 #define LINCE_LOGGER
-#include "stdio.h"
+#include <stdio.h>
 
 /** @brief Opens the logging file.
 * If it does not exist, it creates one.

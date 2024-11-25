@@ -1,6 +1,7 @@
 #include "logger.h"
-#include "stdarg.h"
-#include "assert.h"
+#include <stdarg.h>
+#include <assert.h>
+#include <time.h>
 
 static FILE* _logfile = NULL;
 
@@ -12,7 +13,8 @@ static FILE* _logfile = NULL;
 
 #define WRITE_LOGFILE(file, header, fmt)   \
     do {                                   \
-        fprintf(file, "["header"] ");      \
+        PrintDatetimeNow(file);            \
+        fprintf(file, " ["header"] ");     \
         va_list args;                      \
         va_start(args, fmt);               \
         vfprintf(file, fmt, args);         \
@@ -20,6 +22,20 @@ static FILE* _logfile = NULL;
         fprintf(file, "\n");               \
     } while(0)                             \
 
+
+static void PrintDatetimeNow(FILE* file){
+    time_t tstamp = time(0);
+    struct tm * timeinfo = localtime(&tstamp);
+    fprintf(
+        file, "[%d-%02d-%02d %02d:%02d:%02d]",
+        timeinfo->tm_year + 1900,
+        timeinfo->tm_mon + 1,
+        timeinfo->tm_mday,
+        timeinfo->tm_hour,
+        timeinfo->tm_min,
+        timeinfo->tm_sec
+    );
+}
 
 int LinceOpenLogger(const char* filename){
     if(!filename) return 0;
