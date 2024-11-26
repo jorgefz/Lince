@@ -1,51 +1,54 @@
 /** @file defs.h
-## Platform and setup macros ##
-+ ----------------- + ---------------------------------------------------------- +
-| Name              | Description                                                |
-+ ----------------- + ---------------------------------------------------------- +
-| LINCE_WINDOWS     | Defined on Windows                                         |
-| LINCE_LINUX       | Defined on GNU/Linux                                       |
-| LINCE_MACOS       | Defined on MacOS                                           |
-| LINCE_VERSION     | String with current engine version                         |
-| LINCE_DIR         | Directory where output files are saved                     |
-| LINCE_ASSETS_PATH | Relative path between executable and Lince's assets folder |
-+ ----------------- + ---------------------------------------------------------- +
-
-## Debugging ##
-+ ------------------------- + -------------------------------------------------- +
-| Name                      | Description                                        |
-+ ------------------------- + -------------------------------------------------- +
-| LINCE_UNUSED(x)           | Supresses compiler warnings about unused variables |
-| LINCE_DEBUG               | Defined if compiled on debug configuration         |
-| LINCE_INFO(fmt, ...)      | Prints debug message - allows formatted string     |
-| LINCE_WARN(fmt, ...)      | Prints debug warning - allows formatted string     |
-| LINCE_ERROR(fmt, ...)     | Prints debug error - allows formatted string       |
-| LINCE_ASSERT(x, fmt, ...) | Prints a message and exits if the condition fails  |
-| LINCE_ASSERT_ALLOC(p, sz) | Exist if the given pointer is NULL                 |
-| LINCE_PROFILE             | Enables profiling in debug mode                    |
-+ ------------------------- + -------------------------------------------------- +
-
-## Engine constants ##
-+ -------------------- + ------------------------------------ +
-| Name                 | Description                          |
-+ -------------------- + ------------------------------------ +
-| LINCE_NAME_MAX       | Maximum size for short names         |
-| LINCE_TEXT_MAX       | Maximum size for longer strings      |
-| LINCE_PATH_MAX       | Maximum size for a path or directory |
-+ -------------------- + ------------------------------------ +
-
-## Allocations
-Customise memory management.
-Note that these do not apply to the containers (e.g. array, hashmap, list).
-+ ------------- + ----------------------------+
-| Name          | Description                 |
-+ ------------- + ----------------------------+
-| LINCE_MALLOC  | Custom version of `malloc`  |
-| LINCE_CALLOC  | Custom version of `calloc`  |
-| LINCE_REALLOC | Custom version of `realloc` |
-| LINCE_FREE    | Custom version of `free`    |
-+ ------------- + ----------------------------+
-*/
+ * 
+ * Engine-wide macro definitions and constants
+ * 
+ * ## Platform and setup macros ##
+ * + ----------------- + ---------------------------------------------------------- +
+ * | Name              | Description                                                |
+ * + ----------------- + ---------------------------------------------------------- +
+ * | LINCE_WINDOWS     | Defined on Windows                                         |
+ * | LINCE_LINUX       | Defined on GNU/Linux                                       |
+ * | LINCE_MACOS       | Defined on MacOS                                           |
+ * | LINCE_VERSION     | String with current engine version                         |
+ * | LINCE_DIR         | Directory where output files are saved                     |
+ * | LINCE_ASSETS_PATH | Relative path between executable and Lince's assets folder |
+ * + ----------------- + ---------------------------------------------------------- +
+ * 
+ * ## Debugging ##
+ * + ------------------------- + -------------------------------------------------- +
+ * | Name                      | Description                                        |
+ * + ------------------------- + -------------------------------------------------- +
+ * | LINCE_UNUSED(x)           | Supresses compiler warnings about unused variables |
+ * | LINCE_DEBUG               | Defined if compiled on debug configuration         |
+ * | LINCE_INFO(fmt, ...)      | Prints debug message - allows formatted string     |
+ * | LINCE_WARN(fmt, ...)      | Prints debug warning - allows formatted string     |
+ * | LINCE_ERROR(fmt, ...)     | Prints debug error - allows formatted string       |
+ * | LINCE_ASSERT(x, fmt, ...) | Prints a message and exits if the condition fails  |
+ * | LINCE_ASSERT_ALLOC(p, sz) | Exist if the given pointer is NULL                 |
+ * | LINCE_PROFILE             | Enables profiling in debug mode                    |
+ * + ------------------------- + -------------------------------------------------- +
+ * 
+ * ## Engine constants ##
+ * + -------------------- + ------------------------------------ +
+ * | Name                 | Description                          |
+ * + -------------------- + ------------------------------------ +
+ * | LINCE_NAME_MAX       | Maximum size for short names         |
+ * | LINCE_TEXT_MAX       | Maximum size for longer strings      |
+ * | LINCE_PATH_MAX       | Maximum size for a path or directory |
+ * + -------------------- + ------------------------------------ +
+ * 
+ * ## Allocations
+ * Customise memory management.
+ * Note that these do not apply to the containers (e.g. array, hashmap, list).
+ * + ------------- + ----------------------------+
+ * | Name          | Description                 |
+ * + ------------- + ----------------------------+
+ * | LINCE_MALLOC  | Custom version of `malloc`  |
+ * | LINCE_CALLOC  | Custom version of `calloc`  |
+ * | LINCE_REALLOC | Custom version of `realloc` |
+ * | LINCE_FREE    | Custom version of `free`    |
+ * + ------------- + ----------------------------+
+ */
 
 
 #ifndef LINCE_DEFS_H
