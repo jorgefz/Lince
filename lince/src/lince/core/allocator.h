@@ -22,6 +22,8 @@ Add header to each allocation.
 
 */
 
+#define LINCE_DEBUG
+#define LINCE_DEBUG_MEMCHECK
 
 /** @typedef Type signature of function to allocate a block of memory */
 typedef void* (*LinceAllocFn)(size_t size, void* user_data);
@@ -36,9 +38,11 @@ typedef void  (*LinceFreeFn)(void* block, void* user_data);
 #ifdef LINCE_DEBUG
 typedef struct LinceAllocStats {
     long nblocks; ///< Number of blocks allocated
+#ifdef LINCE_DEBUG_MEMCHECK
     long nbytes;  ///< Total bytes allocated
     long max_blocks; ///< Maximum allocated blocks reached
     long max_bytes;  ///< Maximum number of allocated bytes reached
+#endif
 } LinceAllocStats;
 #endif
 

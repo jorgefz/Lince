@@ -16,10 +16,15 @@ typedef struct LinceAllocator {
 #endif
 } LinceAllocator;
 
+
+#ifdef LINCE_DEBUG_MEMCHECK
+/** Header data stored in memory before every allocated block */
 typedef struct LinceAllocHeader {
-    LinceAllocator* allocator;
-    size_t size;
+    LinceAllocator* allocator; ///< Pointer to _global_allocator. Check for integrity of block memory.
+    size_t size; ///< Size of the allocated block.
 } LinceAllocHeader;
+#endif
+
 
 /*
  * Wrappers for standard library functions malloc, realloc, and free,
@@ -53,20 +58,14 @@ void LinceSetAllocator(LinceAllocFn alloc, LinceReallocFn realloc, LinceFreeFn f
     _global_allocator.user_data = user_data;
 }
 
+
 void* LinceMemoryAlloc(size_t size, int line, const char* file, const char* func){
     LINCE_UNUSED(line);
     LINCE_UNUSED(file);
     LINCE_UNUSED(func);
-
     void* block = NULL;
 
-#ifdef LINCE_DEBUG
-
-    if(size == 0){
-        LINCE_ERROR("Allocating block of zero bytes at 0x%p", block);
-        LINCE_ERROR("at %s:%d in function '%s'", file, line, func);
-        exit(-1);
-    }
+#if defined(LINCE_DEBUG) && defined(LINCE_DEBUG_MEMCHECK)
 
     LinceAllocHeader* header = _global_allocator.alloc(size + sizeof(LinceAllocHeader), _global_allocator.user_data);
     if(header == NULL){
@@ -74,15 +73,17 @@ void* LinceMemoryAlloc(size_t size, int line, const char* file, const char* func
         LINCE_ERROR("at %s:%d in function '%s'", file, line, func);
         exit(-1);
     }
-    
     header->allocator = &_global_allocator;
     header->size = size;
     block = header + 1;
-
-    long nblocks = _global_allocator.stats.nblocks++;
+    _global_allocator.stats.nblocks++;
     _global_allocator.stats.nbytes += (long)size;
+    long nblocks = _global_allocator.stats.nblocks;
     LINCE_INFO("Allocated block of %ld bytes at 0x%p (in function %s, %ld total blocks)", size, block, func, nblocks);
-
+    
+#elif defined(LINCE_DEBUG) && !defined(LINCE_DEBUG_MEMCHECK)
+    _global_allocator.stats.nblocks++;
+    block = _global_allocator.alloc(size, _global_allocator.user_data);
 #else
     block = _global_allocator.alloc(size, _global_allocator.user_data);
 #endif
@@ -94,14 +95,13 @@ void* LinceMemoryRealloc(void* block, size_t size, int line, const char* file, c
     LINCE_UNUSED(line);
     LINCE_UNUSED(file);
     LINCE_UNUSED(func);
-
-    void* new_block = NULL;
-
-#ifdef LINCE_DEBUG
     if(!block){
         return LinceMemoryAlloc(size, line, file, func);
     }
 
+    void* new_block = NULL;
+
+#if defined(LINCE_DEBUG) && defined(LINCE_DEBUG_MEMCHECK)
     LinceAllocHeader* header = (LinceAllocHeader*)block - 1;
     if(header->allocator != &_global_allocator){
         LINCE_ERROR("Attempting to reallocate invalid or corrupted heap pointer 0x%p", block);
@@ -123,6 +123,9 @@ void* LinceMemoryRealloc(void* block, size_t size, int line, const char* file, c
     _global_allocator.stats.nbytes += (long)(size - old_size);
 
     LINCE_INFO("Reallocated block from 0x%p to 0x%p, size %ld to %ld bytes (in function %s)", block, new_block, old_size, size, func);
+
+#elif defined(LINCE_DEBUG) && !defined(LINCE_DEBUG_MEMCHECK)
+    new_block = _global_allocator.realloc(block, size, _global_allocator.user_data);
 #else
     new_block = _global_allocator.realloc(block, size, _global_allocator.user_data);
 #endif
@@ -130,9 +133,10 @@ void* LinceMemoryRealloc(void* block, size_t size, int line, const char* file, c
     return new_block;
 }
 
+
 void LinceMemoryFree(void* block, int line, const char* file, const char* func){
 
-#ifdef LINCE_DEBUG
+#if defined(LINCE_DEBUG) && defined(LINCE_DEBUG_MEMCHECK)
 
     if(!block){
         LINCE_ERROR("Free called on NULL pointer");
@@ -157,6 +161,9 @@ void LinceMemoryFree(void* block, int line, const char* file, const char* func){
     long nbytes = _global_allocator.stats.nbytes;
     LINCE_INFO("Deallocated block at 0x%p (in function %s, %d blocks and %ld bytes remain)", block, func, nblocks, nbytes);
 
+#elif defined(LINCE_DEBUG) && !defined(LINCE_DEBUG_MEMCHECK)
+    _global_allocator.stats.nblocks--;
+    _global_allocator.free(block, _global_allocator.user_data);
 #else
     _global_allocator.free(block, _global_allocator.user_data);
 #endif
