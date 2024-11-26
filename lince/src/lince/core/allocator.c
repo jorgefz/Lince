@@ -16,6 +16,11 @@ typedef struct LinceAllocator {
 #endif
 } LinceAllocator;
 
+typedef struct LinceAllocHeader {
+    LinceAllocator* allocator;
+    size_t size;
+} LinceAllocHeader;
+
 /*
  * Wrappers for standard library functions malloc, realloc, and free,
  * which do not take the `user_data` argument that LinceAllocator requires.
@@ -37,8 +42,6 @@ static LinceAllocator _global_allocator = {
 #endif
 };
 
-static int nblocks = 0;
-
 void LinceSetAllocator(LinceAllocFn alloc, LinceReallocFn realloc, LinceFreeFn free, void* user_data){
     // if(_global_allocator.intialised == LinceTrue){
     //     LINCE_WARN("Cannot set allocator after it has been initialised");
@@ -55,11 +58,33 @@ void* LinceMemoryAlloc(size_t size, int line, const char* file, const char* func
     LINCE_UNUSED(file);
     LINCE_UNUSED(func);
 
-    void* block = _global_allocator.alloc(size, _global_allocator.user_data);
+    void* block = NULL;
 
 #ifdef LINCE_DEBUG
+
+    if(size == 0){
+        LINCE_ERROR("Allocating block of zero bytes at 0x%p", block);
+        LINCE_ERROR("at %s:%d in function '%s'", file, line, func);
+        exit(-1);
+    }
+
+    LinceAllocHeader* header = _global_allocator.alloc(size + sizeof(LinceAllocHeader), _global_allocator.user_data);
+    if(header == NULL){
+        LINCE_ERROR("Failed to allocate block of %ld bytes", size + sizeof(LinceAllocHeader));
+        LINCE_ERROR("at %s:%d in function '%s'", file, line, func);
+        exit(-1);
+    }
+    
+    header->allocator = &_global_allocator;
+    header->size = size;
+    block = header + 1;
+
     long nblocks = _global_allocator.stats.nblocks++;
-    LINCE_INFO("Allocated block of %ld bytes at 0x%p (at %s, %ld total blocks)", size, block, func, nblocks);
+    _global_allocator.stats.nbytes += (long)size;
+    LINCE_INFO("Allocated block of %ld bytes at 0x%p (in function %s, %ld total blocks)", size, block, func, nblocks);
+
+#else
+    block = _global_allocator.alloc(size, _global_allocator.user_data);
 #endif
 
     return block;
@@ -69,22 +94,70 @@ void* LinceMemoryRealloc(void* block, size_t size, int line, const char* file, c
     LINCE_UNUSED(line);
     LINCE_UNUSED(file);
     LINCE_UNUSED(func);
+
+    void* new_block = NULL;
+
+#ifdef LINCE_DEBUG
+    if(!block){
+        return LinceMemoryAlloc(size, line, file, func);
+    }
+
+    LinceAllocHeader* header = (LinceAllocHeader*)block - 1;
+    if(header->allocator != &_global_allocator){
+        LINCE_ERROR("Attempting to reallocate invalid or corrupted heap pointer 0x%p", block);
+        LINCE_ERROR("at %s:%d in function '%s'", file, line, func);
+        exit(-1);
+    }
+    size_t old_size = header->size;
     
-    void* new_block = _global_allocator.realloc(block, size, _global_allocator.user_data);
+    LinceAllocHeader* new_header = _global_allocator.realloc(header, size + sizeof(LinceAllocHeader), _global_allocator.user_data);
+    if(new_header == NULL){
+        LINCE_ERROR("Failed to allocate block of %ld bytes", size + sizeof(LinceAllocHeader));
+        LINCE_ERROR("at %s:%d in function '%s'", file, line, func);
+        exit(-1);
+    }
+    
+    new_header->allocator = &_global_allocator;
+    new_header->size = size;
+    new_block = new_header + 1;
+    _global_allocator.stats.nbytes += (long)(size - old_size);
+
+    LINCE_INFO("Reallocated block from 0x%p to 0x%p, size %ld to %ld bytes (in function %s)", block, new_block, old_size, size, func);
+#else
+    new_block = _global_allocator.realloc(block, size, _global_allocator.user_data);
+#endif
+
     return new_block;
 }
 
 void LinceMemoryFree(void* block, int line, const char* file, const char* func){
+
+#ifdef LINCE_DEBUG
+
     if(!block){
         LINCE_ERROR("Free called on NULL pointer");
         LINCE_ERROR("at %s:%d in function '%s'", file, line, func);
         exit(-1);
     }
 
-    _global_allocator.free(block, _global_allocator.user_data);
+    LinceAllocHeader* header = (LinceAllocHeader*)block - 1;
+    if(header->allocator != &_global_allocator){
+        LINCE_ERROR("Attempting to free invalid or corrupted heap pointer 0x%p", block);
+        LINCE_ERROR("at %s:%d in function '%s'", file, line, func);
+        exit(-1);
+    }
+    size_t size = header->size;
+    _global_allocator.free(header, _global_allocator.user_data);
 
-#ifdef LINCE_DEBUG
-    long nblocks = _global_allocator.stats.nblocks--;
-    LINCE_INFO("Deallocated block at 0x%p (at %s, %d blocks remain)", block, func, nblocks);
+    
+    _global_allocator.stats.nblocks--;
+    _global_allocator.stats.nbytes -= (long)size;
+
+    long nblocks = _global_allocator.stats.nblocks;
+    long nbytes = _global_allocator.stats.nbytes;
+    LINCE_INFO("Deallocated block at 0x%p (in function %s, %d blocks and %ld bytes remain)", block, func, nblocks, nbytes);
+
+#else
+    _global_allocator.free(block, _global_allocator.user_data);
 #endif
 }

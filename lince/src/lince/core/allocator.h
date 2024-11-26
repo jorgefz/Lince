@@ -17,6 +17,9 @@ void* array_init_alloc(arr, alloc, realloc, free);
     including size, line, file, and func.
     Keep track of both total bytes allocated as well as total blocks.
 
+How to keep track of heap pointers?
+Add header to each allocation.
+
 */
 
 
@@ -27,15 +30,15 @@ typedef void* (*LinceAllocFn)(size_t size, void* user_data);
 typedef void* (*LinceReallocFn)(void* block, size_t size, void* user_data);
 
 /** @typedef Type signature of function to deallocate a block of memory */
-typedef void* (*LinceFreeFn)(void* block, void* user_data);
+typedef void  (*LinceFreeFn)(void* block, void* user_data);
 
 
 #ifdef LINCE_DEBUG
 typedef struct LinceAllocStats {
-    long nblocks;        ///< Number of blocks allocated
-    #ifdef LINCE_DEBUG_MEMCHECK
-    long nbytes; ///< Total bytes allocated
-    #endif
+    long nblocks; ///< Number of blocks allocated
+    long nbytes;  ///< Total bytes allocated
+    long max_blocks; ///< Maximum allocated blocks reached
+    long max_bytes;  ///< Maximum number of allocated bytes reached
 } LinceAllocStats;
 #endif
 
