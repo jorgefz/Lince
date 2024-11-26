@@ -5,22 +5,33 @@
 #include "allocator.h"
 #include "logger.h"
 
+typedef struct LinceAllocator {
+    LinceAllocFn   alloc;   ///< Function to allocate a block of memory of given size
+    LinceReallocFn realloc; ///< Function to reallocate a block of memory to a different size
+    LinceFreeFn    free;    ///< Function to deallocate a block of memory
+    LinceBool intialised;   ///< LinceInitAllocator called
+    void* user_data;        ///< Custom user-defined data passed to the allocator functions
+#ifdef LINCE_DEBUG
+    LinceAllocStats stats;  ///< Allocation stats and memory checks
+#endif
+} LinceAllocator;
 
 /*
  * Wrappers for standard library functions malloc, realloc, and free,
  * which do not take the `user_data` argument that LinceAllocator requires.
  */
-static void* LinceMallocWrapper(size_t size, void* uptr)              { LINCE_UNUSED(uptr); return malloc(size); }
-static void* LinceReallocWrapper(void* block, size_t size, void* uptr){ LINCE_UNUSED(uptr); return realloc(block, size); }
-static void LinceFreeWrapper(void* block, void* uptr)                 { LINCE_UNUSED(uptr); free(block); }
+static void* LinceStdAllocWrapper(size_t size, void* uptr)                { LINCE_UNUSED(uptr); return malloc(size); }
+static void* LinceStdReallocWrapper(void* block, size_t size, void* uptr) { LINCE_UNUSED(uptr); return realloc(block, size); }
+static void  LinceStdFreeWrapper(void* block, void* uptr)                 { LINCE_UNUSED(uptr); free(block); }
 
 /** @brief Global allocator for Lince.
  * Defaults to standard library functions malloc, realloc, and free.
  */
 static LinceAllocator _global_allocator = {
-    .alloc   = LinceMallocWrapper,
-    .realloc = LinceReallocWrapper,
-    .free    = LinceFreeWrapper,
+    .alloc   = LinceStdAllocWrapper,
+    .realloc = LinceStdReallocWrapper,
+    .free    = LinceStdFreeWrapper,
+    .user_data = NULL,
 #ifdef LINCE_DEBUG
     .stats = {0}
 #endif
@@ -50,6 +61,7 @@ void* LinceMemoryAlloc(size_t size, int line, const char* file, const char* func
     long nblocks = _global_allocator.stats.nblocks++;
     LINCE_INFO("Allocated block of %ld bytes at 0x%p (at %s, %ld total blocks)", size, block, func, nblocks);
 #endif
+
     return block;
 }
 

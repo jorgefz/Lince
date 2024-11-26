@@ -39,17 +39,6 @@ typedef struct LinceAllocStats {
 } LinceAllocStats;
 #endif
 
-typedef struct LinceAllocator {
-    LinceAllocFn   alloc;   ///< Function to allocate a block of memory of given size
-    LinceReallocFn realloc; ///< Function to reallocate a block of memory to a different size
-    LinceFreeFn    free;    ///< Function to deallocate a block of memory
-    LinceBool intialised;   ///< LinceInitAllocator called
-    void* user_data;        ///< Custom user-defined data passed to the allocator functions
-#ifdef LINCE_DEBUG
-    LinceAllocStats stats;  ///< Allocation stats and memory checks
-#endif
-} LinceAllocator;
-
 
 // void LinceInitAllocator();
 // void LinceUninitAllocator();
