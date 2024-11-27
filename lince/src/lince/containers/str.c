@@ -4,6 +4,28 @@
 #include <stdlib.h>
 #include <stdarg.h>
 
+/* Global allocation interface - defaults to std library */
+static void* (*string_alloc)(size_t size)   = malloc;
+static void  (*string_dealloc)(void* block) = free;
+
+
+/* Substitute for calloc to use malloc wrapper */
+static void* string_calloc(size_t count, size_t size){
+	void* block = string_alloc(count * size);
+	if(block) memset(block, 0, count * size);
+	return block;
+}
+
+
+/* Provide custom allocator functions */
+void string_set_alloc(
+	void* (*user_alloc)   (size_t size),
+	void  (*user_dealloc) (void* block)
+) {
+	if(user_alloc)   string_alloc   = user_alloc;
+	if(user_dealloc) string_dealloc = user_dealloc;
+}
+
 
 /** @brief Creates a string from a character array
  * @param str Character array. If NULL, an empty string is created with given size
@@ -18,7 +40,7 @@ string_t string_from_chars(const char* chars, size_t len){
     }
 
     string_t s;
-    s.str = malloc(len + 1);
+    s.str = string_alloc(len + 1);
 
     if (!s.str){
         s.len = 0;
@@ -41,7 +63,7 @@ string_t string_from_chars(const char* chars, size_t len){
 */
 string_t string_from_len(size_t len){
     string_t s;
-    s.str = malloc(len + 1);
+    s.str = string_alloc(len + 1);
 
     if(!s.str){
         s.len = 0;
@@ -85,6 +107,6 @@ string_t string_from_fmt(const char fmt[], ...){
 void string_free(string_t* str){
     if (!str) return;
     str->len = 0;
-    if(str->str) free(str->str);
+    if(str->str) string_dealloc(str->str);
     str->str = NULL;
 }

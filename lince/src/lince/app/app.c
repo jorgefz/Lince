@@ -247,9 +247,8 @@ static void* LinceHashmapRealloc(void* block, size_t size){ return LinceMemoryRe
 static void  LinceHashmapFree(void* block)                {        LinceMemoryFree(block, 0, "hashmap.c", "<anonymous hashmap function>"); }
 
 /* Memory management interface for string functions */
-static void* LinceStringAlloc(size_t size)               { return LinceMemoryAlloc(size, 0, "str.c", "<anonymous str function>"); }
-static void* LinceStringRealloc(void* block, size_t size){ return LinceMemoryRealloc(block, size, 0, "str.c", "<anonymous str function>"); }
-static void  LinceStringFree(void* block)                {        LinceMemoryFree(block, 0, "str.c", "<anonymous str function>"); }
+static void* LinceStringAlloc(size_t size)   { return LinceMemoryAlloc(size, 0, "str.c", "<anonymous str function>"); }
+static void  LinceStringDealloc(void* block) {        LinceMemoryFree(block, 0, "str.c", "<anonymous str function>"); }
 
 
 
@@ -293,6 +292,7 @@ static void LinceInit(){
     // LinceAllocatorInit()
     array_set_alloc(LinceArrayAlloc, LinceArrayRealloc, LinceArrayFree);
     hashmap_set_alloc(LinceHashmapAlloc, LinceHashmapRealloc, LinceHashmapFree);
+    string_set_alloc(LinceStringAlloc, LinceStringDealloc);
     
     // Check user settings and set defaults
     if (app.screen_width == 0) app.screen_width = 500;

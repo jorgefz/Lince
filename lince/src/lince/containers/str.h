@@ -33,6 +33,16 @@ typedef struct string {
 */
 #define string_from_literal(LIT) string_from_chars((LIT), sizeof(LIT)-1)
 
+/** @brief Set custom memory allocation functions.
+ * @note Only call this function before any heap-allocated strings have been initialised
+ * @param user_alloc   Custom malloc function, allocates block of memory of given size.
+ * @param user_dealloc Custom free function, deallocates an allocated block of memory.
+ */
+void string_set_alloc(
+	void* (*user_alloc)   (size_t size),
+	void  (*user_dealloc) (void* block)
+);
+
 /** @brief Creates a string from a character array
  * @param str Character array 
  * @param len Number of chacaters in the character array
