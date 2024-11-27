@@ -149,10 +149,11 @@ void LinceMemoryFree(void* block, int line, const char* file, const char* func){
 
     LinceAllocHeader* header = (LinceAllocHeader*)block - 1;
     if(header->allocator != &_global_allocator){
-        LINCE_ERROR("Attempting to free invalid or corrupted heap pointer 0x%p", block);
-        LINCE_ERROR("at %s:%d in function '%s'", file, line, func);
-        exit(-1);
+        LINCE_WARN("Attempted to free invalid or corrupted heap pointer 0x%p", block);
+        LINCE_WARN("at %s:%d in function '%s'", file, line, func);
+        return;
     }
+
     size_t size = header->size;
     _global_allocator.free(header, _global_allocator.user_data);
 
