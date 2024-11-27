@@ -8,9 +8,21 @@
 #define ARRAY_INITIAL_CAPACITY 1
 
 
-/*
-Returns the nearest highest power of two of an integer
-*/
+/* Global allocation interface - defaults to std library */
+static void* (*array_malloc)(size_t size)               = malloc;
+static void* (*array_realloc)(void* block, size_t size) = realloc;
+static void  (*array_free)(void* block)                 = free;
+
+
+/* Substitute for calloc to use malloc wrapper */
+static void* array_calloc(size_t count, size_t size){
+	void* block = array_malloc(count * size);
+	if(block) memset(block, 0, count * size);
+	return block;
+}
+
+
+/* Returns the nearest highest power of two of an integer */
 static uint32_t nearest_pow2(uint32_t n){
     if(n <= 1) return 1;
     uint32_t x = 2;
@@ -19,9 +31,8 @@ static uint32_t nearest_pow2(uint32_t n){
 	return x;
 }
 
-/*
-Increments capacity of the array to the next power of two.
-*/
+
+/* Increments capacity of the array to the next power of two */
 static array_t* extend_capacity(array_t* array){
 	if(!array) return NULL;
 
@@ -31,7 +42,7 @@ static array_t* extend_capacity(array_t* array){
 	if(capacity == 0) capacity++;
 	else capacity *= 2;
 
-	data = realloc(array->data, capacity * array->element_size);
+	data = array_realloc(array->data, capacity * array->element_size);
 	if(!data) return NULL;
 
 	array->data = data;
@@ -40,7 +51,19 @@ static array_t* extend_capacity(array_t* array){
 }
 
 
-// -- INITIALIZATIONS
+// -- INITIALIZATIONS -- //
+
+/* Provide custom allocator functions */
+void array_set_alloc(
+	void* (*user_alloc)  (size_t size),
+	void* (*user_realloc)(void* block, size_t size),
+	void  (*user_free)   (void* block)
+) {
+	if(user_alloc)   array_malloc  = user_alloc;
+	if(user_realloc) array_realloc = user_realloc;
+	if(user_free)    array_free    = user_free;
+}
+
 
 /*
 Initialises an array via a given pointer.
@@ -59,7 +82,7 @@ Deallocates and resets the array data without freeing the array object itself.
 */
 void array_uninit(array_t* array){
 	if(!array) return;
-	if(array->data) free(array->data);
+	if(array->data) array_free(array->data);
 	*array = (array_t){0};
 }
 
@@ -67,7 +90,7 @@ void array_uninit(array_t* array){
 /* Creates a new array of size zero */
 array_t* array_create(uint32_t element_size){
 	if(element_size == 0) return NULL;
-	array_t* array = calloc(1, sizeof(array_t));
+	array_t* array = array_calloc(1, sizeof(array_t));
 	if(!array) return NULL;
 	array->element_size = element_size;
 	return array;
@@ -76,8 +99,8 @@ array_t* array_create(uint32_t element_size){
 /* Frees all the elements of an array */
 void array_destroy(array_t* array){
 	if(!array) return;
-	if(array->data) free(array->data);
-	free(array);
+	if(array->data) array_free(array->data);
+	array_free(array);
 }
 
 /** @brief Copies an array into another.
@@ -135,7 +158,7 @@ array_t* array_resize(array_t* array, uint32_t size){
 	// Round up new capacity to the highest power of two closest to the size
 	uint32_t capacity = nearest_pow2(size);
 	if(capacity > array->capacity){
-		void* data = realloc(array->data, capacity * array->element_size);
+		void* data = array_realloc(array->data, capacity * array->element_size);
 		if(!data) return NULL;
 		array->capacity = capacity;
 		array->data = data;

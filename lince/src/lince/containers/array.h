@@ -12,17 +12,24 @@ typedef struct array_container {
 	uint32_t size;			///< Number of stored elements
 	uint32_t capacity;		///< Number of elements allocated
 	uint32_t element_size;	///< Size in bytes of an element
-	
-	/** Pointer to the first element of the array.
-	 * If the array has a size of zero, then begin==end.
-	 */
-	void* begin;
-
-	/** Pointer to the element after the last element of the array.
-	 * If the array has a size of zero, then begin==end.
-	 */
-	void* end;
+	void* begin; /**< Pointer to the first element of the array.
+					  If the array has a size of zero, then begin==end. */
+	void* end;   /**< Pointer to the element after the last element of the array.
+	                  If the array has a size of zero, then begin==end. */
 } array_t;
+
+
+/** @brief Set custom memory allocation functions.
+ * @note Only call this function before any arrays have been initialised
+ * @param user_alloc Custom malloc function, allocates block of memory of given size.
+ * @param user_realloc Custom realloc function, reallocates existing block of memory into a given size.
+ * @param user_free Custom free function, deallocates an allocated block of memory.
+ */
+void array_set_alloc(
+	void* (*user_alloc)  (size_t size),
+	void* (*user_realloc)(void* block, size_t size),
+	void  (*user_free)   (void* block)
+);
 
 /** @brief Initialises an array via a given pointer.
 *   Should be freed with `array_uninit`.
