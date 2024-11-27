@@ -32,16 +32,12 @@ typedef void* (*LinceReallocFn)(void* block, size_t size, void* user_data);
 typedef void  (*LinceFreeFn)(void* block, void* user_data);
 
 
-#ifdef LINCE_DEBUG
 typedef struct LinceAllocStats {
     long nblocks; ///< Number of blocks allocated
-#ifdef LINCE_DEBUG_MEMCHECK
     long nbytes;  ///< Total bytes allocated
     long max_blocks; ///< Maximum allocated blocks reached
     long max_bytes;  ///< Maximum number of allocated bytes reached
-#endif
 } LinceAllocStats;
-#endif
 
 
 // void LinceInitAllocator();
@@ -56,13 +52,11 @@ typedef struct LinceAllocStats {
 #define LinceMalloc(SZ)       LinceAlloc(SZ) /* Temporary, until LinceMalloc is replaced with LinceAlloc */
 
 
-#ifdef LINCE_DEBUG
 /** @brief Obtain statistics about current memory usage */
 void LinceGetAllocStats(LinceAllocStats* stats);
-#endif
 
 /** @brief Set custom memory management functions */
-void LinceSetAllocator(LinceAllocFn alloc, LinceReallocFn realloc, LinceFreeFn free, void* user_data);
+void LinceSetAllocator(LinceAllocFn alloc_fn, LinceReallocFn realloc_fn, LinceFreeFn free_fn);
 
 /** @brief Memory allocation function that tracks where the memory operation was requested (file, line, and function) */
 void* LinceMemoryAlloc(size_t size, int line, const char* file, const char* func);

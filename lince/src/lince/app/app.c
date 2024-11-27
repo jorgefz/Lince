@@ -92,6 +92,7 @@ LinceApp* LinceGetApp(){
 void LinceAppSetTitle(const char* title, size_t len) {
     
     if (len > LINCE_TITLE_MAX){
+        LINCE_WARN("Truncated title to %d characters", LINCE_TITLE_MAX);
         len = LINCE_TITLE_MAX; // Truncate title
     }
 
@@ -100,7 +101,7 @@ void LinceAppSetTitle(const char* title, size_t len) {
         return;
     }
 
-    app.title = string_from_chars(title, len);
+    app.title = string_from_chars(title, len); // ALLOCATED BEFORE MEMORY ALLOCATOR KICKS IN
 }
 
 /** @brief Retrieve the asset cache of the application */
@@ -454,7 +455,7 @@ static void LinceAppDrawDebugUIPanel(LinceLayer* overlay, float dt){
     struct nk_context *ctx = LinceUIGetNkContext(ui);
     nk_style_push_font(ctx, LinceUIGetFontHandle(ui, string_scoped_lit("droid20")));
     
-    if (nk_begin(ctx, "Debug", nk_rect(50, 50, 300, 250),
+    if (nk_begin(ctx, "Debug", nk_rect(50, 50, 500, 250),
         NK_WINDOW_BORDER|NK_WINDOW_MOVABLE|NK_WINDOW_SCALABLE|
         NK_WINDOW_MINIMIZABLE|NK_WINDOW_TITLE
     )) {
@@ -470,6 +471,14 @@ static void LinceAppDrawDebugUIPanel(LinceLayer* overlay, float dt){
         nk_labelf(ctx, NK_TEXT_LEFT, "Active texture units: %u", renderer->texture_slot_count);
         nk_labelf(ctx, NK_TEXT_LEFT, "Sprites: %u", renderer->quad_count);
 
+        nk_layout_row_static(ctx, 30, 450, 1);
+        LinceAllocStats alloc_stats;
+        LinceGetAllocStats(&alloc_stats);
+        nk_labelf(ctx, NK_TEXT_LEFT, "Allocated blocks: %ld, max %ld", alloc_stats.nblocks, alloc_stats.max_blocks);
+        nk_labelf(ctx, NK_TEXT_LEFT, "Memory used: %ld B (%.2g MB), max %ld B (%.2f MB)",
+            alloc_stats.nbytes, (double)alloc_stats.nbytes/1024.0/1024.0,
+            alloc_stats.max_bytes, (double)alloc_stats.max_bytes/1024.0/1024.0
+        );
     }
     nk_end(ctx);
     nk_style_pop_font(ctx);
