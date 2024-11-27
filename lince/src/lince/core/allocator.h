@@ -57,13 +57,20 @@ typedef struct LinceAllocStats {
 
 
 #ifdef LINCE_DEBUG
+/** @brief Obtain statistics about current memory usage */
 void LinceGetAllocStats(LinceAllocStats* stats);
 #endif
 
+/** @brief Set custom memory management functions */
 void LinceSetAllocator(LinceAllocFn alloc, LinceReallocFn realloc, LinceFreeFn free, void* user_data);
 
+/** @brief Memory allocation function that tracks where the memory operation was requested (file, line, and function) */
 void* LinceMemoryAlloc(size_t size, int line, const char* file, const char* func);
+
+/** @brief Memory rellocation function that tracks where the memory operation was requested (file, line, and function) */
 void* LinceMemoryRealloc(void* block, size_t size, int line, const char* file, const char* func);
+
+/** @brief Memory deallocation function that tracks where the memory operation was requested (file, line, and function) */
 void LinceMemoryFree(void* block, int line, const char* file, const char* func);
 
 

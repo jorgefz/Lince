@@ -236,6 +236,22 @@ LincePoint LinceGetMousePosWorld(LinceCamera* cam) {
 }
 
 
+/* Memory management interface for array functions */
+static void* LinceArrayAlloc(size_t size)               { return LinceMemoryAlloc(size, 0, "app.c", "<anonymous array function>"); }
+static void* LinceArrayRealloc(void* block, size_t size){ return LinceMemoryRealloc(block, size, 0, "app.c", "<anonymous array function>"); }
+static void  LinceArrayFree(void* block)                {        LinceMemoryFree(block, 0, "app.c", "<anonymous array function>"); }
+
+/* Memory management interface for hashmap functions */
+static void* LinceHashmapAlloc(size_t size)               { return LinceMemoryAlloc(size, 0, "hashmap.c", "<anonymous array function>"); }
+static void* LinceHashmapRealloc(void* block, size_t size){ return LinceMemoryRealloc(block, size, 0, "hashmap.c", "<anonymous hashmap function>"); }
+static void  LinceHashmapFree(void* block)                {        LinceMemoryFree(block, 0, "hashmap.c", "<anonymous hashmap function>"); }
+
+/* Memory management interface for string functions */
+static void* LinceStringAlloc(size_t size)               { return LinceMemoryAlloc(size, 0, "str.c", "<anonymous str function>"); }
+static void* LinceStringRealloc(void* block, size_t size){ return LinceMemoryRealloc(block, size, 0, "str.c", "<anonymous str function>"); }
+static void  LinceStringFree(void* block)                {        LinceMemoryFree(block, 0, "str.c", "<anonymous str function>"); }
+
+
 
 /* ==== Public function definitions ==== */
 
@@ -272,6 +288,10 @@ static void LinceInit(){
 
     LINCE_INFO("Output path for logs: '%s'", LINCE_DIR);
     LINCE_INFO("Path to Lince's assets folder: '%s'", LINCE_ASSETS_PATH);
+
+    // Setup memory management
+    // LinceAllocatorInit()
+    array_set_alloc(LinceArrayAlloc, LinceArrayRealloc, LinceArrayFree);
     
     // Check user settings and set defaults
     if (app.screen_width == 0) app.screen_width = 500;
