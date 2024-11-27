@@ -54,6 +54,18 @@ typedef struct hashmap {
 } hashmap_t;
 
 
+/** @brief Set custom memory allocation functions.
+ * @note Only call this function before any hashmaps have been initialised
+ * @param user_alloc Custom malloc function, allocates block of memory of given size.
+ * @param user_realloc Custom realloc function, reallocates existing block of memory into a given size.
+ * @param user_free Custom free function, deallocates an allocated block of memory.
+ */
+void hashmap_set_alloc(
+	void* (*user_alloc)  (size_t size),
+	void* (*user_realloc)(void* block, size_t size),
+	void  (*user_free)   (void* block)
+);
+
 /** @brief Returns the hash of a given number of bytes.
  * The size of the hashmap must be passed as an argument,
  * as it will be mod (%) with the hash result.

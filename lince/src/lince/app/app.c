@@ -292,6 +292,7 @@ static void LinceInit(){
     // Setup memory management
     // LinceAllocatorInit()
     array_set_alloc(LinceArrayAlloc, LinceArrayRealloc, LinceArrayFree);
+    hashmap_set_alloc(LinceHashmapAlloc, LinceHashmapRealloc, LinceHashmapFree);
     
     // Check user settings and set defaults
     if (app.screen_width == 0) app.screen_width = 500;

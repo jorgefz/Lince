@@ -5,13 +5,34 @@
 #include <stdlib.h>
 #include <string.h>
 
+
+/* 
+ * ----------------
+ * Global Variables
+ * ----------------
+ */
+
 #define HASHMAP_LOADING_FACTOR 2
+
+/* Global allocation interface - defaults to std library */
+static void* (*hashmap_malloc)(size_t size)               = malloc;
+static void* (*hashmap_realloc)(void* block, size_t size) = realloc;
+static void  (*hashmap_free)(void* block)                 = free;
+
 
 /* 
  * ----------------
  * Static Functions
  * ----------------
  */
+
+/* Substitute for calloc to use malloc wrapper */
+static void* hashmap_calloc(size_t count, size_t size){
+	void* block = hashmap_malloc(count * size);
+	if(block) memset(block, 0, count * size);
+	return block;
+}
+
 
 /** CRC32 hashing algorithm */
 static uint32_t crc32b_hash(const char *key, uint64_t len) {
@@ -110,6 +131,23 @@ static hashmap_entry_t* hashmap_lookup(hashmap_t* map, string_t key){
  * ----------------
  */
 
+/** @brief Set custom memory allocation functions.
+ * @note Only call this function before any hashmaps have been initialised
+ * @param user_alloc Custom malloc function, allocates block of memory of given size.
+ * @param user_realloc Custom realloc function, reallocates existing block of memory into a given size.
+ * @param user_free Custom free function, deallocates an allocated block of memory.
+ */
+void hashmap_set_alloc(
+	void* (*user_alloc)  (size_t size),
+	void* (*user_realloc)(void* block, size_t size),
+	void  (*user_free)   (void* block)
+) {
+	if(user_alloc)   hashmap_malloc  = user_alloc;
+	if(user_realloc) hashmap_realloc = user_realloc;
+	if(user_free)    hashmap_free    = user_free;
+}
+
+
 /** @brief Returns the hash of a given number of bytes.
  * The size of the hashmap must be passed as an argument,
  * as it will be mod (%) with the hash result.
@@ -144,7 +182,7 @@ hashmap_t* hashmap_init(hashmap_t* map, uint64_t size_hint){
     if(!map) return NULL;
     *map = (hashmap_t){0};
     map->size = next_prime(size_hint);
-    map->table = calloc(map->size, sizeof(hashmap_entry_t*));
+    map->table = hashmap_calloc(map->size, sizeof(hashmap_entry_t*));
     if(!map->table) return NULL;
     return map;
 }
@@ -163,12 +201,12 @@ void hashmap_uninit(hashmap_t* map){
         hashmap_entry_t* next;
         while(entry){
             next = entry->next;
-            free(entry->key);
-            free(entry);
+            hashmap_free(entry->key);
+            hashmap_free(entry);
             entry = next;
         }
     }
-    free(map->table);
+    hashmap_free(map->table);
     *map = (hashmap_t){0};
 }
 
@@ -178,11 +216,11 @@ void hashmap_uninit(hashmap_t* map){
  * @returns pointer to new hashmap
  */
 hashmap_t* hashmap_create(uint64_t size_hint){
-    hashmap_t* map = malloc(sizeof(hashmap_t));
+    hashmap_t* map = hashmap_malloc(sizeof(hashmap_t));
     if(!map) return NULL;
     void* res = hashmap_init(map, size_hint);
     if(!res){
-        free(map);
+        hashmap_free(map);
         return NULL;
     }
     return map;
@@ -197,7 +235,7 @@ hashmap_t* hashmap_create(uint64_t size_hint){
 void hashmap_destroy(hashmap_t* map){
     if(!map) return;
     hashmap_uninit(map);
-    free(map);
+    hashmap_free(map);
 }
 
 /** @brief Checks if a map has a given key
@@ -270,12 +308,12 @@ hashmap_t* hashmap_setb(hashmap_t* map, const void* bkey, uint64_t key_len, void
     }
 
     // No matching key found
-    entry = calloc(1, sizeof(hashmap_entry_t));
+    entry = hashmap_calloc(1, sizeof(hashmap_entry_t));
     if (!entry) return NULL;
 
-    entry->key = malloc(key_len);
+    entry->key = hashmap_malloc(key_len);
     if (!entry->key) {
-        free(entry);
+        hashmap_free(entry);
         return NULL;
     }
 
