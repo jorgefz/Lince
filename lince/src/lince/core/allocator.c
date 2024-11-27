@@ -66,7 +66,6 @@ void* LinceMemoryAlloc(size_t size, int line, const char* file, const char* func
     void* block = NULL;
 
 #if defined(LINCE_DEBUG) && defined(LINCE_DEBUG_MEMCHECK)
-
     LinceAllocHeader* header = _global_allocator.alloc(size + sizeof(LinceAllocHeader), _global_allocator.user_data);
     if(header == NULL){
         LINCE_ERROR("Failed to allocate block of %ld bytes", size + sizeof(LinceAllocHeader));
@@ -79,7 +78,7 @@ void* LinceMemoryAlloc(size_t size, int line, const char* file, const char* func
     _global_allocator.stats.nblocks++;
     _global_allocator.stats.nbytes += (long)size;
     long nblocks = _global_allocator.stats.nblocks;
-    LINCE_INFO("Allocated block of %ld bytes at 0x%p (in function %s, %ld total blocks)", size, block, func, nblocks);
+    LINCE_INFO("Allocated %*ld byte block at 0x%p (in function %s, %ld total blocks)", 7, size, block, func, nblocks);
     
 #elif defined(LINCE_DEBUG) && !defined(LINCE_DEBUG_MEMCHECK)
     _global_allocator.stats.nblocks++;
@@ -120,9 +119,9 @@ void* LinceMemoryRealloc(void* block, size_t size, int line, const char* file, c
     new_header->allocator = &_global_allocator;
     new_header->size = size;
     new_block = new_header + 1;
-    _global_allocator.stats.nbytes += (long)(size - old_size);
+    _global_allocator.stats.nbytes += (long)(size) - (long)(old_size);
 
-    LINCE_INFO("Reallocated block from 0x%p to 0x%p, size %ld to %ld bytes (in function %s)", block, new_block, old_size, size, func);
+    LINCE_INFO("Reallocated %*ld byte block to 0x%p, from %ld byte block at 0x%p (in function %s)", 5, size, new_block, old_size, block, func);
 
 #elif defined(LINCE_DEBUG) && !defined(LINCE_DEBUG_MEMCHECK)
     new_block = _global_allocator.realloc(block, size, _global_allocator.user_data);
@@ -137,7 +136,6 @@ void* LinceMemoryRealloc(void* block, size_t size, int line, const char* file, c
 void LinceMemoryFree(void* block, int line, const char* file, const char* func){
 
 #if defined(LINCE_DEBUG) && defined(LINCE_DEBUG_MEMCHECK)
-
     if(!block){
         LINCE_ERROR("Free called on NULL pointer");
         LINCE_ERROR("at %s:%d in function '%s'", file, line, func);
@@ -159,7 +157,7 @@ void LinceMemoryFree(void* block, int line, const char* file, const char* func){
 
     long nblocks = _global_allocator.stats.nblocks;
     long nbytes = _global_allocator.stats.nbytes;
-    LINCE_INFO("Deallocated block at 0x%p (in function %s, %d blocks and %ld bytes remain)", block, func, nblocks, nbytes);
+    LINCE_INFO("Deallocated %*ld byte block at 0x%p (in function %s, %d blocks and %ld bytes remain)", 5, size, block, func, nblocks, nbytes);
 
 #elif defined(LINCE_DEBUG) && !defined(LINCE_DEBUG_MEMCHECK)
     _global_allocator.stats.nblocks--;

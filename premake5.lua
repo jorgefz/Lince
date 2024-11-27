@@ -19,7 +19,8 @@ workspace "lince"
     warnings "Extra"
     
     -- ## YOUR DEFINES HERE ## --
-    -- defines{"LINCE_PROFILE"}
+    -- defines {"LINCE_PROFILE"}
+    defines {"LINCE_DEBUG_MEMCHECK"}
     -- defines {"LINCE_ASSETS_PATH=\"../../../lince/assets\""}
     defines {"LINCE_DIR=\"" .. os.getcwd() .. "/\""}
     -----------------------------

@@ -22,9 +22,6 @@ Add header to each allocation.
 
 */
 
-#define LINCE_DEBUG
-#define LINCE_DEBUG_MEMCHECK
-
 /** @typedef Type signature of function to allocate a block of memory */
 typedef void* (*LinceAllocFn)(size_t size, void* user_data);
 
