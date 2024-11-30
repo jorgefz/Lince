@@ -34,21 +34,11 @@
  * | Name                 | Description                          |
  * + -------------------- + ------------------------------------ +
  * | LINCE_NAME_MAX       | Maximum size for short names         |
+ * | LINCE_TITLE_MAX      | maximum length for the title         |
  * | LINCE_TEXT_MAX       | Maximum size for longer strings      |
  * | LINCE_PATH_MAX       | Maximum size for a path or directory |
  * + -------------------- + ------------------------------------ +
  * 
- * ## Allocations
- * Customise memory management.
- * Note that these do not apply to the containers (e.g. array, hashmap, list).
- * + ------------- + ----------------------------+
- * | Name          | Description                 |
- * + ------------- + ----------------------------+
- * | LINCE_MALLOC  | Custom version of `malloc`  |
- * | LINCE_CALLOC  | Custom version of `calloc`  |
- * | LINCE_REALLOC | Custom version of `realloc` |
- * | LINCE_FREE    | Custom version of `free`    |
- * + ------------- + ----------------------------+
  */
 
 
@@ -159,22 +149,6 @@
 /** @enum LinceBool
 * Custom boolean type */
 typedef enum LinceBool{ LinceFalse = 0, LinceTrue = 1 } LinceBool;
-
-#ifndef LINCE_MALLOC
-    #define LINCE_MALLOC malloc ///< Custom malloc
-#endif
-
-#ifndef LINCE_CALLOC
-    #define LINCE_CALLOC calloc ///< Custom calloc
-#endif
-
-#ifndef LINCE_REALLOC
-    #define LINCE_REALLOC realloc ///< Custom realloc
-#endif
-
-#ifndef LINCE_FREE
-    #define LINCE_FREE free ///< Custom free
-#endif
 
 
 #endif /* LINCE_DEFS_H */
