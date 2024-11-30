@@ -12,6 +12,7 @@
 #include "lince/core/profiler.h"
 #include "lince/utils/memory.h"
 #include "lince/core/logger.h"
+#include "stb_image_alloc.h"
 
 
 /* ==== Macros ==== */
@@ -251,6 +252,11 @@ static void  LinceHashmapFree(void* block)                {        LinceMemoryFr
 static void* LinceStringAlloc(size_t size)   { return LinceMemoryAlloc(size, 0, "str.c", "<anonymous str function>"); }
 static void  LinceStringDealloc(void* block) {        LinceMemoryFree(block, 0, "str.c", "<anonymous str function>"); }
 
+/* Memory management interface for stbi_image */
+static void* LinceSTBIImageAlloc(size_t size)                { return LinceMemoryAlloc(size, 0, "stb_image.c", "<anonymous stb_image function>"); }
+static void* LinceSTBIImageRealloc(void* block, size_t size) { return LinceMemoryRealloc(block, size, 0, "stb_image.c", "<anonymous stb_image function>"); }
+static void  LinceSTBIImageFree(void* block)                 {        LinceMemoryFree(block, 0, "stb_image.c", "<anonymous stb_image function>"); }
+
 
 
 /* ==== Public function definitions ==== */
@@ -294,7 +300,8 @@ static void LinceInit(){
     array_set_alloc(LinceArrayAlloc, LinceArrayRealloc, LinceArrayFree);
     hashmap_set_alloc(LinceHashmapAlloc, LinceHashmapRealloc, LinceHashmapFree);
     string_set_alloc(LinceStringAlloc, LinceStringDealloc);
-    
+    stbi_set_alloc(LinceSTBIImageAlloc, LinceSTBIImageRealloc, LinceSTBIImageFree);
+
     // Check user settings and set defaults
     if (app.screen_width == 0) app.screen_width = 500;
     if (app.screen_height == 0) app.screen_height = 500;

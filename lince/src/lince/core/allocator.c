@@ -142,9 +142,9 @@ void LinceMemoryFree(void* block, int line, const char* file, const char* func){
 
 #if defined(LINCE_DEBUG) && defined(LINCE_DEBUG_MEMCHECK)
     if(!block){
-        LINCE_ERROR("Free called on NULL pointer");
-        LINCE_ERROR("at %s:%d in function '%s'", file, line, func);
-        exit(-1);
+        LINCE_WARN("Free called on NULL pointer");
+        LINCE_WARN("at %s:%d in function '%s'", file, line, func);
+        return;
     }
 
     LinceAllocHeader* header = (LinceAllocHeader*)block - 1;
