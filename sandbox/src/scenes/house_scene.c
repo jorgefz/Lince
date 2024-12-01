@@ -35,7 +35,7 @@ static void UpdatePlayer(GameData* game_data){
 
 
 void HouseSceneInit(LinceScene* scene){
-    HouseScene* house_scene = LinceMalloc(sizeof(HouseScene));
+    HouseScene* house_scene = LinceAlloc(sizeof(HouseScene));
     scene->data = house_scene;
     
     // Town map

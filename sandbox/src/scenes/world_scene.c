@@ -49,7 +49,7 @@ static void UpdatePlayer(GameData* game_data){
 
 
 void WorldSceneInit(LinceScene* scene){
-    WorldScene* world_scene = LinceMalloc(sizeof(WorldScene));
+    WorldScene* world_scene = LinceAlloc(sizeof(WorldScene));
     scene->data = world_scene;
     
     // Town map

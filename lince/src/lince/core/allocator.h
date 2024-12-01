@@ -49,7 +49,6 @@ typedef struct LinceAllocStats {
 
 #define LinceCalloc(SZ)       memset(LinceAlloc(SZ), (char)0, (SZ))
 #define LinceNewCopy(PTR, SZ) memcpy(LinceAlloc(SZ), (PTR), (SZ))
-#define LinceMalloc(SZ)       LinceAlloc(SZ) /* Temporary, until LinceMalloc is replaced with LinceAlloc */
 
 
 /** @brief Obtain statistics about current memory usage */

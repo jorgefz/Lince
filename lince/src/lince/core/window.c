@@ -115,7 +115,7 @@ LinceWindow* LinceCreateWindow(uint32_t width, uint32_t height, const char* titl
     glfwGetVersion(&glfw_major, &glfw_minor, &glfw_rev);
     LINCE_INFO("GLFW Version %d.%d.%d", glfw_major, glfw_minor, glfw_rev);
 
-    LinceWindow* window = LinceMalloc(sizeof(LinceWindow));
+    LinceWindow* window = LinceAlloc(sizeof(LinceWindow));
     *window = (LinceWindow){
         .handle = handle,
         .height = height,

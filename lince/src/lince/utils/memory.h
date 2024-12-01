@@ -8,7 +8,7 @@
 #include "lince/core/core.h"
 
 /** @brief `malloc` with checks and assertion of return pointer */
-// void* LinceMalloc(size_t nbytes);
+// void* LinceAlloc(size_t nbytes);
 
 /** @brief `calloc` with checks and assertion of return pointer */
 // void* LinceCalloc(size_t nbytes);

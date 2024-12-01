@@ -50,7 +50,7 @@ void LinceUninitAssetCache(LinceAssetCache* cache) {
 
 
 LinceAssetCache* LinceCreateAssetCache() {
-    LinceAssetCache* cache = LinceMalloc(sizeof(LinceAssetCache));
+    LinceAssetCache* cache = LinceAlloc(sizeof(LinceAssetCache));
     if (!cache) return NULL;
     if (!LinceInitAssetCache(cache)) {
         LinceFree(cache);
@@ -145,7 +145,7 @@ void* LinceAssetCacheAddType(
         return NULL;
     }
 
-    LinceAssetStore* st = LinceMalloc(sizeof(LinceAssetStore));
+    LinceAssetStore* st = LinceAlloc(sizeof(LinceAssetStore));
     LINCE_ASSERT_ALLOC(st, sizeof(LinceAssetCache));
     st->callbacks = (LinceAssetCallbacks){.load = load, .unload = unload};
     hashmap_init(&st->handles, 10);

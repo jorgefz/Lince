@@ -30,7 +30,7 @@ void LinceInitSound(LinceAudioEngine* audio, LinceSound* s){
         flags |= MA_SOUND_FLAG_STREAM;
     }
 
-    s->handle = LinceMalloc(sizeof(ma_sound));
+    s->handle = LinceAlloc(sizeof(ma_sound));
     LINCE_ASSERT_ALLOC(s->handle, sizeof(ma_sound));
     
     result = ma_sound_init_from_file(audio->handle, s->filename.str, flags, NULL, NULL, s->handle);
@@ -108,7 +108,7 @@ LinceBool LinceIsSoundStopped(LinceSound* s){
 
 LinceAudioEngine* LinceCreateAudioEngine(void){
     LinceAudioEngine engine = {
-        .handle = LinceMalloc(sizeof(ma_engine))
+        .handle = LinceAlloc(sizeof(ma_engine))
     };
     ma_result result;
     result = ma_engine_init(NULL, engine.handle);
@@ -133,7 +133,7 @@ LinceSoundManager* LinceCreateSoundManager(LinceAudioEngine* audio, LinceSoundTy
 
     // Pre-load sound file
     LinceSound first = {
-        .handle = LinceMalloc(sizeof(ma_sound)),
+        .handle = LinceAlloc(sizeof(ma_sound)),
         .filename = manager.filename, // No need to copy full path, original stored in manager
         .type = type,
         .config = default_sound_config,
@@ -198,7 +198,7 @@ void LinceSpawnSound(LinceAudioEngine* audio, LinceSoundManager* manager, LinceS
         if(manager->type == LinceSound_Stream){
             flags |= MA_SOUND_FLAG_STREAM;
         }
-        new_sound.handle = LinceMalloc(sizeof(ma_sound));
+        new_sound.handle = LinceAlloc(sizeof(ma_sound));
         ma_sound_init_copy(audio->handle, first->handle, flags, NULL, new_sound.handle);
     }
 

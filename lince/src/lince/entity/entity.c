@@ -10,7 +10,7 @@ LinceEntityRegistry* LinceCreateEntityRegistry(uint32_t component_count, ...){
     LINCE_ASSERT(component_count <= max_components,
         "Too many components, max is %u.", max_components);
     
-    LinceEntityRegistry* reg = LinceMalloc(sizeof(LinceEntityRegistry));
+    LinceEntityRegistry* reg = LinceAlloc(sizeof(LinceEntityRegistry));
     LINCE_ASSERT_ALLOC(reg, sizeof(LinceEntityRegistry));
     
     reg->component_count = component_count;
