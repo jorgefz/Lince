@@ -5,6 +5,9 @@
 #include "gamedata.h"
 #include "scenes/scenes.h"
 
+#include <toml.h>
+
+
 static GameData DATA = {0};
 
 static const char asset_dir[] = "../../../sandbox/assets";
@@ -52,10 +55,43 @@ void SetupApplication(){
 }
 
 
+void TestReadToml(){
+    char errbuf[200];
+
+    string_t content = LinceReadFile(string_scoped_lit("sandbox/assets/config/config.toml"));
+    if(!content.str){
+        printf("Could not read toml file\n");
+        return;
+    }
+
+    toml_table_t* tab = toml_parse(content.str, errbuf, sizeof(errbuf));
+    if(!tab){
+        printf("Failed to parse toml file\n");
+        printf("%s\n", errbuf);
+        return;
+    }
+    printf("Success!\n");
+
+    toml_datum_t number = toml_int_in(tab, "number");
+    if(!number.ok) printf("Failed to parse number\n");
+    else           printf("number = %d\n", (int)number.u.i);
+
+    toml_datum_t name = toml_string_in(tab, "name");
+    if(!name.ok) printf("Failed to parse name\n");
+    else {
+        printf("name = %s\n", name.u.s);
+        free(name.u.s);
+    }
+
+    toml_free(tab);
+}
+
 int main(void) {
 
-    SetupApplication();
-    LinceRun();
+    TestReadToml();
+
+    // SetupApplication();
+    // LinceRun();
 
     return 0;
 }
