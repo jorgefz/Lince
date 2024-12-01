@@ -21,7 +21,8 @@ project "sandbox"
         "%{wks.location}/%{LinceIncludeDir.cglm}",
         "%{wks.location}/%{LinceIncludeDir.nuklear}",
         "%{wks.location}/%{LinceIncludeDir.stb}",
-        "%{wks.location}/%{LinceIncludeDir.miniaudio}"
+        "%{wks.location}/%{LinceIncludeDir.miniaudio}",
+        "%{wks.location}/%{LinceIncludeDir.toml}"
     }
 
     links {
@@ -31,7 +32,8 @@ project "sandbox"
         "cglm",
         "stb",
         "nuklear",
-        "miniaudio"
+        "miniaudio",
+        "toml"
     }
 
     libdirs {"%{wks.location}/bin/" .. LinceOutputDir .. "/lince"}
