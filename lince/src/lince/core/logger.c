@@ -57,17 +57,17 @@ void LinceLoggerDefaultToStderr(int flag){
 
 void LinceLoggerInfo(const char* fmt, ...){
     if(_logfile){
-        WRITE_LOGFILE(_logfile, "INFO", fmt);
+        WRITE_LOGFILE(_logfile, " INFO", fmt);
     } else if(_use_default_stderr == 1){
-        WRITE_LOGFILE(stderr, "INFO", fmt);
+        WRITE_LOGFILE(stderr, " INFO", fmt);
     }
 }
 
 void LinceLoggerWarn(const char* fmt, ...){
     if(_logfile){
-        WRITE_LOGFILE(_logfile, "WARNING", fmt);
+        WRITE_LOGFILE(_logfile, " WARN", fmt);
     } else if(_use_default_stderr == 1){
-        WRITE_LOGFILE(stderr, "WARNING", fmt);
+        WRITE_LOGFILE(stderr, " WARN", fmt);
     }
 }
 
