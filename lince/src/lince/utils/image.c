@@ -53,7 +53,7 @@ void LinceDeleteImage(LinceImage* image){
         stbi_image_free(image->data);
         LINCE_INFO("Unloaded image of size %ux%u", image->width, image->height);
     }
-    *image = (LinceImage){0};
+    LinceFree(image);
 }
 
 uint8_t* LinceImageGetPixel(LinceImage* image, uint32_t x, uint32_t y){

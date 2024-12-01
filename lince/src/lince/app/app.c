@@ -403,6 +403,7 @@ static void LinceAppTerminate(){
         LinceScene* scene = hashmap_get(&app.scene_cache, key);
         if (scene) {
             if (scene->loaded) {
+                LINCE_INFO("Unloaded scene '%s'", key.str);
                 LinceUninitScene(scene);
             }
             LinceFree(scene);
