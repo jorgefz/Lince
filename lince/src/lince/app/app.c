@@ -102,7 +102,8 @@ void LinceAppSetTitle(const char* title, size_t len) {
         return;
     }
 
-    app.title = string_from_chars(title, len); // ALLOCATED BEFORE MEMORY ALLOCATOR KICKS IN
+    // app.title = string_from_chars(title, len);
+    app.title = string_scoped(title, len);
 }
 
 /** @brief Retrieve the asset cache of the application */
@@ -305,7 +306,8 @@ static void LinceInit(){
     // Check user settings and set defaults
     if (app.screen_width == 0) app.screen_width = 500;
     if (app.screen_height == 0) app.screen_height = 500;
-    if (!app.title.str) app.title = string_from_literal("Lince App");
+    if (app.title.str) app.title = string_from_chars(app.title.str, app.title.len);
+    else app.title = string_from_literal("Lince App");
     
     // Create a windowed mode window and its OpenGL context
     app.window = LinceCreateWindow(app.screen_width, app.screen_height, app.title.str);
