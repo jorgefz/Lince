@@ -90,8 +90,8 @@ int main(void) {
 
     TestReadToml();
 
-    // SetupApplication();
-    // LinceRun();
+    SetupApplication();
+    LinceRun();
 
     return 0;
 }
