@@ -2,7 +2,7 @@
 #define LINCE_UI_H
 
 #include "lince/core/window.h"
-#include "lince/app/asset_cache.h"
+#include "lince/assetcache/assetcache.h"
 #include "lince/containers/str.h"
 #include "lince/containers/hashmap.h"
 

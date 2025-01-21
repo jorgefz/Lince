@@ -8,10 +8,10 @@
 
 
 ///< Callback signature to load an asset from disk
-typedef void* (*LinceAssetLoad)(string_t path, void* args);
+typedef void* (*LinceAssetLoad)(string_t path, void* args); // (LinceAssetCache* cache, string_t path)
 
 ///< Callback signature to free an asset from memory
-typedef void (*LinceAssetUnload)(void* obj);
+typedef void (*LinceAssetUnload)(void* obj); // (LinceAssetCache* cache, void* obj)
 
 /// Callbacks to load, unload, and manage assets of a specific type
 typedef struct LinceAssetCallbacks {

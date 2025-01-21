@@ -1,7 +1,5 @@
-#include "lince/app/asset_cache.h"
+#include "lince/assetcache/assetcache.h"
 #include "lince/utils/fileio.h"
-#include "lince/core/logger.h"
-#include "lince/utils/memory.h"
 
 
 LinceBool LinceInitAssetCache(LinceAssetCache* cache) {

@@ -18,7 +18,7 @@
 #include "lince/renderer/camera.h"
 #include "lince/gui/gui.h"
 #include "lince/scene/scene.h"
-#include "lince/app/asset_cache.h"
+#include "lince/assetcache/assetcache.h"
 #include "lince/renderer/transform.h"
 #include "lince/input/input.h"
 
