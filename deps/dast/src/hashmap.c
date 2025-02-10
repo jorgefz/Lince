@@ -14,10 +14,12 @@
 
 #define HASHMAP_LOADING_FACTOR 2
 
-/* Global allocation interface - defaults to std library */
-static void* (*hashmap_malloc)(size_t size)               = malloc;
-static void* (*hashmap_realloc)(void* block, size_t size) = realloc;
-static void  (*hashmap_free)(void* block)                 = free;
+// CALLOC = memset(block, 0, count * size);
+
+static const void* hashmap_default_alloc   = malloc;  ///< Default allocate function 
+static const void* hashmap_default_realloc = realloc; ///< Default reallocate function
+static const void* hashmap_default_free    = free;    ///< Default deallocate function
+static const void* hashmap_default_hashfn  = hashmap_FNV1a64_hash; ///< Default hashing function
 
 
 /* 
@@ -26,50 +28,9 @@ static void  (*hashmap_free)(void* block)                 = free;
  * ----------------
  */
 
-/* Substitute for calloc to use malloc wrapper */
-static void* hashmap_calloc(size_t count, size_t size){
-	void* block = hashmap_malloc(count * size);
-	if(block) memset(block, 0, count * size);
-	return block;
-}
-
-
-/** CRC32 hashing algorithm */
-static uint32_t crc32b_hash(const char *key, uint64_t len) {
-   uint32_t j;
-   uint32_t byte, crc, mask;
-   crc = 0xFFFFFFFF;
-
-   for(uint64_t i = 0; i != len; ++i){
-      byte = key[i];
-      crc = crc ^ byte;
-      for (j = 7; j >= 0; j--) {
-         mask = 0 - (crc & 1); // Avoid compiler warning
-         crc = (crc >> 1) ^ (0xEDB88320 & mask);
-      }
-   }
-   return ~crc;
-}
-
-/** Bob Jenkins' one-at-a-time hashing algorithm */
-static uint32_t jenkins_hash(const char* key, uint64_t len) {
-    // Using 'one-at-a-time' hashing function by Bob Jenkins
-    // https://en.wikipedia.org/wiki/Jenkins_hash_function
-    uint64_t i = 0;
-    uint32_t hash = 0;
-    while (i != len) {
-        hash += key[i++];
-        hash += hash << 10;
-        hash ^= hash >> 6;
-    }
-    hash += hash << 3;
-    hash ^= hash >> 11;
-    hash += hash << 15;
-    return hash;
-}
 
 /** Checks whether an input number is prime */
-static uint64_t isprime(uint64_t n) {
+static uint64_t hashmap_isprime(uint64_t n) {
 
     // Easy cases
     if (n <= 1)  return 0;
@@ -84,15 +45,20 @@ static uint64_t isprime(uint64_t n) {
 }
 
 /** Returns the next prime number larger than the given number `n` */
-static uint64_t next_prime(uint64_t n){
+static uint64_t hashmap_next_prime(uint64_t n){
     if(n<=1) return 2;
-    while(!isprime(++n));
+    while(!hashmap_isprime(++n));
     return n;
 }
 
 /** Checks whether two memory locations `b1` and `b2` store the same data */
-static int memeq(const void* b1, const void* b2, uint64_t s1, uint64_t s2) {
+static int hashmap_memeq(const void* b1, const void* b2, uint64_t s1, uint64_t s2) {
     return (b1 && b2) && (s1 == s2) && ((b1 == b2) || (memcmp(b1, b2, s1) == 0));
+}
+
+/** Return the hash of a chunk of memory mod'ed with the map size */
+static hashmap_get_hash(hashmap_t* map, const void* key, uint64_t keylen){
+    return map->hash_fn(key, keylen) % map->size;
 }
 
 /** Returns the hashmap element with the given binary key
@@ -103,11 +69,11 @@ static int memeq(const void* b1, const void* b2, uint64_t s1, uint64_t s2) {
 */
 static hashmap_entry_t* hashmap_lookupb(hashmap_t* map, const void* bkey, uint64_t key_len) {
     if (!map || !bkey) return NULL;
-    uint32_t hash = hashmap_hashb(bkey, key_len, map->size);
+    uint32_t hash = hashmap_get_hash(map, bkey, key_len);
     hashmap_entry_t* entry = map->table[hash];
 
     while (entry) {
-        if (memeq(bkey, entry->key, key_len, entry->len)) {
+        if (hashmap_memeq(bkey, entry->key, key_len, entry->len)) {
             return entry;
         }
         entry = entry->next;
@@ -125,52 +91,65 @@ static hashmap_entry_t* hashmap_lookup(hashmap_t* map, string_t key){
     return hashmap_lookupb(map, key.str, key.len + 1); // include null-terminating char
 }
 
+
+
 /* 
  * ----------------
  * Public Functions
  * ----------------
  */
 
-/** @brief Set custom memory allocation functions.
- * @note Only call this function before any hashmaps have been initialised
- * @param user_alloc Custom malloc function, allocates block of memory of given size.
- * @param user_realloc Custom realloc function, reallocates existing block of memory into a given size.
- * @param user_free Custom free function, deallocates an allocated block of memory.
- */
-void hashmap_set_alloc(
-	void* (*user_alloc)  (size_t size),
-	void* (*user_realloc)(void* block, size_t size),
-	void  (*user_free)   (void* block)
-) {
-	if(user_alloc)   hashmap_malloc  = user_alloc;
-	if(user_realloc) hashmap_realloc = user_realloc;
-	if(user_free)    hashmap_free    = user_free;
+#define HASHMAP_FNV_64BIT_OFFSET_BASIS ((uint64_t)0xcbf29ce484222325)
+#define HASHMAP_FNV_64BIT_PRIME ((uint64_t)0x100000001b3)
+
+/* Computes the hash of a sequence of `len` bytes of `data`
+using the FNV1-a hashing algorithm. */
+uint64_t hashmap_FNV1a64_hash(const void* data, uint64_t len){
+	const char* p = data;
+	uint64_t hash = HASHMAP_FNV_64BIT_OFFSET_BASIS;
+	for(uint64_t i = 0; i != len; ++i){
+		hash = hash ^ p[i];
+		hash = hash * HASHMAP_FNV_64BIT_PRIME;
+	}
+	return hash;
 }
 
 
-/** @brief Returns the hash of a given number of bytes.
- * The size of the hashmap must be passed as an argument,
- * as it will be mod (%) with the hash result.
- * @param bkey binary key to hash, can be any set of bytes 
- * @param key_len number of bytes in the binary key
- * @param map_size number of buckets in the hashmap.
- * @returns 32-bit hash of the input key
- */
-uint32_t hashmap_hashb(const void* bkey, uint64_t key_len, uint64_t map_size) {
-    return jenkins_hash(bkey, key_len) % (uint32_t)map_size;
+/** @brief Initialise hashmap via user-managed object with custom allocator and/or hash function.
+ * Should be deleted with `hashmap_uninit`.
+ * @param map Hashmap to initialised
+ * @param size_hint Starting number of buckets
+ * @param hash_fn Hash function
+ * @param alloc_fn Allocation function
+ * @param realloc_fn Reallocation function
+ * @param free_fn Deallocation function
+*/
+hashmap_t* hashmap_init_custom(
+	hashmap_t*        map,
+	uint64_t          size_hint,
+	hashmap_hashfn_t  hash_fn,
+	hashmap_alloc_t   alloc_fn,
+	hashmap_realloc_t realloc_fn,
+	hashmap_free_t    free_fn
+){
+    if(!map) return NULL;
+    *map = (hashmap_t){0};
+
+    hash_fn    ? map->hash_fn    = hash_fn    : hashmap_default_hashfn;
+    alloc_fn   ? map->alloc_fn   = alloc_fn   : hashmap_default_alloc;
+    realloc_fn ? map->realloc_fn = realloc_fn : hashmap_default_realloc;
+    free_fn    ? map->free_fn    = free_fn    : hashmap_default_free;
+
+    map->size = hashmap_next_prime(size_hint);
+    map->table = map->alloc_fn(map->size, sizeof(hashmap_entry_t*));
+    if(!map->table){
+        return NULL;
+    }
+    memset(map->table, 0, map->size * sizeof(hashmap_entry_t*));
+
+    return map;
 }
 
-/** @brief Returns the hash of a given string key.
- * The size of the hashmap must be passed as an argument,
- * as it will be mod (%) with the hash result.
- * @param key string key
- * @param map_size number of buckets.
- * @returns 32-bit hash of the input key
- */
-uint32_t hashmap_hash(string_t key, uint64_t map_size) {
-    if (!key.str) return 0;
-    return hashmap_hashb(key.str, key.len + 1, map_size); // include null-terminating char
-}
 
 /** @brief Initialise hashmap via user-managed object.
  * Should be deleted using `hashmap_uninit`.
@@ -179,12 +158,13 @@ uint32_t hashmap_hash(string_t key, uint64_t map_size) {
  * @returns the input map on success, and NULL otherwise
  */
 hashmap_t* hashmap_init(hashmap_t* map, uint64_t size_hint){
-    if(!map) return NULL;
-    *map = (hashmap_t){0};
-    map->size = next_prime(size_hint);
-    map->table = hashmap_calloc(map->size, sizeof(hashmap_entry_t*));
-    if(!map->table) return NULL;
-    return map;
+    return hashmap_init_custom(
+        map, size_hint,
+        hashmap_default_hashfn,
+        hashmap_default_alloc,
+        hashmap_default_realloc,
+        hashmap_default_free
+    );
 }
 
 /** @brief Clears a hashmap and removes all stored data.
@@ -201,8 +181,8 @@ void hashmap_uninit(hashmap_t* map){
         hashmap_entry_t* next;
         while(entry){
             next = entry->next;
-            hashmap_free(entry->key);
-            hashmap_free(entry);
+            map->free_fn(entry->key);
+            map->free_fn(entry);
             entry = next;
         }
     }
@@ -210,33 +190,6 @@ void hashmap_uninit(hashmap_t* map){
     *map = (hashmap_t){0};
 }
 
-/** @brief Allocates and initialises a hashmap.
- * Destroy with `hashmap_destroy`.
- * @param size_hint initial number of buckets.
- * @returns pointer to new hashmap
- */
-hashmap_t* hashmap_create(uint64_t size_hint){
-    hashmap_t* map = hashmap_malloc(sizeof(hashmap_t));
-    if(!map) return NULL;
-    void* res = hashmap_init(map, size_hint);
-    if(!res){
-        hashmap_free(map);
-        return NULL;
-    }
-    return map;
-}
-
-/** @brief Deallocates a hashmap created with `hashmap_create`.
- * It does not free the pointers to values.
- * You must free the values yourself before destroying the hashmap.
- * You can do this by iterating over the keys and freeing each value in turn.
- * @param map hasmap to delete
- */
-void hashmap_destroy(hashmap_t* map){
-    if(!map) return;
-    hashmap_uninit(map);
-    hashmap_free(map);
-}
 
 /** @brief Checks if a map has a given key
  * @param map initialised hashmap
@@ -297,10 +250,10 @@ hashmap_t* hashmap_setb(hashmap_t* map, const void* bkey, uint64_t key_len, void
     if (!map || !bkey) return NULL;
 
     hashmap_entry_t* entry = hashmap_lookupb(map, bkey, key_len);
-    uint32_t hash = hashmap_hashb(bkey, key_len, map->size);
+    uint32_t hash = map->hash_fn(bkey, key_len) % map->size;
 
     while (entry) {
-        if (memeq(bkey, entry->key, key_len, entry->len)) {
+        if (hashmap_memeq(bkey, entry->key, key_len, entry->len)) {
             entry->value = value;
             return map;
         }
@@ -308,12 +261,13 @@ hashmap_t* hashmap_setb(hashmap_t* map, const void* bkey, uint64_t key_len, void
     }
 
     // No matching key found
-    entry = hashmap_calloc(1, sizeof(hashmap_entry_t));
+    entry = map->alloc_fn(sizeof(hashmap_entry_t));
     if (!entry) return NULL;
 
+    memset(entry, 0, sizeof(hashmap_entry_t));
     entry->key = hashmap_malloc(key_len);
     if (!entry->key) {
-        hashmap_free(entry);
+        map->free_fn(entry);
         return NULL;
     }
 
@@ -359,7 +313,7 @@ hashmap_t* hashmap_resize(hashmap_t* map) {
 
     uint64_t new_size = map->entries * HASHMAP_LOADING_FACTOR;
     hashmap_t new_map;
-    hashmap_init(&new_map, new_size);
+    hashmap_init_custom(&new_map, new_size, map->hash_fn, map->alloc_fn, map->realloc_fn, map->free_fn);
     hashmap_entry_t* entry;
     uint64_t i;
 
@@ -421,7 +375,7 @@ void* hashmap_iterb(hashmap_t* map, const char* bkey, uint64_t* key_len) {
     }
 
     // Fetch the key in the table (with a different hash)
-    hash = hashmap_hashb(bkey, *key_len, map->size);
+    hash = map->hash_fn(bkey, *key_len) % map->size;
     for (uint32_t i = hash + 1; i != map->size; ++i) {
         if (map->table[i]) {
             if (key_len) {

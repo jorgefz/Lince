@@ -31,8 +31,24 @@
 #include <inttypes.h>
 #include "str.h"
 
-/** Typedef for 32-bit hash */
-// typedef uint32_t hashmap_hash32_t;
+#ifdef HASHMAP_HASH_32BIT
+	typedef uint32_t hashmap_hash_t; ///< @typedef Type of 64-bit hashed value
+#else
+	typedef uint64_t hashmap_hash_t; ///< @typedef Type of 32-bit hashed value
+#endif
+
+/** @typedef Type for hashing function */
+typedef hashmap_hash_t (*hashmap_hashfn_t)(const void* data, size_t len);
+
+/** @typedef Type for allocator function */
+typedef void* (*hashmap_alloc_t)(size_t size);
+
+/** @typedef Type for reallocator function */
+typedef void* (*hashmap_realloc_t)(void* block, size_t new_size);
+
+/** @typedef Type for deallocator function */
+typedef void (*hashmap_free_t)(void* block);
+
 
 /** @struct hashmap_entry
  * @brief Hashmap entry. Holds a key-value pair.
@@ -48,42 +64,24 @@ typedef struct hashmap_entry {
  * @brief Hash map data structure. Holds key-value pairs accessed via hashes.
  */
 typedef struct hashmap {
-	uint64_t size;           ///< total number of buckets
-    uint64_t entries;        ///< number of filled buckets
-	hashmap_entry_t** table; ///< Hashtable of entries
+	uint64_t          size;        ///< Total number of buckets
+    uint64_t          entries;     ///< Number of filled buckets
+	hashmap_entry_t** table;       ///< Hash table of entries
+
+	hashmap_hashfn_t  hash_fn;     ///< Hashing function
+	hashmap_alloc_t   alloc_fn;    ///< Memory allocation function
+	hashmap_realloc_t realloc_fn;  ///< Memory reallocation function
+	hashmap_free_t    free_fn;     ///< Memory deallocation function
 } hashmap_t;
 
 
-/** @brief Set custom memory allocation functions.
- * @note Only call this function before any hashmaps have been initialised
- * @param user_alloc Custom malloc function, allocates block of memory of given size.
- * @param user_realloc Custom realloc function, reallocates existing block of memory into a given size.
- * @param user_free Custom free function, deallocates an allocated block of memory.
- */
-void hashmap_set_alloc(
-	void* (*user_alloc)  (size_t size),
-	void* (*user_realloc)(void* block, size_t size),
-	void  (*user_free)   (void* block)
-);
+/** @brief FNV1-a 64-bit hashing algorithm */
+uint64_t hashmap_FNV1a64_hash(const void* data, uint64_t len);
 
-/** @brief Returns the hash of a given number of bytes.
- * The size of the hashmap must be passed as an argument,
- * as it will be mod (%) with the hash result.
- * @param bkey binary key to hash, can be any set of bytes 
- * @param key_len number of bytes in the binary key
- * @param map_size number of buckets in the hashmap.
- * @returns hash of the input key
- */
-uint32_t hashmap_hashb(const void* bkey, uint64_t key_len, uint64_t map_size);
 
-/** @brief Returns the hash of a given string key.
- * The size of the hashmap must be passed as an argument,
- * as it will be mod (%) with the hash result.
- * @param key string key
- * @param map_size number of buckets.
- * @returns hash of the input key
- */
-uint32_t hashmap_hash(string_t key, uint64_t map_size);
+// Set default hash function
+// void hashmap_set_default_hash_fn();
+
 
 /** @brief Initialise hashmap via user-managed object.
  * Should be deleted using `hashmap_uninit`.
@@ -93,6 +91,25 @@ uint32_t hashmap_hash(string_t key, uint64_t map_size);
  */
 hashmap_t* hashmap_init(hashmap_t* map, uint64_t size_hint);
 
+/** @brief Initialise hashmap via user-managed object with custom allocator and/or hash function.
+ * Should be deleted with `hashmap_uninit`.
+ * @param map Hashmap to initialised
+ * @param size_hint Starting number of buckets
+ * @param hash_fn Hash function
+ * @param alloc_fn Allocation function
+ * @param realloc_fn Reallocation function
+ * @param free_fn Deallocation function
+*/
+hashmap_t* hashmap_init_custom(
+	hashmap_t*        map,
+	uint64_t          size_hint,
+	hashmap_hashfn_t  hash_fn,
+	hashmap_alloc_t   alloc_fn,
+	hashmap_realloc_t realloc_fn,
+	hashmap_free_t    free_fn
+);
+
+
 /** @brief Clears a hashmap and removes all stored data.
  * It does not free the pointers to values, as these are managed by the user.
  * You must free the values yourself before uninitialising the hashmap.
@@ -100,21 +117,6 @@ hashmap_t* hashmap_init(hashmap_t* map, uint64_t size_hint);
  * @param map hashmap to uninitialise
  */
 void hashmap_uninit(hashmap_t* map);
-
-/** @brief Allocates and initialises a hashmap.
- * Destroy with `hashmap_destroy`.
- * @param size_hint initial number of buckets.
- * @returns pointer to new hashmap
- */
-hashmap_t* hashmap_create(uint64_t size_hint);
-
-/** @brief Deallocates a hashmap created with `hashmap_create`.
- * It does not free the pointers to values.
- * You must free the values yourself before destroying the hashmap.
- * You can do this by iterating over the keys and freeing each value in turn.
- * @param map hasmap to delete
- */
-void hashmap_destroy(hashmap_t* map);
 
 /** @brief Checks if a map has a given key
  * @param map initialised hashmap

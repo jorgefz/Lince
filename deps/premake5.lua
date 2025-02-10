@@ -227,3 +227,22 @@ project "toml"
         "%{wks.location}/bin/" .. LinceOutputDir .. "/glad",
         "%{wks.location}/bin/" .. LinceOutputDir .. "/glfw",
     }
+
+
+project "dast"
+    kind "StaticLib"
+    language "C"
+    staticruntime "on"
+    location "%{wks.location}/build/%{prj.name}"
+
+    objdir ("%{wks.location}/obj/" .. LinceOutputDir .. "/%{prj.name}" )
+    targetdir ("%{wks.location}/bin/" .. LinceOutputDir .. "/%{prj.name}" )
+    
+    files {
+        "%{prj.name}/src/**.c",
+        "%{prj.name}/include/**.h",
+    }
+    
+    includedirs {
+        "%{prj.name}/include",
+    }
