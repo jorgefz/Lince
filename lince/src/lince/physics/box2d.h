@@ -1,9 +1,8 @@
 #ifndef LINCE_BOX2D_H
 #define LINCE_BOX2D_H
 
-#include <lince/core/core.h>
-#include <lince/containers/array.h>
-#include <lince/entity/entity.h>
+#include "lince/core/core.h"
+#include "lince/entity/entity.h"
 
 /** @enum LinceBox2DFlags
 * @brief Settings and state for a box collider.

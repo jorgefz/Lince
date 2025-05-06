@@ -48,8 +48,6 @@ void OnTerminate(){
 #define LINCE_AUDIO_H
 
 #include <lince/core/core.h>
-#include <lince/containers/str.h>
-#include <lince/containers/array.h>
 
 /** @enum LinceSoundType
 * @brief Holds the type of a sound: buffered or streamed.

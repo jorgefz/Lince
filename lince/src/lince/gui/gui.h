@@ -1,10 +1,9 @@
 #ifndef LINCE_UI_H
 #define LINCE_UI_H
 
+#include "lince/core/core.h"
 #include "lince/core/window.h"
 #include "lince/assetcache/assetcache.h"
-#include "lince/containers/str.h"
-#include "lince/containers/hashmap.h"
 
 /** @enum LinceFonts
 * @brief Indices of preloaded fonts by the engine,

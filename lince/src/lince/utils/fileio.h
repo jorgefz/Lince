@@ -3,8 +3,6 @@
 #define LINCE_FILEIO_H
 
 #include "lince/core/core.h"
-#include "lince/containers/array.h"
-#include "lince/containers/str.h"
 
 /** @brief Returns the directory of the running executable, with the filename stripped,
  * and ending in a slash (forward or backward).

@@ -2,9 +2,6 @@
 #define LINCE_ASSET_MANAGER_H
 
 #include "lince/core/core.h"
-#include "lince/containers/array.h"
-#include "lince/containers/str.h"
-#include "lince/containers/hashmap.h"
 
 
 ///< Callback signature to load an asset from disk

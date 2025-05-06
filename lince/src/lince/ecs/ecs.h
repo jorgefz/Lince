@@ -41,8 +41,6 @@ QUERY(components)
 #ifndef LINCE_ECS_H
 #define LINCE_ECS_H
 
-#include "lince/containers/array.h"
-#include "lince/containers/hashmap.h"
 #include "lince/core/core.h"
 
 /* Integral type for Entity IDs */

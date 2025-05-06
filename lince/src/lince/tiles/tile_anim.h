@@ -1,7 +1,6 @@
 #ifndef LINCE_TILE_ANIM_H
 #define LINCE_TILE_ANIM_H
 
-#include "lince/containers/array.h"
 #include "lince/tiles/tileset.h"
 
 /** @enum LinceTileAnimFlags

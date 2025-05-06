@@ -5,9 +5,6 @@
 #include "lince/core/core.h"
 #include "cglm/types.h"
 
-#include "lince/containers/str.h"
-#include "lince/containers/hashmap.h"
-
 /** @struct shader */
 typedef struct LinceShader {
 	uint32_t id; 				///< OpenGL program id

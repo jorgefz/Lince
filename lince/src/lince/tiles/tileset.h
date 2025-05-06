@@ -1,7 +1,7 @@
 #ifndef LINCE_TILESET_H
 #define LINCE_TILESET_H
 
-#include "lince/containers/array.h"
+#include "lince/core/core.h"
 #include "lince/renderer/transform.h"
 #include "lince/renderer/texture.h"
 

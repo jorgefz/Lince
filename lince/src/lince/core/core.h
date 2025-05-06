@@ -17,6 +17,8 @@
 #include <string.h>
 #include <stdint.h>
 
+#include <dast.h> // Data structures
+
 #include "lince/core/defs.h"
 #include "lince/core/logger.h"
 #include "lince/core/allocator.h"

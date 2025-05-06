@@ -5,9 +5,6 @@
 * Main initialisation and execution functions for the Lince engine
 */
 #include "cglm/mat4.h"
-#include "lince/containers/array.h"
-#include "lince/containers/str.h"
-#include "lince/containers/hashmap.h"
 #include "lince/utils/clock.h"
 #include "lince/core/window.h"
 #include "lince/app/layer.h"

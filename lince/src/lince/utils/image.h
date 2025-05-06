@@ -2,7 +2,6 @@
 #define LINCE_IMAGE_H
 
 #include "lince/core/core.h"
-#include "lince/containers/str.h"
 
 /** @struct LinceImage
  * @brief Buffer for storing an image loaded from disk.
