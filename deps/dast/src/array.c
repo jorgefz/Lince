@@ -1,31 +1,10 @@
-#include <stdlib.h>
-#include <string.h>
-#include "containers/array.h"
-
-/* Factor by which the capacity is increased */
-#define ARRAY_GROW_FACTOR 1.5
-
-#define ARRAY_INITIAL_CAPACITY 1
-
-
-/* Global allocation interface - defaults to std library */
-static void* (*array_malloc)(size_t size)               = malloc;
-static void* (*array_realloc)(void* block, size_t size) = realloc;
-static void  (*array_free)(void* block)                 = free;
-
-
-/* Substitute for calloc to use malloc wrapper */
-static void* array_calloc(size_t count, size_t size){
-	void* block = array_malloc(count * size);
-	if(block) memset(block, 0, count * size);
-	return block;
-}
+#include "array.h"
 
 
 /* Returns the nearest highest power of two of an integer */
-static uint32_t nearest_pow2(uint32_t n){
+static dast_sz dast_nearest_pow2(dast_sz n){
+    dast_sz x = 2;
     if(n <= 1) return 1;
-    uint32_t x = 2;
     n--;
 	while (n >>= 1) x <<= 1;
 	return x;
@@ -33,17 +12,18 @@ static uint32_t nearest_pow2(uint32_t n){
 
 
 /* Increments capacity of the array to the next power of two */
-static array_t* extend_capacity(array_t* array){
-	if(!array) return NULL;
+static array_t* array_extend_capacity(array_t* array){
+	dast_sz capacity;
+    void* data;
 
-	uint32_t capacity = array->capacity;
-	void* data;
+    if(!array) return dast_null;
+	capacity = array->capacity;
 
 	if(capacity == 0) capacity++;
 	else capacity *= 2;
 
-	data = array_realloc(array->data, capacity * array->element_size);
-	if(!data) return NULL;
+	data = array->alloc.realloc(array->data, capacity * array->element_size);
+	if(!data) return dast_null;
 
 	array->data = data;
 	array->capacity = capacity;
@@ -51,30 +31,28 @@ static array_t* extend_capacity(array_t* array){
 }
 
 
-// -- INITIALIZATIONS -- //
-
-/* Provide custom allocator functions */
-void array_set_alloc(
-	void* (*user_alloc)  (size_t size),
-	void* (*user_realloc)(void* block, size_t size),
-	void  (*user_free)   (void* block)
-) {
-	if(user_alloc)   array_malloc  = user_alloc;
-	if(user_realloc) array_realloc = user_realloc;
-	if(user_free)    array_free    = user_free;
-}
-
+/* -- INITIALIZATIONS -- */
 
 /*
 Initialises an array via a given pointer.
 Should be later freed using `array_uninit`.
 */
-int array_init(array_t* array, uint32_t element_size){
-	if(!array) return 0;
-	*array = (array_t){0};
-	if(element_size == 0) return 0;
-	array->element_size = element_size;
-	return 1;
+array_t* array_init(array_t* array, dast_sz element_size){
+	return array_init_custom(array, element_size, DAST_DEFAULT_ALLOCATOR);
+}
+
+#include <stdio.h>
+
+/** @brief Initialises an array via a given pointer with custom memory allocation functions.
+*   Should be freed with `array_uninit`.
+*/
+array_t* array_init_custom(array_t* array, dast_sz element_size, dast_allocator_t alloc){
+	if(!array || !alloc.alloc || !alloc.realloc || !alloc.free) return dast_null;
+    if(element_size == 0) return dast_null;
+    *array = (array_t){0};
+    array->element_size = element_size;
+    array->alloc = alloc;
+    return array;
 }
 
 /*
@@ -82,25 +60,8 @@ Deallocates and resets the array data without freeing the array object itself.
 */
 void array_uninit(array_t* array){
 	if(!array) return;
-	if(array->data) array_free(array->data);
+	if(array->data) array->alloc.free(array->data);
 	*array = (array_t){0};
-}
-
-
-/* Creates a new array of size zero */
-array_t* array_create(uint32_t element_size){
-	if(element_size == 0) return NULL;
-	array_t* array = array_calloc(1, sizeof(array_t));
-	if(!array) return NULL;
-	array->element_size = element_size;
-	return array;
-}
-
-/* Frees all the elements of an array */
-void array_destroy(array_t* array){
-	if(!array) return;
-	if(array->data) array_free(array->data);
-	array_free(array);
 }
 
 /** @brief Copies an array into another.
@@ -111,55 +72,44 @@ void array_destroy(array_t* array){
  *  @returns `dest` if successful, and NULL otherwise.
 */
 array_t* array_copy(array_t* dest, array_t* src){
-	if(!dest || !src) return NULL;
+	if(!dest || !src) return dast_null;
 	
-	int success = array_init(dest, src->element_size);
-	if(!success) return NULL;
+	void* success = array_init_custom(dest, src->element_size, src->alloc);
+	if(!success) return dast_null;
 	if(src->size == 0) return dest;
 
 	if(!array_resize(dest, src->size)){
 		array_uninit(dest);
-		return NULL;
+		return dast_null;
 	}
 
-	memcpy(dest->data, src->data, dest->size * dest->element_size);
+	dast_memcpy(dest->data, src->data, dest->size * dest->element_size);
 	return dest;
 }
 
-array_t* array_new_copy(array_t* orig){
-	if(!orig) return NULL;
-
-	array_t* new = array_create(orig->element_size);
-	if(!new) return NULL;
-	if(orig->size == 0) return new;
-
-	if(!array_resize(new, orig->size)){
-		array_destroy(new);
-		return NULL;
-	}
-
-	memcpy(new->data, orig->data, new->size * new->element_size);
-	return new;
-}
 
 /* Pre-allocates a given number of elements but does not initialise them */
-array_t* array_resize(array_t* array, uint32_t size){
-	if(!array || array->element_size == 0) return NULL;
+array_t* array_resize(array_t* array, dast_sz size){
+	dast_sz capacity;
+    void* data;
+
+    if(!array || array->element_size == 0){
+        return dast_null;
+    }
 
 	if(size <= array->size){
-		// Shrinking
-		// No need to delete anything. Old data will eventually be overwritten.
-		array->size = size;
-		array->end = array_end(array);
+		/* Shrinking - No need to delete anything. Old data will eventually be overwritten. */
+		array->size  = size;
+		array->end   = array_end(array);
 		array->begin = array_front(array);
 		return array;
 	}
 	
-	// Round up new capacity to the highest power of two closest to the size
-	uint32_t capacity = nearest_pow2(size);
+	/* Round up new capacity to the highest power of two closest to the size */
+	capacity = dast_nearest_pow2(size);
 	if(capacity > array->capacity){
-		void* data = array_realloc(array->data, capacity * array->element_size);
-		if(!data) return NULL;
+		data = array->alloc.realloc(array->data, capacity * array->element_size);
+		if(!data) return dast_null;
 		array->capacity = capacity;
 		array->data = data;
 	}
@@ -170,73 +120,78 @@ array_t* array_resize(array_t* array, uint32_t size){
 	return array;
 }
 
-// -- SETTERS
+/* -- SETTERS -- */
 /* Overwrites an element at the given index with the given data */
-void* array_set(array_t* array, void* element, uint32_t index){
-	if(!array || array->element_size == 0 || index >= array->size) return NULL;
-	char* addr = (char*)array->data + index * array->element_size;
+void* array_set(array_t* array, void* element, dast_sz index){
+	char* addr;
+    if(!array || array->element_size == 0 || index >= array->size) return dast_null;
+    addr = (char*)array->data + index * array->element_size;
 	if(!element){
-		memset(addr, 0, array->element_size);
+		dast_memset(addr, 0, array->element_size);
 	} else {
-		memmove(addr, element, array->element_size);
+		dast_memmove(addr, element, array->element_size);
 	}
 	return addr;
 }
 
-// -- RETRIEVALS
+/* -- RETRIEVALS -- */
 /* Returns a pointer to the element at the specified index */
-void* array_get(array_t* array, uint32_t index){
-	if(!array || array->element_size == 0 || index >= array->size) return NULL;
-	char* addr = (char*)array->data + index * array->element_size;
+void* array_get(array_t* array, dast_sz index){
+    char* addr;
+    if(!array || array->element_size == 0 || index >= array->size) return dast_null;
+	addr = (char*)array->data + index * array->element_size;
 	return addr;
 }
 
 /* Returns a pointer to the first element */
 void* array_front(array_t* array){
-	if(!array || array->size == 0) return NULL;
+	if(!array || array->size == 0) return dast_null;
 	return array->data;
 }
 
 /* Returns a pointer to the last element */
 void* array_back(array_t* array){
-	if(!array || array->size == 0) return NULL;
+	if(!array || array->size == 0) return dast_null;
 	return array_get(array, array->size-1);
 }
 
 /* Returns a pointer to first byte after the end of the array */
 void* array_end(array_t* array){
 	if(!array || !array->data || array->element_size == 0 || array->size == 0){
-		return NULL;
+		return dast_null;
 	}
 	return (char*)array_back(array) + array->element_size;
 }
 
-// -- INSERTING
+/* -- INSERTING -- */
 /* Inserts an element at the given index */
-void* array_insert(array_t* array, void* element, uint32_t index){
-	if(!array || array->element_size == 0 || index > array->size){
-		return NULL;
+void* array_insert(array_t* array, void* element, dast_sz index){
+	array_t* r;
+	char* addr;
+    dast_sz move_bytes;
+
+    if(!array || array->element_size == 0 || index > array->size){
+		return dast_null;
 	}
 
 	if(array->size >= array->capacity || !array->data){
-		array_t* r = extend_capacity(array);
-		if(!r) return NULL;
+		r = array_extend_capacity(array);
+		if(!r) return dast_null;
 	}
 	
-	char* addr = (char*)array->data + index * array->element_size;
-	uint32_t move_bytes = (array->size - index) * array->element_size;
+	addr = (char*)(array->data) + index * array->element_size;
+	move_bytes = (array->size - index) * array->element_size;
 	
 	if(move_bytes > 0){
-		// displace elements to make space for new one
-		// this operation is invalid if you want to insert at the end of the array
-		memmove(addr + array->element_size, addr, move_bytes);
+		/* Displace elements to make space for new one.
+		   This operation is invalid if you want to insert at the end of the array. */
+		dast_memmove(addr + array->element_size, addr, move_bytes);
 	}
 
-	// setting value
 	if(!element){
-		memset(addr, 0, array->element_size);
+		dast_memset(addr, 0, array->element_size);
 	} else {
-		memmove(addr, element, array->element_size);
+		dast_memmove(addr, element, array->element_size);
 	}
 	array->size++;
 	array->begin = array->data;
@@ -254,24 +209,27 @@ void* array_push_front(array_t* array, void* element){
 	return array_insert(array, element, 0);
 }
 
-// -- DELETING
+/* -- DELETING -- */
 /* Removes the element at the given index */
-array_t* array_remove(array_t* array, uint32_t index){
+array_t* array_remove(array_t* array, dast_sz index){
+    dast_sz move_bytes;
+    char *dest, *orig;
+
 	if(!array || !array->data || index >= array->size){
-		return NULL;
+		return dast_null;
 	}
 
 	if (index == array->size - 1){
-		// pop back, no need to shuffle data around
+		/* Pop back, no need to shuffle data around */
 		array->size--;
 		return array;
 	}
 	
-	char* dest = (char*)array->data + index * array->element_size;
-	char* orig = dest + array->element_size;
-	uint32_t move_bytes = (array->size - index) * array->element_size;
+	dest = (char*)array->data + index * array->element_size;
+	orig = dest + array->element_size;
+	move_bytes = (array->size - index) * array->element_size;
 
-	memmove(dest, orig, move_bytes);
+	dast_memmove(dest, orig, move_bytes);
 	array->size--;
 	array->begin = array->data;
 	array->end = array_end(array);
@@ -281,7 +239,7 @@ array_t* array_remove(array_t* array, uint32_t index){
 
 /* Removes the element last element of the array */
 array_t* array_pop_back(array_t* array){
-	if(array->size == 0) return NULL;
+	if(array->size == 0) return dast_null;
 	return array_remove(array, array->size-1);
 }
 
@@ -292,10 +250,10 @@ array_t* array_pop_front(array_t* array){
 
 /* Removes all elements on the array */
 array_t* array_clear(array_t* array){
-	if(!array) return NULL;
+	if(!array) return dast_null;
 	array->size = 0;
-	array->begin = NULL;
-	array->end   = NULL;
+	array->begin = dast_null;
+	array->end   = dast_null;
 	return array;
 }
 

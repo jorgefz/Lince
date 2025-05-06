@@ -6,7 +6,7 @@
 * Example code:
 * ```c
 *     hashmap_t map;
-*     hashmap_init(&map, 5); // initial expected size
+*     hashmap_init(&map, 5); // Starting capacity
 * 
 *     int x = 10;
 *     float y = 0.016;
@@ -20,7 +20,7 @@
 *     assert(x == a);
 *     assert(y == b);
 * 
-*     hashmap_uninit(&map); // does not free stored values
+*     hashmap_uninit(&map); // Does not free stored values
 * ```
 */
 
@@ -28,59 +28,46 @@
 #ifndef HASHMAP_H
 #define HASHMAP_H
 
-#include <inttypes.h>
+#include "defs.h"
+#include "mem.h"
 #include "str.h"
 
-#ifdef HASHMAP_HASH_32BIT
-	typedef uint32_t hashmap_hash_t; ///< @typedef Type of 64-bit hashed value
-#else
-	typedef uint64_t hashmap_hash_t; ///< @typedef Type of 32-bit hashed value
-#endif
+
+#define HASHMAP_LOADING_FACTOR 2
+
 
 /** @typedef Type for hashing function */
-typedef hashmap_hash_t (*hashmap_hashfn_t)(const void* data, size_t len);
+typedef dast_u64 (*hashmap_hashfn_t)(const void* data, dast_sz len);
 
-/** @typedef Type for allocator function */
-typedef void* (*hashmap_alloc_t)(size_t size);
-
-/** @typedef Type for reallocator function */
-typedef void* (*hashmap_realloc_t)(void* block, size_t new_size);
-
-/** @typedef Type for deallocator function */
-typedef void (*hashmap_free_t)(void* block);
-
+/** @typedef Type for key equality function */
+typedef dast_bool (*hashmap_eqfn_t)(const void* a, const void* b, dast_sz len);
 
 /** @struct hashmap_entry
  * @brief Hashmap entry. Holds a key-value pair.
  */
 typedef struct hashmap_entry {
-	char*    key;               ///< Key (may be string or binary)
-	uint64_t len;				///< Number of bytes in the key	
-	void*    value;             ///< Data associated with the key
-	struct hashmap_entry* next; ///< Linked list for hash collisions
+	char*    key;               /**< Key (may be string or binary)   */
+	dast_sz  len;				/**< Number of bytes in the key	     */
+	void*    value;             /**< Data associated with the key    */
+	struct hashmap_entry* next; /**< Linked list for hash collisions */
 } hashmap_entry_t;
 
 /** @struct hashmap_t
  * @brief Hash map data structure. Holds key-value pairs accessed via hashes.
  */
 typedef struct hashmap {
-	uint64_t          size;        ///< Total number of buckets
-    uint64_t          entries;     ///< Number of filled buckets
-	hashmap_entry_t** table;       ///< Hash table of entries
+	dast_sz           size;     /**< Total number of buckets  */
+    dast_sz           entries;  /**< Number of filled buckets */
+	hashmap_entry_t** table;    /**< Hash table of entries    */
 
-	hashmap_hashfn_t  hash_fn;     ///< Hashing function
-	hashmap_alloc_t   alloc_fn;    ///< Memory allocation function
-	hashmap_realloc_t realloc_fn;  ///< Memory reallocation function
-	hashmap_free_t    free_fn;     ///< Memory deallocation function
+	dast_allocator_t  alloc;    /**< Memory allocator       */
+	hashmap_hashfn_t  hash_fn;  /**< Hashing function       */
+	hashmap_eqfn_t    eq_fn;    /**< Key equality function  */
 } hashmap_t;
 
 
 /** @brief FNV1-a 64-bit hashing algorithm */
-uint64_t hashmap_FNV1a64_hash(const void* data, uint64_t len);
-
-
-// Set default hash function
-// void hashmap_set_default_hash_fn();
+dast_u64 hashmap_FNV1a64_hash(const void* data, dast_sz len);
 
 
 /** @brief Initialise hashmap via user-managed object.
@@ -89,24 +76,22 @@ uint64_t hashmap_FNV1a64_hash(const void* data, uint64_t len);
  * @param size_hint starting number of buckets
  * @returns the input map on success, and NULL otherwise
  */
-hashmap_t* hashmap_init(hashmap_t* map, uint64_t size_hint);
+hashmap_t* hashmap_init(hashmap_t* map, dast_sz size_hint);
 
 /** @brief Initialise hashmap via user-managed object with custom allocator and/or hash function.
  * Should be deleted with `hashmap_uninit`.
  * @param map Hashmap to initialised
  * @param size_hint Starting number of buckets
- * @param hash_fn Hash function
- * @param alloc_fn Allocation function
- * @param realloc_fn Reallocation function
- * @param free_fn Deallocation function
+ * @param alloc Memory allocation functions
+ * @param hash_fn Hash function. If NULL, defaults to 64-bit FNV-1A.
+ * @param eq_fn Key equality function. Needed when hashes collide and keys need to be compared. If NULL, defaults to comparing the raw bytes of the two keys.
 */
 hashmap_t* hashmap_init_custom(
 	hashmap_t*        map,
-	uint64_t          size_hint,
+	dast_sz          size_hint,
+	dast_allocator_t  alloc,
 	hashmap_hashfn_t  hash_fn,
-	hashmap_alloc_t   alloc_fn,
-	hashmap_realloc_t realloc_fn,
-	hashmap_free_t    free_fn
+	hashmap_eqfn_t    eq_fn
 );
 
 
@@ -122,16 +107,16 @@ void hashmap_uninit(hashmap_t* map);
  * @param map initialised hashmap
  * @param bkey key to find, can be any set of bytes
  * @param key_len number of bytes in the key
- * @returns 1 if key exists in the map, and 0 otherwise
+ * @returns `dast_true` if key exists in the map, and `dast_false` otherwise
  */
-int hashmap_has_keyb(hashmap_t* map, const void* bkey, uint64_t key_len);
+dast_bool hashmap_has_keyb(hashmap_t* map, const void* bkey, dast_sz key_len);
 
 /** @brief Checks if a map has a given string key
  * @param map initialised hashmap
  * @param key string key
- * @returns 1 if key exists in the map, and 0 otherwise
+ * @returns `dast_true` if key exists in the map, and `dast_false` otherwise
  */
-int hashmap_has_key(hashmap_t* map, string_t key);
+dast_bool hashmap_has_key(hashmap_t* map, string_t key);
 
 /** @brief Retrieves the data associated with a key.
  * @param hashmap to query
@@ -139,7 +124,7 @@ int hashmap_has_key(hashmap_t* map, string_t key);
  * @param key_len number of bytes in the key
  * @returns map element associated to the input key, or NULL if the key does not exist
  */
-void* hashmap_getb(hashmap_t* map, const void* bkey, uint64_t key_len);
+void* hashmap_getb(hashmap_t* map, const void* bkey, dast_sz key_len);
 
 /** @brief Retrieves the data associated with a key.
  * @param hashmap to query
@@ -161,7 +146,7 @@ void* hashmap_get(hashmap_t* map, string_t key);
  * If this function is used to replace a value with the same key, the previous value pointer is dropped!!
  * Moreover, unlike the value, a copy of the key IS stored.
  */
-hashmap_t* hashmap_setb(hashmap_t* map, const void* bkey, uint64_t key_len, void* value);
+hashmap_t* hashmap_setb(hashmap_t* map, const void* bkey, dast_sz key_len, void* value);
 
 /** @brief Adds a new key-value pair to a hashmap. If the key already exists, the value is replaced.
  * @param map hashmap to which to insert value
@@ -193,27 +178,28 @@ hashmap_t* hashmap_resize(hashmap_t* map);
  * Example:
  * 	```c
  * 	char* key = NULL;
- * 	uint64_t len = 0;
+ * 	dast_sz len = 0;
  * 	do{
  * 		key = hashmap_iterb(map, key, &len);
  * 	} while(key);
  * 	```
  */
-void* hashmap_iterb(hashmap_t* map, const char* bkey, uint64_t* key_len);
+void* hashmap_iterb(hashmap_t* map, const char* bkey, dast_sz* key_len);
 
 /** @brief Returns the next key in a hashmap.
  * @param key Previous string key. To start iterating, input empty string (where `str` field is NULL).
  * @returns the next key in the hashmap.
  * @note When the functions returns NULL, there are no more keys to fetch.
+ * @warning Assumess all keys are null-terminating strings.
  * Example:
  * 	```c
  * 	string_t key = (string_t){0};
- * 	do{
- * 		key = hashmap_iter_keysb(map, key);
- * 	} while(key);
+ *  while( hashmap_iter_keys(map, &key) ){
+ *      ...
+ *  }
  * 	```
 */
-string_t hashmap_iter(hashmap_t* map, string_t key);
+string_t* hashmap_iter(hashmap_t* map, string_t* key);
 
 
 #endif /* HASHMAP_H */
