@@ -25,7 +25,8 @@ project "lince"
         "%{wks.location}/%{LinceIncludeDir.nuklear}",
         "%{wks.location}/%{LinceIncludeDir.stb}",
         "%{wks.location}/%{LinceIncludeDir.miniaudio}",
-        "%{wks.location}/%{LinceIncludeDir.toml}"
+        "%{wks.location}/%{LinceIncludeDir.toml}",
+        "%{wks.location}/%{LinceIncludeDir.dast}",
     }
 
     links {
@@ -35,7 +36,8 @@ project "lince"
         "nuklear",
         "stb",
         "miniaudio",
-        "toml"
+        "toml",
+        "dast"
     }
 
     libdirs {
@@ -46,6 +48,7 @@ project "lince"
         "%{wks.location}/bin/" .. LinceOutputDir .. "/stb",
         "%{wks.location}/bin/" .. LinceOutputDir .. "/miniaudio",
         "%{wks.location}/bin/" .. LinceOutputDir .. "/toml",
+        "%{wks.location}/bin/" .. LinceOutputDir .. "/dast",
     }
 
     filter "system:windows"
