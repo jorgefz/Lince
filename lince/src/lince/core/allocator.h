@@ -55,7 +55,7 @@ typedef struct LinceAllocStats {
 void LinceGetAllocStats(LinceAllocStats* stats);
 
 /** @brief Set custom memory management functions */
-void LinceSetAllocator(LinceAllocFn alloc_fn, LinceReallocFn realloc_fn, LinceFreeFn free_fn);
+void LinceSetAllocator(LinceAllocFn alloc_fn, LinceReallocFn realloc_fn, LinceFreeFn free_fn, void* user_data);
 
 /** @brief Memory allocation function that tracks where the memory operation was requested (file, line, and function) */
 void* LinceMemoryAlloc(size_t size, int line, const char* file, const char* func);

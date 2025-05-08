@@ -165,9 +165,11 @@ void LinceMemoryFree(void* block, int line, const char* file, const char* func){
     LINCE_INFO("Deallocated %*ld byte block at 0x%p (in function %s, %d blocks and %ld bytes in use)", 5, size, block, func, nblocks, nbytes);
 
 #elif defined(LINCE_DEBUG) && !defined(LINCE_DEBUG_MEMCHECK)
+    (void)line, (void)file, (void)func;
     _global_allocator.stats.nblocks--;
     _global_allocator.free(block, _global_allocator.user_data);
 #else
+    (void)line, (void)file, (void)func;
     _global_allocator.free(block, _global_allocator.user_data);
 #endif
 }
