@@ -32,11 +32,11 @@ void LinceUninitAssetCache(LinceAssetCache* cache) {
     array_uninit(&cache->folders);
 
     string_t type = (string_t){0};
-    while ((type = hashmap_iter(&cache->stores, type)).str) {
+    while ((hashmap_iter(&cache->stores, &type))) {
         LinceAssetStore* st = hashmap_get(&cache->stores, type);
         
         string_t asset = (string_t){0};
-        while ((asset = hashmap_iter(&st->handles, asset)).str) {
+        while ((hashmap_iter(&st->handles, &asset))) {
             LinceAssetCacheUnload(cache, asset, type);
         }
         hashmap_uninit(&st->handles);
