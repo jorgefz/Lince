@@ -22,7 +22,8 @@ project "sandbox"
         "%{wks.location}/%{LinceIncludeDir.nuklear}",
         "%{wks.location}/%{LinceIncludeDir.stb}",
         "%{wks.location}/%{LinceIncludeDir.miniaudio}",
-        "%{wks.location}/%{LinceIncludeDir.toml}"
+        "%{wks.location}/%{LinceIncludeDir.toml}",
+        "%{wks.location}/%{LinceIncludeDir.dast}",
     }
 
     links {
@@ -33,7 +34,8 @@ project "sandbox"
         "stb",
         "nuklear",
         "miniaudio",
-        "toml"
+        "toml",
+        "dast"
     }
 
     libdirs {"%{wks.location}/bin/" .. LinceOutputDir .. "/lince"}
