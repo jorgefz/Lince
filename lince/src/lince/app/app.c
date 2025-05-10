@@ -297,12 +297,8 @@ static void LinceInit(){
     LINCE_INFO("Path to Lince's assets folder: '%s'", LINCE_ASSETS_PATH);
 
     // Setup memory management
-    // LinceAllocatorInit()
-    array_set_alloc(LinceArrayAlloc, LinceArrayRealloc, LinceArrayFree);
-    hashmap_set_alloc(LinceHashmapAlloc, LinceHashmapRealloc, LinceHashmapFree);
-    string_set_alloc(LinceStringAlloc, LinceStringDealloc);
-    stbi_set_alloc(LinceSTBIImageAlloc, LinceSTBIImageRealloc, LinceSTBIImageFree);
-
+    LinceAllocatorInit();
+    
     // Check user settings and set defaults
     if (app.screen_width == 0) app.screen_width = 500;
     if (app.screen_height == 0) app.screen_height = 500;
@@ -401,7 +397,7 @@ static void LinceAppTerminate(){
     
     // Destroy scene cache
     string_t key = (string_t){0};
-    while ((key = hashmap_iter(&app.scene_cache, key)).str) {
+    while ((hashmap_iter(&app.scene_cache, &key))) {
         LinceScene* scene = hashmap_get(&app.scene_cache, key);
         if (scene) {
             if (scene->loaded) {

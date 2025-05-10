@@ -5,11 +5,13 @@
 #include "allocator.h"
 #include "logger.h"
 
+#include "stb_image_alloc.h"
+
 typedef struct LinceAllocator {
     LinceAllocFn   alloc;   ///< Function to allocate a block of memory of given size
     LinceReallocFn realloc; ///< Function to reallocate a block of memory to a different size
     LinceFreeFn    free;    ///< Function to deallocate a block of memory
-    LinceBool intialised;   ///< LinceInitAllocator called
+    LinceBool initialised;   ///< LinceInitAllocator called
     void* user_data;        ///< Custom user-defined data passed to the allocator functions
     LinceAllocStats stats;  ///< Allocation stats and memory checks
 } LinceAllocator;
@@ -32,6 +34,34 @@ static void* LinceStdAllocWrapper(size_t size, void* uptr)                { LINC
 static void* LinceStdReallocWrapper(void* block, size_t size, void* uptr) { LINCE_UNUSED(uptr); return realloc(block, size); }
 static void  LinceStdFreeWrapper(void* block, void* uptr)                 { LINCE_UNUSED(uptr); free(block); }
 
+/* --- Wrappers for external libraries --- */
+
+/* Memory management interface for array functions */
+static void* LinceArrayAlloc(size_t size)               { return LinceMemoryAlloc  (size,        0, "array.c", "<array_t function>"); }
+static void* LinceArrayRealloc(void* block, size_t size){ return LinceMemoryRealloc(block, size, 0, "array.c", "<array_t function>"); }
+static void  LinceArrayFree(void* block)                {        LinceMemoryFree   (block,       0, "array.c", "<array_t function>"); }
+
+/* Memory management interface for hashmap functions */
+static void* LinceHashmapAlloc(size_t size)               { return LinceMemoryAlloc  (size,        0, "hashmap.c", "<hashmap_t function>"); }
+static void* LinceHashmapRealloc(void* block, size_t size){ return LinceMemoryRealloc(block, size, 0, "hashmap.c", "<hashmap_t function>"); }
+static void  LinceHashmapFree(void* block)                {        LinceMemoryFree   (block,       0, "hashmap.c", "<hashmap_t function>"); }
+
+/* Memory management interface for string functions */
+static void* LinceStringAlloc(size_t size) { return LinceMemoryAlloc(size,  0, "str.c", "<string_t function>"); }
+static void  LinceStringFree(void* block)  {        LinceMemoryFree (block, 0, "str.c", "<string_t function>"); }
+
+/* Memory management interface for stbi_image */
+void* LinceSTBIImageAlloc(size_t size)                { return LinceMemoryAlloc  (size,        0, "stb_image.c", "<stb_image function>"); }
+void* LinceSTBIImageRealloc(void* block, size_t size) { return LinceMemoryRealloc(block, size, 0, "stb_image.c", "<stb_image function>"); }
+void  LinceSTBIImageFree(void* block)                 {        LinceMemoryFree   (block,       0, "stb_image.c", "<stb_image function>"); }
+
+/* Global allocators for external libraries */
+const dast_allocator_t LINCE_DAST_ARRAY_ALLOCATOR   = {.alloc=LinceArrayAlloc,   .realloc=LinceArrayRealloc,   .free=LinceArrayFree  };
+const dast_allocator_t LINCE_DAST_HASHMAP_ALLOCATOR = {.alloc=LinceHashmapAlloc, .realloc=LinceHashmapRealloc, .free=LinceHashmapFree};
+const dast_allocator_t LINCE_DAST_STRING_ALLOCATOR  = {.alloc=LinceStringAlloc,  .realloc=NULL,                .free=LinceStringFree };
+
+
+
 /** @brief Global allocator for Lince.
  * Defaults to standard library functions malloc, realloc, and free.
  */
@@ -40,8 +70,21 @@ static LinceAllocator _global_allocator = {
     .realloc = LinceStdReallocWrapper,
     .free    = LinceStdFreeWrapper,
     .user_data = NULL,
-    .stats = {0}
+    .stats = {0},
+    .initialised = LinceFalse
 };
+
+/** @brief Initialise Allocator */
+void LinceAllocatorInit(void){
+    // stbi_image
+    stbi_set_alloc(LinceSTBIImageAlloc, LinceSTBIImageRealloc, LinceSTBIImageFree);
+    _global_allocator.initialised = LinceTrue;
+}
+
+/** @brief Uninitialise Allocator */
+void LinceAllocatorUninit(void){
+
+}
 
 /** @brief Obtain statistics about current memory usage */
 void LinceGetAllocStats(LinceAllocStats* stats){
@@ -49,10 +92,10 @@ void LinceGetAllocStats(LinceAllocStats* stats){
 }
 
 void LinceSetAllocator(LinceAllocFn alloc_fn, LinceReallocFn realloc_fn, LinceFreeFn free_fn, void* user_data){
-    // if(_global_allocator.intialised == LinceTrue){
-    //     LINCE_WARN("Cannot set allocator after it has been initialised");
-    //     return;
-    // }
+    if(_global_allocator.initialised){
+        LINCE_WARN("Cannot set allocator after it has been initialised");
+        return;
+    }
     _global_allocator.alloc     = alloc_fn;
     _global_allocator.realloc   = realloc_fn;
     _global_allocator.free      = free_fn;
@@ -173,3 +216,4 @@ void LinceMemoryFree(void* block, int line, const char* file, const char* func){
     _global_allocator.free(block, _global_allocator.user_data);
 #endif
 }
+

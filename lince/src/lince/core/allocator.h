@@ -22,6 +22,9 @@ Add header to each allocation.
 
 */
 
+#include <dast.h>
+
+
 /** @typedef Type signature of function to allocate a block of memory */
 typedef void* (*LinceAllocFn)(size_t size, void* user_data);
 
@@ -43,6 +46,12 @@ typedef struct LinceAllocStats {
 // void LinceInitAllocator();
 // void LinceUninitAllocator();
 
+
+extern const dast_allocator_t LINCE_DAST_ARRAY_ALLOCATOR;
+extern const dast_allocator_t LINCE_DAST_HASHMAP_ALLOCATOR;
+extern const dast_allocator_t LINCE_DAST_STRING_ALLOCATOR;
+
+
 #define LinceAlloc(SZ)        LinceMemoryAlloc((SZ), __LINE__, __FILE__, __func__)
 #define LinceRealloc(PTR, SZ) LinceMemoryRealloc((PTR), (SZ), __LINE__, __FILE__, __func__)
 #define LinceFree(PTR)        LinceMemoryFree((PTR), __LINE__, __FILE__, __func__)
@@ -50,6 +59,11 @@ typedef struct LinceAllocStats {
 #define LinceCalloc(SZ)       memset(LinceAlloc(SZ), (char)0, (SZ))
 #define LinceNewCopy(PTR, SZ) memcpy(LinceAlloc(SZ), (PTR), (SZ))
 
+/** @brief Initialise Allocator */
+void LinceAllocatorInit(void);
+
+/** @brief Uninitialise Allocator */
+void LinceAllocatorUninit(void);
 
 /** @brief Obtain statistics about current memory usage */
 void LinceGetAllocStats(LinceAllocStats* stats);
@@ -65,6 +79,7 @@ void* LinceMemoryRealloc(void* block, size_t size, int line, const char* file, c
 
 /** @brief Memory deallocation function that tracks where the memory operation was requested (file, line, and function) */
 void LinceMemoryFree(void* block, int line, const char* file, const char* func);
+
 
 
 #endif /* LINCE_ALLOCATOR_H */
