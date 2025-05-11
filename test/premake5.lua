@@ -20,6 +20,7 @@ project "test"
         "%{wks.location}/%{LinceIncludeDir.glfw}",
         "%{wks.location}/%{LinceIncludeDir.glad}",
         "%{wks.location}/%{LinceIncludeDir.cglm}",
+        "%{wks.location}/%{LinceIncludeDir.dast}",
     }
 
     links {
@@ -28,7 +29,8 @@ project "test"
         "glfw",
         "cglm",
         "nuklear",
-        "stb"
+        "stb",
+        "dast"
     }
     libdirs {
         "%{wks.location}/bin/" .. LinceOutputDir .. "/lince"

@@ -28,8 +28,6 @@ int main() {
 
     static const struct CMUnitTest tests[] = {
         TEST_GROUP_ASSET_CACHE,
-
-        cmocka_unit_test(test_linkedlist),
         cmocka_unit_test(test_entity),
         cmocka_unit_test(test_uuid),
         cmocka_unit_test(test_point),

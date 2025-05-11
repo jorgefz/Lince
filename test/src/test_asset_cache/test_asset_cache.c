@@ -4,7 +4,6 @@
 #include <setjmp.h>
 #include <cmocka.h>
 
-#include "lince/containers/str.h"
 #include "lince/assetcache/assetcache.h"
 #include "lince/utils/fileio.h"
 #include "lince/utils/image.h"
