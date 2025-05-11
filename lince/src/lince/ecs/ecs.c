@@ -58,10 +58,10 @@ LINCE_STATIC LinceECSArchetype* LinceECSGetOrCreateArchetype(LinceECS* ecs, Linc
 	arch = array_back(&ecs->archetypes);
 
 	memmove(arch->mask, mask, sizeof(LinceECSMask));
-	array_init(&arch->entity_ids, sizeof(LinceEntity));
-	array_init(&arch->comp_stores, sizeof(LinceECSComponentStore));
-	array_init(&arch->unused_slots, sizeof(uint32_t));
-	array_init(&arch->unused_index, sizeof(uint32_t));
+	array_init_custom(&arch->entity_ids, sizeof(LinceEntity), LINCE_DAST_ARRAY_ALLOCATOR);
+	array_init_custom(&arch->comp_stores, sizeof(LinceECSComponentStore), LINCE_DAST_ARRAY_ALLOCATOR);
+	array_init_custom(&arch->unused_slots, sizeof(uint32_t), LINCE_DAST_ARRAY_ALLOCATOR);
+	array_init_custom(&arch->unused_index, sizeof(uint32_t), LINCE_DAST_ARRAY_ALLOCATOR);
 
 	for (uint32_t comp_id = 0, column = 0; comp_id != ecs->component_count; ++comp_id) {
 		if (!LinceECSCheckMaskBit(mask, comp_id)) continue;
@@ -69,7 +69,7 @@ LINCE_STATIC LinceECSArchetype* LinceECSGetOrCreateArchetype(LinceECS* ecs, Linc
 		// Initialise component stores
 		uint32_t comp_size = *(uint32_t*)array_get(&ecs->component_sizes, comp_id);
 		LinceECSComponentStore comp_store = { .id = comp_id, .element_size = comp_size };
-		array_init(&comp_store.data, comp_store.element_size);
+		array_init_custom(&comp_store.data, comp_store.element_size, LINCE_DAST_ARRAY_ALLOCATOR);
 		array_push_back(&arch->comp_stores, &comp_store);
 		
 		// Update component_index entry
@@ -160,13 +160,13 @@ LinceECS* LinceECSInit(LinceECS* ecs) {
 	ecs->component_count = 0;
 	ecs->entity_count = 0;
 	ecs->user_data = NULL;
-	array_init(&ecs->entity_records,    sizeof(LinceECSRecord));
-	array_init(&ecs->component_sizes,   sizeof(uint32_t));
-	array_init(&ecs->archetypes,        sizeof(LinceECSArchetype));
-	array_init(&ecs->component_index,   sizeof(hashmap_t));
-	array_init(&ecs->entity_pool,       sizeof(LinceEntity));
-	array_init(&ecs->query_result,      sizeof(LinceEntity));
-	hashmap_init(&ecs->archetype_map,   64);
+	array_init_custom(&ecs->entity_records,    sizeof(LinceECSRecord), LINCE_DAST_ARRAY_ALLOCATOR);
+	array_init_custom(&ecs->component_sizes,   sizeof(uint32_t), LINCE_DAST_ARRAY_ALLOCATOR);
+	array_init_custom(&ecs->archetypes,        sizeof(LinceECSArchetype), LINCE_DAST_ARRAY_ALLOCATOR);
+	array_init_custom(&ecs->component_index,   sizeof(hashmap_t), LINCE_DAST_ARRAY_ALLOCATOR);
+	array_init_custom(&ecs->entity_pool,       sizeof(LinceEntity), LINCE_DAST_ARRAY_ALLOCATOR);
+	array_init_custom(&ecs->query_result,      sizeof(LinceEntity), LINCE_DAST_ARRAY_ALLOCATOR);
+	hashmap_init_custom(&ecs->archetype_map,   64, LINCE_DAST_HASHMAP_ALLOCATOR, NULL, NULL);
 
 	// Create the default archetype with no components
 	// Located at index 0, the default value when initialising an entity record
@@ -281,7 +281,7 @@ uint32_t LinceECSNewComponent(LinceECS* ecs, uint32_t component_size) {
 	ecs->component_count++;
 	
 	hashmap_t arch_records;
-	hashmap_init(&arch_records, 5);
+	hashmap_init_custom(&arch_records, 5, LINCE_DAST_HASHMAP_ALLOCATOR, NULL, NULL);
 	array_push_back(&ecs->component_index, &arch_records);
 	
 	LINCE_INFO("ECS: added new component of size %u with ID %u",

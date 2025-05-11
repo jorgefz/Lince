@@ -16,8 +16,8 @@ LinceBool LinceInitAssetCache(LinceAssetCache* cache) {
     LINCE_INFO("Located executable at '%s'", cache->exedir.str);
 
     string_free(&buf);
-    array_init(&cache->folders, sizeof(string_t));
-    hashmap_init(&cache->stores, 10);
+    array_init_custom(&cache->folders, sizeof(string_t), LINCE_DAST_ARRAY_ALLOCATOR);
+    hashmap_init_custom(&cache->stores, 10, LINCE_DAST_HASHMAP_ALLOCATOR, NULL, NULL);
 
     return LinceTrue;
 }
@@ -146,7 +146,7 @@ void* LinceAssetCacheAddType(
     LinceAssetStore* st = LinceAlloc(sizeof(LinceAssetStore));
     LINCE_ASSERT_ALLOC(st, sizeof(LinceAssetCache));
     st->callbacks = (LinceAssetCallbacks){.load = load, .unload = unload};
-    hashmap_init(&st->handles, 10);
+    hashmap_init_custom(&st->handles, 10, LINCE_DAST_HASHMAP_ALLOCATOR, NULL, NULL);
     hashmap_set(&cache->stores, name, st);
 
     return cache;

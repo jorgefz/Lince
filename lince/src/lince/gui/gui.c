@@ -35,7 +35,7 @@ LinceUI* LinceInitUI(LinceWindow* window, LinceAssetCache* ac){
 	LinceUI* ui = LinceCalloc(sizeof(LinceUI));
 	ui->window = window;
     ui->asset_cache = ac;
-    hashmap_init(&ui->font_cache, 10);
+    hashmap_init_custom(&ui->font_cache, 10, LINCE_DAST_HASHMAP_ALLOCATOR, NULL, NULL);
 
 	ui->ctx = nk_glfw3_init(
         &ui->backend,

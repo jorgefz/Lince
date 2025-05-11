@@ -15,12 +15,12 @@ LinceTilemap* LinceTilemapInit(LinceTilemap* map, uint32_t* map_grid){
     map->sprite = (LinceSprite){ .color = {1,1,1} };
 
     // Copy grid of indices
-    array_init(&map->indices, sizeof(uint32_t));
+    array_init_custom(&map->indices, sizeof(uint32_t), LINCE_DAST_ARRAY_ALLOCATOR);
     array_resize(&map->indices, map_size);
     memcpy(map->indices.data, map_grid, sizeof(uint32_t)*map_size);
 
     // Generate grid of transforms
-    array_init(&map->transforms, sizeof(LinceTransform));
+    array_init_custom(&map->transforms, sizeof(LinceTransform), LINCE_DAST_ARRAY_ALLOCATOR);
     array_resize(&map->transforms, map_size);
 
     // Add overlap between map tiles to avoid
