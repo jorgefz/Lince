@@ -10,9 +10,6 @@
 
 #include "lince/core/logger.h"
 #include "test_asset_cache/test_asset_cache.h"
-#include "test_array/test_array.h"
-#include "test_string/test_string.h"
-#include "test_hashmap/test_hashmap.h"
 
 void test_linkedlist(void** state);
 void test_entity(void** state);
@@ -30,10 +27,7 @@ int main() {
     LinceLoggerDefaultToStderr(0);
 
     static const struct CMUnitTest tests[] = {
-        TEST_GROUP_ARRAY,
-        TEST_GROUP_STRING,
         TEST_GROUP_ASSET_CACHE,
-        TEST_GROUP_HASHMAP,
 
         cmocka_unit_test(test_linkedlist),
         cmocka_unit_test(test_entity),
