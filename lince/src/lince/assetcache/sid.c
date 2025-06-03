@@ -1,9 +1,10 @@
 #include "sid.h"
 
 
+/** @todo Make thread-safe when I integrate CThreads */
 static hashmap_t SID_CACHE = {0};
 
-static dast_bool LinceSIDCmp(const void* a, const void* b, dast_sz len){
+dast_bool LinceSIDCmp(const void* a, const void* b, dast_sz len){
     (void)len;
     return *(LinceSID*)a == *(LinceSID*)b;
 }

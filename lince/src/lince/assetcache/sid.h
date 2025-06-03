@@ -10,6 +10,9 @@ typedef uint64_t LinceSID;
 /** @def Helper macro to create a SID from a string literal */
 #define  LinceSIDFromLit(LIT) LinceMakeSID(string_scoped_lit(LIT))
 
+/** @brief Compares two SIDs, returns dast_true if they are equal and dast_false otherwise */
+dast_bool LinceSIDCmp(const void* a, const void* b, dast_sz len);
+
 /** @brief Initialise SID cache that maps SID to original string */
 hashmap_t* LinceInitSIDCache();
 
