@@ -18,7 +18,7 @@ typedef struct dast_string {
 } string_t;
 
 /** @brief Resolves to `dast_true` if a string was successfully initialised */
-#define string_ok(STR) (dast_bool)((STR).str)
+#define string_ok(STR) (dast_bool)(!!(STR).str)
 
 /** @brief Returns the allocator used by a string.
  * @note Attempting to get the allocator of a scoped string results in undefined behaviour.

@@ -319,7 +319,7 @@ hashmap_t* hashmap_resize(hashmap_t* map) {
  * 	} while(key);
  * 	```
  */
-void* hashmap_iterb(hashmap_t* map, const char* bkey, dast_sz* key_len) {
+void* hashmap_iterb(hashmap_t* map, const void* bkey, dast_sz* key_len) {
     if (!map || !map->table) return dast_null;
 
     hashmap_entry_t* entry = dast_null;

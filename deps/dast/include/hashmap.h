@@ -184,7 +184,7 @@ hashmap_t* hashmap_resize(hashmap_t* map);
  * 	} while(key);
  * 	```
  */
-void* hashmap_iterb(hashmap_t* map, const char* bkey, dast_sz* key_len);
+void* hashmap_iterb(hashmap_t* map, const void* bkey, dast_sz* key_len);
 
 /** @brief Returns the next key in a hashmap.
  * @param key Previous string key. To start iterating, input empty string (where `str` field is NULL).
