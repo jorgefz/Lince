@@ -19,8 +19,9 @@ hashmap_t* LinceInitSIDCache(){
 void LinceUninitSIDCache(){
     if(!SID_CACHE.table) return;
     LinceSID* sid = NULL;
+    uint64_t sz = sizeof(LinceSID);
     do {
-        sid = (LinceSID*)hashmap_iterb(&SID_CACHE, (void*)sid, NULL);
+        sid = (LinceSID*)hashmap_iterb(&SID_CACHE, (void*)sid, &sz);
         string_t *s = hashmap_getb(&SID_CACHE, sid, sizeof(LinceSID));
         string_free(s);
         LinceFree(s);
