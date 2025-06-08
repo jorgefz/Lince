@@ -336,6 +336,9 @@ static void LinceInit(){
     // LinceInputSetWindow(app.window);
     LinceInitRenderer(app.window);
 
+    // Load default assets
+    LinceAssetCacheSetDefault(&app.asset_cache, LinceSIDFromLit("texture"), LinceSIDFromLit("default_sprite"));
+
     /// TODO: improve font handling
     app.ui = LinceInitUI(app.window, &app.asset_cache);
     
