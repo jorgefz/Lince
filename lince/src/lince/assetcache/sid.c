@@ -1,6 +1,5 @@
 #include "sid.h"
 
-
 /** @todo Make thread-safe when I integrate CThreads */
 static hashmap_t SID_CACHE = {0};
 
@@ -41,11 +40,15 @@ LinceSID LinceMakeSID(string_t name){
 	return sid;
 }
 
-
 /* Return value is scoped - do not free or use after scope ends */
 string_t LinceGetSIDName(LinceSID sid){
     if (!SID_CACHE.table) return (string_t){0};
     string_t* s = hashmap_getb(&SID_CACHE, &sid, sizeof(LinceSID));
     if(!s) return (string_t){0};
     return *s;
+}
+
+/** @brief Return a pointer to the SID cache */
+hashmap_t* LinceGetSIDCache(){
+    return &SID_CACHE;
 }

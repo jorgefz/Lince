@@ -34,4 +34,7 @@ LinceSID LinceMakeSID(string_t name);
  */
 string_t LinceGetSIDName(LinceSID sid);
 
+/** @brief Return a pointer to the SID cache */
+hashmap_t* LinceGetSIDCache();
+
 #endif /* LINCE_SID */
