@@ -41,7 +41,7 @@ LinceTileset* LinceLoadTilesetToml(LinceAssetCache* assets, string_t fname){
     size_t height_px = field_height_px.u.i;
     toml_free(table);
 
-    LinceTexture* tex = LinceAssetCacheGet(assets, texname, string_scoped_lit("texture"));
+    LinceTexture* tex = LinceAssetCacheGet(assets, LinceMakeSID(texname));
     if(!tex){
         printf("Could not find texture '%s'\n", texname.str);
         string_free(&texname);
@@ -97,7 +97,7 @@ LinceTilemap* LinceLoadTilemapToml(LinceAssetCache* assets, string_t fname){
         array_set(&grid, &value, i);
     }
 
-    LinceTileset* tset = LinceAssetCacheGet(assets, tsetname, string_scoped_lit("tileset"));
+    LinceTileset* tset = LinceAssetCacheGet(assets, LinceMakeSID(tsetname));
 
     LinceTilemap* tm = LinceCalloc(sizeof(LinceTilemap));
     tm->width = (uint32_t)width;

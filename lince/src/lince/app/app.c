@@ -118,7 +118,7 @@ void LinceAppPushAssetFolder(string_t dir){
 
 /** @brief Retrieve (or load) an asset from the cache */
 void* LinceAppGetAsset(string_t path, string_t type){
-    return LinceAssetCacheGet(LinceAppGetAssetCache(), path, type);
+    return LinceAssetCacheGet(LinceAppGetAssetCache(), LinceMakeSID(path));
 }
 
 /** @brief Adds a rendering layer to the application.
@@ -298,29 +298,23 @@ static void LinceInit(){
 
     // Setup memory management
     LinceAllocatorInit();
-    
-    // Check user settings and set defaults
-    if (app.screen_width == 0) app.screen_width = 500;
-    if (app.screen_height == 0) app.screen_height = 500;
-    if (app.title.str) app.title = string_from_chars(app.title.str, app.title.len);
-    else app.title = string_from_literal("Lince App");
-    
-    // Create a windowed mode window and its OpenGL context
-    app.window = LinceCreateWindow(app.screen_width, app.screen_height, app.title.str);
-    LinceSetMainEventCallback(app.window, LinceAppOnEvent);
-    // LinceInputSetWindow(app.window);
-    LinceInitRenderer(app.window);
+
+    // Setup String ID cache
+    LinceInitSIDCache();
 
     // Create asset cache
     LinceInitAssetCache(&app.asset_cache);
     LinceAssetCachePushFolder(&app.asset_cache, string_scoped_lit(LINCE_ASSETS_PATH));
     
     // Register asset types
-    LinceAssetCacheAddType(&app.asset_cache, string_scoped_lit("image"), LinceLoadImageAsset, LinceUnloadImageAsset);
-    LinceAssetCacheAddType(&app.asset_cache, string_scoped_lit("texture"), LinceLoadTextureAsset, LinceUnloadTextureAsset);
+    LinceAssetCacheAddType(&app.asset_cache, LinceSIDFromLit("image"), LinceLoadImageAsset, LinceUnloadImageAsset);
+    LinceAssetCacheAddType(&app.asset_cache, LinceSIDFromLit("texture"), LinceLoadTextureAsset, LinceUnloadTextureAsset);
     // LinceAssetCacheAddType(&app.asset_cache, "shader", LinceLoadShader, LinceUnloadShader);
     // LinceAssetCacheAddType(&app.asset_cache, "shader_header", LinceLoadShader, LinceUnloadShader);
     
+    // Register internal engine assets
+    LinceAssetCacheRegister(&app.asset_cache, LinceSIDFromLit("default_sprite"), LinceSIDFromLit("texture"), string_scoped_lit("sprites/default.png"));
+
     // Create layer stacks
     array_init_custom(&app.layer_stack, sizeof(LinceLayer), LINCE_DAST_ARRAY_ALLOCATOR);
     array_init_custom(&app.overlay_stack, sizeof(LinceLayer), LINCE_DAST_ARRAY_ALLOCATOR);
@@ -329,6 +323,18 @@ static void LinceInit(){
     // array_init(&app.scene_stack, sizeof(LinceScene));
     void* success = hashmap_init_custom(&app.scene_cache, 5, LINCE_DAST_HASHMAP_ALLOCATOR, NULL, NULL);
     LINCE_ASSERT(success, "Failed to create scene cache");
+
+    // Check user settings and set defaults
+    if (app.screen_width == 0) app.screen_width = 500;
+    if (app.screen_height == 0) app.screen_height = 500;
+    if (app.title.str) app.title = string_from_chars(app.title.str, app.title.len);
+    else app.title = string_from_literal("Lince App");
+
+    // Create a windowed mode window and its OpenGL context
+    app.window = LinceCreateWindow(app.screen_width, app.screen_height, app.title.str);
+    LinceSetMainEventCallback(app.window, LinceAppOnEvent);
+    // LinceInputSetWindow(app.window);
+    LinceInitRenderer(app.window);
 
     /// TODO: improve font handling
     app.ui = LinceInitUI(app.window, &app.asset_cache);
@@ -410,6 +416,7 @@ static void LinceAppTerminate(){
     hashmap_uninit(&app.scene_cache);
 
     LinceTerminateUI(app.ui);
+
     LinceUninitAssetCache(&app.asset_cache);
     
     /* shutdown window last, as it destroys opengl context
@@ -417,6 +424,8 @@ static void LinceAppTerminate(){
     LinceDestroyWindow(app.window);
     LINCE_INFO("Destroyed window and GLFW context");
     
+    LinceUninitSIDCache();
+
     app.window = NULL;
     app.running = 0;
     string_free(&app.title);

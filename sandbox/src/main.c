@@ -26,6 +26,9 @@ void SandboxInit() {
 
     app->user_data = &DATA;
 
+    LinceAssetCacheRegister(LinceAppGetAssetCache(), LinceSIDFromLit("inside"), LinceSIDFromLit("texture"), string_scoped_lit("textures/inside.png"));
+    LinceAssetCacheRegister(LinceAppGetAssetCache(), LinceSIDFromLit("outside"), LinceSIDFromLit("texture"), string_scoped_lit("textures/outside.png"));
+
     LinceAppRegisterScene(string_scoped_lit("MainMenu"), &SCENE_CALLBACKS[Scene_MainMenu]);
     LinceAppRegisterScene(string_scoped_lit("World"), &SCENE_CALLBACKS[Scene_World]);
     LinceAppRegisterScene(string_scoped_lit("House"), &SCENE_CALLBACKS[Scene_House]);
@@ -88,7 +91,8 @@ void TestReadToml(){
 
 int main(void) {
 
-    TestReadToml();
+    //TestReadToml();
+    //return 0;
 
     SetupApplication();
     LinceRun();
