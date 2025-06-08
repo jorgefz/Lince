@@ -17,13 +17,15 @@ LinceBool LinceInitAssetCache(LinceAssetCache* cache) {
 
     string_free(&buf);
     array_init_custom(&cache->folders, sizeof(string_t), LINCE_DAST_ARRAY_ALLOCATOR);
-    hashmap_init_custom(&cache->stores, 10, LINCE_DAST_HASHMAP_ALLOCATOR, NULL, NULL);
+    hashmap_init_custom(&cache->assets, 10, LINCE_DAST_HASHMAP_ALLOCATOR, NULL, LinceSIDCmp);
+    hashmap_init_custom(&cache->types, 10, LINCE_DAST_HASHMAP_ALLOCATOR, NULL, LinceSIDCmp);
 
     return LinceTrue;
 }
 
 
 void LinceUninitAssetCache(LinceAssetCache* cache) {
+
     string_free(&cache->exedir);
 
     for(string_t* s = cache->folders.begin; s != cache->folders.end; ++s){
@@ -31,19 +33,24 @@ void LinceUninitAssetCache(LinceAssetCache* cache) {
     }
     array_uninit(&cache->folders);
 
-    string_t type = (string_t){0};
-    while ((hashmap_iter(&cache->stores, &type))) {
-        LinceAssetStore* st = hashmap_get(&cache->stores, type);
-        
-        string_t asset = (string_t){0};
-        while ((hashmap_iter(&st->handles, &asset))) {
-            LinceAssetCacheUnload(cache, asset, type);
-        }
-        hashmap_uninit(&st->handles);
-        LinceFree(st);
-    
-	}
-    hashmap_uninit(&cache->stores);
+    // Unload and delete assets
+    LinceSID* psid = NULL;
+    uint64_t sz = sizeof(LinceSID);
+    while((psid=hashmap_iterb(&cache->assets, psid, &sz))){
+        LinceAssetCacheUnload(cache, *psid);
+        LinceAsset* asset = hashmap_getb(&cache->assets, psid, sizeof(LinceSID));
+        string_free(&asset->path);
+        LinceFree(asset);
+    }
+    hashmap_uninit(&cache->assets);
+
+    // Free loaders
+    psid = NULL;
+    while((psid=hashmap_iterb(&cache->types, psid, &sz))){
+        LinceAssetLoader* loader = hashmap_getb(&cache->types, psid, sizeof(LinceSID));
+        LinceFree(loader);
+    }
+    hashmap_uninit(&cache->types);
 }
 
 
@@ -112,7 +119,7 @@ string_t LinceAssetCacheFetchPath(LinceAssetCache* cache, string_t filename){
             continue;
         }
         
-        string_t full_path = string_from_fmt("%s%s", dir->str, filename.str);
+        string_t full_path = string_from_fmt_custom(LINCE_DAST_STRING_ALLOCATOR, "%s%s", dir->str, filename.str);
 
         if (LinceIsFile(full_path)){
             LINCE_INFO("Located asset '%s' at '%s'", filename.str, full_path.str);
@@ -125,116 +132,186 @@ string_t LinceAssetCacheFetchPath(LinceAssetCache* cache, string_t filename){
 }
 
 /** @brief Registers a new type of asset on the asset cache.
- * @param cache Asset cache
- * @param name String identifier of the asset type. Must not be in use.
- * @param load Function to load the asset given a file path.
+ * An asset type defines an interface to load and unload assets of the same kind.
+ * @param cache  Asset cache
+ * @param name   String ID of the asset type. Must not be in use.
+ * @param load   Function to load the asset given a file path.
  * @param unload Function to free the asset from memory.
+ * @note If type already exists, it's loader is updated to the input functions.
+ * @returns LinceTrue on success and LinceFalse otherwise.
 */
-void* LinceAssetCacheAddType(
+LinceBool LinceAssetCacheAddType(
         LinceAssetCache* cache,
-        string_t         name,
+        LinceSID         type_sid,
         LinceAssetLoad   load,
         LinceAssetUnload unload
     ){
-    if(!cache || !name.str || !load || !unload) return NULL;
+    if(!cache || !load || !unload) return LinceFalse;
+
+    LinceAssetLoader* loader;
+    loader = hashmap_getb(&cache->types, &type_sid, sizeof(LinceSID));
     
-    if (hashmap_has_keyb(&cache->stores, name.str, name.len)){
-        LINCE_WARN("Failed to add asset type '%s' to asset cache because it already exists", name.str);
-        return NULL;
+    if (loader){
+        loader->load = load;
+        loader->unload = unload;
+        LINCE_WARN("Asset type '%s' already exists. Loader updated.", LinceGetSIDName(type_sid).str);
+        return LinceTrue;
     }
 
-    LinceAssetStore* st = LinceAlloc(sizeof(LinceAssetStore));
-    LINCE_ASSERT_ALLOC(st, sizeof(LinceAssetCache));
-    st->callbacks = (LinceAssetCallbacks){.load = load, .unload = unload};
-    hashmap_init_custom(&st->handles, 10, LINCE_DAST_HASHMAP_ALLOCATOR, NULL, NULL);
-    hashmap_set(&cache->stores, name, st);
+    LinceAssetLoader new_loader = {.load = load, .unload = unload};
+    loader = LinceNewCopy(&new_loader, sizeof(LinceAssetLoader));
+    hashmap_setb(&cache->types, &type_sid, sizeof(LinceSID), loader);
 
-    return cache;
+    LINCE_INFO("Added new asset type '%s'", LinceGetSIDName(type_sid).str);
+    return LinceTrue;
 }
 
-void* LinceAssetCacheAdd(LinceAssetCache* cache, string_t name, string_t type, void* handle){
-    if(!name.str || !type.str || !handle) return NULL;
+/** @brief Registers an asset to the cache. Stores its type and filename, but does not load it.
+ * @param cache Asset cache
+ * @param sid   String ID of the asset
+ * @param type  String ID of its type
+ * @param path  Location of the asset inside an asset folder.
+ * @returns LinceTrue if asset was succesfully registered, and LinceFalse if the asset
+ *          cannot be located on disk or if it has already been registered.
+*/
+LinceBool LinceAssetCacheRegister(LinceAssetCache* cache, LinceSID sid, LinceSID type, string_t path){
+    if(!cache || !string_ok(path)) return LinceFalse;
 
-    LinceAssetStore* st = hashmap_get(&cache->stores, type);
-    if(!st){
-        LINCE_WARN("Asset type '%s' does not exist in asset cache", type.str);
-        return NULL;
+    if(hashmap_has_keyb(&cache->assets, &sid, sizeof(LinceSID))){
+        LINCE_WARN("Asset '%s' has already been registered", LinceGetSIDName(sid).str);
+        return LinceFalse;
     }
 
-    if(hashmap_get(&st->handles, name)){
-        LINCE_WARN("Failed to add asset '%s' to asset cache because it is already loaded", name);
-        return NULL;
+    string_t full_path = LinceAssetCacheFetchPath(cache, path);
+    if(!string_ok(full_path)) {
+        return LinceFalse;
     }
 
-    hashmap_set(&st->handles, name, handle);
-    return handle;
+    LinceAsset* asset_data = LinceCalloc(sizeof(LinceAsset));
+    asset_data->sid = sid;
+    asset_data->type = type;
+    asset_data->path = full_path;
+    hashmap_setb(&cache->assets, &sid, sizeof(LinceSID), asset_data);
+
+    LINCE_INFO("Registered new asset '%s' located at '%s'", LinceGetSIDName(sid).str, full_path.str);
+    return LinceTrue;
 }
 
+/** @brief Adds a pre-loaded asset to the cache.
+ * The asset must be heap-allocated and not registered.
+ * Passing it to the cache will mean transfering ownership to it, so don't free it yourself!
+ * @param cache  Asset cache
+ * @param sid    String ID of the asset
+ * @param type   String ID of the asset type
+ * @param handle Raw pointer to the (heap-allocated) asset data
+ * @returns LinceTrue if asset was successfully added, and LinceFalse otherwise.
+*/
+LinceBool LinceAssetCacheAdd(LinceAssetCache* cache, LinceSID sid, LinceSID type, void* handle){
+    if(!cache|| !handle) return LinceFalse;
 
-void* LinceAssetCacheLoad(LinceAssetCache* cache, string_t name, string_t type, void* args){
-    if (!cache || !name.str || !type.str) return NULL;
+    if(!hashmap_has_keyb(&cache->types, &type, sizeof(LinceSID))){
+        LINCE_WARN("Could not add asset '%s' as it has an invalid type", LinceGetSIDName(sid).str);
+        LinceFalse;
+    }
+
+    if(hashmap_has_keyb(&cache->assets, &sid, sizeof(LinceSID))){
+        // Asset already registered/loaded
+        LINCE_WARN("Could not add asset '%s' as it is already registered", LinceGetSIDName(sid).str);
+        return LinceFalse;
+    }
+
+    LinceAsset* asset_data = LinceCalloc(sizeof(LinceAsset));
+    asset_data->sid = sid;
+    asset_data->type = type;
+    // asset_data->path = string_from_literal_custom("...", LINCE_DAST_STRING_ALLOCATOR);
+    hashmap_setb(&cache->assets, &sid, sizeof(LinceSID), asset_data);
+
+    return LinceTrue;
+}
+
+/** @brief Load an asset from memory.
+ * @param sid  String ID for the asset
+ * @param args Custom argument passed to load function
+ * @returns pointer to loaded asset, or NULL if the asset does not exist,
+ *          has not been registered, or is already loaded.
+*/
+void* LinceAssetCacheLoad(LinceAssetCache* cache, LinceSID sid, void* args){
+    if (!cache) return NULL;
     
-    string_t path = LinceAssetCacheFetchPath(cache, name);
-    if(!path.str) return NULL;
-
-    LinceAssetStore* st = hashmap_get(&cache->stores, type);
-
-    if(!st){
-        // Create asset store automatically?
-        LINCE_WARN("Asset type '%s' does not exist", type);
-        string_free(&path);
+    LinceAsset* asset = hashmap_getb(&cache->assets, &sid, sizeof(LinceSID));
+    if(!asset || !string_ok(asset->path)){
+        LINCE_WARN("Asset '%s' does not exist", LinceGetSIDName(sid).str);
+        return NULL;
+    } else if (asset->handle){
+        LINCE_WARN("Asset '%s' already loaded", LinceGetSIDName(sid).str);
         return NULL;
     }
 
-    if(hashmap_get(&st->handles, name)){
-        LINCE_WARN("Did not load asset '%s' (%s) because it is already loaded", name.str, type.str);
-        string_free(&path);
+    LinceAssetLoader* loader = hashmap_getb(&cache->types, &asset->type, sizeof(LinceSID));
+    if(!loader){
+        LINCE_WARN("Asset '%s' has an invalid loader", LinceGetSIDName(sid).str);
         return NULL;
     }
 
-    void* handle = st->callbacks.load(path, args);
-    hashmap_set(&st->handles, name, handle);
-    string_free(&path);
-    return handle;
+    asset->handle = loader->load(asset->path, args);
+    //hashmap_setb(&cache->assets, &sid, sizeof(LinceSID), handle);
+    return asset->handle;
 }
 
-void* LinceAssetCacheUnload(LinceAssetCache* cache, string_t name, string_t type){
-    if (!cache || !name.str || !type.str) return NULL;
+/** @brief Unload a cached asset
+ * @param cache Asset cache
+ * @param sid   String ID of the asset
+ * @returns LinceTrue if the asset was succesfully unloaded,
+ *          and LinceFalse if the asset does not exist.
+*/
+LinceBool LinceAssetCacheUnload(LinceAssetCache* cache, LinceSID sid){
+    if (!cache) return LinceFalse;
 
-    LinceAssetStore* st = hashmap_get(&cache->stores, type);
-    if(!st){
-        LINCE_WARN("Asset type '%s' does not exist", type);
-        return NULL;
+    LinceAsset* asset = hashmap_getb(&cache->assets, &sid, sizeof(LinceSID));
+    if(!asset || !asset->handle){
+        LINCE_WARN("Asset '%s' does not exist or is not loaded", LinceGetSIDName(sid).str);
+        return LinceFalse;
     }
 
-    void* handle = hashmap_get(&st->handles, name);
-    if(!handle) return NULL;
+    LinceAssetLoader* loader = hashmap_getb(&cache->types, &asset->type, sizeof(LinceSID));
+    if (!loader) return LinceFalse;
 
-    st->callbacks.unload(handle);
-    hashmap_set(&st->handles, name, NULL);
+    loader->unload(asset->handle);
+    asset->handle = NULL;
 
-    return cache;
+    return LinceTrue;
 }
 
-void* LinceAssetCacheReload(LinceAssetCache* cache, string_t name, string_t type, void* args){
-    if (!cache || !name.str || !type.str) return NULL;
-
-    LinceAssetCacheUnload(cache, name, type); // Does nothing if asset is not loaded
-    return LinceAssetCacheLoad(cache, name, type, args);
+/** Reloads an existing asset from disk, discarding the previous one.
+ * If the asset was added instead of being loaded, it will unload it but it won't be able to load it back.
+ * @param sid  String ID of the asset
+ * @param args Custom extra arguments for load function
+ * @returns raw pointer to reloaded asset, or NULL if the asset does not exist or has not been registered.
+ * @note If the asset wasn't previously loaded, it simply loads it.
+*/
+void* LinceAssetCacheReload(LinceAssetCache* cache, LinceSID sid, void* args){
+    if (!cache) return NULL;
+    LinceAssetCacheUnload(cache, sid); // Does nothing if asset is not loaded
+    return LinceAssetCacheLoad(cache, sid, args);
 }
 
+/** @brief Retrieve a cached asset
+ * @param sid String ID
+ * @returns Raw pointer to asset, or NULL if asset does not exist or has not been registered.
+ * @note If an asset is requested but is not currently loaded,
+ * it will attempt to load it with no extra arguments (i.e. args = NULL in LinceAssetCacheLoad).
+ * If you want to ensure an asset is loaded with specific arguments,
+ * call LinceAssetCacheLoad once with the desired arguments, and then use LinceAssetCacheGet afterwards.
+*/
+void* LinceAssetCacheGet(LinceAssetCache* cache, LinceSID sid){
+    if(!cache) return NULL;
 
-void* LinceAssetCacheGet(LinceAssetCache* cache, string_t name, string_t type){
-    if(!cache || !name.str || !type.str) return NULL;
-
-    LinceAssetStore* st = hashmap_get(&cache->stores, type);
-    if(!st){
-        LINCE_WARN("Asset type '%s' does not exist", type);
+    LinceAsset* asset = hashmap_getb(&cache->assets, &sid, sizeof(LinceSID));
+    if(!asset){
+        LINCE_WARN("Asset '%s' does not exist or has not been registered", LinceGetSIDName(sid).str);
         return NULL;
     }
-    void* handle = hashmap_get(&st->handles,name);
-    if(handle) return handle;
-
-    return LinceAssetCacheLoad(cache, name, type, NULL);
+    if(asset->handle) return asset->handle;
+    return LinceAssetCacheLoad(cache, sid, NULL);
 }
 
