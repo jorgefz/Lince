@@ -183,17 +183,19 @@ LinceBool LinceAssetCacheRegister(LinceAssetCache* cache, LinceSID sid, LinceSID
     }
 
     string_t full_path = LinceAssetCacheFetchPath(cache, path);
-    if(!string_ok(full_path)) {
-        return LinceFalse;
-    }
 
     LinceAsset* asset_data = LinceCalloc(sizeof(LinceAsset));
-    asset_data->sid = sid;
-    asset_data->type = type;
-    asset_data->path = full_path;
     hashmap_setb(&cache->assets, &sid, sizeof(LinceSID), asset_data);
 
-    LINCE_INFO("Registered new asset '%s' located at '%s'", LinceGetSIDName(sid).str, full_path.str);
+    asset_data->sid = sid;
+    asset_data->type = type;
+
+    if(string_ok(full_path)) {
+        asset_data->path = full_path;
+        LINCE_INFO("Registered new asset '%s' located at '%s'", LinceGetSIDName(sid).str, full_path.str);
+    } else {
+        LINCE_WARN("Registered new asset '%s' that could not be located - no match for input path '%s'", LinceGetSIDName(sid).str, path.str);
+    }
     return LinceTrue;
 }
 
@@ -239,12 +241,15 @@ void* LinceAssetCacheLoad(LinceAssetCache* cache, LinceSID sid, void* args){
     if (!cache) return NULL;
     
     LinceAsset* asset = hashmap_getb(&cache->assets, &sid, sizeof(LinceSID));
-    if(!asset || !string_ok(asset->path)){
+    if(!asset){
         LINCE_WARN("Asset '%s' does not exist", LinceGetSIDName(sid).str);
         return NULL;
     } else if (asset->handle){
         LINCE_WARN("Asset '%s' already loaded", LinceGetSIDName(sid).str);
         return NULL;
+    } else if (!string_ok(asset->path)){
+        LINCE_WARN("Asset '%s' could not be located - using default asset", LinceGetSIDName(sid).str);
+        return LinceAssetCacheGetDefault(cache, asset->type);
     }
 
     LinceAssetLoader* loader = hashmap_getb(&cache->types, &asset->type, sizeof(LinceSID));
@@ -254,7 +259,11 @@ void* LinceAssetCacheLoad(LinceAssetCache* cache, LinceSID sid, void* args){
     }
 
     asset->handle = loader->load(asset->path, args);
-    //hashmap_setb(&cache->assets, &sid, sizeof(LinceSID), handle);
+    if(!asset->handle){
+        LINCE_WARN("Asset '%s' could not be loaded - using default asset");
+        return LinceAssetCacheGetDefault(cache, asset->type);
+    }
+
     return asset->handle;
 }
 
@@ -262,14 +271,17 @@ void* LinceAssetCacheLoad(LinceAssetCache* cache, LinceSID sid, void* args){
  * @param cache Asset cache
  * @param sid   String ID of the asset
  * @returns LinceTrue if the asset was succesfully unloaded,
- *          and LinceFalse if the asset does not exist.
+ *          and LinceFalse otherwise
 */
 LinceBool LinceAssetCacheUnload(LinceAssetCache* cache, LinceSID sid){
     if (!cache) return LinceFalse;
 
     LinceAsset* asset = hashmap_getb(&cache->assets, &sid, sizeof(LinceSID));
-    if(!asset || !asset->handle){
-        LINCE_WARN("Asset '%s' does not exist or is not loaded", LinceGetSIDName(sid).str);
+    if(!asset){
+        LINCE_WARN("Cannot unload asset '%s' because it has not been registered", LinceGetSIDName(sid).str);
+        return LinceFalse;
+    } else if (!asset->handle){
+        LINCE_INFO("Skipped unloading asset '%s' as it was not loaded", LinceGetSIDName(sid).str);
         return LinceFalse;
     }
 
@@ -279,6 +291,7 @@ LinceBool LinceAssetCacheUnload(LinceAssetCache* cache, LinceSID sid){
     loader->unload(asset->handle);
     asset->handle = NULL;
 
+    LINCE_INFO("Unloaded asset '%s'", LinceGetSIDName(sid).str);
     return LinceTrue;
 }
 
@@ -315,3 +328,67 @@ void* LinceAssetCacheGet(LinceAssetCache* cache, LinceSID sid){
     return LinceAssetCacheLoad(cache, sid, NULL);
 }
 
+
+/** @brief Set the default asset for a type.
+ * If a requested asset does not exist, the default asset is returned instead.
+ * The asset to be set as default must have been registered already.
+ * If the default asset has not yet been loaded, it will be loaded with args = NULL.
+ * @param cache          Asset cache
+ * @param type           Asset type for which to set a default
+ * @param default_asset  Asset to use as default for this type. Must have been registered.
+ * @returns LinceTrue if the default asset was succesfully set/loaded, and LinceFalse otherwise.
+*/
+LinceBool LinceAssetCacheSetDefault(LinceAssetCache* cache, LinceSID type, LinceSID default_asset){
+    if(!cache) return LinceFalse;
+    LinceAsset* asset = hashmap_getb(&cache->assets, &default_asset, sizeof(LinceSID));
+    LinceAssetLoader* loader = hashmap_getb(&cache->types, &type, sizeof(LinceSID));
+
+    if(!asset){
+        string_t type_name = LinceGetSIDName(type);
+        LINCE_ERROR("Default asset for type '%s' could not be set because it has not been registered", type_name.str);
+        return LinceFalse;
+    } else if (asset->type != type){
+        string_t type_name = LinceGetSIDName(type);
+        string_t asset_type_name = LinceGetSIDName(asset->type);
+        LINCE_ERROR("Default asset for type '%s' could not be set because it is of type '%s'", type_name.str, asset_type_name.str);
+        return LinceFalse;
+    } else if(!loader){
+        string_t type_name = LinceGetSIDName(type);
+        LINCE_ERROR("Cannot set default asset for type '%s' since it does not exist", type_name.str);
+        return LinceFalse;
+    }
+
+    void* handle = LinceAssetCacheLoad(cache, default_asset, NULL);
+    if(!handle){
+        LINCE_ERROR("Could not load default asset '%s'", LinceGetSIDName(default_asset).str);
+        return LinceFalse;
+    }
+
+    loader->default_asset = default_asset;
+    LINCE_INFO("Set asset '%s' as default for type '%s'", LinceGetSIDName(default_asset).str, LinceGetSIDName(type).str);
+    return LinceTrue;
+}
+
+/** @brief Fetch the default asset for an asset type.
+ * If a default has not been set, NULL is returned.
+ * @param cache Asset cache
+ * @param type  Asset type
+ * @returns Handle of default asset if successful, NULL otherwise.
+ */
+void* LinceAssetCacheGetDefault(LinceAssetCache* cache, LinceSID type){
+    if(!cache) return NULL;
+
+    LinceAssetLoader* loader = hashmap_getb(&cache->types, &type, sizeof(LinceSID));
+    if(!loader){
+        LINCE_ERROR("Could not fetch default asset for type '%s' - unknown type", LinceGetSIDName(type).str);
+        return NULL;
+    }
+
+    if(loader->default_asset == 0){
+        LINCE_ERROR("No default asset set for type '%s'", LinceGetSIDName(type));
+        return NULL;
+    }
+
+    LinceAsset* default_asset = hashmap_getb(&cache->assets, &loader->default_asset, sizeof(LinceSID));
+    return default_asset->handle;
+}

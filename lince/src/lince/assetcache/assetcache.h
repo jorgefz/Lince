@@ -14,6 +14,7 @@ typedef void (*LinceAssetUnload)(void* obj); // (LinceAssetCache* cache, void* o
 typedef struct LinceAssetLoader {
     LinceAssetLoad   load;   ///< Callback to load an asset from disk
     LinceAssetUnload unload; ///< Callback to free an asset from memory
+    LinceSID default_asset;  ///< Default asset to use when a requested one does not exist
 } LinceAssetLoader;
 
 typedef struct LinceAsset {
@@ -112,7 +113,7 @@ void* LinceAssetCacheLoad(LinceAssetCache* cache, LinceSID sid, void* args);
  * @param cache Asset cache
  * @param sid   String ID of the asset
  * @returns LinceTrue if the asset was succesfully unloaded,
- *          and LinceFalse if the asset does not exist.
+ *          and LinceFalse otherwise.
 */
 LinceBool LinceAssetCacheUnload(LinceAssetCache* cache, LinceSID sid);
 
@@ -133,6 +134,25 @@ void* LinceAssetCacheReload(LinceAssetCache* cache, LinceSID sid, void* args);
  * call LinceAssetCacheLoad once with the desired arguments, and then use LinceAssetCacheGet afterwards.
 */
 void* LinceAssetCacheGet(LinceAssetCache* cache, LinceSID sid);
+
+/** @brief Set the default asset for a type.
+ * If a requested asset does not exist, the default asset is returned instead.
+ * The asset to be set as default must have been registered already.
+ * If the default asset has not yet been loaded, it will be loaded with args = NULL.
+ * @param cache          Asset cache
+ * @param type           Asset type for which to set a default
+ * @param default_asset  Asset to use as default for this type. Must have been registered.
+ * @returns LinceTrue if the default asset was succesfully set/loaded, and LinceFalse otherwise.
+*/
+LinceBool LinceAssetCacheSetDefault(LinceAssetCache* cache, LinceSID type, LinceSID default_asset);
+
+/** @brief Fetch the default asset for an asset type.
+ * If a default has not been set, NULL is returned.
+ * @param cache Asset cache
+ * @param type  Asset type
+ * @returns Handle of default asset if successful, NULL otherwise.
+ */
+void* LinceAssetCacheGetDefault(LinceAssetCache* cache, LinceSID type);
 
 // void* LinceAssetCacheLoadAsync(LinceAssetCache* cache, LinceSID sid);
 
