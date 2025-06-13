@@ -52,16 +52,17 @@ void WorldSceneInit(LinceScene* scene){
     WorldScene* world_scene = LinceAlloc(sizeof(WorldScene));
     scene->data = world_scene;
     
-    // Town map
-    LinceTexture* tex = LinceAssetCacheGet(LinceAppGetAssetCache(), LinceSIDFromLit("outside"));
-    LinceTilesetInit(&world_scene->tileset, tex, 16, 16);
-    
+    // Register assets
+    LinceAssetCacheRegister(LinceAppGetAssetCache(), LinceSIDFromLit("tileset_outside"), LinceSIDFromLit("tileset"), string_scoped_lit("tilesets/outside.toml"));
+
+    // Create town map
+    LinceTileset* tset = LinceAssetCacheGet(LinceAppGetAssetCache(), LinceSIDFromLit("tileset_outside"));
     world_scene->map =  (LinceTilemap){
         .width = 15, .height = 15,
         .scale = {1,1}, .pos = {-2,0},
     };
     LinceTilemapInit(&world_scene->map, OUTSIDE_GRID);
-    LinceTilemapUseTileset(&world_scene->map, &world_scene->tileset);
+    LinceTilemapUseTileset(&world_scene->map, tset);
  
     world_scene->house_door = (DoorLink){
         .box = (LinceBox2D){.x=6-0.5, .y=6-0.5, .w=1, .h=1},
@@ -116,6 +117,5 @@ void WorldSceneUpdate(LinceScene* scene, float dt){
 void WorldSceneDestroy(LinceScene* scene){
     WorldScene* world_scene = scene->data;
     LinceTilemapUninit(&world_scene->map);
-    LinceTilesetUninit(&world_scene->tileset);
     LinceFree(scene->data);
 }
