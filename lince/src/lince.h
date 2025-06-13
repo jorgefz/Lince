@@ -16,6 +16,7 @@
 #include "lince/utils/fileio.h"
 #include "lince/utils/clock.h"
 #include "lince/utils/image.h"
+#include "lince/assetcache/assetcache.h"
 
 /* Input */
 #include "lince/input/input.h"
