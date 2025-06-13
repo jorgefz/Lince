@@ -4,6 +4,10 @@
 #include "lince/core/core.h"
 #include "lince/renderer/transform.h"
 #include "lince/renderer/texture.h"
+#include "lince/utils/fileio.h"
+#include "lince/assetcache/assetcache.h"
+#include "toml.h"
+
 
 typedef struct LinceTileset {
 	LinceTexture* texture;	///< Base texture atlas
@@ -28,5 +32,20 @@ void LinceTilesetUninit(LinceTileset* tset);
 */
 LinceRect* LinceTilesetGetTileCoords(LinceTileset* tileset, uint32_t x, uint32_t y);
 
+/** @brief Initialise a tileset from a TOML file.
+ * TOML file must have the following parameters:
+ * 	texture     :(str) Path of base texture
+ *  tilewidth   :(int) Tile width in pixels
+ *  tileheight  :(int) Tile height in pixels
+ * @param cache Asset cache
+ * @param path  Path to tileset TOML file
+ * @param args  Unused
+ * @returns Pointer to allocated initalised tileset,
+ *   or NULL if TOML file or texture could not be loaded.
+*/
+void* LinceLoadTilesetAsset(LinceAssetCache* cache, string_t path, void* args);
+
+/** @brief Unload tileset loaded with `LinceLoadTilesetAsset` */
+void LinceUnloadTilesetAsset(LinceAssetCache* cache, void* obj);
 
 #endif /* LINCE_TILESET_H */
