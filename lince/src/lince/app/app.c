@@ -311,7 +311,8 @@ static void LinceInit(){
     LinceAssetCacheAddType(&app.asset_cache, LinceSIDFromLit("texture"), LinceLoadTextureAsset, LinceUnloadTextureAsset);
     // LinceAssetCacheAddType(&app.asset_cache, "shader", LinceLoadShader, LinceUnloadShader);
     // LinceAssetCacheAddType(&app.asset_cache, "shader_header", LinceLoadShader, LinceUnloadShader);
-    
+    LinceAssetCacheAddType(&app.asset_cache, LinceSIDFromLit("tileset"), LinceLoadTilesetAsset, LinceUnloadTilesetAsset);
+
     // Register internal engine assets
     LinceAssetCacheRegister(&app.asset_cache, LinceSIDFromLit("default_sprite"), LinceSIDFromLit("texture"), string_scoped_lit("sprites/default.png"));
 
