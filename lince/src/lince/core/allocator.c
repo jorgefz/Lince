@@ -5,6 +5,7 @@
 #include "allocator.h"
 #include "logger.h"
 
+#include "toml.h"
 #include "stb_image_alloc.h"
 
 typedef struct LinceAllocator {
@@ -55,6 +56,10 @@ void* LinceSTBIImageAlloc(size_t size)                { return LinceMemoryAlloc 
 void* LinceSTBIImageRealloc(void* block, size_t size) { return LinceMemoryRealloc(block, size, 0, "stb_image.c", "<stb_image function>"); }
 void  LinceSTBIImageFree(void* block)                 {        LinceMemoryFree   (block,       0, "stb_image.c", "<stb_image function>"); }
 
+/* Memory management interface for toml */
+void* LinceTOMLAlloc(size_t size) { return LinceMemoryAlloc  (size,  0, "toml.c", "<toml function>"); }
+void  LinceTOMLFree(void* block)  {        LinceMemoryFree   (block, 0, "toml.c", "<toml function>"); }
+
 /* Global allocators for external libraries */
 const dast_allocator_t LINCE_DAST_ARRAY_ALLOCATOR   = {.alloc=LinceArrayAlloc,   .realloc=LinceArrayRealloc,   .free=LinceArrayFree  };
 const dast_allocator_t LINCE_DAST_HASHMAP_ALLOCATOR = {.alloc=LinceHashmapAlloc, .realloc=LinceHashmapRealloc, .free=LinceHashmapFree};
@@ -78,6 +83,7 @@ static LinceAllocator _global_allocator = {
 void LinceAllocatorInit(void){
     // stbi_image
     stbi_set_alloc(LinceSTBIImageAlloc, LinceSTBIImageRealloc, LinceSTBIImageFree);
+    toml_set_memutil(LinceTOMLAlloc, LinceTOMLFree);
     _global_allocator.initialised = LinceTrue;
 }
 
