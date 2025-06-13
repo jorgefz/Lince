@@ -288,7 +288,9 @@ LinceBool LinceAssetCacheUnload(LinceAssetCache* cache, LinceSID sid){
     LinceAssetLoader* loader = hashmap_getb(&cache->types, &asset->type, sizeof(LinceSID));
     if (!loader) return LinceFalse;
 
-    loader->unload(cache, asset->handle);
+    if (loader->unload){
+        loader->unload(cache, asset->handle);
+    }
     asset->handle = NULL;
 
     LINCE_INFO("Unloaded asset '%s'", LinceGetSIDName(sid).str);
