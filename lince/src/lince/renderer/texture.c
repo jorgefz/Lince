@@ -5,11 +5,13 @@
 #include "lince/utils/memory.h"
 #include "lince/renderer/texture.h"
 
-void* LinceLoadTextureAsset(string_t path, void* args){
+void* LinceLoadTextureAsset(LinceAssetCache* cache, string_t path, void* args){
+	(void)cache;
 	return LinceCreateTextureFromFile(path.str, (uint32_t)(uint64_t)args);
 }
 
-void LinceUnloadTextureAsset(void* ptr){
+void LinceUnloadTextureAsset(LinceAssetCache* cache, void* ptr){
+	(void)cache;
 	LinceDeleteTexture(ptr);
 }
 

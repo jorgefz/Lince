@@ -2,6 +2,7 @@
 #define LINCE_TEXTURE_H
 
 #include "lince/core/core.h"
+#include "lince/assetcache/assetcache.h"
 #include "lince/utils/image.h"
 
 /** @enum LinceTextureFlags
@@ -27,10 +28,10 @@ typedef struct LinceTexture {
  * 			   Must be an uint32_t converted to pointer.
  * @returns loaded texture
 */
-void* LinceLoadTextureAsset(string_t path, void* args);
+void* LinceLoadTextureAsset(LinceAssetCache* cache, string_t path, void* args);
 
 /** @brief Callback to unload texture via asset cache */
-void LinceUnloadTextureAsset(void* ptr);
+void LinceUnloadTextureAsset(LinceAssetCache* cache, void* ptr);
 
 /** @brief Loads a texture from file.
 * Alias for `LinceCreateTextureFromFile`.

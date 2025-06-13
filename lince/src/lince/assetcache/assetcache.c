@@ -258,7 +258,7 @@ void* LinceAssetCacheLoad(LinceAssetCache* cache, LinceSID sid, void* args){
         return NULL;
     }
 
-    asset->handle = loader->load(asset->path, args);
+    asset->handle = loader->load(cache, asset->path, args);
     if(!asset->handle){
         LINCE_WARN("Asset '%s' could not be loaded - using default asset");
         return LinceAssetCacheGetDefault(cache, asset->type);
@@ -288,7 +288,7 @@ LinceBool LinceAssetCacheUnload(LinceAssetCache* cache, LinceSID sid){
     LinceAssetLoader* loader = hashmap_getb(&cache->types, &asset->type, sizeof(LinceSID));
     if (!loader) return LinceFalse;
 
-    loader->unload(asset->handle);
+    loader->unload(cache, asset->handle);
     asset->handle = NULL;
 
     LINCE_INFO("Unloaded asset '%s'", LinceGetSIDName(sid).str);

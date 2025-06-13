@@ -39,3 +39,46 @@ LinceRect* LinceTilesetGetTileCoords(LinceTileset* tileset, uint32_t x, uint32_t
 	return array_get(&tileset->coords, tileset->xcells * y + x);
 }
 
+
+
+/** @brief Load tileset from TOML file */
+/*
+void* LinceLoadTilesetAsset(string_t path, void* args){
+	string_t content = LinceReadFile(path);
+	if(!string_ok(content)) return NULL;
+
+	static char errbuf[200];
+	toml_table_t* tab = toml_parse(content.str, errbuf, sizeof(errbuf));
+    if(!tab){
+		LINCE_ERROR("Failed to parse TOML file");
+		LINCE_ERROR("%s", errbuf);
+		string_free(&content);
+        return NULL;
+    }
+	string_free(&content);
+
+	toml_datum_t texpath = toml_int_in(tab, "texture");
+	toml_datum_t cellw   = toml_int_in(tab, "cell_width");
+	toml_datum_t cellh   = toml_int_in(tab, "cell_height");
+	
+	if (!texpath.ok || !cellw.ok || !cellh.ok){
+		toml_free(tab);
+		LINCE_ERROR("Failed to parse tileset TOML file - invalid parameters");
+		return NULL;
+	}
+
+	size_t len = strlen(texpath.u.s);
+	LinceSID texsid = LinceMakeSID(string_scoped(texpath.u.s, len));
+    LinceTexture* tex = LinceAssetCacheGet(cache, texsid);
+	if(!tex){
+		LinceAssetCacheRegister(cache, texsid, ...)
+		tex = LinceAssetCacheGet(cache, texsid);
+	}
+
+	LinceTileset* tset = LinceCalloc(sizeof(LinceTileset));
+	LinceTilesetInit(tset, tex, (uint32_t)cellw.u.i, (uint32_t)cellh.u.i);
+
+	toml_free(tab);
+	return tset;
+}
+*/

@@ -4,11 +4,14 @@
 #include "lince/core/core.h"
 #include "lince/assetcache/sid.h"
 
+/// Forward declaration
+struct LinceAssetCache;
+
 ///< Callback signature to load an asset from disk
-typedef void* (*LinceAssetLoad)(string_t path, void* args); // (LinceAssetCache* cache, string_t path)
+typedef void* (*LinceAssetLoad)(struct LinceAssetCache *cache, string_t path, void* args);
 
 ///< Callback signature to free an asset from memory
-typedef void (*LinceAssetUnload)(void* obj); // (LinceAssetCache* cache, void* obj)
+typedef void (*LinceAssetUnload)(struct LinceAssetCache *cache, void* obj);
 
 /// Callbacks to load, unload, and manage assets of a specific type
 typedef struct LinceAssetLoader {

@@ -4,13 +4,13 @@
 #include "lince/utils/memory.h"
 #include "lince/utils/image.h"
 
-
-void* LinceLoadImageAsset(string_t path, void* args){
-    (void)args;
+void* LinceLoadImageAsset(LinceAssetCache* cache, string_t path, void* args){
+    (void)args, (void)cache;
     return LinceLoadImage(path.str);
 }
 
-void LinceUnloadImageAsset(void* img){
+void LinceUnloadImageAsset(LinceAssetCache* cache, void* img){
+    (void)cache;
     LinceDeleteImage(img);
 }
 

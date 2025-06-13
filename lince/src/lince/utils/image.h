@@ -2,6 +2,7 @@
 #define LINCE_IMAGE_H
 
 #include "lince/core/core.h"
+#include "lince/assetcache/assetcache.h"
 
 /** @struct LinceImage
  * @brief Buffer for storing an image loaded from disk.
@@ -15,10 +16,10 @@ typedef struct LinceImage {
 } LinceImage;
 
 /** @brief Callback for asset cache to load image from disk */
-void* LinceLoadImageAsset(string_t path, void* args);
+void* LinceLoadImageAsset(LinceAssetCache* cache, string_t path, void* args);
 
 /** @brief Callback for asset cache to unload image */
-void LinceUnloadImageAsset(void* img);
+void LinceUnloadImageAsset(LinceAssetCache* cache, void* img);
 
 /** @brief Loads an image from disk.
  * @param path filename of the image to load
