@@ -23,8 +23,8 @@ typedef struct LinceTilemap{
     // Internal data
     LinceTileset* tileset; ///< Tileset
     LinceSprite sprite;    ///< Sprite shared by all tiles
-    array_t transforms; ///< array<LinceTransform> Transforms of each map tile
-    array_t indices;    ///< array<uint32_t> Indices of tiles in tileset to draw at each location
+    array_t transforms;    ///< array<LinceTransform> Transforms of each map tile
+    array_t indices;       ///< array<uint32_t> Indices of tiles in tileset to draw at each location
 
 } LinceTilemap;
 
@@ -52,6 +52,23 @@ void LinceTilemapUseTileset(LinceTilemap* map, LinceTileset* tileset);
  * @note Do not draw tiles outside of the screen!
 */
 void LinceDrawTilemap(LinceTilemap* map, LinceShader* shader);
+
+/** @brief Load a tilemap from a TOML file.
+ * The TOML file must have the following parameters:
+ *   mapwidth    :(int) Width of the map in tiles.
+ *   mapheight   :(int) Height of the map in tiles.
+ *   grid        :(Array[float]) Array of length mapwidth*mapheight storing the indices of the tiles
+ *                               to draw at each location.
+ *   centerx     :(float, optional) Location of the centre of the map in the X axis. Default is 0.
+ *   centery     :(float, optional) Location of the centre of the map in the Y axis. Default is 0.
+ *   scalewidth  :(float, optional) Width of each tile in world coordinates. Default is 1.
+ *   scaleheight :(float, optional) Height of each tile in world coordinates. Default is 1.
+ *   tileset     :(str, optional)   Tileset used to draw the map tiles
+ */
+void* LinceLoadTilemapAsset(LinceAssetCache* cache, string_t path, void* args);
+
+/** @brief Unload tilemap loaded with `LinceLoadTilemapAsset` */
+void LinceUnloadTilemapAsset(LinceAssetCache* cache, void* obj);
 
 
 /* ----------------------------------- */

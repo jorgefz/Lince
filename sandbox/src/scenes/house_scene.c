@@ -51,10 +51,10 @@ void HouseSceneInit(LinceScene* scene){
     LinceTilemapUseTileset(&house_scene->map, tset);
 
     house_scene->house_door = (DoorLink){
-        .box = (LinceBox2D){.x=3-0.5, .y=1-0.5, .w=1, .h=1},
+        .box = (LinceBox2D){.x=2.0, .y=0.0, .w=1, .h=1},
         .to_scene = "World", .to_scene_len = sizeof("World") - 1,
-        .to_x = 5.5,
-        .to_y = 4.5,
+        .to_x = -2,
+        .to_y = -2.5,
     };
 }
 

@@ -78,6 +78,115 @@ void LinceDrawTilemap(LinceTilemap* map, LinceShader* shader){
     }
 }
 
+/** @brief Load a tilemap from a TOML file.
+ * The TOML file must have the following parameters:
+ *   mapwidth    :(int) Width of the map in tiles.
+ *   mapheight   :(int) Height of the map in tiles.
+ *   grid        :(Array[float]) Array of length mapwidth*mapheight storing the indices of the tiles
+ *                               to draw at each location.
+ *   centerx     :(float, optional) Location of the centre of the map in the X axis. Default is 0.
+ *   centery     :(float, optional) Location of the centre of the map in the Y axis. Default is 0.
+ *   scalewidth  :(float, optional) Width of each tile in world coordinates. Default is 1.
+ *   scaleheight :(float, optional) Height of each tile in world coordinates. Default is 1.
+ *   tileset     :(str, optional)   Tileset used to draw the map tiles
+ */
+void* LinceLoadTilemapAsset(LinceAssetCache* cache, string_t path, void* args){
+    (void)args;
+    
+    string_t content = LinceReadFile(path);
+	if(!string_ok(content)){
+		LINCE_ERROR("Could not read tilemap at '%s'", path.str);
+		return NULL;
+	}
+
+    char errbuf[256];
+	toml_table_t* tab = toml_parse(content.str, errbuf, sizeof(errbuf));
+    string_free(&content);
+    if(!tab){
+		LINCE_ERROR("Error parsing TOML file '%s'", path.str);
+		LINCE_ERROR(" -> %s", errbuf);
+	    return NULL;
+    }
+
+	toml_datum_t w    = toml_int_in(tab, "mapwidth");
+	toml_datum_t h    = toml_int_in(tab, "mapheight");
+	toml_datum_t cx   = toml_double_in(tab, "centerx");
+    toml_datum_t cy   = toml_double_in(tab, "centery");
+	toml_datum_t sw   = toml_double_in(tab, "scalewidth");
+    toml_datum_t sh   = toml_double_in(tab, "scaleheight");
+    toml_datum_t tset = toml_string_in(tab, "tileset");
+    toml_array_t* grid = toml_array_in(tab, "grid");
+
+    if(!w.ok || !h.ok || !grid){
+        LINCE_ERROR("Error parsing TOML file '%s'", path.str);
+        LINCE_ERROR(" -> Invalid parameters: %s%s%s",
+            w.ok ? "" : "mapwidth, ",
+            h.ok ? "" : "mapheight, ",
+            grid ? "" : "grid"
+        );
+        toml_free(tab);
+        return NULL;
+    }
+
+    uint32_t width  = (uint32_t)w.u.i;
+    uint32_t height = (uint32_t)h.u.i;
+    uint32_t nelem  = (uint32_t)toml_array_nelem(grid);
+    if(nelem != width*height){
+        LINCE_ERROR("Error parsing TOML file '%s'", path.str);
+        LINCE_ERROR(" -> Expected %lu items but grid has %lu", width*height, nelem);
+        toml_free(tab);
+        return NULL;
+    } else if ( (toml_array_kind(grid) != 'v') || (toml_array_type(grid) != 'i') ){
+        LINCE_ERROR("Error parsing TOML file '%s'", path.str);
+        LINCE_ERROR(" -> Grid values should be integers");
+        toml_free(tab);
+        return NULL;
+    }
+
+    uint32_t* grid_data = LinceAlloc(sizeof(uint32_t) * nelem);
+    for(uint32_t i = 0; i != nelem; ++i){
+        grid_data[i] = (uint32_t)toml_int_at(grid, i).u.i;
+    }
+    
+    LincePoint pos, scale;
+    pos.x   = cx.ok ? (float)cx.u.d : 0.0f;
+    pos.y   = cy.ok ? (float)cy.u.d : 0.0f;
+    scale.x = sw.ok ? (float)sw.u.d : 1.0f;
+    scale.y = sh.ok ? (float)sh.u.d : 1.0f;
+    
+    LinceTilemap* map = LinceCalloc(sizeof(LinceTilemap));
+    map->width  = width;
+    map->height = height;
+    map->pos    = pos;
+    map->scale  = scale;
+
+    LinceTilemap *success = LinceTilemapInit(map, grid_data);
+    if(!success){
+        toml_free(tab);
+        return NULL;
+    }
+
+    if (tset.ok){
+        string_t tset_str = string_scoped(tset.u.s, strlen(tset.u.s));
+        LinceSID tset_sid = LinceMakeSID(tset_str);
+        LinceTileset* tileset = LinceAssetCacheGet(cache, tset_sid);
+        if(!tileset){
+            LinceAssetCacheRegister(cache, tset_sid, LinceSIDFromLit("tileset"), tset_str);
+            tileset = LinceAssetCacheGet(cache, tset_sid);
+        }
+        if (tileset) LinceTilemapUseTileset(map, tileset);
+    }
+
+    toml_free(tab);
+    return map;
+}
+
+/** @brief Unload tileset loaded with `LinceLoadTilesetAsset` */
+void LinceUnloadTilemapAsset(LinceAssetCache* cache, void* obj){
+	if(!cache || !obj) return;
+	LinceTilemapUninit(obj);
+}
+
 
 /*
 LinceTilemap* LinceInitTilemap(LinceTilemap* map, uint32_t* grid){

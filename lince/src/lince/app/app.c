@@ -12,6 +12,7 @@
 #include "lince/core/profiler.h"
 #include "lince/utils/memory.h"
 #include "lince/core/logger.h"
+#include "lince/tiles/tilemap.h"
 #include "stb_image_alloc.h"
 
 
@@ -312,6 +313,8 @@ static void LinceInit(){
     // LinceAssetCacheAddType(&app.asset_cache, "shader", LinceLoadShader, LinceUnloadShader);
     // LinceAssetCacheAddType(&app.asset_cache, "shader_header", LinceLoadShader, LinceUnloadShader);
     LinceAssetCacheAddType(&app.asset_cache, LinceSIDFromLit("tileset"), LinceLoadTilesetAsset, LinceUnloadTilesetAsset);
+    LinceAssetCacheAddType(&app.asset_cache, LinceSIDFromLit("tilemap"), LinceLoadTilemapAsset, LinceUnloadTilesetAsset);
+
 
     // Register internal engine assets
     LinceAssetCacheRegister(&app.asset_cache, LinceSIDFromLit("default_sprite"), LinceSIDFromLit("texture"), string_scoped_lit("sprites/default.png"));

@@ -53,26 +53,17 @@ void WorldSceneInit(LinceScene* scene){
     scene->data = world_scene;
     
     // Register assets
-    LinceAssetCacheRegister(LinceAppGetAssetCache(), LinceSIDFromLit("tileset_outside"), LinceSIDFromLit("tileset"), string_scoped_lit("tilesets/outside.toml"));
+    LinceAssetCacheRegister(LinceAppGetAssetCache(), LinceSIDFromLit("tilesets/outside.toml"), LinceSIDFromLit("tileset"), string_scoped_lit("tilesets/outside.toml"));
+    LinceAssetCacheRegister(LinceAppGetAssetCache(), LinceSIDFromLit("tilemaps/outside.toml"), LinceSIDFromLit("tilemap"), string_scoped_lit("tilemaps/outside.toml"));
+    
+    world_scene->map = LinceAssetCacheGet(LinceAppGetAssetCache(), LinceSIDFromLit("tilemaps/outside.toml"));
 
-    // Create town map
-    LinceTileset* tset = LinceAssetCacheGet(LinceAppGetAssetCache(), LinceSIDFromLit("tileset_outside"));
-    world_scene->map =  (LinceTilemap){
-        .width = 15, .height = 15,
-        .scale = {1,1}, .pos = {-2,0},
-    };
-    LinceTilemapInit(&world_scene->map, OUTSIDE_GRID);
-    LinceTilemapUseTileset(&world_scene->map, tset);
- 
     world_scene->house_door = (DoorLink){
-        .box = (LinceBox2D){.x=6-0.5, .y=6-0.5, .w=1, .h=1},
+        .box = (LinceBox2D){.x=-2.0f, .y=-1.5f, .w=1, .h=1},
         .to_scene = "House", .to_scene_len = sizeof("House") - 1,
         .to_x = 3, .to_y = 2,
     };
 
-    // world_scene->door_link  = (LinceBox2D){.x=7-0.5, .y=6-0.5, .w=1, .h=1};
-    // world_scene->player_box = (LinceBox2D){.x=0, .y=0, .w=0.7, .h=0.7};
-    // world_scene->player_sprite = (LinceSprite){.x=0, .y=0, .w=0.7, .h=0.7, .color={0,0,1,1}, .zorder=1};
 }
 
 void WorldSceneUpdate(LinceScene* scene, float dt){
@@ -82,7 +73,7 @@ void WorldSceneUpdate(LinceScene* scene, float dt){
     MoveCamera(&game_data->camera, dt * game_data->camera_speed);
     
     LinceBeginRender(&game_data->camera);
-    LinceDrawTilemap(&world_scene->map, NULL);
+    LinceDrawTilemap(world_scene->map, NULL);
     LinceDrawSprite(&game_data->player_sprite, &game_data->player_transform, NULL);
     UpdatePlayer(game_data);
 
@@ -116,6 +107,6 @@ void WorldSceneUpdate(LinceScene* scene, float dt){
 
 void WorldSceneDestroy(LinceScene* scene){
     WorldScene* world_scene = scene->data;
-    LinceTilemapUninit(&world_scene->map);
+    // LinceTilemapUninit(&world_scene->map);
     LinceFree(scene->data);
 }
