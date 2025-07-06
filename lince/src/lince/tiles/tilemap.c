@@ -187,76 +187,33 @@ void LinceUnloadTilemapAsset(LinceAssetCache* cache, void* obj){
 	LinceTilemapUninit(obj);
 }
 
+/** @brief Write tilemap data to disk */
+LinceBool LinceSaveTilemapAsset(LinceAssetCache* cache, LinceSID asset_sid){
+    if(!cache) return LinceFalse;
 
-/*
-LinceTilemap* LinceInitTilemap(LinceTilemap* map, uint32_t* grid){
+    LinceTilemap* map = LinceAssetCacheGet(cache, asset_sid);
+    string_t path = LinceAssetCacheGetPath(cache, asset_sid);
+    if(!map || !string_ok(path)) return LinceFalse;
 
-    // LINCE_ASSERT(map,               "NULL pointer");
-    // LINCE_ASSERT(map->texture,      "Tileset undefined");
-    // LINCE_ASSERT(map->cellsize[0]>0, "Cellsize must be greater than zero");
-    // LINCE_ASSERT(map->cellsize[1]>0, "Cellsize must be greater than zero");
-    // LINCE_ASSERT(map->width  > 0,    "Map width must be greater than zero");
-    // LINCE_ASSERT(map->height > 0,    "Map height must be greater than zero");
-    // LINCE_ASSERT(map->grid,          "Map grid undefined");
-    // if(map->scale[0] < 1e-7f) map->scale[0] = 1.0f;
-    // if(map->scale[1] < 1e-7f) map->scale[1] = 1.0f;
+    FILE* f = fopen(path.str, "w");
 
-    // Initalise base sprite
-    map->sprite = (LinceSprite){.texture = map->texture, .color = {1,1,1}};
+    fprintf(f, "mapwidth    = %lu\n", map->width);
+    fprintf(f, "mapheight   = %lu\n", map->height);
+    fprintf(f, "centerx     = %f\n", map->pos.x);
+    fprintf(f, "centery     = %f\n", map->pos.y);
+    fprintf(f, "scalewidth  = %f\n", map->scale.x);
+    fprintf(f, "scaleheight = %f\n", map->scale.y);
+    fprintf(f, "tileset     = %s", ...);
 
-    // Load tiles from texture
-    map->texsize = (LincePoint){
-        .x = (float)map->texture->width,
-        .y = (float)map->texture->height
-    };
-    LinceTilesetGetCoords(map->texsize, map->cellsize, &map->tiles);
-
-    // Ensure all indices in grid are valid
-    uint32_t map_size = map->height * map->width;
-    
-    for(size_t i = 0; i != map_size; ++i){
-        LINCE_ASSERT(grid[i] < map->tiles.size,
-            "Invalid value in tilemap base grid "
-            "(tile index %d but there are only %u tiles)",
-            (int)grid[i], (int)map->tiles.size);
-    }
-
-    array_init(&map->indices, sizeof(uint32_t));
-    array_resize(&map->indices, map_size);
-    memcpy(map->indices.data, grid, sizeof(uint32_t)*map_size);
-
-    // Generate grid of transforms
-    array_init(&map->transforms, sizeof(LinceTransform));
-    array_resize(&map->transforms, map->width * map->height);
-
-    for(uint32_t y = 0; y != map->height; ++y){
-        for(uint32_t x = 0; x != map->width; ++x){
-            LinceTransform transform = map->base_transform;
-            transform.x += (x - (float)(map->width )/2.0f) * transform.w;
-            transform.y += (y - (float)(map->height)/2.0f) * transform.h;
-            array_set(&map->transforms, &transform, map->width * y + x);    
+    fprintf(f, "grid        = [");
+    for(uint32_t* i = map->indices.begin; i != map->indices.begin; ++i){
+        if((*i % map->width) == 0){
+            fprintf(f, "\n    ");
         }
+        fprintf(f, "%lu,", *i);
     }
+    fprintf(f,"\n]");
 
-    return map;
+    fclose(f);
+    return LinceTrue;
 }
-
-void LinceUninitTilemap(LinceTilemap* map){
-    if(!map) return;
-    array_uninit(&map->tiles);
-    array_uninit(&map->transforms);
-}
-
-
-// TODO: don't draw tiles off screen!
-void LinceDrawTilemap(LinceTilemap* map, LinceShader* shader){
-    if(!map) return;
-    for(uint32_t i = 0; i != map->width*map->height; ++i){
-        LinceTransform* tr = array_get(&map->transforms, i);
-        uint32_t idx = *(uint32_t*)array_get(&map->indices, i);
-        LinceRect* uv = array_get(&map->tiles, idx);
-        LinceDrawSpriteTile(&map->sprite, tr, uv, shader);
-    }
-}
-*/
-
