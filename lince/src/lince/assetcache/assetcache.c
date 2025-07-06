@@ -107,7 +107,7 @@ LinceBool LinceAssetCachePushFolder(LinceAssetCache* cache, string_t path){
 * @param filename Location of the asset file within an asset folder
 * @returns the full path of the asset; which needs to be freed with `string_free`.
 */
-string_t LinceAssetCacheFetchPath(LinceAssetCache* cache, string_t filename){
+string_t LinceAssetCacheFindPath(LinceAssetCache* cache, string_t filename){
 
     array_t* folders = &cache->folders;
 
@@ -182,7 +182,7 @@ LinceBool LinceAssetCacheRegister(LinceAssetCache* cache, LinceSID sid, LinceSID
         return LinceFalse;
     }
 
-    string_t full_path = LinceAssetCacheFetchPath(cache, path);
+    string_t full_path = LinceAssetCacheFindPath(cache, path);
 
     LinceAsset* asset_data = LinceCalloc(sizeof(LinceAsset));
     hashmap_setb(&cache->assets, &sid, sizeof(LinceSID), asset_data);
@@ -393,4 +393,21 @@ void* LinceAssetCacheGetDefault(LinceAssetCache* cache, LinceSID type){
 
     LinceAsset* default_asset = hashmap_getb(&cache->assets, &loader->default_asset, sizeof(LinceSID));
     return default_asset->handle;
+}
+
+/** @brief Get the full path of a loaded asset.
+ * If the asset does not exist, calling string_ok() on the result will return LinceFalse.
+ * @param cache Asset cache
+ * @param sid String ID of the asset
+ * @returns Full path of the asset
+ */
+string_t LinceAssetCacheGetPath(LinceAssetCache* cache, LinceSID sid){
+    if(!cache) return (string_t){0};
+
+    LinceAsset* asset = hashmap_getb(&cache->assets, &sid, sizeof(LinceSID));
+    if(!asset){
+        LINCE_ERROR("Could not get path to asset because it does not exist");
+        return (string_t){0};
+    }
+    return asset->path;
 }

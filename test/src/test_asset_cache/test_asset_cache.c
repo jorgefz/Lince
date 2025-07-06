@@ -111,7 +111,7 @@ void test_asset_cache_fetch_path_real(void** state){
     int success = LinceAssetCachePushFolder(cache, path);
     assert_int_equal(success, 1);
 
-    string_t result = LinceAssetCacheFetchPath(cache, name);
+    string_t result = LinceAssetCacheFindPath(cache, name);
     assert_non_null(result.str);
     assert_true(LinceIsFile(result));
 
@@ -139,7 +139,7 @@ void test_asset_cache_fetch_path_fake(void** state){
     assert_int_equal(success, 1);
 
     const char asset[] = "FAKE";
-    string_t result = LinceAssetCacheFetchPath(cache, string_scoped_lit(asset));
+    string_t result = LinceAssetCacheFindPath(cache, string_scoped_lit(asset));
     assert_null(result.str);
 
     LinceDeleteAssetCache(cache);
@@ -159,7 +159,7 @@ void test_asset_cache_asset_shadowing(void** state){
     assert_int_equal(success, 1);
 
     const char asset[] = "fonts/DroidSans.ttf";
-    string_t result = LinceAssetCacheFetchPath(cache, string_scoped_lit(asset));
+    string_t result = LinceAssetCacheFindPath(cache, string_scoped_lit(asset));
     assert_non_null(result.str);
     assert_true(LinceIsFile(result));
 

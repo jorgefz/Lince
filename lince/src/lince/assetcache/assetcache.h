@@ -72,7 +72,7 @@ LinceBool LinceAssetCachePushFolder(LinceAssetCache* cache, string_t path);
 * @returns the full path of the asset; which needs to be freed with `string_free`,
 *          or, on failure, an invalid string for which `string_ok` returns LinceFalse.
 */
-string_t LinceAssetCacheFetchPath(LinceAssetCache* cache, string_t filename);
+string_t LinceAssetCacheFindPath(LinceAssetCache* cache, string_t filename);
 
 /** @brief Registers a new type of asset on the asset cache.
  * An asset type defines an interface to load and unload assets of the same kind.
@@ -156,6 +156,14 @@ LinceBool LinceAssetCacheSetDefault(LinceAssetCache* cache, LinceSID type, Lince
  * @returns Handle of default asset if successful, NULL otherwise.
  */
 void* LinceAssetCacheGetDefault(LinceAssetCache* cache, LinceSID type);
+
+/** @brief Get the full path of a loaded asset.
+ * If the asset does not exist, calling string_ok() on the result will return LinceFalse.
+ * @param cache Asset cache
+ * @param sid String ID of the asset
+ * @returns Full path of the asset
+ */
+string_t LinceAssetCacheGetPath(LinceAssetCache* cache, LinceSID sid);
 
 // void* LinceAssetCacheLoadAsync(LinceAssetCache* cache, LinceSID sid);
 
