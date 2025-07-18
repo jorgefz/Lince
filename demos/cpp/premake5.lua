@@ -24,7 +24,9 @@ project "cpp_demo"
         "%{wks.location}/%{LinceIncludeDir.cglm}",
         "%{wks.location}/%{LinceIncludeDir.nuklear}",
         "%{wks.location}/%{LinceIncludeDir.stb}",
-        "%{wks.location}/%{LinceIncludeDir.miniaudio}"
+        "%{wks.location}/%{LinceIncludeDir.miniaudio}",
+        "%{wks.location}/%{LinceIncludeDir.dast}",
+        "%{wks.location}/%{LinceIncludeDir.toml}",
     }
 
     links {
@@ -34,7 +36,9 @@ project "cpp_demo"
         "cglm",
         "stb",
         "nuklear",
-        "miniaudio"
+        "miniaudio",
+        "dast",
+        "toml"
     }
 
     libdirs {"%{wks.location}/bin/" .. LinceOutputDir .. "/lince"}

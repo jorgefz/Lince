@@ -21,7 +21,9 @@ project "mandelbrot_demo"
         "%{wks.location}/%{LinceIncludeDir.cglm}",
         "%{wks.location}/%{LinceIncludeDir.nuklear}",
         "%{wks.location}/%{LinceIncludeDir.stb}",
-        "%{wks.location}/%{LinceIncludeDir.miniaudio}"
+        "%{wks.location}/%{LinceIncludeDir.miniaudio}",
+        "%{wks.location}/%{LinceIncludeDir.dast}",
+        "%{wks.location}/%{LinceIncludeDir.toml}"
     }
 
     links {
@@ -31,7 +33,9 @@ project "mandelbrot_demo"
         "cglm",
         "stb",
         "nuklear",
-        "miniaudio"
+        "miniaudio",
+        "dast",
+        "toml"
     }
 
     libdirs {"%{wks.location}/bin/" .. LinceOutputDir .. "/lince"}
