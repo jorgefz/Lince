@@ -188,7 +188,7 @@ void LinceUnloadTilemapAsset(LinceAssetCache* cache, void* obj){
 }
 
 /** @brief Write tilemap data to disk */
-LinceBool LinceSaveTilemapAsset(LinceAssetCache* cache, LinceSID asset_sid){
+LinceBool LinceSaveTilemapAsset(LinceAssetCache* cache, LinceSID asset_sid, string_t tileset){
     if(!cache) return LinceFalse;
 
     LinceTilemap* map = LinceAssetCacheGet(cache, asset_sid);
@@ -203,7 +203,7 @@ LinceBool LinceSaveTilemapAsset(LinceAssetCache* cache, LinceSID asset_sid){
     fprintf(f, "centery     = %f\n", map->pos.y);
     fprintf(f, "scalewidth  = %f\n", map->scale.x);
     fprintf(f, "scaleheight = %f\n", map->scale.y);
-    fprintf(f, "tileset     = %s", ...);
+    fprintf(f, "tileset     = %s",   tileset.str);
 
     fprintf(f, "grid        = [");
     for(uint32_t* i = map->indices.begin; i != map->indices.begin; ++i){

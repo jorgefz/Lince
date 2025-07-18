@@ -70,8 +70,13 @@ void* LinceLoadTilemapAsset(LinceAssetCache* cache, string_t path, void* args);
 /** @brief Unload tilemap loaded with `LinceLoadTilemapAsset` */
 void LinceUnloadTilemapAsset(LinceAssetCache* cache, void* obj);
 
-/** @brief Write tilemap data to disk */
-LinceBool LinceSaveTilemapAsset(LinceAssetCache* cache, LinceSID asset_sid);
+/** @brief Write tilemap data to disk.
+ * @param cache Asset cache
+ * @param asset_sid SID of tilemap asset to write to disk.
+ * @param tileset Path to tileset.
+ * @returns LinceTrue if successful, and LinceFalse otherwise.
+*/
+LinceBool LinceSaveTilemapAsset(LinceAssetCache* cache, LinceSID asset_sid, string_t tileset);
 
 /* ----------------------------------- */
 
