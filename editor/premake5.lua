@@ -9,10 +9,11 @@ project "editor"
     objdir ("%{wks.location}/obj/" .. LinceOutputDir .. "/%{prj.name}")
 
     files {
-        "src/**.c",
-        "src/**.h",
+        "src/*.c",
+        "src/*.h",
+        "src/platform/platform.h"
     }
-    
+
     includedirs {
 		"src",
         "%{wks.location}/%{LinceIncludeDir.lince}",
@@ -21,7 +22,9 @@ project "editor"
         "%{wks.location}/%{LinceIncludeDir.cglm}",
         "%{wks.location}/%{LinceIncludeDir.nuklear}",
         "%{wks.location}/%{LinceIncludeDir.stb}",
-        "%{wks.location}/%{LinceIncludeDir.miniaudio}"
+        "%{wks.location}/%{LinceIncludeDir.miniaudio}",
+        "%{wks.location}/%{LinceIncludeDir.dast}",
+        "%{wks.location}/%{LinceIncludeDir.toml}"
     }
 
     links {
@@ -31,7 +34,9 @@ project "editor"
         "cglm",
         "stb",
         "nuklear",
-        "miniaudio"
+        "miniaudio",
+        "dast",
+        "toml"
     }
 
     libdirs {"%{wks.location}/bin/" .. LinceOutputDir .. "/lince"}
@@ -41,11 +46,13 @@ project "editor"
         defines {"_CRT_SECURE_NO_WARNINGS", "LINCE_WINDOWS"}
         buildoptions {"/Zc:preprocessor"}
         links {"opengl32"}
+        files { "src/platform/windows/*.c" }
 
     filter "system:linux"
         systemversion "latest"    
         links {"GL","rt","m","dl","pthread","X11","uuid"}
         defines {"LINCE_LINUX"}
+        files { "src/platform/linux/*.c" }
         
     filter "configurations:Debug"
         symbols "on"
