@@ -1,6 +1,7 @@
 #include "platform/platform.h"
 
 #include <stdlib.h>
+#include <lince.h>
 #include <windows.h>
 #include <ShObjIdl_core.h>
 
@@ -10,24 +11,24 @@
  * The length of the path in wide-chars is written to the input `fpath_len`.
  * If it returns NULL, no file was chosen.
  */
-wchar_t* LinceEditorOpenLoadFileDialog(size_t *fpath_len){
+string_t LinceEditorOpenLoadFileDialog(){
     HRESULT hr = CoInitializeEx(NULL, COINIT_APARTMENTTHREADED | COINIT_DISABLE_OLE1DDE);
     if(!SUCCEEDED(hr)){
-        return NULL;
+        return (string_t){0};
     }
 
     IFileOpenDialog *pfd;
     hr = CoCreateInstance(&CLSID_FileOpenDialog, NULL, CLSCTX_ALL, &IID_IFileOpenDialog, (LPVOID*)(&pfd));
     if(!SUCCEEDED(hr)){
         CoUninitialize();
-        return NULL;
+        return (string_t){0};
     }
 
     hr = pfd->lpVtbl->Show(pfd, NULL);
     if(!SUCCEEDED(hr)){
         pfd->lpVtbl->Release(pfd);
         CoUninitialize();
-        return NULL;
+        return (string_t){0};
     }
 
     IShellItem *pitem;
@@ -35,10 +36,8 @@ wchar_t* LinceEditorOpenLoadFileDialog(size_t *fpath_len){
     if(!SUCCEEDED(hr)){
         pfd->lpVtbl->Release(pfd);
         CoUninitialize();
-        return NULL;
+        return (string_t){0};
     }
-
-    wchar_t* result = NULL;
 
     PWSTR psz_fpath;
     hr = pitem->lpVtbl->GetDisplayName(pitem, SIGDN_FILESYSPATH, &psz_fpath);
@@ -46,20 +45,18 @@ wchar_t* LinceEditorOpenLoadFileDialog(size_t *fpath_len){
         pitem->lpVtbl->Release(pitem);
         pfd->lpVtbl->Release(pfd);
         CoUninitialize();
-        return NULL;
+        return (string_t){0};
     }
     
     // Copy filepath to output wchar buffer
-    size_t len   = wcslen(psz_fpath);
-    size_t sz    = sizeof(wchar_t) * len;
-    size_t bufsz = sz + sizeof(wchar_t);
-    result = malloc(bufsz);
-    memcpy(result, psz_fpath, sz);
-    result[sz] = L'\0';
+    // size_t len   = wcslen(psz_fpath);
+    // size_t sz    = sizeof(wchar_t) * len;
+    // size_t bufsz = sz + sizeof(wchar_t);
+    // result = malloc(bufsz);
+    // memcpy(result, psz_fpath, sz);
+    // result[sz] = L'\0';
 
-    if (fpath_len) *fpath_len = bufsz;
-
-    // MessageBoxW(NULL, psz_fpath, L"File Path", MB_OK);
+    string_t result = string_from_fmt("%S", psz_fpath);
     CoTaskMemFree(psz_fpath);
 
     pitem->lpVtbl->Release(pitem);
@@ -68,22 +65,19 @@ wchar_t* LinceEditorOpenLoadFileDialog(size_t *fpath_len){
     return result;
 }
 
-wchar_t* LinceEditorOpenSaveFileDialog(void){
-    return NULL;
+string_t LinceEditorOpenSaveFileDialog(void){
+    return (string_t){0};
+}
+
+void LinceEditorShowMessageBox(char* title, char* content){
+    MessageBoxA(NULL, content, title, MB_OK);
 }
 
 int LinceEditorShowMessageBoxYesNo(char* title, char* content){
-    int retval = MessageBox(NULL, content, title, MB_YESNO);
+    int retval = MessageBoxA(NULL, content, title, MB_YESNO);
     if (retval == IDYES){
         return 1;
     }
     return 0;
 }
 
-int LinceEditorShowMessageBoxWYesNo(wchar_t* title, wchar_t* content){
-    int retval = MessageBoxW(NULL, content, title, MB_YESNO);
-    if (retval == IDYES){
-        return 1;
-    }
-    return 0;
-}

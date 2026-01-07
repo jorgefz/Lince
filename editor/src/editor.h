@@ -2,6 +2,7 @@
 #define EDITOR_H
 
 #include <lince.h>
+#include <nuklear.h>
 
 void EditorInit();
 void EditorOnUpdate(float dt);

@@ -10,13 +10,15 @@ void SetupApplication(){
     // app->user_data = NULL;
     app->screen_width = 1280;
     app->screen_height = 720;
-    app->title = "Sandbox";
+    LinceAppSetTitle("Sandbox", sizeof("Sandbox"));
     // app->flags = LINCE_FULLSCREEN | LINCE_VSYNC | LINCE_RESIZEABLE | ...
 
     app->on_init = EditorInit;
     app->on_update = EditorOnUpdate;
     app->on_event = EditorOnEvent;
     app->on_terminate = EditorTerminate;
+
+    app->show_debug_panel = LinceTrue;
 }
 
 

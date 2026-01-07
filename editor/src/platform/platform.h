@@ -1,14 +1,14 @@
 #ifndef LINCE_EDITOR_PLATFORM_H
 #define LINCE_EDITOR_PLATFORM_H
 
-#include <stdio.h>
+#include <lince.h>
 
-wchar_t* LinceEditorOpenLoadFileDialog(size_t *fpath_len);
+string_t LinceEditorOpenLoadFileDialog(void);
 
-wchar_t* LinceEditorOpenSaveFileDialog(void);
+string_t LinceEditorOpenSaveFileDialog(void);
+
+void LinceEditorShowMessageBox(char* title, char* content);
 
 int LinceEditorShowMessageBoxYesNo(char* title, char* content);
-
-int LinceEditorShowMessageBoxWYesNo(wchar_t* title, wchar_t* content);
 
 #endif /* LINCE_EDITOR_PLATFORM_H */
