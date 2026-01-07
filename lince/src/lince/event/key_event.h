@@ -13,6 +13,7 @@
 */
 typedef struct LinceKeyPressEvent {
     int keycode; ///< Code of pressed key. See `LinceKey`.
+    int mods;    ///< Key mods pressed, e.g. Control. See LinceKeyMod.
     int repeats; ///< (unused)
 } LinceKeyPressEvent;
 
@@ -22,7 +23,8 @@ typedef struct LinceKeyPressEvent {
 * The specific event data is retrieved via `LinceEvent.data.key_release`.
 */
 typedef struct LinceKeyReleaseEvent {
-    int keycode; ///< Code of released key. See `LinceKey`. 
+    int keycode; ///< Code of released key. See `LinceKey`.
+    int mods;    ///< Key mods pressed, e.g. Control. See LinceKeyMod.
 } LinceKeyReleaseEvent;
 
 /** @struct LinceKeyTypeEvent
@@ -33,16 +35,16 @@ typedef struct LinceKeyReleaseEvent {
 * The specific event data is retrieved via `LinceEvent.data.key_type`.
 */
 typedef struct LinceKeyTypeEvent {
-    int keycode; ///< Code of typed key. See `LinceKey`.
+    uint32_t keycode; ///< Codepoint of typed key. See `LinceKey`. This is encoded as Unicode UTF-32.
 } LinceKeyTypeEvent;
 
 /** @brief Initialise a key press event */
-LinceEvent LinceNewKeyPressEvent(int key, int repeats);
+LinceEvent LinceNewKeyPressEvent(int key, int repeats, int mods);
 
 /** @brief Initialise a key release event */
-LinceEvent LinceNewKeyReleaseEvent(int key);
+LinceEvent LinceNewKeyReleaseEvent(int key, int mods);
 
 /** @brief Initialise a key type event */
-LinceEvent LinceNewKeyTypeEvent(int key);
+LinceEvent LinceNewKeyTypeEvent(uint32_t key);
 
 #endif // LINCE_KEY_EVENT_H

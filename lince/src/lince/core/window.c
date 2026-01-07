@@ -181,13 +181,13 @@ static void KeyCallback(GLFWwindow* wptr, int key, int scancode, int action, int
     LinceEvent e;
     switch (action) {
         case GLFW_PRESS:
-            e = LinceNewKeyPressEvent(key, 0);
+            e = LinceNewKeyPressEvent(key, 0, mods);
             break;
         case GLFW_RELEASE:
-            e = LinceNewKeyReleaseEvent(key);
+            e = LinceNewKeyReleaseEvent(key, mods);
             break;
         case GLFW_REPEAT:
-            e = LinceNewKeyPressEvent(key, 1);
+            e = LinceNewKeyPressEvent(key, 1, mods);
             break;
         default:
             LINCE_ASSERT(0, "Invalid KeyCallback action\n");
@@ -196,12 +196,12 @@ static void KeyCallback(GLFWwindow* wptr, int key, int scancode, int action, int
     if (w->event_callback) w->event_callback(&e);
     LinceEndEvent(&e);
     LINCE_UNUSED(scancode);
-    LINCE_UNUSED(mods);
 }
 
-static void CharCallback(GLFWwindow* wptr, uint32_t key_typed){
+static void CharCallback(GLFWwindow* wptr, uint32_t codepoint){
+    // Received codepoints are Unicode UTF-32, which may be encoded to UTF-8.
     LinceWindow* w = (LinceWindow*)glfwGetWindowUserPointer(wptr);
-    LinceEvent e = LinceNewKeyTypeEvent(key_typed);
+    LinceEvent e = LinceNewKeyTypeEvent(codepoint);
     if (w->event_callback) w->event_callback(&e);
     LinceEndEvent(&e);
 }

@@ -1,6 +1,19 @@
 #ifndef LINCE_KEYCODES_H
 #define LINCE_KEYCODES_H
 
+/** @enum LinceKeyMod
+ * @brief Bits that indicate whether keys where pressed alongside mod keys, e.g. Control, Shift, Alt, etc.
+*/
+typedef enum LinceKeyMod {
+    LinceKeyMod_Shift       = 0x0001,
+    LinceKeyMod_Control     = 0x0002,
+    LinceKeyMod_Alt         = 0x0004,
+    LinceKeyMod_Super       = 0x0008,
+    LinceKeyMod_CapsLock    = 0x0010,
+    LinceKeyMod_NumLock     = 0x0020,
+} LinceKeyMod;
+
+
 /** @enum LinceKey
 * @brief Codes for keyboard keys, identical to GLFW values.
 */
