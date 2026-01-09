@@ -7,4 +7,6 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <direct.h>
+#include "rpc.h"
+#include <rpcdce.h>
 #include "windows.h"

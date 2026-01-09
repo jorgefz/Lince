@@ -1,36 +1,6 @@
 #include "lince/utils/uuid.h"
 #include "lince/core/logger.h"
 
-#ifdef LINCE_WINDOWS
-    #include "rpc.h"
-    #include <rpcdce.h>
-#elif defined(LINCE_LINUX)
-    #include <uuid/uuid.h>
-#endif
-
-
-LinceUUID LinceNewUUID(){
-    LinceUUID uuid;
-
-#ifdef LINCE_WINDOWS
-    UUID win_uuid;
-    RPC_STATUS err =  UuidCreate(&win_uuid);
-    LINCE_ASSERT(
-        err == RPC_S_OK || err == RPC_S_UUID_LOCAL_ONLY,
-        "Failed to generate UUID"
-    );
-    memmove(&uuid, &win_uuid, sizeof(LinceUUID));
-
-#elif defined(LINCE_LINUX)
-    uuid_t unix_uuid;
-    uuid_generate(unix_uuid);
-    memmove(&uuid, unix_uuid, sizeof(LinceUUID));
-
-#endif
-
-    return uuid;
-}
-
 
 LinceBool LinceUUIDEquals(LinceUUID uu1, LinceUUID uu2){
     return (uu1.lo==uu2.lo && uu1.hi==uu2.hi);
