@@ -33,4 +33,9 @@ LinceBool LinceUUIDEquals(LinceUUID uu1, LinceUUID uu2);
 */
 void LinceUUIDToStr(LinceUUID uuid, char* buf, uint64_t size);
 
+/** @brief Convert string representation of UUID into numeric UUID.
+* @param str UUID represented as string, must be canonical representation (36 chars with hypens).
+*/
+LinceUUID LinceUUIDFromStr(string_t str);
+
 #endif /* LINCE_UUID_H */

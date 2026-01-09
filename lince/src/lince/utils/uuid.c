@@ -20,3 +20,26 @@ void LinceUUIDToStr(LinceUUID uuid, char* buf, uint64_t size){
     );
     LINCE_ASSERT(ret == LINCE_UUID_STR_SIZE-1, "Failed to format UUID as a string");
 }
+
+
+LinceUUID LinceUUIDFromStr(string_t str){
+    LINCE_ASSERT(str.str && str.len == 36, "Invalid string UUID - must be 36 chars in length");
+    LinceUUID uuid;
+    uint8_t* b = (uint8_t*)&uuid;
+
+    char buf[3] = {0}; // Holds each hex value plus terminator char
+    char *p = str.str;
+
+    while(p != '\0'){
+        if(*p == '-'){
+            p++;
+            continue;
+        }
+        buf[0] = p[0];
+        buf[1] = p[1];
+        *b = (uint8_t)strtol(buf, NULL, 16);
+        p += 2;
+        b++;
+    }
+    return uuid;
+}
