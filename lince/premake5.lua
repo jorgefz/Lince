@@ -14,6 +14,10 @@ project "lince"
         "src/**.c",
         "src/**.h",
     }
+
+    removefiles {
+        "src/%{prj.name}/platform/**"
+    }
     
     includedirs {
         ".",
@@ -56,11 +60,19 @@ project "lince"
         defines {"_CRT_SECURE_NO_WARNINGS", "LINCE_WINDOWS"}
         buildoptions {"/Zc:preprocessor"}
         links {"opengl32","rpcrt4"}
+        files {
+            "src/%{prj.name}/platform/windows/**.c",
+            "src/%{prj.name}/platform/windows/**.h"
+        }
 
     filter "system:linux"
         systemversion "latest"    
         links {"GL","rt","m","dl","pthread","X11","uuid"}
         defines {"LINCE_LINUX"}
+        files {
+            "src/%{prj.name}/platform/linux/**.c",
+            "src/%{prj.name}/platform/linux/**.h"
+        }
         
     filter "configurations:Debug"
         symbols "on"
