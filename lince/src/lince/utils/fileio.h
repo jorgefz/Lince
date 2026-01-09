@@ -26,6 +26,13 @@ LinceBool LinceIsFile(string_t path);
  */
 LinceBool LinceIsDir(string_t path);
 
+/** @brief Creates a directory
+ * @param path Directory path
+ * @returns LinceTrue if the directory was successfuly created,
+ *  and LinceFalse if it already existed or it could not be created for another reason.
+ */
+LinceBool LinceMakeDir(string_t path);
+
 /** @brief Loads a file's contents into memory.
  * On fail, the returning string will have the field `str` set to NULL and its size set to zero.
  * @note Returned string must be freed with `string_free`.
