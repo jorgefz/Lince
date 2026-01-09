@@ -37,11 +37,18 @@ typedef struct LinceApp{
     LinceGameTerminateFn on_terminate; ///< User-defined callback called when the app closes.
 
     /* User settings */
+    string_t config_path;        ///< Path to configuration TOML file.
+    string_t root_path;          ///< Root path of the project.
+    string_t assets_path;        ///< Path to assets folder, relative to root.
+    string_t engine_path;        ///< Path to engine folder (lince), relative to root.
+    string_t logfile_path;       ///< Path to log file, relative to root.
+
     string_t title;              ///< String displayed at the top of the window.
-    void* user_data;             ///< Pointer that may be freely re-assiged by the user.      
+    LinceBool fullscreen;        ///< Whether window is in fullscreen mode or not.
     uint32_t screen_width;       ///< Width in pixels of the window.
     uint32_t screen_height;      ///< Height in pixels of the window.
     LinceBool show_debug_panel;  ///< Shows UI panel with debug info
+    void* user_data;             ///< Pointer that may be freely re-assiged by the user.      
 
     /* Internal state */
     LinceWindow     *window;        ///< Window state.
@@ -73,12 +80,8 @@ void LinceRun();
 */
 LinceApp* LinceGetApp(void);
 
-/** @brief Set the window title. Only works before the window is initialised.
- * @note If the length of the title exceeeds LINCE_TITLE_MAX, it will be truncated to that value.
- * @param title Title string
- * @param len Number of characters in the title
-*/
-void LinceAppSetTitle(const char* title, size_t len);
+/** @brief Set the location of the configuration TOML file */
+void LinceAppSetConfigFile(string_t path);
 
 /** @brief Retrieve the asset cache of the application */
 LinceAssetCache* LinceAppGetAssetCache();

@@ -67,6 +67,9 @@ static void LinceAppDrawDebugUIPanel(LinceLayer* overlay, float dt);
 static LinceBool LinceAppEventWindowResize(LinceEvent* e);
 static LinceBool LinceAppEventWindowClose(LinceEvent* e);
 
+/** Config file loading */
+static LinceBool LinceAppLoadConfigFile();
+
 
 /* ==== Public function definitions ==== */
 
@@ -89,23 +92,10 @@ LinceApp* LinceGetApp(){
     return &app;
 }
 
-/** @brief Set the window title. Only works before the window is initialised.
-*/
-void LinceAppSetTitle(const char* title, size_t len) {
-    
-    if (len > LINCE_TITLE_MAX){
-        LINCE_WARN("Truncated title to %d characters", LINCE_TITLE_MAX);
-        len = LINCE_TITLE_MAX; // Truncate title
-    }
-
-    if(app.title.str){
-        LINCE_WARN("Can't change window title, already set to '%s'", app.title.str);
-        return;
-    }
-
-    // app.title = string_from_chars(title, len);
-    app.title = string_scoped(title, len);
+void LinceAppSetConfigFile(string_t path){
+    app.config_path = path;
 }
+
 
 /** @brief Retrieve the asset cache of the application */
 LinceAssetCache* LinceAppGetAssetCache(){
@@ -114,7 +104,7 @@ LinceAssetCache* LinceAppGetAssetCache(){
 
 /** @brief Save the location of an assets folder relative to the executable */
 void LinceAppPushAssetFolder(string_t dir){
-    LinceAssetCachePushFolder(&app.asset_cache, dir);
+    LinceAssetCachePushPath(&app.asset_cache, dir);
 }
 
 /** @brief Retrieve (or load) an asset from the cache */
@@ -263,13 +253,101 @@ static void  LinceSTBIImageFree(void* block)                 {        LinceMemor
 
 /* ==== Public function definitions ==== */
 
+static void LinceAppLoadDefaultConfig(){
+    if (string_ok(app.config_path)){
+        // Could be provided by user via LinceAppSetConfigFile
+        // but this is not stored in allocated memory
+        app.config_path = string_from_chars(app.config_path.str, app.config_path.len);
+    } else {
+        app.config_path  = string_from_literal("project.toml");
+    }
+    app.root_path    = string_from_literal("./");
+    app.assets_path  = string_from_literal("assets/");
+    app.engine_path  = string_from_literal("lince/");
+    app.logfile_path = string_from_literal("log.txt");
+
+    app.title = string_from_literal("Lince App");
+    app.fullscreen = LinceFalse;
+    app.screen_width = 1280;
+    app.screen_height = 720;
+
+}
+
+
+static LinceBool LinceAppLoadConfigFile(){
+    LinceAppLoadDefaultConfig();
+
+    string_t content = LinceReadFile(app.config_path);
+    if(!string_ok(content)) return LinceFalse;
+
+    char errbuf[100];
+    toml_table_t* config = toml_parse(content.str, errbuf, sizeof(errbuf));
+    string_free(&content);
+    if(!config){
+        return LinceFalse;
+    }
+    
+    toml_datum_t root_path   = toml_string_in(config, "root");
+    if(root_path.ok){
+        string_free(&app.root_path);
+        app.root_path = string_from_chars(root_path.u.s, strlen(root_path.u.s));
+    }
+
+    toml_datum_t assets_path = toml_string_in(config, "assets");
+    if(assets_path.ok){
+        string_free(&app.assets_path);
+        app.assets_path = string_from_fmt("%s%s", app.root_path.str, assets_path.u.s);
+    }
+
+    toml_datum_t engine_path = toml_string_in(config, "engine");
+    if(engine_path.ok){
+        string_free(&app.engine_path);
+        app.engine_path = string_from_fmt("%s%s", app.root_path.str, engine_path.u.s);
+    }
+
+    toml_datum_t logfile_path = toml_string_in(config, "logfile");
+    if(logfile_path.ok){
+        string_free(&app.logfile_path);
+        app.logfile_path = string_from_fmt("%s%s", app.root_path.str, logfile_path.u.s);
+    }
+
+    // Window configuration
+    toml_table_t* window = toml_table_in(config, "window");
+    if(window){
+        toml_datum_t title = toml_string_in(window, "title");
+        if(title.ok) {
+            string_free(&app.title);
+            app.title = string_from_chars(title.u.s, strlen(title.u.s));
+        }
+        
+        toml_datum_t fullscreen = toml_bool_in(window, "fullscreen");
+        if(fullscreen.ok) app.fullscreen = (LinceBool)fullscreen.u.b;
+
+        toml_datum_t width = toml_int_in(window, "width");
+        if(width.ok) app.screen_width = (uint32_t)width.u.i;
+
+        toml_datum_t height = toml_int_in(window, "height");
+        if(height.ok) app.screen_height = (uint32_t)height.u.i;
+        
+    }
+
+    toml_free(config);
+    return LinceTrue;
+}
 
 static void LinceInit(){
+
+    // Setup memory management
+    LinceAllocatorInit();
+
+    // Load configuration file
+    LinceBool config_loaded = LinceAppLoadConfigFile();
+
     // Open log file
     #ifdef LINCE_DEBUG
         LinceLoggerDefaultToStderr(1);
     #else
-        LinceOpenLogger(LINCE_DIR"log.txt");
+        LinceOpenLogger(app.logfile_path.str);
     #endif
 
     // Report platform and configuration
@@ -290,22 +368,32 @@ static void LinceInit(){
     // Open profiling file
 #ifdef LINCE_PROFILE
     LINCE_INFO("PROFILING ENABLED");
-    LINCE_INFO("Saving profiling data to '%s'", LINCE_DIR"profiler.txt");
-    LinceOpenProfiler(LINCE_DIR"profiler.txt");
+    string_t profiler_path = string_from_fmt("%s%s", app.root_path.str, "profiler.txt");
+    LINCE_INFO("Saving profiling data to '%s'", profiler_path.str);
+    LinceOpenProfiler(profiler_path.str);
+    string_free(&profiler_path);
 #endif
 
-    LINCE_INFO("Output path for logs: '%s'", LINCE_DIR);
-    LINCE_INFO("Path to Lince's assets folder: '%s'", LINCE_ASSETS_PATH);
-
-    // Setup memory management
-    LinceAllocatorInit();
+    if (config_loaded){
+        LINCE_INFO("Loaded project config from '%s'", app.config_path.str);
+    } else {
+        LINCE_INFO("Could not load config file '%s'. Using defaults.", app.config_path.str);
+    }
+    LINCE_INFO("Project root path: '%s'", app.root_path.str);
+    LINCE_INFO("Project assets path: '%s'", app.assets_path.str);
+    LINCE_INFO("Project engine path: '%s'", app.engine_path.str);
+    LINCE_INFO("Log file location: '%s'", app.logfile_path.str);
 
     // Setup String ID cache
     LinceInitSIDCache();
 
     // Create asset cache
     LinceInitAssetCache(&app.asset_cache);
-    LinceAssetCachePushFolder(&app.asset_cache, string_scoped_lit(LINCE_ASSETS_PATH));
+
+    // Push app assets after engine assets, so that app assets are looked up first.
+    // that way we can overwrite engine assets in our app (if they are named the same).
+    LinceAssetCachePushPath(&app.asset_cache, app.engine_path);
+    LinceAssetCachePushPath(&app.asset_cache, app.assets_path);
     
     // Register asset types
     LinceAssetCacheAddType(&app.asset_cache, LinceSIDFromLit("image"), LinceLoadImageAsset, LinceUnloadImageAsset);
@@ -328,13 +416,8 @@ static void LinceInit(){
     void* success = hashmap_init_custom(&app.scene_cache, 5, LINCE_DAST_HASHMAP_ALLOCATOR, NULL, NULL);
     LINCE_ASSERT(success, "Failed to create scene cache");
 
-    // Check user settings and set defaults
-    if (app.screen_width == 0) app.screen_width = 500;
-    if (app.screen_height == 0) app.screen_height = 500;
-    if (app.title.str) app.title = string_from_chars(app.title.str, app.title.len);
-    else app.title = string_from_literal("Lince App");
-
     // Create a windowed mode window and its OpenGL context
+    printf("%u %u\n", app.screen_width, app.screen_height);
     app.window = LinceCreateWindow(app.screen_width, app.screen_height, app.title.str);
     LinceSetMainEventCallback(app.window, LinceAppOnEvent);
     // LinceInputSetWindow(app.window);
