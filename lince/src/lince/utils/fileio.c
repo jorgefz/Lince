@@ -73,7 +73,7 @@ LinceBool LinceIsFile(string_t path){
 #elif defined(LINCE_LINUX)
 
 	struct stat path_stat;
-    stat(path, &path_stat);
+    stat(path.str, &path_stat);
     is_file = S_ISREG(path_stat.st_mode);
 
 #endif
@@ -108,7 +108,7 @@ LinceBool LinceIsDir(string_t path){
 
 	struct stat path_stat;
 	
-    if(stat(path, &path_stat) != 0){
+    if(stat(path.str, &path_stat) != 0){
 		is_dir = LinceFalse;
 	} else {
 		is_dir = (path_stat.st_mode & S_IFDIR) != 0;
