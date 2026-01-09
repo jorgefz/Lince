@@ -38,7 +38,14 @@
  * | LINCE_TEXT_MAX       | Maximum size for longer strings      |
  * | LINCE_PATH_MAX       | Maximum size for a path or directory |
  * + -------------------- + ------------------------------------ +
- * 
+ *
+ * ## Utility macros ##
+ * + -------------------- + ----------------------------------------- +
+ * | Name                 | Description                               |
+ * + -------------------- + ----------------------------------------- +
+ * | LINCE_MAX (X,Y)      | Returns the maximum of two values X and Y |
+ * | LINCE_MAX (X,Y)      | Returns the minimum of two values X and Y |
+ * + -------------------- + ----------------------------------------- +
  */
 
 
@@ -150,5 +157,10 @@
 * Custom boolean type */
 typedef enum LinceBool{ LinceFalse = 0, LinceTrue = 1 } LinceBool;
 
+/** @brief Resolves to the maximum of two given values X and Y */
+#define LINCE_MAX(X,Y) ( ((X)>(Y)) ? (X) : (Y))
+
+/** @brief Resolves to the minimum of two given values X and Y */
+#define LINCE_MIN(X,Y) ( ((X)>(Y)) ? (Y) : (X))
 
 #endif /* LINCE_DEFS_H */
