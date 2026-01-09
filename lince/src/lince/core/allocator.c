@@ -128,13 +128,13 @@ void* LinceMemoryAlloc(size_t size, int line, const char* file, const char* func
     _global_allocator.stats.nblocks++;
     _global_allocator.stats.nbytes += (long)size;
     long nblocks = _global_allocator.stats.nblocks;
-    _global_allocator.stats.max_blocks = max(nblocks, _global_allocator.stats.max_blocks);
-    _global_allocator.stats.max_bytes  = max(_global_allocator.stats.nbytes,  _global_allocator.stats.max_bytes);
+    _global_allocator.stats.max_blocks = LINCE_MAX(nblocks, _global_allocator.stats.max_blocks);
+    _global_allocator.stats.max_bytes  = LINCE_MAX(_global_allocator.stats.nbytes,  _global_allocator.stats.max_bytes);
     LINCE_INFO("Allocated %*ld byte block at 0x%p (in function %s, %ld total blocks)", 7, size, block, func, nblocks);
     
 #elif defined(LINCE_DEBUG) && !defined(LINCE_DEBUG_MEMCHECK)
     _global_allocator.stats.nblocks++;
-    _global_allocator.stats.max_blocks = max(_global_allocator.stats.nblocks, _global_allocator.stats.max_blocks);
+    _global_allocator.stats.max_blocks = LINCE_MAX(_global_allocator.stats.nblocks, _global_allocator.stats.max_blocks);
     block = _global_allocator.alloc(size, _global_allocator.user_data);
 #else
     block = _global_allocator.alloc(size, _global_allocator.user_data);
@@ -173,7 +173,7 @@ void* LinceMemoryRealloc(void* block, size_t size, int line, const char* file, c
     new_header->size = size;
     new_block = new_header + 1;
     _global_allocator.stats.nbytes += (long)(size) - (long)(old_size);
-    _global_allocator.stats.max_bytes  = max(_global_allocator.stats.nbytes,  _global_allocator.stats.max_bytes);
+    _global_allocator.stats.max_bytes  = LINCE_MAX(_global_allocator.stats.nbytes,  _global_allocator.stats.max_bytes);
 
     LINCE_INFO("Reallocated %*ld byte block to 0x%p, from %ld byte block at 0x%p (in function %s)", 5, size, new_block, old_size, block, func);
 
