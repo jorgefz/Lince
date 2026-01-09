@@ -27,11 +27,9 @@ LinceBool LinceUUIDEquals(LinceUUID uu1, LinceUUID uu2);
 
 /** @brief Convert UUID to string representation.
 * @param uuid UUID to convert to string.
-* @param buf Output buffer pointing to valid memory.
-* @param size Size in bytes of the output buffer.
-* NOTE: user must provide a buffer with a size of at least 37 characters.
+* @returns canonical string representation of the UUID - 36 characters including hyphens.
 */
-void LinceUUIDToStr(LinceUUID uuid, char* buf, uint64_t size);
+string_t LinceUUIDToStr(LinceUUID uuid);
 
 /** @brief Convert string representation of UUID into numeric UUID.
 * @param str UUID represented as string, must be canonical representation (36 chars with hypens).
