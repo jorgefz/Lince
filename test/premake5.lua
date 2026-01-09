@@ -12,14 +12,17 @@ project "test"
         "src/**.c",
         "src/**.h",
     }
-    
+
     includedirs {
-        "%{prj.name}",
-        "%{prj.name}/src",
+		"src",
         "%{wks.location}/%{LinceIncludeDir.lince}",
         "%{wks.location}/%{LinceIncludeDir.glfw}",
         "%{wks.location}/%{LinceIncludeDir.glad}",
         "%{wks.location}/%{LinceIncludeDir.cglm}",
+        "%{wks.location}/%{LinceIncludeDir.nuklear}",
+        "%{wks.location}/%{LinceIncludeDir.stb}",
+        "%{wks.location}/%{LinceIncludeDir.miniaudio}",
+        "%{wks.location}/%{LinceIncludeDir.toml}",
         "%{wks.location}/%{LinceIncludeDir.dast}",
     }
 
@@ -28,13 +31,14 @@ project "test"
         "glad",
         "glfw",
         "cglm",
-        "nuklear",
         "stb",
+        "nuklear",
+        "miniaudio",
+        "toml",
         "dast"
     }
-    libdirs {
-        "%{wks.location}/bin/" .. LinceOutputDir .. "/lince"
-    }
+
+    libdirs {"%{wks.location}/bin/" .. LinceOutputDir .. "/lince"}
 
     filter "system:windows"
         systemversion "latest"

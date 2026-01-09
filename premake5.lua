@@ -34,7 +34,7 @@ workspace "lince"
     
     group "test"
         include "test/premake5.lua"
-        include "benchmark/premake5.lua"
+        -- include "benchmark/premake5.lua"
     group ""
 
     group "core"
