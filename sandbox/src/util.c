@@ -2,12 +2,12 @@
 #include "util.h"
 
 
-size_t strlen_or(char* const buf, long max){
+size_t strlen_or(char* const buf, long maxval){
     char* p = &(buf[0]); // Avoid compiler warning on const
-    while(p != '\0'){
+    while(*p != '\0'){
         p++;
-        if( (p - buf) > max){
-            return max;
+        if( (p - buf) > maxval){
+            return maxval;
         }
     }
     return (size_t)(p - buf);
