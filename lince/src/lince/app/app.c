@@ -254,6 +254,24 @@ static void  LinceSTBIImageFree(void* block)                 {        LinceMemor
 /* ==== Public function definitions ==== */
 
 static void LinceAppLoadDefaultConfig(){
+
+    app.root_path    = string_from_literal("./");
+    app.assets_path  = string_from_literal("assets/");
+    app.engine_path  = string_from_literal("lince/");
+    app.logfile_path = string_from_literal("log.txt");
+    app.logging      = LinceFalse;
+
+    // Window config
+    app.wconfig.width      = 1080;
+    app.wconfig.height     = 720;
+    app.wconfig.fullscreen = LinceFalse;
+    app.wconfig.vsync      = LinceTrue;
+    app.wconfig.resizable  = LinceFalse;
+}
+
+
+static LinceBool LinceAppLoadConfigFile(){
+    
     if (string_ok(app.config_path)){
         // Could be provided by user via LinceAppSetConfigFile
         // but this is not stored in allocated memory
@@ -261,22 +279,6 @@ static void LinceAppLoadDefaultConfig(){
     } else {
         app.config_path  = string_from_literal("project.toml");
     }
-    app.root_path    = string_from_literal("./");
-    app.assets_path  = string_from_literal("assets/");
-    app.engine_path  = string_from_literal("lince/");
-    app.logfile_path = string_from_literal("log.txt");
-
-    app.wconfig.title  = string_from_literal("Lince App");
-    app.wconfig.width  = 1280;
-    app.wconfig.height = 720;
-    app.wconfig.fullscreen = LinceFalse;
-    app.wconfig.vsync      = LinceTrue;
-    app.wconfig.resizeable = LinceFalse;
-}
-
-
-static LinceBool LinceAppLoadConfigFile(){
-    LinceAppLoadDefaultConfig();
 
     string_t content = LinceReadFile(app.config_path);
     if(!string_ok(content)) return LinceFalse;
@@ -285,59 +287,44 @@ static LinceBool LinceAppLoadConfigFile(){
     toml_table_t* config = toml_parse(content.str, errbuf, sizeof(errbuf));
     string_free(&content);
     if(!config){
+        LinceAppLoadDefaultConfig();
         return LinceFalse;
     }
     
-    toml_datum_t root_path   = toml_string_in(config, "root");
-    if(root_path.ok){
-        string_free(&app.root_path);
-        app.root_path = string_from_chars(root_path.u.s, strlen(root_path.u.s));
-    }
-    LinceFree(root_path.u.s);
-
-    toml_datum_t assets_path = toml_string_in(config, "assets");
-    if(assets_path.ok){
-        string_free(&app.assets_path);
-        app.assets_path = string_from_fmt("%s%s", app.root_path.str, assets_path.u.s);
-    }
-    LinceFree(assets_path.u.s);
-
-    toml_datum_t engine_path = toml_string_in(config, "engine");
-    if(engine_path.ok){
-        string_free(&app.engine_path);
-        app.engine_path = string_from_fmt("%s%s", app.root_path.str, engine_path.u.s);
-    }
-    LinceFree(engine_path.u.s);
-
+    toml_datum_t root_path    = toml_string_in(config, "root");
+    toml_datum_t assets_path  = toml_string_in(config, "assets");
+    toml_datum_t engine_path  = toml_string_in(config, "engine");
     toml_datum_t logfile_path = toml_string_in(config, "logfile");
-    if(logfile_path.ok){
-        string_free(&app.logfile_path);
-        app.logfile_path = string_from_fmt("%s%s", app.root_path.str, logfile_path.u.s);
-    }
-    LinceFree(logfile_path.u.s);
+    toml_datum_t logging      = toml_bool_in  (config, "logging");
+
+    app.root_path    = string_from_fmt("%s",                      ( root_path.ok    ? root_path.u.s    : "./"     ) );
+    app.assets_path  = string_from_fmt("%s%s", app.root_path.str, ( assets_path.ok  ? assets_path.u.s  : "assets/") );
+    app.engine_path  = string_from_fmt("%s%s", app.root_path.str, ( engine_path.ok  ? engine_path.u.s  : "lince/" ) );
+    app.logfile_path = string_from_fmt("%s%s", app.root_path.str, ( logfile_path.ok ? logfile_path.u.s : "log.txt") );
+    app.logging      = (logging.ok) ? logging.u.b : LinceFalse;
+    
+    if(root_path.ok   ) LinceFree(root_path.u.s);
+    if(assets_path.ok ) LinceFree(assets_path.u.s);
+    if(engine_path.ok ) LinceFree(engine_path.u.s);
+    if(logfile_path.ok) LinceFree(logfile_path.u.s);
 
     // Window configuration
     toml_table_t* window = toml_table_in(config, "window");
     if(window){
         toml_datum_t title = toml_string_in(window, "title");
-        if(title.ok) {
-            string_free(&app.wconfig.title);
-            app.wconfig.title = string_from_chars(title.u.s, strlen(title.u.s));
-            LinceFree(title.u.s);
-        }
+        app.wconfig.title  = (title.ok) ? string_from_chars(title.u.s, strlen(title.u.s)) : string_from_literal("Lince App");
 
-        toml_datum_t width = toml_int_in(window, "width");
-        if(width.ok) app.wconfig.width = (uint32_t)width.u.i;
-
-        toml_datum_t height = toml_int_in(window, "height");
-        if(height.ok) app.wconfig.height = (uint32_t)height.u.i;
-
+        toml_datum_t width      = toml_int_in(window, "width");
+        toml_datum_t height     = toml_int_in(window, "height");
         toml_datum_t fullscreen = toml_bool_in(window, "fullscreen");
-        if(fullscreen.ok) app.wconfig.fullscreen = (LinceBool)fullscreen.u.b;
+        toml_datum_t vsync      = toml_bool_in(window, "vsync");
+        toml_datum_t resizable  = toml_bool_in(window, "resizable");
         
-        toml_datum_t vsync = toml_bool_in(window, "vsync");
-        if(vsync.ok) app.wconfig.vsync = (LinceBool)vsync.u.b;
-
+        app.wconfig.width      = (width.ok)      ? (uint32_t)width.u.i       : 1080;
+        app.wconfig.height     = (height.ok)     ? (uint32_t)height.u.i      : 720;
+        app.wconfig.fullscreen = (fullscreen.ok) ? (LinceBool)fullscreen.u.b : LinceFalse;
+        app.wconfig.vsync      = (vsync.ok)      ? (LinceBool)vsync.u.b      : LinceTrue;
+        app.wconfig.resizable  = (resizable.ok)  ? (LinceBool)resizable.u.b  : LinceFalse;
     }
 
     toml_free(config);
@@ -356,8 +343,10 @@ static void LinceInit(){
     #ifdef LINCE_DEBUG
         LinceLoggerDefaultToStderr(1);
     #else
-        LinceOpenLogger(app.logfile_path.str);
+        LinceLoggerDefaultToStderr(0);
     #endif
+
+    if (app.logging) LinceOpenLogger(app.logfile_path.str);
 
     // Report platform and configuration
     LINCE_INFO("Lince version: "LINCE_VERSION);
@@ -425,7 +414,7 @@ static void LinceInit(){
     LINCE_ASSERT(success, "Failed to create scene cache");
 
     // Create a windowed mode window and its OpenGL context
-    app.window = LinceCreateWindow(app.wconfig);
+    app.window = LinceCreateWindow(&app.wconfig);
     LinceSetMainEventCallback(app.window, LinceAppOnEvent);
     // LinceInputSetWindow(app.window);
     LinceInitRenderer(app.window);

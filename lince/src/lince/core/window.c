@@ -11,6 +11,7 @@
 #include "lince/event/key_event.h"
 #include "lince/event/mouse_event.h"
 #include "lince/event/window_event.h"
+#include "lince/utils/image.h"
 
 /*
 Returns the OpenGL string name for an error code.
@@ -89,7 +90,7 @@ static void LinceInitGLContext(GLFWwindow* handle){
 
 /* Public API */
 
-LinceWindow* LinceCreateWindow(LinceWindowAttributes config){
+LinceWindow* LinceCreateWindow(LinceWindowAttributes* config){
 
     LINCE_ASSERT(glfwInit(), "Failed to initialise GLFW");
     
@@ -97,11 +98,12 @@ LinceWindow* LinceCreateWindow(LinceWindowAttributes config){
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, LINCE_GL_VERSION_MAJOR);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, LINCE_GL_VERSION_MINOR);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    glfwWindowHint(GLFW_RESIZABLE, (config->resizable ? GLFW_TRUE : GLFW_FALSE) );
 
     glfwSetErrorCallback(LinceGLFWErrorCallback);
     
-    GLFWmonitor* monitor = (config.fullscreen ? glfwGetPrimaryMonitor() : NULL);
-    GLFWwindow* handle = glfwCreateWindow(config.width, config.height, config.title.str, monitor, NULL);
+    GLFWmonitor* monitor = (config->fullscreen ? glfwGetPrimaryMonitor() : NULL);
+    GLFWwindow* handle = glfwCreateWindow(config->width, config->height, config->title.str, monitor, NULL);
     if (!handle) {
         glfwTerminate();
         LINCE_ASSERT(0, "Failed to initialise GLFW window");
@@ -114,8 +116,8 @@ LinceWindow* LinceCreateWindow(LinceWindowAttributes config){
         glViewport(0, 0, mode->width, mode->height);
         LINCE_INFO("Setting fullscreen viewport to %ux%u", (uint32_t)mode->width, (uint32_t)mode->height);
     } else {
-        glViewport(0, 0, config.width, config.height);
-        LINCE_INFO("Setting windowed viewport to %ux%u", config.width, config.height);
+        glViewport(0, 0, config->width, config->height);
+        LINCE_INFO("Setting windowed viewport to %ux%u", config->width, config->height);
     }
 
     int glfw_major, glfw_minor, glfw_rev;
@@ -127,10 +129,12 @@ LinceWindow* LinceCreateWindow(LinceWindowAttributes config){
         .handle = handle,
         .initialised = 1,
         .event_callback = NULL,
-        .attrib = config
+        .attrib = *config
     };
 
-    LinceSetWindowVSync(window, config.vsync);
+    // LinceLoadWindowIcon(window, string_scoped_lit("lince/assets/sprites/default.png"));
+
+    LinceSetWindowVSync(window, config->vsync);
 
     glfwSetWindowUserPointer((GLFWwindow*)window->handle, window);
     LinceSetGLFWCallbacks(window);
@@ -163,6 +167,17 @@ void LinceSetWindowVSync(LinceWindow* window, LinceBool vsync){
     window->attrib.vsync = vsync;
     glfwSwapInterval(vsync);
 }
+
+void LinceLoadWindowIcon(LinceWindow* window, string_t path){
+    LinceImage* src = LinceLoadImage(path.str);
+    GLFWimage image;
+    image.pixels = src->data;
+    image.width  = src->width;
+    image.height = src->height;
+    glfwSetWindowIcon(window->handle, 1, &image);
+    LinceDeleteImage(src);
+}
+
 
 /*
     ----- Event Callbacks -----

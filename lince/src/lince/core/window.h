@@ -17,7 +17,7 @@ typedef struct LinceWindowAttributes {
     string_t title;         ///< Window title shown at the top bar
     uint32_t height, width; ///< Window dimensions in pixels when not in fullscreen mode
     LinceBool fullscreen;   ///< Whether window is in fullscreen mode
-    LinceBool resizeable;   ///< Whether window can be resized
+    LinceBool resizable;   ///< Whether window can be resized
     LinceBool vsync;        ///< Whether VSync enabled
 } LinceWindowAttributes;
 
@@ -34,7 +34,7 @@ typedef struct LinceWindow {
 /** @brief Initialises GLFW window
 * @param attrib Window attributes. 
 */
-LinceWindow* LinceCreateWindow(LinceWindowAttributes config);
+LinceWindow* LinceCreateWindow(LinceWindowAttributes* config);
 
 /** @brief Signals whether the window should be shutdown */
 uint32_t LinceShouldCloseWindow(LinceWindow* window);
@@ -59,6 +59,8 @@ to enabled (fullscreen = LinceTrue) or disabled (fullscreen = False) */
 
 /** @brief Enable syncing window's refresh rate to that of the screen */
 void LinceSetWindowVSync(LinceWindow* window, LinceBool vsync);
+
+void LinceLoadWindowIcon(LinceWindow* window, string_t path);
 
 
 #endif // LINCE_WINDOW_H

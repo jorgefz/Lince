@@ -42,6 +42,7 @@ typedef struct LinceApp{
     string_t assets_path;        ///< Path to assets folder, relative to root.
     string_t engine_path;        ///< Path to engine assets folder (lince), relative to root.
     string_t logfile_path;       ///< Path to log file, relative to root.
+    LinceBool logging;           ///< Whether logging messages are written to the log file.
 
     LinceWindowAttributes wconfig; ///< Startup window configuration
     LinceBool show_debug_panel;    ///< Shows UI panel with debug info
