@@ -379,10 +379,10 @@ static void LinceInit(){
     } else {
         LINCE_INFO("Could not load config file '%s'. Using defaults.", app.config_path.str);
     }
-    LINCE_INFO("Project root path: '%s'", app.root_path.str);
+    LINCE_INFO("Project root path: '%s'",   app.root_path.str);
     LINCE_INFO("Project assets path: '%s'", app.assets_path.str);
     LINCE_INFO("Project engine path: '%s'", app.engine_path.str);
-    LINCE_INFO("Log file location: '%s'", app.logfile_path.str);
+    LINCE_INFO("Log file location: '%s'",   app.logfile_path.str);
 
     // Setup String ID cache
     LinceInitSIDCache();
@@ -402,7 +402,6 @@ static void LinceInit(){
     // LinceAssetCacheAddType(&app.asset_cache, "shader_header", LinceLoadShader, LinceUnloadShader);
     LinceAssetCacheAddType(&app.asset_cache, LinceSIDFromLit("tileset"), LinceLoadTilesetAsset, LinceUnloadTilesetAsset);
     LinceAssetCacheAddType(&app.asset_cache, LinceSIDFromLit("tilemap"), LinceLoadTilemapAsset, LinceUnloadTilesetAsset);
-
 
     // Register internal engine assets
     LinceAssetCacheRegister(&app.asset_cache, LinceSIDFromLit("default_sprite"), LinceSIDFromLit("texture"), string_scoped_lit("sprites/default.png"));
