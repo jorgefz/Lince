@@ -54,9 +54,8 @@ void SetupApplication(){
     app->on_update    = SandboxUpdate;
     app->on_terminate = SandboxTerminate;
     app->show_debug_panel = LinceTrue;
-    LinceAppSetTitle("Sandbox", sizeof("Sandbox")-1);
+    LinceAppSetConfigFile(string_scoped_lit("/home/jorgefz/dev/lince/sandbox/project.toml"));
 }
-
 
 void TestReadToml(){
     char errbuf[200];

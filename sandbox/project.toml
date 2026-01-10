@@ -1,0 +1,26 @@
+# Configuration file for a Lince project
+# All paths must en in '/'.
+
+
+# Core parameters
+#   root    : str, Absolute path to the root directory of the project.
+#   assets  : str, Path to the app assets, relative to root.
+#   engine  : str, Path to the engine assets, relative to root.
+#   logfile : str, Path to log file, relative to root.
+
+root    = "/home/jorgefz/dev/lince/sandbox/"
+assets  = "assets/"
+engine  = "../lince/assets"
+logfile = "log.txt"
+
+# Window parameters
+#   title       : str, Title displayed at the top of the window
+#   fullscreen  : bool, Whether the window should start in fullscreen mode
+#   width       : int, Window width  in pixels (if fullscreen is false)
+#   height      : int, Window height in pixels (if fullscreen is false)
+
+[window]
+title = "Sandbox"
+#fullscreen = false
+width = 1280
+height = 520
