@@ -71,7 +71,7 @@ void LinceDeleteAssetCache(LinceAssetCache* cache) {
 }
 
 
-LinceBool LinceAssetCachePushFolder(LinceAssetCache* cache, string_t path){
+LinceBool LinceAssetCachePushPath(LinceAssetCache* cache, string_t path){
 
     if(path.len + cache->exedir.len + 1 >= LINCE_PATH_MAX){ // Extra space for terminating char
         LINCE_WARN("Failed to add assets folder because its full path is longer than %ld", LINCE_PATH_MAX);
@@ -79,7 +79,8 @@ LinceBool LinceAssetCachePushFolder(LinceAssetCache* cache, string_t path){
     }
 
     // Extra space at the end of fmt to allow for extra slash separator if needed
-    string_t assets_dir = string_from_fmt("%s%s ", cache->exedir.str, path.str);
+    // string_t assets_dir = string_from_fmt("%s%s ", cache->exedir.str, path.str);
+    string_t assets_dir = string_from_fmt("%s ", path.str); //Add space for potential slash needed at the end
 
     // Add slash separator at the end if missing
     char* end = assets_dir.str + assets_dir.len - 1;

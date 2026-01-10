@@ -65,7 +65,7 @@ void LinceDeleteAssetCache(LinceAssetCache* cache);
  * @param path Path to the directory in which to search for assets.
  * @returns LinceTrue if the asset folder exists, LinceFalse otherwise.
  */
-LinceBool LinceAssetCachePushFolder(LinceAssetCache* cache, string_t path);
+LinceBool LinceAssetCachePushPath(LinceAssetCache* cache, string_t path);
 
 /** @brief Retrieves the full path of an asset file by searching in the stored asset folders
 * @param filename Location of the asset file within an asset folder
