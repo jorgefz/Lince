@@ -36,7 +36,7 @@ void DrawMainMenu(LinceScene* scene){
         nk_style_item_color((struct nk_color){0,0,0,255})
     );
 
-    LincePoint wsize = LinceAppGetScreenSize();
+    LincePoint wsize = LinceAppGetWindowSize();
     vec2 sc = { wsize.x, wsize.y };
     vec2 btn_sz = {200, 120};
     vec2 btn_pos = {sc[0]/2 - btn_sz[0]/2, sc[1]/2 - btn_sz[1]/2};

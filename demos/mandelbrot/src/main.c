@@ -50,7 +50,7 @@ void OnInit(){
     string_free(&vert_path);
     string_free(&frag_path);
     
-    LincePoint screen = LinceAppGetScreenSize();
+    LincePoint screen = LinceAppGetWindowSize();
 
     LinceBindShader(state.canvas_shader);
     LinceSetShaderUniformVec2(state.canvas_shader, string_scoped_lit("uScreen"), (float[]){screen.x,screen.y});
@@ -107,7 +107,7 @@ void OnUpdate(float dt){
 void OnEvent(LinceEvent* event){
     if(event->type == LinceEventType_WindowResize){
         LinceUpdateCameraProjection(&state.cam, LinceAppGetAspectRatio());
-        LincePoint screen = LinceAppGetScreenSize();
+        LincePoint screen = LinceAppGetWindowSize();
         LinceBindShader(state.canvas_shader);
         LinceSetShaderUniformVec2(state.canvas_shader, string_scoped_lit("uScreen"), &screen.x);
     }

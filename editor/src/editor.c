@@ -112,7 +112,7 @@ void SpriteGUI(struct nk_context* ctx, uint32_t entity_id){
 
 LinceBool DrawGUINewTilemapHeightWidthBox(LincePoint* new_dims){
     struct nk_context* ctx = LinceUIGetNkContext(LinceGetApp()->ui);
-    LincePoint screen = LinceAppGetScreenSize();
+    LincePoint screen = LinceAppGetWindowSize();
     
     // State
     static int height = 100, width = 100;
@@ -146,7 +146,7 @@ LinceBool DrawGUINewTilemapHeightWidthBox(LincePoint* new_dims){
 
 void DrawGUITopBar(){
     struct nk_context* ctx = LinceUIGetNkContext(LinceGetApp()->ui);
-    LincePoint screen = LinceAppGetScreenSize();
+    LincePoint screen = LinceAppGetWindowSize();
 
     const struct nk_style_button topbar_button_style = {
         /* background */
@@ -271,7 +271,7 @@ void DrawGUITopBar(){
 
 void DrawGUISidePanel(){
     struct nk_context* ctx = LinceUIGetNkContext(LinceGetApp()->ui);
-    LincePoint screen = LinceAppGetScreenSize();
+    LincePoint screen = LinceAppGetWindowSize();
     
     float topbar_h = 35; // SHOULD BE GLOBAL
     float sidebar_w = 250; // SHOULD BE GLOBAL

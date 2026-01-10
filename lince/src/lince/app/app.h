@@ -40,18 +40,15 @@ typedef struct LinceApp{
     string_t config_path;        ///< Path to configuration TOML file.
     string_t root_path;          ///< Root path of the project.
     string_t assets_path;        ///< Path to assets folder, relative to root.
-    string_t engine_path;        ///< Path to engine folder (lince), relative to root.
+    string_t engine_path;        ///< Path to engine assets folder (lince), relative to root.
     string_t logfile_path;       ///< Path to log file, relative to root.
 
-    string_t title;              ///< String displayed at the top of the window.
-    LinceBool fullscreen;        ///< Whether window is in fullscreen mode or not.
-    uint32_t screen_width;       ///< Width in pixels of the window.
-    uint32_t screen_height;      ///< Height in pixels of the window.
-    LinceBool show_debug_panel;  ///< Shows UI panel with debug info
-    void* user_data;             ///< Pointer that may be freely re-assiged by the user.      
+    LinceWindowAttributes wconfig; ///< Startup window configuration
+    LinceBool show_debug_panel;    ///< Shows UI panel with debug info
+    void* user_data;               ///< Pointer that may be freely re-assiged by the user.      
 
     /* Internal state */
-    LinceWindow     *window;        ///< Window state.
+    LinceWindow *window;   ///< Window state.
     array_t layer_stack;   ///< Array of rendering layers.
     array_t overlay_stack; ///< Array of rendering overlays (drawn after layers).
     
@@ -151,7 +148,7 @@ LinceScene* LinceAppGetScene(string_t name);
 float LinceAppGetAspectRatio(void);
 
 /** @brief Returns the current window width and height in pixels */
-LincePoint LinceAppGetScreenSize(void);
+LincePoint LinceAppGetWindowSize(void);
 
 /** @brief Returns the position of the mouse pointer in world coordinates.
 * @param cam Camera used to determine the world position.

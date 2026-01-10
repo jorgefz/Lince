@@ -89,7 +89,7 @@ static void LinceInitGLContext(GLFWwindow* handle){
 
 /* Public API */
 
-LinceWindow* LinceCreateWindow(uint32_t width, uint32_t height, const char* title){
+LinceWindow* LinceCreateWindow(LinceWindowAttributes config){
 
     LINCE_ASSERT(glfwInit(), "Failed to initialise GLFW");
     
@@ -100,16 +100,23 @@ LinceWindow* LinceCreateWindow(uint32_t width, uint32_t height, const char* titl
 
     glfwSetErrorCallback(LinceGLFWErrorCallback);
     
-    GLFWwindow* handle = glfwCreateWindow(width, height, title, NULL, NULL);
+    GLFWmonitor* monitor = (config.fullscreen ? glfwGetPrimaryMonitor() : NULL);
+    GLFWwindow* handle = glfwCreateWindow(config.width, config.height, config.title.str, monitor, NULL);
     if (!handle) {
         glfwTerminate();
-        LINCE_ASSERT(0, "Failed to create window");
+        LINCE_ASSERT(0, "Failed to initialise GLFW window");
     }
-    LINCE_INFO("Window %dx%d created", width, height);
+    LINCE_INFO("Created GLFW window");
     LinceInitGLContext(handle);
 
-    glfwSwapInterval(1); // activate vsync
-    glViewport(0, 0, width, height);
+    if (monitor){
+        const GLFWvidmode* mode = glfwGetVideoMode(monitor);
+        glViewport(0, 0, mode->width, mode->height);
+        LINCE_INFO("Setting fullscreen viewport to %ux%u", (uint32_t)mode->width, (uint32_t)mode->height);
+    } else {
+        glViewport(0, 0, config.width, config.height);
+        LINCE_INFO("Setting windowed viewport to %ux%u", config.width, config.height);
+    }
 
     int glfw_major, glfw_minor, glfw_rev;
     glfwGetVersion(&glfw_major, &glfw_minor, &glfw_rev);
@@ -118,12 +125,12 @@ LinceWindow* LinceCreateWindow(uint32_t width, uint32_t height, const char* titl
     LinceWindow* window = LinceAlloc(sizeof(LinceWindow));
     *window = (LinceWindow){
         .handle = handle,
-        .height = height,
-        .width = width,
         .initialised = 1,
-        .title = "Lince Window",
-        .event_callback = NULL
+        .event_callback = NULL,
+        .attrib = config
     };
+
+    LinceSetWindowVSync(window, config.vsync);
 
     glfwSetWindowUserPointer((GLFWwindow*)window->handle, window);
     LinceSetGLFWCallbacks(window);
@@ -144,6 +151,7 @@ void LinceDestroyWindow(LinceWindow* window){
     glfwSetErrorCallback(NULL); // otherwise GLFW throws an error on shutdown
     if (window->initialised) glfwTerminate();
     if (window->handle) glfwDestroyWindow((GLFWwindow*)(window->handle));
+    string_free(&window->attrib.title);
 	LinceFree(window);
 }
 
@@ -151,7 +159,10 @@ void LinceSetMainEventCallback(LinceWindow* window, LinceEventCallbackFn func){
     window->event_callback = func;
 }
 
-
+void LinceSetWindowVSync(LinceWindow* window, LinceBool vsync){
+    window->attrib.vsync = vsync;
+    glfwSwapInterval(vsync);
+}
 
 /*
     ----- Event Callbacks -----
@@ -161,8 +172,8 @@ static void WindowResizeCallback(GLFWwindow* wptr, int width, int height){
     glViewport(0, 0, width, height);
     
     LinceWindow* w = (LinceWindow*)glfwGetWindowUserPointer(wptr);
-    w->width = (uint32_t)width;
-    w->height = (uint32_t)height;
+    w->attrib.width = (uint32_t)width;
+    w->attrib.height = (uint32_t)height;
 
     LinceEvent e = LinceNewWindowResizeEvent(width, height);
     if (w->event_callback) w->event_callback(&e);

@@ -209,14 +209,14 @@ LinceScene* LinceAppGetScene(string_t name) {
 /** @brief Returns aspect ratio of the window.
 */
 float LinceAppGetAspectRatio(){
-    return (float)app.window->width / (float)app.window->height;
+    return (float)app.window->attrib.width / (float)app.window->attrib.height;
 }
 
 /** @brief Returns the current window width and height in pixels */
-LincePoint LinceAppGetScreenSize(){
+LincePoint LinceAppGetWindowSize(){
     return (LincePoint) {
-        .x = (float)app.window->width,
-        .y = (float)app.window->height
+        .x = (float)app.window->attrib.width,
+        .y = (float)app.window->attrib.height
     };
 }
 
@@ -224,7 +224,7 @@ LincePoint LinceAppGetScreenSize(){
 * @param cam Camera used to determine the world position.
 */
 LincePoint LinceGetMousePosWorld(LinceCamera* cam) {
-    LincePoint scr = LinceAppGetScreenSize();
+    LincePoint scr = LinceAppGetWindowSize();
     LincePoint pos = LincePointPixelToScreen(LinceGetMousePos(), scr.x, scr.y);
     return LincePointScreenToWorld(pos, cam);
 }
@@ -266,11 +266,12 @@ static void LinceAppLoadDefaultConfig(){
     app.engine_path  = string_from_literal("lince/");
     app.logfile_path = string_from_literal("log.txt");
 
-    app.title = string_from_literal("Lince App");
-    app.fullscreen = LinceFalse;
-    app.screen_width = 1280;
-    app.screen_height = 720;
-
+    app.wconfig.title  = string_from_literal("Lince App");
+    app.wconfig.width  = 1280;
+    app.wconfig.height = 720;
+    app.wconfig.fullscreen = LinceFalse;
+    app.wconfig.vsync      = LinceTrue;
+    app.wconfig.resizeable = LinceFalse;
 }
 
 
@@ -292,43 +293,51 @@ static LinceBool LinceAppLoadConfigFile(){
         string_free(&app.root_path);
         app.root_path = string_from_chars(root_path.u.s, strlen(root_path.u.s));
     }
+    LinceFree(root_path.u.s);
 
     toml_datum_t assets_path = toml_string_in(config, "assets");
     if(assets_path.ok){
         string_free(&app.assets_path);
         app.assets_path = string_from_fmt("%s%s", app.root_path.str, assets_path.u.s);
     }
+    LinceFree(assets_path.u.s);
 
     toml_datum_t engine_path = toml_string_in(config, "engine");
     if(engine_path.ok){
         string_free(&app.engine_path);
         app.engine_path = string_from_fmt("%s%s", app.root_path.str, engine_path.u.s);
     }
+    LinceFree(engine_path.u.s);
 
     toml_datum_t logfile_path = toml_string_in(config, "logfile");
     if(logfile_path.ok){
         string_free(&app.logfile_path);
         app.logfile_path = string_from_fmt("%s%s", app.root_path.str, logfile_path.u.s);
     }
+    LinceFree(logfile_path.u.s);
 
     // Window configuration
     toml_table_t* window = toml_table_in(config, "window");
     if(window){
         toml_datum_t title = toml_string_in(window, "title");
         if(title.ok) {
-            string_free(&app.title);
-            app.title = string_from_chars(title.u.s, strlen(title.u.s));
+            string_free(&app.wconfig.title);
+            app.wconfig.title = string_from_chars(title.u.s, strlen(title.u.s));
+            LinceFree(title.u.s);
         }
-        
-        toml_datum_t fullscreen = toml_bool_in(window, "fullscreen");
-        if(fullscreen.ok) app.fullscreen = (LinceBool)fullscreen.u.b;
 
         toml_datum_t width = toml_int_in(window, "width");
-        if(width.ok) app.screen_width = (uint32_t)width.u.i;
+        if(width.ok) app.wconfig.width = (uint32_t)width.u.i;
 
         toml_datum_t height = toml_int_in(window, "height");
-        if(height.ok) app.screen_height = (uint32_t)height.u.i;
+        if(height.ok) app.wconfig.height = (uint32_t)height.u.i;
+
+        toml_datum_t fullscreen = toml_bool_in(window, "fullscreen");
+        if(fullscreen.ok) app.wconfig.fullscreen = (LinceBool)fullscreen.u.b;
         
+        toml_datum_t vsync = toml_bool_in(window, "vsync");
+        if(vsync.ok) app.wconfig.vsync = (LinceBool)vsync.u.b;
+
     }
 
     toml_free(config);
@@ -416,8 +425,7 @@ static void LinceInit(){
     LINCE_ASSERT(success, "Failed to create scene cache");
 
     // Create a windowed mode window and its OpenGL context
-    printf("%u %u\n", app.screen_width, app.screen_height);
-    app.window = LinceCreateWindow(app.screen_width, app.screen_height, app.title.str);
+    app.window = LinceCreateWindow(app.wconfig);
     LinceSetMainEventCallback(app.window, LinceAppOnEvent);
     // LinceInputSetWindow(app.window);
     LinceInitRenderer(app.window);
@@ -455,9 +463,6 @@ static void LinceAppOnUpdate(){
     float runtime = (float)LinceReadClock(app.clock) * 1000.0f; // to millisecs
     app.dt = runtime - app.runtime;
     app.runtime = (float)LinceReadClock(app.clock) * 1000.0f;
-
-    app.screen_width = app.window->width;
-    app.screen_height = app.window->height;
 
     LinceBeginUIRender(app.ui);
 
@@ -517,7 +522,11 @@ static void LinceAppTerminate(){
 
     app.window = NULL;
     app.running = 0;
-    string_free(&app.title);
+    string_free(&app.config_path);
+    string_free(&app.root_path);
+    string_free(&app.assets_path);
+    string_free(&app.engine_path);
+    string_free(&app.logfile_path);
     
     LinceCloseProfiler();
     LinceCloseLogger();
@@ -553,6 +562,7 @@ static void LinceAppDrawDebugUIPanel(LinceLayer* overlay, float dt){
 
     if(!app.show_debug_panel) return; // Panel hidden
     
+    LincePoint wsize = LinceAppGetWindowSize();
     LinceUI* ui = LinceGetApp()->ui;
     // struct nk_context *ctx = ui->ctx;
     // nk_style_push_font(ctx, &((struct nk_font*)ui->fonts[LinceFont_Droid20])->handle);
@@ -565,7 +575,7 @@ static void LinceAppDrawDebugUIPanel(LinceLayer* overlay, float dt){
     )) {
 
         nk_layout_row_static(ctx, 30, 250, 1);
-        nk_labelf(ctx, NK_TEXT_LEFT, "Window: %ux%u", app.screen_width, app.screen_height);
+        nk_labelf(ctx, NK_TEXT_LEFT, "Window: %ux%u", (uint32_t)wsize.x, (uint32_t)wsize.y);
         nk_labelf(ctx, NK_TEXT_LEFT, "dt: %.2f ms", dt);
         nk_labelf(ctx, NK_TEXT_LEFT, "FPS: %.2f", 1000.0f/dt);
         nk_labelf(ctx, NK_TEXT_LEFT, "Runtime: %.2f s", app.runtime/1000.0f);

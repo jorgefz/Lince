@@ -221,7 +221,7 @@ void LinceDrawSprites(LinceEntityRegistry* reg){
 
     // Setup lightning shader uniforms
     LinceBindShader(game_data.custom_shader);
-    LincePoint screen_size = LinceAppGetScreenSize();
+    LincePoint screen_size = LinceAppGetWindowSize();
     vec2 wsize = { screen_size.x, screen_size.y };
     LinceSetShaderUniformVec2(game_data.custom_shader, "uWindowSize", wsize);
     LincePoint mouse_pos = LinceGetMousePos();

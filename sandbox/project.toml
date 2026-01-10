@@ -21,6 +21,7 @@ logfile = "log.txt"
 
 [window]
 title = "Sandbox"
-#fullscreen = false
 width = 1280
-height = 520
+height = 720
+fullscreen = true
+vsync = true

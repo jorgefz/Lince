@@ -48,8 +48,6 @@ void SandboxTerminate(){
 
 void SetupApplication(){
     LinceApp* app = LinceGetApp();
-    app->screen_width = 1280;
-    app->screen_height = 720;
     app->on_init      = SandboxInit;
     app->on_update    = SandboxUpdate;
     app->on_terminate = SandboxTerminate;
