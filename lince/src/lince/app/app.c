@@ -414,8 +414,8 @@ static void LinceInit(){
     LINCE_ASSERT(success, "Failed to create scene cache");
 
     // Create a windowed mode window and its OpenGL context
-    app.window = LinceCreateWindow(&app.wconfig);
-    LinceSetMainEventCallback(app.window, LinceAppOnEvent);
+    app.window = LinceWindowCreate(&app.wconfig);
+    LinceWindowSetMainEventCallback(app.window, LinceAppOnEvent);
     // LinceInputSetWindow(app.window);
     LinceInitRenderer(app.window);
 
@@ -468,7 +468,7 @@ static void LinceAppOnUpdate(){
     if (app.on_update) app.on_update(app.dt);
 
     LinceEndUIRender(app.ui);
-    LinceUpdateWindow(app.window);
+    LinceWindowUpdate(app.window);
     LINCE_PROFILER_END(timer);
 }
 

@@ -11,7 +11,6 @@
 #include "lince/event/key_event.h"
 #include "lince/event/mouse_event.h"
 #include "lince/event/window_event.h"
-#include "lince/utils/image.h"
 
 /*
 Returns the OpenGL string name for an error code.
@@ -90,7 +89,7 @@ static void LinceInitGLContext(GLFWwindow* handle){
 
 /* Public API */
 
-LinceWindow* LinceCreateWindow(LinceWindowAttributes* config){
+LinceWindow* LinceWindowCreate(LinceWindowAttributes* config){
 
     LINCE_ASSERT(glfwInit(), "Failed to initialise GLFW");
     
@@ -132,9 +131,9 @@ LinceWindow* LinceCreateWindow(LinceWindowAttributes* config){
         .attrib = *config
     };
 
-    // LinceLoadWindowIcon(window, string_scoped_lit("lince/assets/sprites/default.png"));
+    // LinceWindowSetIcon(window, string_scoped_lit("lince/assets/sprites/default.png"));
 
-    LinceSetWindowVSync(window, config->vsync);
+    LinceWindowSetVSync(window, config->vsync);
 
     glfwSetWindowUserPointer((GLFWwindow*)window->handle, window);
     LinceSetGLFWCallbacks(window);
@@ -142,13 +141,16 @@ LinceWindow* LinceCreateWindow(LinceWindowAttributes* config){
     return window;
 }
 
-uint32_t LinceShouldCloseWindow(LinceWindow* window){
-    return glfwWindowShouldClose((GLFWwindow*)(window->handle));
+LinceBool LinceWindowShouldClose(LinceWindow* window){
+    return (LinceBool)glfwWindowShouldClose((GLFWwindow*)(window->handle));
 }
 
-void LinceUpdateWindow(LinceWindow* window){
+void LinceWindowUpdate(LinceWindow* window){
     glfwSwapBuffers(window->handle);
 	glfwPollEvents();
+#ifdef LINCE_DEBUG
+    LinceCheckGLErrors();
+#endif
 }
 
 void LinceDestroyWindow(LinceWindow* window){
@@ -156,26 +158,27 @@ void LinceDestroyWindow(LinceWindow* window){
     if (window->initialised) glfwTerminate();
     if (window->handle) glfwDestroyWindow((GLFWwindow*)(window->handle));
     string_free(&window->attrib.title);
+    window->initialised = LinceFalse;
+    window->handle = NULL;
 	LinceFree(window);
 }
 
-void LinceSetMainEventCallback(LinceWindow* window, LinceEventCallbackFn func){
+void LinceWindowSetMainEventCallback(LinceWindow* window, LinceEventCallbackFn func){
     window->event_callback = func;
 }
 
-void LinceSetWindowVSync(LinceWindow* window, LinceBool vsync){
+void LinceWindowSetVSync(LinceWindow* window, LinceBool vsync){
     window->attrib.vsync = vsync;
     glfwSwapInterval(vsync);
 }
 
-void LinceLoadWindowIcon(LinceWindow* window, string_t path){
-    LinceImage* src = LinceLoadImage(path.str);
-    GLFWimage image;
-    image.pixels = src->data;
-    image.width  = src->width;
-    image.height = src->height;
-    glfwSetWindowIcon(window->handle, 1, &image);
-    LinceDeleteImage(src);
+LinceBool LinceWindowSetIcon(LinceWindow* window, LinceImage* icon){
+    GLFWimage gl_img;
+    gl_img.pixels = icon->data;
+    gl_img.width  = icon->width;
+    gl_img.height = icon->height;
+    glfwSetWindowIcon(window->handle, 1, &gl_img);
+    LinceDeleteImage(icon);
 }
 
 
@@ -183,11 +186,11 @@ void LinceLoadWindowIcon(LinceWindow* window, string_t path){
     ----- Event Callbacks -----
 */
 
-static void WindowResizeCallback(GLFWwindow* wptr, int width, int height){
+static void LinceWindowResizeCallback(GLFWwindow* wptr, int width, int height){
     glViewport(0, 0, width, height);
     
-    LinceWindow* w = (LinceWindow*)glfwGetWindowUserPointer(wptr);
-    w->attrib.width = (uint32_t)width;
+    LinceWindow* w   = (LinceWindow*)glfwGetWindowUserPointer(wptr);
+    w->attrib.width  = (uint32_t)width;
     w->attrib.height = (uint32_t)height;
 
     LinceEvent e = LinceNewWindowResizeEvent(width, height);
@@ -195,14 +198,14 @@ static void WindowResizeCallback(GLFWwindow* wptr, int width, int height){
     LinceEndEvent(&e);
 }
 
-static void WindowCloseCallback(GLFWwindow* wptr){
+static void LinceWindowCloseCallback(GLFWwindow* wptr){
     LinceWindow* w = (LinceWindow*)glfwGetWindowUserPointer(wptr);
     LinceEvent e = LinceNewWindowCloseEvent();
     if (w->event_callback) w->event_callback(&e);
     LinceEndEvent(&e);
 }
 
-static void KeyCallback(GLFWwindow* wptr, int key, int scancode, int action, int mods){
+static void LinceKeyCallback(GLFWwindow* wptr, int key, int scancode, int action, int mods){
     LinceWindow* w = (LinceWindow*)glfwGetWindowUserPointer(wptr);
     LinceEvent e;
     switch (action) {
@@ -224,7 +227,7 @@ static void KeyCallback(GLFWwindow* wptr, int key, int scancode, int action, int
     LINCE_UNUSED(scancode);
 }
 
-static void CharCallback(GLFWwindow* wptr, uint32_t codepoint){
+static void LinceCharCallback(GLFWwindow* wptr, uint32_t codepoint){
     // Received codepoints are Unicode UTF-32, which may be encoded to UTF-8.
     LinceWindow* w = (LinceWindow*)glfwGetWindowUserPointer(wptr);
     LinceEvent e = LinceNewKeyTypeEvent(codepoint);
@@ -232,7 +235,7 @@ static void CharCallback(GLFWwindow* wptr, uint32_t codepoint){
     LinceEndEvent(&e);
 }
 
-static void MouseButtonCallback(GLFWwindow* wptr, int button, int action, int mods){
+static void LinceMouseButtonCallback(GLFWwindow* wptr, int button, int action, int mods){
     LinceWindow* w = (LinceWindow*)glfwGetWindowUserPointer(wptr);
     LinceEvent e;
     switch (action) {
@@ -253,14 +256,14 @@ static void MouseButtonCallback(GLFWwindow* wptr, int button, int action, int mo
     LINCE_UNUSED(mods);
 }
 
-static void MouseScrolledCallback(GLFWwindow* wptr, double xoff, double yoff){
+static void LinceMouseScrollCallback(GLFWwindow* wptr, double xoff, double yoff){
     LinceWindow* w = (LinceWindow*)glfwGetWindowUserPointer(wptr);
     LinceEvent e = LinceNewMouseScrollEvent(xoff, yoff);
     if (w->event_callback) w->event_callback(&e);
     LinceEndEvent(&e);
 }
 
-static void MouseMovedCallback(GLFWwindow* wptr, double xpos, double ypos){
+static void LinceMouseMoveCallback(GLFWwindow* wptr, double xpos, double ypos){
     LinceWindow* w = (LinceWindow*)glfwGetWindowUserPointer(wptr);
     LinceEvent e = LinceNewMouseMoveEvent(xpos, ypos);
     if (w->event_callback) w->event_callback(&e);
@@ -271,11 +274,11 @@ static void MouseMovedCallback(GLFWwindow* wptr, double xpos, double ypos){
 // forward declare to call from CreateWindow
 static void LinceSetGLFWCallbacks(LinceWindow* w){
     GLFWwindow* window = w->handle;
-    glfwSetFramebufferSizeCallback(window, WindowResizeCallback);
-    glfwSetWindowCloseCallback(window, WindowCloseCallback);
-    glfwSetKeyCallback(window, KeyCallback);
-    glfwSetCharCallback(window, CharCallback);
-    glfwSetMouseButtonCallback(window, MouseButtonCallback);
-    glfwSetScrollCallback(window, MouseScrolledCallback);
-    glfwSetCursorPosCallback(window, MouseMovedCallback);
+    glfwSetFramebufferSizeCallback(window, LinceWindowResizeCallback);
+    glfwSetWindowCloseCallback(window, LinceWindowCloseCallback);
+    glfwSetKeyCallback(window, LinceKeyCallback);
+    glfwSetCharCallback(window, LinceCharCallback);
+    glfwSetMouseButtonCallback(window, LinceMouseButtonCallback);
+    glfwSetScrollCallback(window, LinceMouseScrollCallback);
+    glfwSetCursorPosCallback(window, LinceMouseMoveCallback);
 }

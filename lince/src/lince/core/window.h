@@ -3,6 +3,7 @@
 
 #include "lince/core/core.h"
 #include "lince/event/event.h"
+#include "lince/utils/image.h"
 
 /** @typedef LinceEventCallbackFn
 * @brief Simplifies pointer type for function that takes a LinceEvent.
@@ -34,33 +35,33 @@ typedef struct LinceWindow {
 /** @brief Initialises GLFW window
 * @param attrib Window attributes. 
 */
-LinceWindow* LinceCreateWindow(LinceWindowAttributes* config);
+LinceWindow* LinceWindowCreate(LinceWindowAttributes* config);
 
 /** @brief Signals whether the window should be shutdown */
-uint32_t LinceShouldCloseWindow(LinceWindow* window);
+LinceBool LinceWindowShouldClose(LinceWindow* window);
 
 /** @brief Swaps buffers and polls GLFW events */
-void LinceUpdateWindow(LinceWindow* window);
+void LinceWindowUpdate(LinceWindow* window);
 
-/** @brief Shutds down window */
+/** @brief Shuts down window */
 void LinceDestroyWindow(LinceWindow* window);
 
 /** @brief Set the function called every time an event occurs,
 which then propagates it to other callbacks */
-void LinceSetMainEventCallback(LinceWindow* window, LinceEventCallbackFn func);
+void LinceWindowSetMainEventCallback(LinceWindow* window, LinceEventCallbackFn func);
 
 /** @brief Change the window's fullscreen mode
 to enabled (fullscreen = LinceTrue) or disabled (fullscreen = False) */
-// void LinceSetWindowFullscreen(LinceWindow* window, LinceBool fullscreen);
+void LinceSetWindowFullscreen(LinceWindow* window, LinceBool fullscreen);
 
-/** @brief Change the window's fullscreen mode
-to enabled (fullscreen = LinceTrue) or disabled (fullscreen = False) */
-// void LinceIsWindowFullscreen(LinceWindow* window, LinceBool fullscreen);
+/** @brief Check whether the window is in fullscreen mode */
+LinceBool LinceWindowIsFullscreen(LinceWindow* window);
 
 /** @brief Enable syncing window's refresh rate to that of the screen */
-void LinceSetWindowVSync(LinceWindow* window, LinceBool vsync);
+void LinceWindowSetVSync(LinceWindow* window, LinceBool vsync);
 
-void LinceLoadWindowIcon(LinceWindow* window, string_t path);
+/** @brief Set the application's icon using an image on disk */
+LinceBool LinceWindowSetIcon(LinceWindow* window, LinceImage* icon);
 
 
 #endif // LINCE_WINDOW_H
