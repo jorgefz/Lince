@@ -10,8 +10,6 @@
  * | LINCE_LINUX       | Defined on GNU/Linux                                       |
  * | LINCE_MACOS       | Defined on MacOS                                           |
  * | LINCE_VERSION     | String with current engine version                         |
- * | LINCE_DIR         | Directory where output files are saved                     |
- * | LINCE_ASSETS_PATH | Relative path between executable and Lince's assets folder |
  * + ----------------- + ---------------------------------------------------------- +
  * 
  * ## Debugging ##
@@ -73,15 +71,6 @@
 #endif
 
 /* Directories */
-#ifndef LINCE_DIR
-    /// Directory where output files are saved
-    #define LINCE_DIR ""
-#endif
-
-#ifndef LINCE_ASSETS_PATH
-    /// Relative path between executable and Lince's assets folder
-    #define LINCE_ASSETS_PATH "../../../lince/assets" 
-#endif
 
 /* Misc */
 #define LINCE_UNUSED(x) (void)(x)  ///< Gets rid of unused variable compiler warnings
