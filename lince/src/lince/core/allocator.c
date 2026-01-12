@@ -21,12 +21,17 @@ typedef struct LinceAllocator {
 
 
 #ifdef LINCE_DEBUG_MEMCHECK
-/** Header data stored in memory before every allocated block */
+/** @brief Header data stored in memory before every allocated block
+* which provides additional context about the allocated memory block.
+* @note The "_pad" member exists only to ensure the struct is 32 bytes in size. 
+*/
 typedef struct LinceAllocHeader {
     LinceAllocator* allocator; ///< Pointer to _global_allocator. Check for integrity of block memory.
-    size_t size;               ///< Size of the allocated block.
-    LinceAllocTag tag;         ///< Category tag
+    size_t  size;    ///< Size of the allocated block.
+    int32_t tag;     ///< Category tag
+    int32_t _pad[3]; ///< Padding to ensure sizeof(LinceAllocHeader) == 32 bytes.
 } LinceAllocHeader;
+
 #endif
 
 
