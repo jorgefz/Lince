@@ -13,7 +13,7 @@ typedef struct LinceAllocator {
     LinceAllocFn   alloc;   ///< Function to allocate a block of memory of given size
     LinceReallocFn realloc; ///< Function to reallocate a block of memory to a different size
     LinceFreeFn    free;    ///< Function to deallocate a block of memory
-    LinceBool initialised;   ///< LinceInitAllocator called
+    LinceBool initialised;  ///< LinceInitAllocator called
     void* user_data;        ///< Custom user-defined data passed to the allocator functions
     LinceAllocStats stats;  ///< Allocation stats and memory checks
 } LinceAllocator;
@@ -38,25 +38,10 @@ static void  LinceStdFreeWrapper(void* block, void* uptr)                 { LINC
 
 /* --- Wrappers for external libraries --- */
 
-/* Memory management interface for array functions */
-static void* LinceArrayAlloc(size_t size)               { return LinceMemoryAlloc  (size,        0, "array.c", "<array_t function>"); }
-static void* LinceArrayRealloc(void* block, size_t size){ return LinceMemoryRealloc(block, size, 0, "array.c", "<array_t function>"); }
-static void  LinceArrayFree(void* block)                {        LinceMemoryFree   (block,       0, "array.c", "<array_t function>"); }
-
-/* Memory management interface for hashmap functions */
-static void* LinceHashmapAlloc(size_t size)               { return LinceMemoryAlloc  (size,        0, "hashmap.c", "<hashmap_t function>"); }
-static void* LinceHashmapRealloc(void* block, size_t size){ return LinceMemoryRealloc(block, size, 0, "hashmap.c", "<hashmap_t function>"); }
-static void  LinceHashmapFree(void* block)                {        LinceMemoryFree   (block,       0, "hashmap.c", "<hashmap_t function>"); }
-
-/* Memory management interface for string functions */
-static void* LinceStringAlloc(size_t size) { return LinceMemoryAlloc(size,  0, "str.c", "<string_t function>"); }
-static void  LinceStringFree(void* block)  {        LinceMemoryFree (block, 0, "str.c", "<string_t function>"); }
-
 /* Memory management interface for DAST functions (string, array, hashmap) */
 static void* LinceDASTAlloc(size_t size)               { return LinceMemoryAlloc  (size,        0, "dast.h", "<dast function>"); }
 static void* LinceDASTRealloc(void* block, size_t size){ return LinceMemoryRealloc(block, size, 0, "dast.h", "<dast function>"); }
 static void  LinceDASTFree(void* block)                {        LinceMemoryFree   (block,       0, "dast.h", "<dast function>"); }
-
 
 /* Memory management interface for stbi_image */
 void* LinceSTBIImageAlloc(size_t size)                { return LinceMemoryAlloc  (size,        0, "stb_image.c", "<stb_image function>"); }
@@ -98,6 +83,7 @@ void LinceAllocatorUninit(void){
 void LinceGetAllocStats(LinceAllocStats* stats){
     *stats = _global_allocator.stats;
 }
+
 
 void LinceSetAllocator(LinceAllocFn alloc_fn, LinceReallocFn realloc_fn, LinceFreeFn free_fn, void* user_data){
     if(_global_allocator.initialised){
