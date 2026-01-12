@@ -1,5 +1,30 @@
 #include "mem.h"
 
+/** Default values for the default global allocator.
+* NULL when stdlib is disabled, and stdlib functions otherwise */
+#ifdef DAST_NO_STDLIB
+    #define DAST_FALLBACK_ALLOCATOR (dast_allocator_t){0}
+#else
+    #define DAST_FALLBACK_ALLOCATOR (dast_allocator_t){malloc, realloc, free}
+#endif
+
+/* Default global allocator interface adopted when
+ * calling function whose names do *not* end in "_custom".
+ */
+static dast_allocator_t DAST_DEFAULT_ALLOCATOR = DAST_FALLBACK_ALLOCATOR;
+
+dast_allocator_t dast_get_alloc(void){
+    return DAST_DEFAULT_ALLOCATOR;
+}
+
+void dast_set_alloc(dast_allocator_t alloc){
+    if(!alloc.alloc || !alloc.realloc || !alloc.free){
+        DAST_DEFAULT_ALLOCATOR = DAST_FALLBACK_ALLOCATOR;
+        return;
+    }
+    DAST_DEFAULT_ALLOCATOR = alloc;
+}
+
 dast_bool dast_memeq(const void* lhs, const void* rhs, dast_sz size){
 #if DAST_NO_STDLIB
     register const dast_u8 *s1 = (const dast_u8*)lhs;

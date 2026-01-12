@@ -1,17 +1,21 @@
-/* 
+/** @file defs.h
+ * `defs.h` contains type definitions for the library as well as useful macros
+ *  and the definition of a memory allocation interface. 
+ *  
  * +--------------+
  * |    Macros    |
  * +--------------+
  * 
- * +-----------------+----------------------------------------+
- * | Macro           | Description                            |
- * +-----------------+----------------------------------------+
- * | DAST_NO_STDLIB  | Disables all standard library includes |
- * | DAST_ALLOC      | Custom global memory alloc             |
- * | DAST_REALLOC    | Custom global memory realloc           |
- * | DAST_FREE       | Custom global memory free              |
- * | DAST_HASH_64BIT | Enables 64-bit hashes                  |
- * | 
+ * +------------------------+----------------------------------------+
+ * | Macro                  | Description                            |
+ * +------------------------+----------------------------------------+
+ * | DAST_VERSION_MAJOR     | Major DAST version (semver).           |
+ * | DAST_VERSION_MINOR     | Minor DAST version (semver).           |
+ * | DAST_64BIT             | DAST was compiled in 64-bit mode.      |
+ * | DAST_32BIT             | DAST was compiled in 32-bit mode.      |
+ * | DAST_NO_STDLIB         | Disables all standard library includes |
+ * | DAST_DEFAULT_ALLOCATOR | Default allocator used by the library  |
+ * +------------------------+----------------------------------------+
  * 
  */
 
@@ -21,7 +25,7 @@
 
 /* Version */
 #define DAST_VERSION_MAJOR 1
-#define DAST_VERSION_MINOR 0
+#define DAST_VERSION_MINOR 1
 
 /* Check architecture */
 
@@ -107,25 +111,6 @@
 typedef dast_u32 dast_bool; /**< Boolean type */
 #define dast_true  (dast_bool)1 /**< Boolean true */
 #define dast_false (dast_bool)0 /**< Boolean false */
-
-/* Memory allocation */
-typedef void* (*dast_alloc_t)  (dast_sz size);                 /**< Typedef for memory allocation function */ 
-typedef void* (*dast_realloc_t)(void* block, dast_sz newsize); /**< Typedef for memory reallocation function */
-typedef void  (*dast_free_t)   (void* block);                  /**< Typedef for memory deallocation function */
-
-/** Memory management interface */
-typedef struct dast_allocator {
-    dast_alloc_t   alloc;   /**< Allocation function   */
-    dast_realloc_t realloc; /**< Reallocation function */
-    dast_free_t    free;    /**< Deallocation function */
-} dast_allocator_t;
-
-/* Default allocator */
-#ifdef DAST_NO_STDLIB
-    #define DAST_DEFAULT_ALLOCATOR (dast_allocator_t){0}
-#else
-    #define DAST_DEFAULT_ALLOCATOR (dast_allocator_t){malloc, realloc, free}
-#endif
 
 /* Hashing */
 #ifdef DAST_HASH_64BIT

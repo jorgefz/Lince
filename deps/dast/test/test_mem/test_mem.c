@@ -8,6 +8,61 @@
 #include <cmocka.h>
 
 
+static void* custom_alloc(dast_sz size){
+    return test_malloc(size);
+}
+
+static void* custom_realloc(void* block, dast_sz newsize){
+    return test_realloc(block, newsize);
+}
+
+static void custom_free(void* block){
+    test_free(block);
+}
+
+
+void test_default_alloc(void** state){
+    (void)state;
+    dast_allocator_t alloc = dast_get_alloc();
+#ifdef DAST_NO_STDLIB
+    assert_ptr_equal(alloc.alloc,   dast_null);
+    assert_ptr_equal(alloc.realloc, dast_null);
+    assert_ptr_equal(alloc.free,    dast_null);
+#else
+    assert_ptr_equal(alloc.alloc,   malloc);
+    assert_ptr_equal(alloc.realloc, realloc);
+    assert_ptr_equal(alloc.free,    free);
+#endif
+}
+
+
+void test_get_set_alloc(void** state){
+    (void)state;
+    dast_allocator_t custom = {custom_alloc, custom_realloc, custom_free};
+    dast_set_alloc(custom);
+    dast_allocator_t alloc = dast_get_alloc();
+    assert_memory_equal(&alloc, &custom, sizeof(dast_allocator_t));
+}
+
+void test_fallback_alloc(void** state){
+    (void)state;
+
+    dast_allocator_t custom = {custom_alloc, custom_realloc, dast_null};
+    dast_set_alloc(custom);
+    dast_allocator_t alloc = dast_get_alloc();
+
+#ifdef DAST_NO_STDLIB
+    assert_ptr_equal(alloc.alloc,   dast_null);
+    assert_ptr_equal(alloc.realloc, dast_null);
+    assert_ptr_equal(alloc.free,    dast_null);
+#else
+    assert_ptr_equal(alloc.alloc,   malloc);
+    assert_ptr_equal(alloc.realloc, realloc);
+    assert_ptr_equal(alloc.free,    free);
+#endif
+}
+
+
 void test_memeq(void** state){
     (void)state;
     const char a[] = "Test String";

@@ -113,7 +113,7 @@ hashmap_t* hashmap_init_custom(
 #ifdef DAST_NO_STDLIB
         return dast_null;
 #else
-        map->alloc = DAST_DEFAULT_ALLOCATOR;
+        map->alloc = dast_get_alloc();
 #endif
     } else map->alloc = alloc;
 
@@ -136,7 +136,7 @@ hashmap_t* hashmap_init_custom(
  */
 hashmap_t* hashmap_init(hashmap_t* map, dast_sz size_hint){
     return hashmap_init_custom(
-        map, size_hint, DAST_DEFAULT_ALLOCATOR, dast_null, dast_null
+        map, size_hint, dast_get_alloc(), dast_null, dast_null
     );
 }
 

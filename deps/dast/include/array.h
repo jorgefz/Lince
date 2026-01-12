@@ -1,3 +1,30 @@
+/** @file array.h
+* `array.h` is an implementation of a resizeable contiguous array containing items of the same type.
+* A Dast array stores its data on the heap.
+* 
+* Example code:
+* ```c
+* 	array_t data;
+* 	array_init(&data, sizeof(float));
+*   array_resize(&data, 10);
+*
+*	for(uint32_t i = 0; i != data.size; ++i){
+*       float v = (float)i;
+*		array_set(&data, &v, i);
+*	}
+* 	
+* 	float value = 500.0f;
+* 	array_push_back(&data, &value);
+* 	
+*	for(float *item = data.begin; item != data.end; ++item){
+*		printf("%.4f ", *item);
+*	}
+* 	
+* 	array_uninit(&data);
+* ```
+*/
+
+
 #ifndef DAST_ARRAY_H
 #define DAST_ARRAY_H
 
@@ -16,7 +43,7 @@ typedef struct dast_array {
 	void* end;   /**< Pointer to the element after the last element of the array.
 	                  If the array has a size of zero, then begin==end. */
     dast_allocator_t alloc; /**< Memory allocation functions */
-} array_t;
+} array_t; /**< Typedef for dast_array */
 
 
 /** @brief Initialises an array via a given pointer.

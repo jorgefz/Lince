@@ -1,3 +1,20 @@
+rem Helper script to compile DAST with VStudio on Windows.
+rem ---
+rem Requires setting up MSVC in the command line,
+rem either by running from a "Developer Command Prompt"
+rem or by setting up the environment variables.
+rem See: https://learn.microsoft.com/en-us/cpp/build/building-on-the-command-line
+rem --- 
+rem USAGE: winmake.bat [PROJECT] ([ARCH]) (NoSTD)
+rem     Project: project name
+rem     Architecture: (optional) 32 or 64, default is 64
+rem     NoSTDLib: (optional) exclude C standard library.
+rem         Any value is valid; leave empty to include the std lib.
+rem ---
+rem EXAMPLES:
+rem     winmake.bat test 32
+rem     winmake.bat test 64 NoSTD
+
 @echo off
 
 set "proj=%1"

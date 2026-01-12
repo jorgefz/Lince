@@ -38,7 +38,7 @@ Initialises an array via a given pointer.
 Should be later freed using `array_uninit`.
 */
 array_t* array_init(array_t* array, dast_sz element_size){
-	return array_init_custom(array, element_size, DAST_DEFAULT_ALLOCATOR);
+	return array_init_custom(array, element_size, dast_get_alloc());
 }
 
 #include <stdio.h>

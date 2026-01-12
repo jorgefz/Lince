@@ -32,9 +32,8 @@
 #include "mem.h"
 #include "str.h"
 
-
+/** @brief Ratio between hasmap size vs number of entries over which the hashmap is resized */
 #define HASHMAP_LOADING_FACTOR 2
-
 
 /** @typedef Type for hashing function */
 typedef dast_u64 (*hashmap_hashfn_t)(const void* data, dast_sz len);
@@ -45,17 +44,17 @@ typedef dast_bool (*hashmap_eqfn_t)(const void* a, const void* b, dast_sz len);
 /** @struct hashmap_entry
  * @brief Hashmap entry. Holds a key-value pair.
  */
-typedef struct hashmap_entry {
+typedef struct dast_hashmap_entry {
 	char*    key;               /**< Key (may be string or binary)   */
 	dast_sz  len;				/**< Number of bytes in the key	     */
 	void*    value;             /**< Data associated with the key    */
-	struct hashmap_entry* next; /**< Linked list for hash collisions */
-} hashmap_entry_t;
+	struct dast_hashmap_entry* next; /**< Linked list for hash collisions */
+} hashmap_entry_t; /**< Typedef for hashmap_entry */
 
 /** @struct hashmap_t
  * @brief Hash map data structure. Holds key-value pairs accessed via hashes.
  */
-typedef struct hashmap {
+typedef struct dast_hashmap {
 	dast_sz           size;     /**< Total number of buckets  */
     dast_sz           entries;  /**< Number of filled buckets */
 	hashmap_entry_t** table;    /**< Hash table of entries    */
@@ -63,7 +62,7 @@ typedef struct hashmap {
 	dast_allocator_t  alloc;    /**< Memory allocator       */
 	hashmap_hashfn_t  hash_fn;  /**< Hashing function       */
 	hashmap_eqfn_t    eq_fn;    /**< Key equality function  */
-} hashmap_t;
+} hashmap_t; /**< Typedef for dast_hashmap */
 
 
 /** @brief FNV1-a 64-bit hashing algorithm */
@@ -119,7 +118,7 @@ dast_bool hashmap_has_keyb(hashmap_t* map, const void* bkey, dast_sz key_len);
 dast_bool hashmap_has_key(hashmap_t* map, string_t key);
 
 /** @brief Retrieves the data associated with a key.
- * @param hashmap to query
+ * @param map hashmap to query
  * @param bkey key to search for, which can be any set of bytes
  * @param key_len number of bytes in the key
  * @returns map element associated to the input key, or NULL if the key does not exist
@@ -127,8 +126,8 @@ dast_bool hashmap_has_key(hashmap_t* map, string_t key);
 void* hashmap_getb(hashmap_t* map, const void* bkey, dast_sz key_len);
 
 /** @brief Retrieves the data associated with a key.
- * @param hashmap to query
- * @param bkey key to search for, which can be any set of bytes
+ * @param map hashmap to query
+ * @param key string key to search for
  * @returns map element associated to the input key, or NULL if the key does not exist.
  * @note The function may also return NULL if the key exists but it is mapped to a NULL value.
  */
@@ -171,6 +170,7 @@ hashmap_t* hashmap_set(hashmap_t* map, string_t key, void* value);
 hashmap_t* hashmap_resize(hashmap_t* map);
 
 /** @brief Returns the next key in a hashmap.
+ * @param map hashmap to iterate
  * @param bkey Previous key, which can be any set of bytes. To start iterating, input NULL.
  * @param key_len number of bytes in the key. Must point to valid memory.
  * @returns the next key in the hashmap, with it length stored in the input `key_len`.
@@ -187,6 +187,7 @@ hashmap_t* hashmap_resize(hashmap_t* map);
 void* hashmap_iterb(hashmap_t* map, const void* bkey, dast_sz* key_len);
 
 /** @brief Returns the next key in a hashmap.
+ * @param map hashmap to iterate
  * @param key Previous string key. To start iterating, input empty string (where `str` field is NULL).
  * @returns the next key in the hashmap.
  * @note When the functions returns NULL, there are no more keys to fetch.

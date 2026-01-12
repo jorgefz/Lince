@@ -1,7 +1,40 @@
+/** @file mem.h
+* `mem.h` contains some utility functions memory that substitute existing stdlib functions. 
+*/
+
+
 #ifndef DAST_MEM_H
 #define DAST_MEM_H
 
 #include "defs.h"
+
+/* Memory allocation */
+typedef void* (*dast_alloc_t)  (dast_sz size);                 /**< Typedef for memory allocation function */ 
+typedef void* (*dast_realloc_t)(void* block, dast_sz newsize); /**< Typedef for memory reallocation function */
+typedef void  (*dast_free_t)   (void* block);                  /**< Typedef for memory deallocation function */
+
+/** @brief Allocation interface to manage memory blocks on the heap */
+typedef struct dast_allocator {
+    dast_alloc_t   alloc;   /**< Allocation function   */
+    dast_realloc_t realloc; /**< Reallocation function */
+    dast_free_t    free;    /**< Deallocation function */
+} dast_allocator_t; /**< Typedef for dast_allocator */
+
+/** @brief Returns the default global allocation interface.
+ * Unless changed with `dast_set_alloc`, this will the
+ * stdlib functions `malloc`, `realloc`, and `free`;
+ * or NULL values if usage of the stdlib is disabled (`DAST_NO_STDLIB`).
+ */
+dast_allocator_t dast_get_alloc(void);
+
+/** @brief Change the default global allocator.
+ * This functions are adopted to allocate and free memory on the heap
+ * when calling functions that do *not* end in "_custom".
+ * @param alloc New default global allocation interface.
+ * @note If any function in `alloc` is `dast_null`, the default allocator will
+ * fallback to stdlib functions (or `dast_null` if the stdlib is disabled).
+ */
+void dast_set_alloc(dast_allocator_t alloc);
 
 /** Compares `size` bytes between two memory locations `lhs` and `rhs`.
  * @param lhs First memory location at which to compare data

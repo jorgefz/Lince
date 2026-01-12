@@ -75,7 +75,8 @@ void test_hashmap_init_custom_default(void** state){
     hashmap_t map;
     hashmap_init_custom(&map, START_SIZE, (dast_allocator_t){0}, NULL, NULL);
     
-    assert_memory_equal(&map.alloc, &DAST_DEFAULT_ALLOCATOR, sizeof(dast_allocator_t));
+    dast_allocator_t default_alloc = dast_get_alloc();
+    assert_memory_equal(&map.alloc, &default_alloc, sizeof(dast_allocator_t));
     assert_ptr_equal(map.hash_fn, hashmap_FNV1a64_hash);
     assert_ptr_equal(map.eq_fn, dast_memeq);
     

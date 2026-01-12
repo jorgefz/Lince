@@ -1,3 +1,30 @@
+/** @file str.h
+* `str.h` is an implementation of a lightweight character string type.
+* It is a thin wrapper around a character array, storing its size
+* and pointer to heap-allocated data,  only 16 bytes in size (8 bytes on 32-bit systems)
+* and zero-terminated.
+* It also supports custom per-object memory allocators,
+* which are stored in the space before the character array.
+* 
+* Example code:
+* ```c
+*   string_t s = string_from_literal("I am a heap-allocated string");
+*   printf("%s. %u\n", s.str, s.len);
+*   string_free(&s);
+*
+*   string_t a = string_from_len(10);
+*   for(int i = 0; i != a.len; ++i){
+*       a.str[i] = 'A';
+*   }
+*   printf("%s\n", a); // AAAAAAAAAA
+*   string_free(&a);
+*
+*   string_t b = string_scoped_lit("I am a scoped string stored on the stack, no need to free me!");
+*   printf("%s I am %u characters long", b.str, b.len);
+* ```
+*/
+
+
 #ifndef DAST_STR_H
 #define DAST_STR_H
 
@@ -15,7 +42,7 @@
 typedef struct dast_string {
     char* str;   /**< Character array                    */
     dast_sz len; /**< Number of characters in the array  */
-} string_t;
+} string_t; /**< Typedef for dast_string */
 
 /** @brief Resolves to `dast_true` if a string was successfully initialised */
 #define string_ok(STR) (dast_bool)(!!(STR).str)
@@ -56,14 +83,14 @@ typedef struct dast_string {
  * @param alloc Custom allocation functions
  * @return string container storing copy of input character array
 */
-string_t string_from_chars_custom(const char* chars, dast_sz len, dast_allocator_t alloc);
+string_t string_from_chars_custom(const char* str, dast_sz len, dast_allocator_t alloc);
 
 /** @brief Creates a string from a character array
  * @param str Character array 
  * @param len Number of chacaters in the character array
  * @return string container storing copy of input character array
 */
-string_t string_from_chars(const char* chars, dast_sz len);
+string_t string_from_chars(const char* str, dast_sz len);
 
 /** @brief Create an empty string with given size, using a custom allocator
  * @param len Number of characters in the string
@@ -81,7 +108,7 @@ string_t string_from_len(dast_sz len);
 /** @brief Create a string from a printf-style format char array, using a custom allocator.
  * @param alloc Custom allocation functions
  * @param fmt Printf-style format string
- * @param args Arguments for string format
+ * @param ... Arguments for string format
  * @returns string with arguments composed following input format
  * @note When using %s (string) arguments on formatted strings,
  * it is recommended to also specify the maximum number of characters to write:
@@ -90,10 +117,10 @@ string_t string_from_len(dast_sz len);
 **/
 string_t string_from_fmt_custom(dast_allocator_t alloc, const char fmt[], ...);
 
-/** @brief Create a string from a format char array.
- * @param fmt Format string
- * @param args Arguments for string format 
- * @returns string with arguments composed following input format
+/** @brief Create a string from a printf-style format char array.
+ * @param fmt Printf-style format string.
+ * @param ... Arguments for string format 
+ * @returns String with arguments composed following input format
  * @note When using %s (string) arguments on formatted strings,
  * it is recommended to also specify the maximum number of characters to write:
  *      string_from_fmt("%.*s", len, str);
@@ -110,11 +137,17 @@ string_t string_copy_custom(string_t s, dast_allocator_t alloc);
 
 /** @brief Duplicate an existing string.
  * @param s String to copy.
- * @param alloc Allocator for the new string.
  * @returns New heap-allocated string.
- * @note Attempting to copy a scoped string results in undefined behaviour.
+ * @note Attempting to copy a scoped string results in undefined behaviour. Instead use `string_copy_scoped`.
 */
 string_t string_copy(string_t s);
+
+/** @brief Duplicate an existing scoped string.
+ * @param s String to copy.
+ * @returns New heap-allocated string.
+ * @note The default dast allocator will be used.
+*/
+string_t string_copy_scoped(string_t s);
 
 /** @brief Frees character array in string. Sets `str` to NULL and `len` to zero.
  * @param str string to deallocate.
