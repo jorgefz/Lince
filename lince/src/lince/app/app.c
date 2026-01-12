@@ -559,7 +559,7 @@ static void LinceAppDrawDebugUIPanel(LinceLayer* overlay, float dt){
     struct nk_context *ctx = LinceUIGetNkContext(ui);
     nk_style_push_font(ctx, LinceUIGetFontHandle(ui, string_scoped_lit("droid20")));
     
-    if (nk_begin(ctx, "Debug", nk_rect(50, 50, 500, 250),
+    if (nk_begin(ctx, "Debug", nk_rect(50, 50, 550, 250),
         NK_WINDOW_BORDER|NK_WINDOW_MOVABLE|NK_WINDOW_SCALABLE|
         NK_WINDOW_MINIMIZABLE|NK_WINDOW_TITLE
     )) {
@@ -577,12 +577,21 @@ static void LinceAppDrawDebugUIPanel(LinceLayer* overlay, float dt){
 
         nk_layout_row_static(ctx, 30, 450, 1);
         LinceAllocStats alloc_stats;
-        LinceGetAllocStats(&alloc_stats);
+        LinceGetGlobalAllocStats(&alloc_stats);
         nk_labelf(ctx, NK_TEXT_LEFT, "Allocated blocks: %ld, max %ld", alloc_stats.nblocks, alloc_stats.max_blocks);
-        nk_labelf(ctx, NK_TEXT_LEFT, "Memory used: %ld B (%.2g MB), max %ld B (%.2f MB)",
-            alloc_stats.nbytes, (double)alloc_stats.nbytes/1024.0/1024.0,
-            alloc_stats.max_bytes, (double)alloc_stats.max_bytes/1024.0/1024.0
+        nk_labelf(ctx, NK_TEXT_LEFT, "Memory used: %.0f kB (%.2g MB), max %.0f kB (%.2f MB)",
+            (double)alloc_stats.nbytes/1024.0, (double)alloc_stats.nbytes/1024.0/1024.0,
+            (double)alloc_stats.max_bytes/1024.0, (double)alloc_stats.max_bytes/1024.0/1024.0
         );
+
+        LinceAllocStats alloc_stats_tagged[LinceAllocTag_Count];
+        LinceGetAllocStatsTagged(alloc_stats_tagged);
+        for(LinceAllocTag tag = 0; tag != LinceAllocTag_Count; ++tag){
+            nk_layout_row_static(ctx, 30, 450, 1);
+            nk_labelf(ctx, NK_TEXT_LEFT, "  %s: %ld blocks, %.3f kB",
+                LinceGetAllocTagStringName(tag), alloc_stats_tagged[tag].nblocks, (double)alloc_stats_tagged[tag].nbytes/1024.0);
+        }
+
     }
     nk_end(ctx);
     nk_style_pop_font(ctx);

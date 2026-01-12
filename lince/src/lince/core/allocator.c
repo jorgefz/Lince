@@ -16,6 +16,7 @@ typedef struct LinceAllocator {
     LinceBool initialised;  ///< LinceInitAllocator called
     void* user_data;        ///< Custom user-defined data passed to the allocator functions
     LinceAllocStats stats;  ///< Allocation stats and memory checks
+    LinceAllocStats tag_stats[LinceAllocTag_Count]; ///< Allocation stats per category
 } LinceAllocator;
 
 
@@ -24,7 +25,7 @@ typedef struct LinceAllocator {
 typedef struct LinceAllocHeader {
     LinceAllocator* allocator; ///< Pointer to _global_allocator. Check for integrity of block memory.
     size_t size;               ///< Size of the allocated block.
-    // LinceAllocTag tag;         ///< Category tag
+    LinceAllocTag tag;         ///< Category tag
 } LinceAllocHeader;
 #endif
 
@@ -45,12 +46,12 @@ static void* LinceDASTRealloc(void* block, size_t size){ return LinceMemoryReall
 static void  LinceDASTFree(void* block)                {        LinceMemoryFree   (block,       0, "dast.h", "<dast function>"); }
 
 /* Memory management interface for stbi_image */
-void* LinceSTBIImageAlloc(size_t size)                { return LinceMemoryAlloc  (size,        0, "stb_image.c", "<stb_image function>"); }
+void* LinceSTBIImageAlloc(size_t size)                { return LinceMemoryAllocTagged(size,    LinceAllocTag_Assets, 0, "stb_image.c", "<stb_image function>"); }
 void* LinceSTBIImageRealloc(void* block, size_t size) { return LinceMemoryRealloc(block, size, 0, "stb_image.c", "<stb_image function>"); }
 void  LinceSTBIImageFree(void* block)                 {        LinceMemoryFree   (block,       0, "stb_image.c", "<stb_image function>"); }
 
 /* Memory management interface for toml */
-void* LinceTOMLAlloc(size_t size) { return LinceMemoryAlloc  (size,  0, "toml.c", "<toml function>"); }
+void* LinceTOMLAlloc(size_t size) { return LinceMemoryAllocTagged(size, LinceAllocTag_Assets, 0, "toml.c", "<toml function>"); }
 void  LinceTOMLFree(void* block)  {        LinceMemoryFree   (block, 0, "toml.c", "<toml function>"); }
 
 
@@ -89,8 +90,30 @@ void LinceAllocatorUninit(void){
 }
 
 /** @brief Obtain statistics about current memory usage */
-void LinceGetAllocStats(LinceAllocStats* stats){
+void LinceGetGlobalAllocStats(LinceAllocStats* stats){
     *stats = _global_allocator.stats;
+}
+
+/** @brief Obtain statistics about current memory usage per category */
+void LinceGetAllocStatsTagged(LinceAllocStats *stats){
+    for(LinceAllocTag tag = 0; tag != LinceAllocTag_Count; tag++){
+        stats[tag] = _global_allocator.tag_stats[tag];
+    }
+}
+
+/** @brief Return string name for memory category */
+const char* LinceGetAllocTagStringName(LinceAllocTag tag){
+    switch(tag){
+        case LinceAllocTag_Graphics:
+            return "Graphics";
+        case LinceAllocTag_Assets:
+            return "Assets";
+        case LinceAllocTag_Other:
+            return "Other";
+        default:
+            return "Unknown";
+    }
+    return NULL;
 }
 
 
@@ -106,7 +129,7 @@ void LinceSetAllocator(LinceAllocFn alloc_fn, LinceReallocFn realloc_fn, LinceFr
 }
 
 
-void* LinceMemoryAlloc(size_t size, int line, const char* file, const char* func){
+void* LinceMemoryAllocTagged(size_t size, LinceAllocTag tag, int line, const char* file, const char* func){
     LINCE_UNUSED(line);
     LINCE_UNUSED(file);
     LINCE_UNUSED(func);
@@ -121,17 +144,31 @@ void* LinceMemoryAlloc(size_t size, int line, const char* file, const char* func
     }
     header->allocator = &_global_allocator;
     header->size = size;
+    header->tag  = tag;
     block = header + 1;
+
     _global_allocator.stats.nblocks++;
     _global_allocator.stats.nbytes += (long)size;
     long nblocks = _global_allocator.stats.nblocks;
     _global_allocator.stats.max_blocks = LINCE_MAX(nblocks, _global_allocator.stats.max_blocks);
     _global_allocator.stats.max_bytes  = LINCE_MAX(_global_allocator.stats.nbytes,  _global_allocator.stats.max_bytes);
-    LINCE_INFO("Allocated %*ld byte block at 0x%p (in function %s, %ld total blocks)", 7, size, block, func, nblocks);
+    LINCE_INFO("Allocated %*ld byte block at 0x%p for %s (in function %s, %ld total blocks)",
+        7, size, block, LinceGetAllocTagStringName(tag), func, nblocks);
+
+    if(tag < LinceAllocTag_Count){
+        _global_allocator.tag_stats[tag].nblocks++;
+        _global_allocator.tag_stats[tag].nbytes += (long)size;
+        long tag_nblocks = _global_allocator.tag_stats[tag].nblocks;
+        _global_allocator.tag_stats[tag].max_blocks = LINCE_MAX(tag_nblocks, _global_allocator.tag_stats[tag].max_blocks);
+        _global_allocator.tag_stats[tag].max_bytes  = LINCE_MAX(_global_allocator.tag_stats[tag].nbytes,  _global_allocator.tag_stats[tag].max_bytes);
+    }
+
     
 #elif defined(LINCE_DEBUG) && !defined(LINCE_DEBUG_MEMCHECK)
+    LINCE_UNUSED(tag);
     _global_allocator.stats.nblocks++;
     _global_allocator.stats.max_blocks = LINCE_MAX(_global_allocator.stats.nblocks, _global_allocator.stats.max_blocks);
+
     block = _global_allocator.alloc(size, _global_allocator.user_data);
 #else
     block = _global_allocator.alloc(size, _global_allocator.user_data);
@@ -139,6 +176,12 @@ void* LinceMemoryAlloc(size_t size, int line, const char* file, const char* func
 
     return block;
 }
+
+
+void* LinceMemoryAlloc(size_t size, int line, const char* file, const char* func){
+    return LinceMemoryAllocTagged(size, LinceAllocTag_Other, line, file, func);
+}
+
 
 void* LinceMemoryRealloc(void* block, size_t size, int line, const char* file, const char* func){
     LINCE_UNUSED(line);
@@ -153,26 +196,34 @@ void* LinceMemoryRealloc(void* block, size_t size, int line, const char* file, c
 #if defined(LINCE_DEBUG) && defined(LINCE_DEBUG_MEMCHECK)
     LinceAllocHeader* header = (LinceAllocHeader*)block - 1;
     if(header->allocator != &_global_allocator){
-        LINCE_ERROR("Attempting to reallocate invalid or corrupted heap pointer 0x%p", block);
+        LINCE_ERROR("Attempting to reallocate invalid or corrupted heap pointer 0x%p for %s", block, LinceGetAllocTagStringName(header->tag));
         LINCE_ERROR("at %s:%d in function '%s'", file, line, func);
         exit(-1);
     }
     size_t old_size = header->size;
+    LinceAllocTag tag = header->tag;
     
     LinceAllocHeader* new_header = _global_allocator.realloc(header, size + sizeof(LinceAllocHeader), _global_allocator.user_data);
     if(new_header == NULL){
-        LINCE_ERROR("Failed to allocate block of %ld bytes", size + sizeof(LinceAllocHeader));
+        LINCE_ERROR("Failed to allocate block of %ld bytes for %s", size + sizeof(LinceAllocHeader), LinceGetAllocTagStringName(header->tag));
         LINCE_ERROR("at %s:%d in function '%s'", file, line, func);
         exit(-1);
     }
     
     new_header->allocator = &_global_allocator;
     new_header->size = size;
+    new_header->tag  = tag;
     new_block = new_header + 1;
     _global_allocator.stats.nbytes += (long)(size) - (long)(old_size);
     _global_allocator.stats.max_bytes  = LINCE_MAX(_global_allocator.stats.nbytes,  _global_allocator.stats.max_bytes);
+    LINCE_INFO("Reallocated %*ld byte block to 0x%p for %s, from %ld byte block at 0x%p (in function %s)",
+        5, size, new_block, LinceGetAllocTagStringName(header->tag), old_size, block, func);
+    
+    if(tag < LinceAllocTag_Count){
+        _global_allocator.tag_stats[tag].nbytes += (long)(size) - (long)(old_size);
+        _global_allocator.tag_stats[tag].max_bytes  = LINCE_MAX(_global_allocator.tag_stats[tag].nbytes,  _global_allocator.tag_stats[tag].max_bytes);
+    }
 
-    LINCE_INFO("Reallocated %*ld byte block to 0x%p, from %ld byte block at 0x%p (in function %s)", 5, size, new_block, old_size, block, func);
 
 #elif defined(LINCE_DEBUG) && !defined(LINCE_DEBUG_MEMCHECK)
     new_block = _global_allocator.realloc(block, size, _global_allocator.user_data);
@@ -201,6 +252,7 @@ void LinceMemoryFree(void* block, int line, const char* file, const char* func){
     }
 
     size_t size = header->size;
+    LinceAllocTag tag = header->tag;
     _global_allocator.free(header, _global_allocator.user_data);
 
     _global_allocator.stats.nblocks--;
@@ -208,7 +260,13 @@ void LinceMemoryFree(void* block, int line, const char* file, const char* func){
 
     long nblocks = _global_allocator.stats.nblocks;
     long nbytes = _global_allocator.stats.nbytes;
-    LINCE_INFO("Deallocated %*ld byte block at 0x%p (in function %s, %d blocks and %ld bytes in use)", 5, size, block, func, nblocks, nbytes);
+    LINCE_INFO("Deallocated %*ld byte block at 0x%p for %s (in function %s, %d blocks and %ld bytes in use)",
+        5, size, block, LinceGetAllocTagStringName(tag), func, nblocks, nbytes);
+
+    if(tag < LinceAllocTag_Count){
+        _global_allocator.tag_stats[tag].nblocks--;
+        _global_allocator.tag_stats[tag].nbytes -= (long)size;
+    }
 
 #elif defined(LINCE_DEBUG) && !defined(LINCE_DEBUG_MEMCHECK)
     (void)line, (void)file, (void)func;
