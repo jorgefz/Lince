@@ -23,7 +23,8 @@ typedef struct LinceAllocator {
 /** Header data stored in memory before every allocated block */
 typedef struct LinceAllocHeader {
     LinceAllocator* allocator; ///< Pointer to _global_allocator. Check for integrity of block memory.
-    size_t size; ///< Size of the allocated block.
+    size_t size;               ///< Size of the allocated block.
+    // LinceAllocTag tag;         ///< Category tag
 } LinceAllocHeader;
 #endif
 
@@ -76,7 +77,15 @@ void LinceAllocatorInit(void){
 
 /** @brief Uninitialise Allocator */
 void LinceAllocatorUninit(void){
-
+    // Check unfreed memory and emit warning
+    if(_global_allocator.stats.nblocks != 0){
+        LINCE_WARN("Allocator warning: %u unfreed blocks (%u bytes)",
+            _global_allocator.stats.nblocks,
+            _global_allocator.stats.nbytes
+        );
+    }
+    _global_allocator.initialised = LinceFalse;
+    LINCE_INFO("Allocator uninitialised");
 }
 
 /** @brief Obtain statistics about current memory usage */
