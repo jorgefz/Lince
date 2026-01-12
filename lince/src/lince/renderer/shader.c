@@ -69,7 +69,7 @@ LinceShader* LinceCreateShaderFromSrc(
 
 	// Start out with hashmap of 21 buckets to avoid costs of
 	// Resizing often at small sizes (e.g. at sizes 2, 3, 5, 7, 11, etc).
-	void* ret = hashmap_init_custom(&shader->uniforms, 20, LINCE_DAST_HASHMAP_ALLOCATOR, NULL, NULL);
+	void* ret = hashmap_init(&shader->uniforms, 20);
 	LINCE_ASSERT(ret,
 		"Failed to create hashmap for shader %d uniforms", shader->id);
 
@@ -103,7 +103,7 @@ int LinceGetShaderUniformID(LinceShader* shader, string_t name){
 
 	/*
 	Uniform locations are saved as void* addresses in the hashmap
-	to avoid allocating memory and freein it afterwards.
+	to avoid allocating memory and freeing it afterwards.
 	The void* type should be 64 bits long (in 64bit systems).
 	*/
 
@@ -114,19 +114,18 @@ int LinceGetShaderUniformID(LinceShader* shader, string_t name){
 		return (int)location;
 	}
 	
-	location = (uint64_t)glGetUniformLocation(shader->id, name.str);
-	hashmap_set(&shader->uniforms, name, (void*)location);
+	int result = glGetUniformLocation(shader->id, name.str);
 	
-	// Implementation without hashmap - slower?
-	// int location =  glGetUniformLocation(shader->id, name);
-	
-	if(location < 0){
+	if(result < 0){
 		LINCE_INFO("Uniform '%s' not found in shader %d",
 			name.str, shader->id);
+	} else {
+		location = (uint64_t)result;
+		hashmap_set(&shader->uniforms, name, (void*)location);
 	}
 	
 	LINCE_PROFILER_END(timer);
-	return (int)location;
+	return result;
 }
 
 /* Set integer uniform */

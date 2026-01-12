@@ -405,12 +405,12 @@ static void LinceInit(){
     LinceAssetCacheRegister(&app.asset_cache, LinceSIDFromLit("default_sprite"), LinceSIDFromLit("texture"), string_scoped_lit("sprites/default.png"));
 
     // Create layer stacks
-    array_init_custom(&app.layer_stack, sizeof(LinceLayer), LINCE_DAST_ARRAY_ALLOCATOR);
-    array_init_custom(&app.overlay_stack, sizeof(LinceLayer), LINCE_DAST_ARRAY_ALLOCATOR);
+    array_init(&app.layer_stack, sizeof(LinceLayer));
+    array_init(&app.overlay_stack, sizeof(LinceLayer));
     
     // Create scene stack
     // array_init(&app.scene_stack, sizeof(LinceScene));
-    void* success = hashmap_init_custom(&app.scene_cache, 5, LINCE_DAST_HASHMAP_ALLOCATOR, NULL, NULL);
+    void* success = hashmap_init(&app.scene_cache, 5);
     LINCE_ASSERT(success, "Failed to create scene cache");
 
     // Create a windowed mode window and its OpenGL context

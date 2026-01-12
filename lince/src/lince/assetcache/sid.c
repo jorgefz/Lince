@@ -12,7 +12,7 @@ hashmap_t* LinceInitSIDCache(){
     if (SID_CACHE.table){
         return &SID_CACHE;
     }
-    return hashmap_init_custom(&SID_CACHE, 10, LINCE_DAST_HASHMAP_ALLOCATOR, NULL, LinceSIDCmp);
+    return hashmap_init_custom(&SID_CACHE, 10, (dast_allocator_t){0}, NULL, LinceSIDCmp);
 }
 
 void LinceUninitSIDCache(){
@@ -34,7 +34,7 @@ LinceSID LinceMakeSID(string_t name){
 	LinceSID sid = (LinceSID)hashmap_FNV1a64_hash(name.str, name.len);
     if(SID_CACHE.table){
         string_t* s = LinceAlloc(sizeof(string_t));
-        *s = string_copy_custom(name, LINCE_DAST_STRING_ALLOCATOR);
+        *s = string_copy_scoped(name);
         hashmap_setb(&SID_CACHE, &sid, sizeof(LinceSID), s);
     }
 	return sid;

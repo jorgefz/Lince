@@ -9,7 +9,7 @@ static void LinceTilesetCalculateCoords(LinceTileset* tileset){
 	uint32_t xcells = tileset->xcells;
 	uint32_t ycells = tileset->ycells;
 	
-	array_init_custom(&tileset->coords, sizeof(LinceRect), LINCE_DAST_ARRAY_ALLOCATOR);
+	array_init(&tileset->coords, sizeof(LinceRect));
 	array_resize(&tileset->coords, xcells*ycells);
 
 	for (uint32_t x = 0; x != xcells; ++x){

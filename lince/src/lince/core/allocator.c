@@ -7,6 +7,7 @@
 
 #include "toml.h"
 #include "stb_image_alloc.h"
+#include "dast.h"
 
 typedef struct LinceAllocator {
     LinceAllocFn   alloc;   ///< Function to allocate a block of memory of given size
@@ -51,6 +52,12 @@ static void  LinceHashmapFree(void* block)                {        LinceMemoryFr
 static void* LinceStringAlloc(size_t size) { return LinceMemoryAlloc(size,  0, "str.c", "<string_t function>"); }
 static void  LinceStringFree(void* block)  {        LinceMemoryFree (block, 0, "str.c", "<string_t function>"); }
 
+/* Memory management interface for DAST functions (string, array, hashmap) */
+static void* LinceDASTAlloc(size_t size)               { return LinceMemoryAlloc  (size,        0, "dast.h", "<dast function>"); }
+static void* LinceDASTRealloc(void* block, size_t size){ return LinceMemoryRealloc(block, size, 0, "dast.h", "<dast function>"); }
+static void  LinceDASTFree(void* block)                {        LinceMemoryFree   (block,       0, "dast.h", "<dast function>"); }
+
+
 /* Memory management interface for stbi_image */
 void* LinceSTBIImageAlloc(size_t size)                { return LinceMemoryAlloc  (size,        0, "stb_image.c", "<stb_image function>"); }
 void* LinceSTBIImageRealloc(void* block, size_t size) { return LinceMemoryRealloc(block, size, 0, "stb_image.c", "<stb_image function>"); }
@@ -59,12 +66,6 @@ void  LinceSTBIImageFree(void* block)                 {        LinceMemoryFree  
 /* Memory management interface for toml */
 void* LinceTOMLAlloc(size_t size) { return LinceMemoryAlloc  (size,  0, "toml.c", "<toml function>"); }
 void  LinceTOMLFree(void* block)  {        LinceMemoryFree   (block, 0, "toml.c", "<toml function>"); }
-
-/* Global allocators for external libraries */
-const dast_allocator_t LINCE_DAST_ARRAY_ALLOCATOR   = {.alloc=LinceArrayAlloc,   .realloc=LinceArrayRealloc,   .free=LinceArrayFree  };
-const dast_allocator_t LINCE_DAST_HASHMAP_ALLOCATOR = {.alloc=LinceHashmapAlloc, .realloc=LinceHashmapRealloc, .free=LinceHashmapFree};
-const dast_allocator_t LINCE_DAST_STRING_ALLOCATOR  = {.alloc=LinceStringAlloc,  .realloc=NULL,                .free=LinceStringFree };
-
 
 
 /** @brief Global allocator for Lince.
@@ -84,6 +85,7 @@ void LinceAllocatorInit(void){
     // stbi_image
     stbi_set_alloc(LinceSTBIImageAlloc, LinceSTBIImageRealloc, LinceSTBIImageFree);
     toml_set_memutil(LinceTOMLAlloc, LinceTOMLFree);
+    dast_set_alloc((dast_allocator_t){LinceDASTAlloc, LinceDASTRealloc, LinceDASTFree});
     _global_allocator.initialised = LinceTrue;
 }
 

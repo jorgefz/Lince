@@ -16,9 +16,9 @@ LinceBool LinceInitAssetCache(LinceAssetCache* cache) {
     LINCE_INFO("Located executable at '%s'", cache->exedir.str);
 
     string_free(&buf);
-    array_init_custom(&cache->folders, sizeof(string_t), LINCE_DAST_ARRAY_ALLOCATOR);
-    hashmap_init_custom(&cache->assets, 10, LINCE_DAST_HASHMAP_ALLOCATOR, NULL, LinceSIDCmp);
-    hashmap_init_custom(&cache->types, 10, LINCE_DAST_HASHMAP_ALLOCATOR, NULL, LinceSIDCmp);
+    array_init(&cache->folders, sizeof(string_t));
+    hashmap_init_custom(&cache->assets, 10, (dast_allocator_t){0}, NULL, LinceSIDCmp);
+    hashmap_init_custom(&cache->types, 10, (dast_allocator_t){0}, NULL, LinceSIDCmp);
 
     return LinceTrue;
 }
@@ -120,7 +120,7 @@ string_t LinceAssetCacheFindPath(LinceAssetCache* cache, string_t filename){
             continue;
         }
         
-        string_t full_path = string_from_fmt_custom(LINCE_DAST_STRING_ALLOCATOR, "%s%s", dir->str, filename.str);
+        string_t full_path = string_from_fmt("%s%s", dir->str, filename.str);
 
         if (LinceIsFile(full_path)){
             LINCE_INFO("Located asset '%s' at '%s'", filename.str, full_path.str);
@@ -214,7 +214,7 @@ LinceBool LinceAssetCacheAdd(LinceAssetCache* cache, LinceSID sid, LinceSID type
 
     if(!hashmap_has_keyb(&cache->types, &type, sizeof(LinceSID))){
         LINCE_WARN("Could not add asset '%s' as it has an invalid type", LinceGetSIDName(sid).str);
-        LinceFalse;
+        return LinceFalse;
     }
 
     if(hashmap_has_keyb(&cache->assets, &sid, sizeof(LinceSID))){
@@ -226,7 +226,7 @@ LinceBool LinceAssetCacheAdd(LinceAssetCache* cache, LinceSID sid, LinceSID type
     LinceAsset* asset_data = LinceCalloc(sizeof(LinceAsset));
     asset_data->sid = sid;
     asset_data->type = type;
-    // asset_data->path = string_from_literal_custom("...", LINCE_DAST_STRING_ALLOCATOR);
+    // asset_data->path = string_from_literal("...");
     hashmap_setb(&cache->assets, &sid, sizeof(LinceSID), asset_data);
 
     return LinceTrue;

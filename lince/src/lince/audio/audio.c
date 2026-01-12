@@ -129,7 +129,7 @@ LinceSoundManager* LinceCreateSoundManager(LinceAudioEngine* audio, LinceSoundTy
         .type = type,
         .filename = string_from_chars(filename.str, filename.len)
     };
-    array_init_custom(&manager.sound_cache, sizeof(LinceSound), LINCE_DAST_ARRAY_ALLOCATOR);
+    array_init(&manager.sound_cache, sizeof(LinceSound));
 
     // Pre-load sound file
     LinceSound first = {

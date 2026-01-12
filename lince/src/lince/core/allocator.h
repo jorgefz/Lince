@@ -47,11 +47,6 @@ typedef struct LinceAllocStats {
 // void LinceUninitAllocator();
 
 
-extern const dast_allocator_t LINCE_DAST_ARRAY_ALLOCATOR;
-extern const dast_allocator_t LINCE_DAST_HASHMAP_ALLOCATOR;
-extern const dast_allocator_t LINCE_DAST_STRING_ALLOCATOR;
-
-
 #define LinceAlloc(SZ)        LinceMemoryAlloc((SZ), __LINE__, __FILE__, __func__)
 #define LinceRealloc(PTR, SZ) LinceMemoryRealloc((PTR), (SZ), __LINE__, __FILE__, __func__)
 #define LinceFree(PTR)        LinceMemoryFree((PTR), __LINE__, __FILE__, __func__)

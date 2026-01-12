@@ -20,7 +20,7 @@ LinceTileAnim* LinceTileAnimInit(LinceTileAnim* anim, LinceTileset* tileset, flo
 
 	anim->tileset = tileset;
 	anim->frame_time = frame_time;
-	array_init_custom(&anim->frames, sizeof(uint32_t), LINCE_DAST_ARRAY_ALLOCATOR);
+	array_init(&anim->frames, sizeof(uint32_t));
 	LinceTileAnimSetDefaultFrames(anim); // Default frames -> cycle through all tiles
 	LinceTileAnimReset(anim);
 	return anim;

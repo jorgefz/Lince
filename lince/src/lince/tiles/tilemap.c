@@ -15,12 +15,12 @@ LinceTilemap* LinceTilemapInit(LinceTilemap* map, uint32_t* map_grid){
     map->sprite = (LinceSprite){ .color = {1,1,1} };
 
     // Copy grid of indices
-    array_init_custom(&map->indices, sizeof(uint32_t), LINCE_DAST_ARRAY_ALLOCATOR);
+    array_init(&map->indices, sizeof(uint32_t));
     array_resize(&map->indices, map_size);
     memcpy(map->indices.data, map_grid, sizeof(uint32_t)*map_size);
 
     // Generate grid of transforms
-    array_init_custom(&map->transforms, sizeof(LinceTransform), LINCE_DAST_ARRAY_ALLOCATOR);
+    array_init(&map->transforms, sizeof(LinceTransform));
     array_resize(&map->transforms, map_size);
 
     // Add overlap between map tiles to avoid
@@ -197,8 +197,8 @@ LinceBool LinceSaveTilemapAsset(LinceAssetCache* cache, LinceSID asset_sid, stri
 
     FILE* f = fopen(path.str, "w");
 
-    fprintf(f, "mapwidth    = %lu\n", map->width);
-    fprintf(f, "mapheight   = %lu\n", map->height);
+    fprintf(f, "mapwidth    = %u\n", map->width);
+    fprintf(f, "mapheight   = %u\n", map->height);
     fprintf(f, "centerx     = %f\n", map->pos.x);
     fprintf(f, "centery     = %f\n", map->pos.y);
     fprintf(f, "scalewidth  = %f\n", map->scale.x);
@@ -210,7 +210,7 @@ LinceBool LinceSaveTilemapAsset(LinceAssetCache* cache, LinceSID asset_sid, stri
         if((*i % map->width) == 0){
             fprintf(f, "\n    ");
         }
-        fprintf(f, "%lu,", *i);
+        fprintf(f, "%u,", *i);
     }
     fprintf(f,"\n]");
 

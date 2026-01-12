@@ -15,8 +15,8 @@ LinceEntityRegistry* LinceCreateEntityRegistry(uint32_t component_count, ...){
     
     reg->component_count = component_count;
     reg->max_components = max_components;
-    array_init_custom(&reg->component_sizes, sizeof(uint32_t), LINCE_DAST_ARRAY_ALLOCATOR);
-    array_init_custom(&reg->component_offsets, sizeof(uint32_t), LINCE_DAST_ARRAY_ALLOCATOR);
+    array_init(&reg->component_sizes, sizeof(uint32_t));
+    array_init(&reg->component_offsets, sizeof(uint32_t));
     
     // Fetch component sizes from varargs
     va_list args;
@@ -41,10 +41,10 @@ LinceEntityRegistry* LinceCreateEntityRegistry(uint32_t component_count, ...){
     LINCE_INFO("Creating Entity Registry - %u components - %u bytes per entity",
         component_count, entity_size);
     
-    array_init_custom(&reg->entity_data, entity_size, LINCE_DAST_ARRAY_ALLOCATOR);
-    array_init_custom(&reg->entity_flags, sizeof(LinceEntityState), LINCE_DAST_ARRAY_ALLOCATOR);
-    array_init_custom(&reg->entity_masks, sizeof(LinceEntityMask), LINCE_DAST_ARRAY_ALLOCATOR);
-    array_init_custom(&reg->entity_pool, sizeof(uint32_t), LINCE_DAST_ARRAY_ALLOCATOR);
+    array_init(&reg->entity_data, entity_size);
+    array_init(&reg->entity_flags, sizeof(LinceEntityState));
+    array_init(&reg->entity_masks, sizeof(LinceEntityMask));
+    array_init(&reg->entity_pool, sizeof(uint32_t));
     
     return reg;
 }
