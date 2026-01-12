@@ -517,6 +517,7 @@ static void LinceAppTerminate(){
     string_free(&app.engine_path);
     string_free(&app.logfile_path);
     
+    LinceAllocatorUninit();
     LinceCloseProfiler();
     LinceCloseLogger();
 }
