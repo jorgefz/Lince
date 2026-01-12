@@ -13,6 +13,7 @@ root    = "/home/jorgefz/dev/lince/sandbox/"
 engine  = "../lince/assets"
 # logfile = "log.txt"
 # logging = true
+memcheck = true
 
 # Window parameters
 #   title       : str, Title displayed at the top of the window
