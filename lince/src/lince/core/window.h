@@ -61,7 +61,7 @@ LinceBool LinceWindowIsFullscreen(LinceWindow* window);
 void LinceWindowSetVSync(LinceWindow* window, LinceBool vsync);
 
 /** @brief Set the application's icon using an image on disk */
-LinceBool LinceWindowSetIcon(LinceWindow* window, LinceImage* icon);
+void LinceWindowSetIcon(LinceWindow* window, LinceImage* icon);
 
 
 #endif // LINCE_WINDOW_H

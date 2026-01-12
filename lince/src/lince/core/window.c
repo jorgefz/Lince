@@ -172,7 +172,7 @@ void LinceWindowSetVSync(LinceWindow* window, LinceBool vsync){
     glfwSwapInterval(vsync);
 }
 
-LinceBool LinceWindowSetIcon(LinceWindow* window, LinceImage* icon){
+void LinceWindowSetIcon(LinceWindow* window, LinceImage* icon){
     GLFWimage gl_img;
     gl_img.pixels = icon->data;
     gl_img.width  = icon->width;
