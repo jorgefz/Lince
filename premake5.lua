@@ -20,7 +20,6 @@ workspace "lince"
     
     -- ## YOUR DEFINES HERE ## --
     -- defines {"LINCE_PROFILE"}
-    -- defines {"LINCE_DEBUG_MEMCHECK"}
     -----------------------------
     
     configurations {"Debug", "Release"}

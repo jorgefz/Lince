@@ -24,7 +24,6 @@
  * | LINCE_ASSERT(x, fmt, ...) | Prints a message and exits if the condition fails  |
  * | LINCE_ASSERT_ALLOC(p, sz) | Exist if the given pointer is NULL                 |
  * | LINCE_PROFILE             | Enables profiling in debug mode                    |
- * | LINCE_DEBUG_MEMCHECK      | Enables tracking of (de)allocations                |
  * + ------------------------- + -------------------------------------------------- +
  * 
  * ## Engine constants ##
@@ -74,11 +73,6 @@
 
 /* Misc */
 #define LINCE_UNUSED(x) (void)(x)  ///< Gets rid of unused variable compiler warnings
-
-/* Memory checking */
-#if defined(LINCE_DEBUG_MEMCHECK) && !defined(LINCE_DEBUG)
-    #define LINCE_DEBUG
-#endif
 
 /* Profiling */
 #if !defined(LINCE_DEBUG) && defined(LINCE_PROFILE)

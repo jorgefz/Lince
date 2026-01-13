@@ -3,23 +3,12 @@
 
 /*
 
-void* hashmap_init_alloc(map, size_hint, alloc, realloc, free);
-void* array_init_alloc(arr, alloc, realloc, free);
-
     IN RELEASE MODE
     Make no checks whatsoever.
 
     IN DEBUG MODE
-    Keep track of number of blocks allocated.
-
-    IN MEMCHECK MODE (LINCE_DEBUG_MEMCHECK defined)
-    In a hashmap, map a block pointer to info about the allocation,
-    including size, line, file, and func.
-    Keep track of both total bytes allocated as well as total blocks.
-    Keep track of category (tag) of allocated memory blocks.
-
-How to keep track of heap pointers?
-Add header to each allocation.
+    Keep track of number of block and bytes allocated,
+    as well as the categories / tags of each allocation.
 
 */
 
@@ -50,12 +39,6 @@ typedef struct LinceAllocStats {
     long max_blocks; ///< Maximum allocated blocks reached
     long max_bytes;  ///< Maximum number of allocated bytes reached
 } LinceAllocStats;
-
-/** @brief Allocator configuration options */
-typedef struct LinceAllocConfig {
-    LinceBool memcheck; ///< Enables checking for memory leaks and usage
-                        ///< by appending headers on every allocation to track context.
-} LinceAllocConfig;
 
 
 /** @brief Helper macro to capture location in source code where an allocation takes place.
@@ -98,21 +81,13 @@ typedef struct LinceAllocConfig {
 #define LinceNewCopy(PTR, SZ)      memcpy(LinceAlloc(SZ), (PTR), (SZ))
 
 /** @brief Initialise the engine's allocator.
- * @param config Configuration for the allocator.
- * @note Passing a NULL value will result in the allocator adopting the default values
- * specified by `LinceAllocatorGetDefaultConfig()`.
  */
-void LinceAllocatorInit(LinceAllocConfig* config);
+void LinceAllocatorInit(void);
 
 /** @brief Uninitialise the engine's allocator.
  * @returns The number of allocated memory blocks that have not been freed.
  */
 uint64_t LinceAllocatorUninit(void);
-
-/** @brief Return the default configuration of the allocator.
- * @param config Output location to which to write default allocator configuration.
- */
-void LinceAllocatorGetDefaultConfig(LinceAllocConfig* config);
 
 /** @brief Obtain statistics about current total memory usage.
  * @param stats LinceAllocStats object to which global statistics are written to.
@@ -130,9 +105,6 @@ const char* LinceAllocatorGetTagStringName(LinceAllocTag tag);
 
 /** @brief Set custom memory management functions. Must be called *before* `LinceAllocatorInit()`. */
 void LinceAllocatorSet(LinceAllocFn alloc_fn, LinceReallocFn realloc_fn, LinceFreeFn free_fn, void* user_data);
-
-
-
 
 /** @brief Memory allocation function that tracks where the memory operation was requested (file, line, and function)
 * as well as the category of the memory (e.g. graphics, assets, etc)

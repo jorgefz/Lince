@@ -260,7 +260,6 @@ static void LinceAppLoadDefaultConfig(){
     app.engine_path  = string_from_literal("lince/");
     app.logfile_path = string_from_literal("log.txt");
     app.logging      = LinceFalse;
-    app.memcheck     = LinceFalse;
 
     // Window config
     app.wconfig.width      = 1080;
@@ -297,14 +296,12 @@ static LinceBool LinceAppLoadConfigFile(){
     toml_datum_t engine_path  = toml_string_in(config, "engine");
     toml_datum_t logfile_path = toml_string_in(config, "logfile");
     toml_datum_t logging      = toml_bool_in  (config, "logging");
-    toml_datum_t memcheck     = toml_bool_in  (config, "memcheck");
 
     app.root_path    = string_from_fmt("%s",                      ( root_path.ok    ? root_path.u.s    : "./"     ) );
     app.assets_path  = string_from_fmt("%s%s", app.root_path.str, ( assets_path.ok  ? assets_path.u.s  : "assets/") );
     app.engine_path  = string_from_fmt("%s%s", app.root_path.str, ( engine_path.ok  ? engine_path.u.s  : "lince/" ) );
     app.logfile_path = string_from_fmt("%s%s", app.root_path.str, ( logfile_path.ok ? logfile_path.u.s : "log.txt") );
     app.logging      = (logging.ok)  ? logging.u.b  : LinceFalse;
-    app.memcheck     = (memcheck.ok) ? memcheck.u.b : LinceFalse;
     
     if(root_path.ok   ) LinceFree(root_path.u.s);
     if(assets_path.ok ) LinceFree(assets_path.u.s);
@@ -342,10 +339,7 @@ static void LinceInit(){
     LinceBool config_loaded = LinceAppLoadConfigFile();
 
     // Setup memory management
-    LinceAllocConfig alloc_config;
-    LinceAllocatorGetDefaultConfig(&alloc_config);
-    alloc_config.memcheck = app.memcheck;
-    LinceAllocatorInit(&alloc_config);
+    LinceAllocatorInit();
 
     // Open log file
     #ifdef LINCE_DEBUG
