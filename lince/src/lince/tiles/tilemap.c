@@ -143,7 +143,7 @@ void* LinceLoadTilemapAsset(LinceAssetCache* cache, string_t path, void* args){
         return NULL;
     }
 
-    uint32_t* grid_data = LinceAlloc(sizeof(uint32_t) * nelem);
+    uint32_t* grid_data = LinceAllocTagged(sizeof(uint32_t) * nelem, LinceAllocTag_Assets);
     for(uint32_t i = 0; i != nelem; ++i){
         grid_data[i] = (uint32_t)toml_int_at(grid, i).u.i;
     }

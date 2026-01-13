@@ -49,7 +49,7 @@ LinceTileset* LinceLoadTilesetToml(LinceAssetCache* assets, string_t fname){
     }
     string_free(&texname);
 
-    LinceTileset* tset = LinceAlloc(sizeof(LinceTileset));
+    LinceTileset* tset = LinceAllocTagged(sizeof(LinceTileset), LinceAllocTag_Assets);
     LinceTilesetInit(tset, tex, (uint32_t)width_px, (uint32_t)height_px);
     return tset;
 }

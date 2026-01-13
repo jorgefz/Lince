@@ -18,7 +18,7 @@ LinceImage* LinceLoadImage(const char* path){
     
     if(!path) return NULL;
 
-    LinceImage* image = LinceAlloc(sizeof(LinceImage));
+    LinceImage* image = LinceAllocTagged(sizeof(LinceImage), LinceAllocTag_Assets);
     if(!image) return NULL;
 
     static int rgba_channels = 4;

@@ -55,7 +55,7 @@ void LinceUninitAssetCache(LinceAssetCache* cache) {
 
 
 LinceAssetCache* LinceCreateAssetCache() {
-    LinceAssetCache* cache = LinceAlloc(sizeof(LinceAssetCache));
+    LinceAssetCache* cache = LinceAllocTagged(sizeof(LinceAssetCache), LinceAllocTag_Assets);
     if (!cache) return NULL;
     if (!LinceInitAssetCache(cache)) {
         LinceFree(cache);
