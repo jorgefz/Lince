@@ -15,6 +15,7 @@ docs/latex
 # Build tools and scripts
 **.exe
 **.sh
+!scripts/**.sh
 premake5
 docs/mdbook
 
