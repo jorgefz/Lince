@@ -8,55 +8,21 @@ project "glfw"
 
     targetdir ("%{wks.location}/bin/" .. LinceOutputDir .. "/%{prj.name}")
     objdir ("%{wks.location}/obj/" .. LinceOutputDir .. "/%{prj.name}")
-
-    local SrcDir = "%{prj.name}/src"
     
     files {
         "%{prj.name}/include/GLFW/glfw3.h",
         "%{prj.name}/include/GLFW/glfw3native.h",
-        SrcDir .. "/context.c",
-        SrcDir .. "/init.c",
-        SrcDir .. "/input.c",
-        SrcDir .. "/monitor.c",
-        SrcDir .. "/vulkan.c",
-        SrcDir .. "/window.c",
-        SrcDir .. "/osmesa_context.c",
+        "%{prj.name}/src/**.c",
+        "%{prj.name}/src/**.h",
     }
+
+    systemversion "latest"
     
     filter "system:linux"
-        systemversion "latest"
-        files {
-            SrcDir .. "/posix_time.c",
-            SrcDir .. "/posix_thread.c",
-            SrcDir .. "/x11_init.c",
-            SrcDir .. "/x11_monitor.c",
-            SrcDir .. "/x11_window.c",
-            SrcDir .. "/egl_context.c",
-            SrcDir .. "/xkb_unicode.c",
-            SrcDir .. "/glx_context.c",
-            SrcDir .. "/linux_joystick.c",
-        }
         defines {"_GLFW_X11"}
     
     filter "system:windows"
-        files{
-            SrcDir .. "/win32_init.c",
-            SrcDir .. "/win32_joystick.c",
-            SrcDir .. "/win32_monitor.c",
-            SrcDir .. "/win32_time.c",
-            SrcDir .. "/win32_thread.c",
-            SrcDir .. "/win32_window.c",
-            SrcDir .. "/wgl_context.c",
-            SrcDir .. "/egl_context.c",
-        }
-
-        defines{
-            "_GLFW_WIN32",
-            "_CRT_SECURE_NO_WARNINGS"
-        }
-
-    filter "system:windows"
-        systemversion "latest"
+        defines{"_GLFW_WIN32", "_CRT_SECURE_NO_WARNINGS"}        
 
     filter "configurations:Debug"
         runtime "Debug"
