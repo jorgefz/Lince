@@ -92,6 +92,14 @@ static void LinceInitGLContext(GLFWwindow* handle){
 LinceWindow* LinceWindowCreate(LinceWindowAttributes* config){
 
     LINCE_ASSERT(glfwInit(), "Failed to initialise GLFW");
+
+#ifdef LINCE_WINDOWS
+    glfwInitHint(GLFW_PLATFORM, GLFW_PLATFORM_WIN32);
+#elif defined(LINCE_LINUX)
+    glfwInitHint(GLFW_PLATFORM, GLFW_PLATFORM_X11);
+#else
+    glfwInitHint(GLFW_PLATFORM, GLFW_PLATFORM_NULL);
+#endif
     
     /* Using OpenGL 4.0 */
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, LINCE_GL_VERSION_MAJOR);
