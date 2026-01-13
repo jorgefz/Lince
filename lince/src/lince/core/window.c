@@ -86,12 +86,25 @@ static void LinceInitGLContext(GLFWwindow* handle){
     LINCE_INFO("OpenGL Version: %s", glGetString(GL_VERSION));
 }
 
+static void* LinceGLFWAlloc(size_t size, void* user){
+    LINCE_UNUSED(user);
+    return LinceMemoryAllocTagged(size, LinceAllocTag_Graphics, 0, "glfw", "<glfw function>");
+}
+
+static void* LinceGLFWRealloc(void* block, size_t size, void* user){
+    LINCE_UNUSED(user);
+    return LinceMemoryRealloc(block, size, 0, "glfw", "<glfw function>");
+}
+
+static void  LinceGLFWFree(void* block, void* user){
+    LINCE_UNUSED(user);
+    LinceMemoryFree(block, 0, "glfw", "<glfw function>");
+}
+
 
 /* Public API */
 
 LinceWindow* LinceWindowCreate(LinceWindowAttributes* config){
-
-    LINCE_ASSERT(glfwInit(), "Failed to initialise GLFW");
 
 #ifdef LINCE_WINDOWS
     glfwInitHint(GLFW_PLATFORM, GLFW_PLATFORM_WIN32);
@@ -100,6 +113,17 @@ LinceWindow* LinceWindowCreate(LinceWindowAttributes* config){
 #else
     glfwInitHint(GLFW_PLATFORM, GLFW_PLATFORM_NULL);
 #endif
+
+    GLFWallocator glfw_alloc = {
+        .allocate   = LinceGLFWAlloc,
+        .reallocate = LinceGLFWRealloc,
+        .deallocate = LinceGLFWFree,
+        .user       = NULL
+    };
+    glfwInitAllocator(&glfw_alloc);
+
+    LINCE_ASSERT(glfwInit(), "Failed to initialise GLFW");
+    LINCE_INFO("Initialised GLFW");
     
     /* Using OpenGL 4.0 */
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, LINCE_GL_VERSION_MAJOR);
@@ -113,7 +137,7 @@ LinceWindow* LinceWindowCreate(LinceWindowAttributes* config){
     GLFWwindow* handle = glfwCreateWindow(config->width, config->height, config->title.str, monitor, NULL);
     if (!handle) {
         glfwTerminate();
-        LINCE_ASSERT(0, "Failed to initialise GLFW window");
+        LINCE_ASSERT(0, "Failed to create GLFW window");
     }
     LINCE_INFO("Created GLFW window");
     LinceInitGLContext(handle);
@@ -131,7 +155,7 @@ LinceWindow* LinceWindowCreate(LinceWindowAttributes* config){
     glfwGetVersion(&glfw_major, &glfw_minor, &glfw_rev);
     LINCE_INFO("GLFW Version %d.%d.%d", glfw_major, glfw_minor, glfw_rev);
 
-    LinceWindow* window = LinceAlloc(sizeof(LinceWindow));
+    LinceWindow* window = LinceAllocTagged(sizeof(LinceWindow), LinceAllocTag_Graphics);
     *window = (LinceWindow){
         .handle = handle,
         .initialised = 1,
