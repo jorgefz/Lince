@@ -316,6 +316,7 @@ static LinceBool LinceAppLoadConfigFile(){
     if(window){
         toml_datum_t title = toml_string_in(window, "title");
         app.wconfig.title  = (title.ok) ? string_from_chars(title.u.s, strlen(title.u.s)) : string_from_literal("Lince App");
+        if(title.ok) LinceFree(title.u.s);
 
         toml_datum_t width      = toml_int_in(window, "width");
         toml_datum_t height     = toml_int_in(window, "height");
@@ -336,11 +337,15 @@ static LinceBool LinceAppLoadConfigFile(){
 
 static void LinceInit(){
 
-    // Setup memory management
-    LinceAllocatorInit();
 
     // Load configuration file
     LinceBool config_loaded = LinceAppLoadConfigFile();
+
+    // Setup memory management
+    LinceAllocConfig alloc_config;
+    LinceAllocatorGetDefaultConfig(&alloc_config);
+    alloc_config.memcheck = app.memcheck;
+    LinceAllocatorInit(&alloc_config);
 
     // Open log file
     #ifdef LINCE_DEBUG
@@ -580,7 +585,7 @@ static void LinceAppDrawDebugUIPanel(LinceLayer* overlay, float dt){
 
         nk_layout_row_static(ctx, 30, 450, 1);
         LinceAllocStats alloc_stats;
-        LinceGetGlobalAllocStats(&alloc_stats);
+        LinceAllocatorGetGlobalStats(&alloc_stats);
         nk_labelf(ctx, NK_TEXT_LEFT, "Allocated blocks: %ld, max %ld", alloc_stats.nblocks, alloc_stats.max_blocks);
         nk_labelf(ctx, NK_TEXT_LEFT, "Memory used: %.0f kB (%.2g MB), max %.0f kB (%.2f MB)",
             (double)alloc_stats.nbytes/1024.0, (double)alloc_stats.nbytes/1024.0/1024.0,
@@ -588,11 +593,11 @@ static void LinceAppDrawDebugUIPanel(LinceLayer* overlay, float dt){
         );
 
         LinceAllocStats alloc_stats_tagged[LinceAllocTag_Count];
-        LinceGetAllocStatsTagged(alloc_stats_tagged);
+        LinceAllocatorGetTaggedStats(alloc_stats_tagged);
         for(LinceAllocTag tag = 0; tag != LinceAllocTag_Count; ++tag){
             nk_layout_row_static(ctx, 30, 450, 1);
             nk_labelf(ctx, NK_TEXT_LEFT, "  %s: %ld blocks, %.3f kB",
-                LinceGetAllocTagStringName(tag), alloc_stats_tagged[tag].nblocks, (double)alloc_stats_tagged[tag].nbytes/1024.0);
+                LinceAllocatorGetTagStringName(tag), alloc_stats_tagged[tag].nblocks, (double)alloc_stats_tagged[tag].nbytes/1024.0);
         }
 
     }

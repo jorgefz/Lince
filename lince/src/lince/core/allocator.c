@@ -10,17 +10,20 @@
 #include "dast.h"
 
 typedef struct LinceAllocator {
+    // Principal interface
     LinceAllocFn   alloc;   ///< Function to allocate a block of memory of given size
     LinceReallocFn realloc; ///< Function to reallocate a block of memory to a different size
     LinceFreeFn    free;    ///< Function to deallocate a block of memory
-    LinceBool initialised;  ///< LinceInitAllocator called
-    void* user_data;        ///< Custom user-defined data passed to the allocator functions
-    LinceAllocStats stats;  ///< Allocation stats and memory checks
+
+    // Internals
+    LinceBool initialised;   ///< LinceInitAllocator called
+    LinceAllocConfig config; ///< Configuration options
+    void* user_data;         ///< Custom user-defined data passed to the allocator functions
+    LinceAllocStats stats;   ///< Allocation stats and memory checks
     LinceAllocStats tag_stats[LinceAllocTag_Count]; ///< Allocation stats per category
 } LinceAllocator;
 
 
-#ifdef LINCE_DEBUG_MEMCHECK
 /** @brief Header data stored in memory before every allocated block
 * which provides additional context about the allocated memory block.
 * @note The "_pad" member exists only to ensure the struct is 32 bytes in size. 
@@ -31,8 +34,6 @@ typedef struct LinceAllocHeader {
     int32_t tag;     ///< Category tag
     int32_t _pad[3]; ///< Padding to ensure sizeof(LinceAllocHeader) == 32 bytes.
 } LinceAllocHeader;
-
-#endif
 
 
 /*
@@ -73,41 +74,62 @@ static LinceAllocator _global_allocator = {
 };
 
 /** @brief Initialise Allocator */
-void LinceAllocatorInit(void){
-    // stbi_image
+void LinceAllocatorInit(LinceAllocConfig* config){
+    
+    if(config){
+        _global_allocator.config = *config;
+    } else {
+        LinceAllocatorGetDefaultConfig(&_global_allocator.config);
+    }
+
+    // Set up external allocators
     stbi_set_alloc(LinceSTBIImageAlloc, LinceSTBIImageRealloc, LinceSTBIImageFree);
     toml_set_memutil(LinceTOMLAlloc, LinceTOMLFree);
     dast_set_alloc((dast_allocator_t){LinceDASTAlloc, LinceDASTRealloc, LinceDASTFree});
+    
     _global_allocator.initialised = LinceTrue;
 }
 
 /** @brief Uninitialise Allocator */
-void LinceAllocatorUninit(void){
-    // Check unfreed memory and emit warning
-    if(_global_allocator.stats.nblocks != 0){
+uint64_t LinceAllocatorUninit(void){
+
+    LINCE_INFO("Allocator: peak of %lu blocks allocated (%.2f kb)",
+        _global_allocator.stats.max_blocks,
+        (double)_global_allocator.stats.max_bytes / 1024.0);
+
+    uint64_t unfreed_blocks = _global_allocator.stats.nblocks;
+    if(unfreed_blocks != 0){
         LINCE_WARN("Allocator warning: %u unfreed blocks (%u bytes)",
-            _global_allocator.stats.nblocks,
-            _global_allocator.stats.nbytes
-        );
+            unfreed_blocks, _global_allocator.stats.nbytes);
     }
     _global_allocator.initialised = LinceFalse;
+    _global_allocator.stats = (LinceAllocStats){0};
     LINCE_INFO("Allocator uninitialised");
+
+    return unfreed_blocks;
+}
+
+/** @brief Return the default configuration of the allocator.
+ * @param config Output location to which to write default allocator configuration.
+ */
+void LinceAllocatorGetDefaultConfig(LinceAllocConfig* config){
+    config->memcheck = LinceFalse;
 }
 
 /** @brief Obtain statistics about current memory usage */
-void LinceGetGlobalAllocStats(LinceAllocStats* stats){
+void LinceAllocatorGetGlobalStats(LinceAllocStats* stats){
     *stats = _global_allocator.stats;
 }
 
 /** @brief Obtain statistics about current memory usage per category */
-void LinceGetAllocStatsTagged(LinceAllocStats *stats){
+void LinceAllocatorGetTaggedStats(LinceAllocStats *stats){
     for(LinceAllocTag tag = 0; tag != LinceAllocTag_Count; tag++){
         stats[tag] = _global_allocator.tag_stats[tag];
     }
 }
 
 /** @brief Return string name for memory category */
-const char* LinceGetAllocTagStringName(LinceAllocTag tag){
+const char* LinceAllocatorGetTagStringName(LinceAllocTag tag){
     switch(tag){
         case LinceAllocTag_Graphics:
             return "Graphics";
@@ -122,7 +144,7 @@ const char* LinceGetAllocTagStringName(LinceAllocTag tag){
 }
 
 
-void LinceSetAllocator(LinceAllocFn alloc_fn, LinceReallocFn realloc_fn, LinceFreeFn free_fn, void* user_data){
+void LinceAllocatorSet(LinceAllocFn alloc_fn, LinceReallocFn realloc_fn, LinceFreeFn free_fn, void* user_data){
     if(_global_allocator.initialised){
         LINCE_WARN("Cannot set allocator after it has been initialised");
         return;
@@ -157,8 +179,8 @@ void* LinceMemoryAllocTagged(size_t size, LinceAllocTag tag, int line, const cha
     long nblocks = _global_allocator.stats.nblocks;
     _global_allocator.stats.max_blocks = LINCE_MAX(nblocks, _global_allocator.stats.max_blocks);
     _global_allocator.stats.max_bytes  = LINCE_MAX(_global_allocator.stats.nbytes,  _global_allocator.stats.max_bytes);
-    LINCE_INFO("Allocated %*ld byte block at 0x%p for %s (in function %s, %ld total blocks)",
-        7, size, block, LinceGetAllocTagStringName(tag), func, nblocks);
+    // LINCE_INFO("Allocated %*ld byte block at 0x%p for %s (in function %s, %ld total blocks)",
+    //     7, size, block, LinceAllocatorGetTagStringName(tag), func, nblocks);
 
     if(tag < LinceAllocTag_Count){
         _global_allocator.tag_stats[tag].nblocks++;
@@ -201,7 +223,7 @@ void* LinceMemoryRealloc(void* block, size_t size, int line, const char* file, c
 #if defined(LINCE_DEBUG) && defined(LINCE_DEBUG_MEMCHECK)
     LinceAllocHeader* header = (LinceAllocHeader*)block - 1;
     if(header->allocator != &_global_allocator){
-        LINCE_ERROR("Attempting to reallocate invalid or corrupted heap pointer 0x%p for %s", block, LinceGetAllocTagStringName(header->tag));
+        LINCE_ERROR("Attempting to reallocate invalid or corrupted heap pointer 0x%p for %s", block, LinceAllocatorGetTagStringName(header->tag));
         LINCE_ERROR("at %s:%d in function '%s'", file, line, func);
         exit(-1);
     }
@@ -210,7 +232,7 @@ void* LinceMemoryRealloc(void* block, size_t size, int line, const char* file, c
     
     LinceAllocHeader* new_header = _global_allocator.realloc(header, size + sizeof(LinceAllocHeader), _global_allocator.user_data);
     if(new_header == NULL){
-        LINCE_ERROR("Failed to allocate block of %ld bytes for %s", size + sizeof(LinceAllocHeader), LinceGetAllocTagStringName(header->tag));
+        LINCE_ERROR("Failed to allocate block of %ld bytes for %s", size + sizeof(LinceAllocHeader), LinceAllocatorGetTagStringName(header->tag));
         LINCE_ERROR("at %s:%d in function '%s'", file, line, func);
         exit(-1);
     }
@@ -221,8 +243,8 @@ void* LinceMemoryRealloc(void* block, size_t size, int line, const char* file, c
     new_block = new_header + 1;
     _global_allocator.stats.nbytes += (long)(size) - (long)(old_size);
     _global_allocator.stats.max_bytes  = LINCE_MAX(_global_allocator.stats.nbytes,  _global_allocator.stats.max_bytes);
-    LINCE_INFO("Reallocated %*ld byte block to 0x%p for %s, from %ld byte block at 0x%p (in function %s)",
-        5, size, new_block, LinceGetAllocTagStringName(header->tag), old_size, block, func);
+    // LINCE_INFO("Reallocated %*ld byte block to 0x%p for %s, from %ld byte block at 0x%p (in function %s)",
+    //     5, size, new_block, LinceAllocatorGetTagStringName(header->tag), old_size, block, func);
     
     if(tag < LinceAllocTag_Count){
         _global_allocator.tag_stats[tag].nbytes += (long)(size) - (long)(old_size);
@@ -244,15 +266,13 @@ void LinceMemoryFree(void* block, int line, const char* file, const char* func){
 
 #if defined(LINCE_DEBUG) && defined(LINCE_DEBUG_MEMCHECK)
     if(!block){
-        LINCE_WARN("Free called on NULL pointer");
-        LINCE_WARN("at %s:%d in function '%s'", file, line, func);
+        LINCE_WARN("Free called on NULL pointer at %s:%d in function '%s'", file, line, func);
         return;
     }
 
     LinceAllocHeader* header = (LinceAllocHeader*)block - 1;
     if(header->allocator != &_global_allocator){
-        LINCE_WARN("Attempted to free invalid or corrupted heap pointer 0x%p", block);
-        LINCE_WARN("at %s:%d in function '%s'", file, line, func);
+        LINCE_WARN("Attempted to free invalid or corrupted heap pointer 0x%p at %s:%d in function '%s'", block, file, line, func);
         return;
     }
 
@@ -265,8 +285,8 @@ void LinceMemoryFree(void* block, int line, const char* file, const char* func){
 
     long nblocks = _global_allocator.stats.nblocks;
     long nbytes = _global_allocator.stats.nbytes;
-    LINCE_INFO("Deallocated %*ld byte block at 0x%p for %s (in function %s, %d blocks and %ld bytes in use)",
-        5, size, block, LinceGetAllocTagStringName(tag), func, nblocks, nbytes);
+    // LINCE_INFO("Deallocated %*ld byte block at 0x%p for %s (in function %s, %d blocks and %ld bytes in use)",
+    //     5, size, block, LinceAllocatorGetTagStringName(tag), func, nblocks, nbytes);
 
     if(tag < LinceAllocTag_Count){
         _global_allocator.tag_stats[tag].nblocks--;
