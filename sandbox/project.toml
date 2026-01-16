@@ -8,7 +8,7 @@
 #   logfile : str, Path to log file, relative to root.
 #   logging : bool, Whether to produce log messages to a log file
 
-root    = "/home/jorgefz/dev/lince/sandbox/"
+root    = "sandbox/"
 # assets  = "assets/"
 engine  = "../lince/assets"
 # logfile = "log.txt"
