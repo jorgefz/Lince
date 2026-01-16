@@ -1,0 +1,8 @@
+root    = "demos/mandelbrot/"
+assets  = "assets/"
+engine  = "../../lince/assets"
+
+[window]
+title       = "Mandelbrot Demo"
+width       = 1280
+height      = 720

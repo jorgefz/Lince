@@ -42,7 +42,7 @@ void OnInit(){
     };
     state.transform = state.viewframe;
     
-    LinceAppPushAssetFolder(string_scoped_lit("../../../demos/mandelbrot/assets"));
+    // LinceAppPushAssetFolder(string_scoped_lit("../../../demos/mandelbrot/assets"));
     string_t vert_path = LinceAssetCacheFindPath(LinceAppGetAssetCache(), string_scoped_lit("shaders/mandelbrot.vert.glsl"));
     string_t frag_path = LinceAssetCacheFindPath(LinceAppGetAssetCache(), string_scoped_lit("shaders/mandelbrot.frag.glsl"));
 
@@ -123,9 +123,8 @@ int main(){
     app->on_update = OnUpdate;
     app->on_event = OnEvent;
     app->on_terminate = OnTerminate;
-    app->screen_width = 1920;
-    app->screen_height = 1080;
 
+    LinceAppSetConfigFile(string_scoped_lit("demos/mandelbrot/project.toml"));
     LinceRun();
     
     return 0;
