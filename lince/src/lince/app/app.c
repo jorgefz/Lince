@@ -267,6 +267,7 @@ static void LinceAppLoadDefaultConfig(){
     app.wconfig.fullscreen = LinceFalse;
     app.wconfig.vsync      = LinceTrue;
     app.wconfig.resizable  = LinceFalse;
+    app.wconfig.title      = string_from_literal("Lince App");
 }
 
 
@@ -281,7 +282,10 @@ static LinceBool LinceAppLoadConfigFile(){
     }
 
     string_t content = LinceReadFile(app.config_path);
-    if(!string_ok(content)) return LinceFalse;
+    if(!string_ok(content)){
+        LinceAppLoadDefaultConfig();
+        return LinceFalse;
+    }
 
     char errbuf[100];
     toml_table_t* config = toml_parse(content.str, errbuf, sizeof(errbuf));
@@ -308,24 +312,38 @@ static LinceBool LinceAppLoadConfigFile(){
     if(engine_path.ok ) LinceFree(engine_path.u.s);
     if(logfile_path.ok) LinceFree(logfile_path.u.s);
 
-    // Window configuration
+    // Window default configuration
+    app.wconfig.width      = 1080;
+    app.wconfig.height     = 720;
+    app.wconfig.fullscreen = LinceFalse;
+    app.wconfig.vsync      = LinceTrue;
+    app.wconfig.resizable  = LinceFalse;
+
     toml_table_t* window = toml_table_in(config, "window");
     if(window){
+        
         toml_datum_t title = toml_string_in(window, "title");
-        app.wconfig.title  = (title.ok) ? string_from_chars(title.u.s, strlen(title.u.s)) : string_from_literal("Lince App");
-        if(title.ok) LinceFree(title.u.s);
-
         toml_datum_t width      = toml_int_in(window, "width");
         toml_datum_t height     = toml_int_in(window, "height");
         toml_datum_t fullscreen = toml_bool_in(window, "fullscreen");
         toml_datum_t vsync      = toml_bool_in(window, "vsync");
         toml_datum_t resizable  = toml_bool_in(window, "resizable");
         
-        app.wconfig.width      = (width.ok)      ? (uint32_t)width.u.i       : 1080;
-        app.wconfig.height     = (height.ok)     ? (uint32_t)height.u.i      : 720;
-        app.wconfig.fullscreen = (fullscreen.ok) ? (LinceBool)fullscreen.u.b : LinceFalse;
-        app.wconfig.vsync      = (vsync.ok)      ? (LinceBool)vsync.u.b      : LinceTrue;
-        app.wconfig.resizable  = (resizable.ok)  ? (LinceBool)resizable.u.b  : LinceFalse;
+        if(width.ok)      app.wconfig.width      = (uint32_t)width.u.i;
+        if(height.ok)     app.wconfig.height     = (uint32_t)height.u.i;
+        if(fullscreen.ok) app.wconfig.fullscreen = (LinceBool)fullscreen.u.b;
+        if(vsync.ok)      app.wconfig.vsync      = (LinceBool)vsync.u.b;
+        if(resizable.ok)  app.wconfig.resizable  = (LinceBool)resizable.u.b;
+
+        if(title.ok){
+            app.wconfig.title = string_from_chars(title.u.s, strlen(title.u.s));
+            LinceFree(title.u.s);
+        }
+
+    }
+
+    if(!string_ok(app.wconfig.title)){
+        app.wconfig.title = string_from_literal("Lince App");
     }
 
     toml_free(config);
@@ -334,12 +352,11 @@ static LinceBool LinceAppLoadConfigFile(){
 
 static void LinceInit(){
 
+    // Setup memory management
+    LinceAllocatorInit();
 
     // Load configuration file
     LinceBool config_loaded = LinceAppLoadConfigFile();
-
-    // Setup memory management
-    LinceAllocatorInit();
 
     // Open log file
     #ifdef LINCE_DEBUG

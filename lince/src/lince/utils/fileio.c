@@ -8,16 +8,18 @@ string_t LinceReadFile(string_t path){
 	LINCE_INFO("Reading file '%s'", path.str);
 	
 	FILE* handle = fopen(path.str, "r");
-	LINCE_ASSERT(handle, "Failed to open file '%s'", path);
-	if(!handle) return (string_t){0};
+	if(!handle){
+		LINCE_ERROR("Failed to open file '%s'", path);
+		return (string_t){0};
+	}
 
 	/* Get file length */
 	fseek(handle, 0, SEEK_END);
 	size_t size = ftell(handle);
 	fseek(handle, 0, SEEK_SET);
 
-	LINCE_ASSERT(size > 0, "File is empty '%s'", path);
 	if(size == 0){
+		LINCE_WARN("File is empty '%s'", path);
 		fclose(handle);
 		return (string_t){0};
 	}
