@@ -1,0 +1,9 @@
+[[assets]]
+name = "outside"
+type = "texture"
+path = "outside.png"
+
+[[assets]]
+name = "chicken"
+type = "texture"
+path = "chicken.png"

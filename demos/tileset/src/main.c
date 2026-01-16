@@ -19,9 +19,9 @@ static LinceTileAnim tile_anim = { .flags = LinceTileAnim_Repeat };
 
 void OnInit() {
     LinceInitCamera(&camera, 800.0f / 500.0f);
+    LinceAssetCacheRegisterIndex(LinceAppGetAssetCache(), string_scoped_lit("assets.toml"));
 
-    LinceAppPushAssetFolder(string_scoped_lit("../../../demos/tileset/assets"));
-    texture = LinceAppGetAsset(string_scoped_lit("outside.png"), string_scoped_lit("texture"));
+    texture = LinceAppGetAsset(string_scoped_lit("outside"), string_scoped_lit("texture"));
     sprite.texture = texture;
 
     LinceTilesetInit(&tileset, texture, 16, 16);
@@ -88,14 +88,12 @@ void OnTerminate(){
 int main() {
 
     LinceApp* app = LinceGetApp();
-    app->screen_width = 800;
-    app->screen_height = 500;
-    LinceAppSetTitle("My Window", sizeof("My Window")-1);
-
     app->on_init = OnInit;
     app->on_update = OnUpdate;
     app->on_event = OnEvent;
     app->on_terminate = OnTerminate;
+
+    LinceAppSetConfigFile(string_scoped_lit("demos/tileset/project.toml"));
 
     LinceRun();
 

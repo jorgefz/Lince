@@ -1,0 +1,8 @@
+root    = "demos/blank/"
+engine  = "../../lince/assets"
+
+[window]
+width = 800
+height = 500
+title = "Tutorial Window"
+resizable = true

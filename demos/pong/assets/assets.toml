@@ -1,0 +1,9 @@
+[[assets]]
+name = "ball"
+type = "texture"
+path = "ball.png"
+
+[[assets]]
+name = "text"
+type = "texture"
+path = "text.png"

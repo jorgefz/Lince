@@ -1,0 +1,7 @@
+root    = "demos/tileset/"
+engine  = "../../lince/assets/"
+assets = "assets/"
+
+[window]
+width = 800
+height = 500

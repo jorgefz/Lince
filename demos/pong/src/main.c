@@ -14,7 +14,7 @@ To Do
 #include <time.h>
 
 #define PAD_SPEED 0.002f
-#define BALL_SPEED 0.025f
+#define BALL_SPEED 0.015f
 #define LPAD_POS (-1.25f)
 #define RPAD_POS (1.25f)
 
@@ -155,8 +155,6 @@ void ResetOnScore(GameData* data, PadLocation scored){
         data->rscore += 1;
     }
 
-    printf("%d %d\n", data->lscore, data->rscore);
-
     ScoreBox* lscorebox = LinceECSGetComponent(&data->ecs, data->lscore_text, Component_ScoreBox);
     ScoreBox* rscorebox = LinceECSGetComponent(&data->ecs, data->rscore_text, Component_ScoreBox);
     lscorebox->uv = *LinceTilesetGetTileCoords(&data->score_nums, data->lscore % 9, 0);
@@ -197,8 +195,7 @@ static void OnInit() {
     LinceGetApp()->user_data = data;
     data->key_start = LinceKey_Space;
 
-    LinceAppPushAssetFolder(string_scoped_lit("../../../demos/pong/assets"));
-
+    LinceAssetCacheRegisterIndex(LinceAppGetAssetCache(), string_scoped_lit("assets.toml"));
     LinceInitCamera(&data->cam, LinceAppGetAspectRatio());
     LinceECSInit(&data->ecs);
     data->ecs.user_data = data;
@@ -244,7 +241,7 @@ static void OnInit() {
     LinceECSSetComponent(&data->ecs, rpad, Component_Pad, &(Pad){.up=LinceKey_Up, .down=LinceKey_Down});
 
     /* Ball */
-    LinceTexture* ball_texture = LinceAppGetAsset(string_scoped_lit("ball.png"), string_scoped_lit("texture"));
+    LinceTexture* ball_texture = LinceAppGetAsset(string_scoped_lit("ball"), string_scoped_lit("texture"));
     LinceECSAddComponents(&data->ecs, ball, 4, (uint32_t[]){
         Component_Sprite, Component_Transform, Component_Box2D, Component_Ball});
     LinceECSSetComponent(&data->ecs, ball, Component_Sprite, &(LinceSprite){.color = {1,1,0}, .texture=ball_texture});
@@ -253,7 +250,7 @@ static void OnInit() {
     LinceECSSetComponent(&data->ecs, ball, Component_Ball, &(Ball){.xbounds={WALL_LEFT,WALL_RIGHT}, .ybounds={WALL_BOT, WALL_TOP}});
 
     /* Score indicators */
-    LinceTexture* score_numbers = LinceAppGetAsset(string_scoped_lit("text.png"), string_scoped_lit("texture"));
+    LinceTexture* score_numbers = LinceAppGetAsset(string_scoped_lit("text"), string_scoped_lit("texture"));
     LinceTilesetInit(&data->score_nums, score_numbers, 5, 5);
     LinceRect* score_zero =  LinceTilesetGetTileCoords(&data->score_nums, 0, 0);
 
@@ -313,14 +310,12 @@ int main() {
     srand(time(NULL));
 
     LinceApp* app = LinceGetApp();
-    LinceAppSetTitle("Pong", sizeof("Pong")-1);
-    app->screen_width = 800;
-    app->screen_height = 500;
     app->on_init   = OnInit;
     app->on_update = OnUpdate;
     app->on_event  = OnEvent;
     app->on_terminate = OnTerminate;
 
+    LinceAppSetConfigFile(string_scoped_lit("demos/pong/project.toml"));
     LinceRun();
 
     return 0;

@@ -1,6 +1,6 @@
 root    = "demos/mandelbrot/"
 assets  = "assets/"
-engine  = "../../lince/assets"
+engine  = "../../lince/assets/"
 
 [window]
 title       = "Mandelbrot Demo"

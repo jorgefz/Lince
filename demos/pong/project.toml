@@ -1,0 +1,5 @@
+root = "demos/pong/"
+engine = "../../lince/assets/"
+assets = "assets/"
+
+[window]
