@@ -37,9 +37,6 @@ static void UpdatePlayer(GameData* game_data){
 void HouseSceneInit(LinceScene* scene){
     HouseScene* house_scene = LinceAlloc(sizeof(HouseScene));
     scene->data = house_scene;
-    
-    // Register assets
-    LinceAssetCacheRegister(LinceAppGetAssetCache(), LinceSIDFromLit("tileset_inside"), LinceSIDFromLit("tileset"), string_scoped_lit("tilesets/inside.toml"));
 
     // Create house map
     LinceTileset* tset = LinceAssetCacheGet(LinceAppGetAssetCache(), LinceSIDFromLit("tileset_inside"));    

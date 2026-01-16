@@ -52,11 +52,7 @@ void WorldSceneInit(LinceScene* scene){
     WorldScene* world_scene = LinceAlloc(sizeof(WorldScene));
     scene->data = world_scene;
     
-    // Register assets
-    LinceAssetCacheRegister(LinceAppGetAssetCache(), LinceSIDFromLit("tilesets/outside.toml"), LinceSIDFromLit("tileset"), string_scoped_lit("tilesets/outside.toml"));
-    LinceAssetCacheRegister(LinceAppGetAssetCache(), LinceSIDFromLit("tilemaps/outside.toml"), LinceSIDFromLit("tilemap"), string_scoped_lit("tilemaps/outside.toml"));
-    
-    world_scene->map = LinceAssetCacheGet(LinceAppGetAssetCache(), LinceSIDFromLit("tilemaps/outside.toml"));
+    world_scene->map = LinceAssetCacheGet(LinceAppGetAssetCache(), LinceSIDFromLit("outside"));
 
     world_scene->house_door = (DoorLink){
         .box = (LinceBox2D){.x=-2.0f, .y=-1.5f, .w=1, .h=1},

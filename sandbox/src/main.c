@@ -16,6 +16,7 @@ void SandboxInit() {
 
     LinceApp* app = LinceGetApp();
     LinceAppPushAssetFolder(string_scoped_lit(asset_dir));
+    LinceAssetCacheRegisterIndex(LinceAppGetAssetCache(), string_scoped_lit("assets.toml"));
     LinceInitCamera(&DATA.camera, LinceAppGetAspectRatio());
     DATA.camera.zoom = 3.0f;
     DATA.camera_speed = 0.003f;
@@ -25,9 +26,6 @@ void SandboxInit() {
     DATA.player_transform = (LinceTransform){.x=0, .y=0, .w=0.7f, .h=0.7f};
 
     app->user_data = &DATA;
-
-    LinceAssetCacheRegister(LinceAppGetAssetCache(), LinceSIDFromLit("inside"), LinceSIDFromLit("texture"), string_scoped_lit("textures/inside.png"));
-    LinceAssetCacheRegister(LinceAppGetAssetCache(), LinceSIDFromLit("outside"), LinceSIDFromLit("texture"), string_scoped_lit("textures/outside.png"));
 
     LinceAppRegisterScene(string_scoped_lit("MainMenu"), &SCENE_CALLBACKS[Scene_MainMenu]);
     LinceAppRegisterScene(string_scoped_lit("World"), &SCENE_CALLBACKS[Scene_World]);
