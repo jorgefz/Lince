@@ -29,9 +29,7 @@
 
 
 #include <stdio.h>
-#include <lince.h>
-#include "lince/containers/array.h"
-#include "lince/containers/hashmap.h"
+#include <dast.h>
 #include <lexer.h>
 
 #define PP_STR_MAX LEX_STR_MAX

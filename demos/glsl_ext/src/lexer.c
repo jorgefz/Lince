@@ -172,13 +172,13 @@ static void lexer_read_pp_directive(struct lexer* lex){
     memcpy(directive, start, lex->p - start);
     directive[lex->p - start] = '\0';
     
-    if(!hashmap_has_key(&lex->keywords, directive)){
+    if(!hashmap_has_keyb(&lex->keywords, directive, strlen(directive))){
 		// Other preprocessor directive, e.g #define
 		// GPU GLSL compiler will take care of it
 		return;
 	}
 
-	int type = (int)(size_t)hashmap_get(&lex->keywords, directive);
+	int type = (int)(size_t)hashmap_getb(&lex->keywords, directive, strlen(directive));
 	lexer_add_token(lex, TOKEN_HASH, start-1, 1);
 	lexer_add_token(lex, type, start, lex->p - start);
 
@@ -280,8 +280,8 @@ struct lexer* lexer_init(const char* source, size_t source_length, array_t* toke
 		return NULL;
 	}
 
-	hashmap_set(&lex->keywords, "include", (void*)(size_t)TOKEN_PP_INCLUDE);
-	hashmap_set(&lex->keywords, "type",    (void*)(size_t)TOKEN_PP_SHADERTYPE);
+	hashmap_setb(&lex->keywords, "include", strlen("include"), (void*)(size_t)TOKEN_PP_INCLUDE);
+	hashmap_setb(&lex->keywords, "type",    strlen("type"), (void*)(size_t)TOKEN_PP_SHADERTYPE);
 	
 	return lex;
 }

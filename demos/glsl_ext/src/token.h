@@ -2,6 +2,7 @@
 #define LINCE_GLSL_EXT_TOKEN_H
 
 #include <ctype.h>
+#include <stdlib.h>
 
 enum token_type	{
 	TOKEN_NONE = 0,

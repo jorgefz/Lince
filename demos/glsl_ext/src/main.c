@@ -69,7 +69,7 @@ int main() {
 
 	hashmap_t headers;
 	hashmap_init(&headers, 10);
-	hashmap_set(&headers, "header", Header);
+	hashmap_setb(&headers, "header", strlen("header"), Header);
 
 	char* vertex_shader = calloc(1, 1000);
 	char* fragment_shader = calloc(1, 1000);

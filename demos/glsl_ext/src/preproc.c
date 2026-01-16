@@ -67,7 +67,7 @@ static void pp_include(struct preproc* pp){
 		return;
 	}
 
-	char* header_source = hashmap_get(pp->headers, target->lexeme);
+	char* header_source = hashmap_getb(pp->headers, target->lexeme, strlen(target->lexeme));
 	if(!header_source){
 		pp->error = PP_ERR_NO_HEADER;
 		return;
@@ -91,12 +91,12 @@ void pp_shader_type(struct preproc* pp){
 		return;
 	}
 
-	if(!hashmap_has_key(&pp->shader_keywords, kword->lexeme)){
+	if(!hashmap_has_keyb(&pp->shader_keywords, kword->lexeme, strlen(kword->lexeme))){
 		pp->error = PP_BAD_SHADER_TYPE;
 		return ;
 	}
 
-	pp->shader_type = (int)(size_t)hashmap_get(&pp->shader_keywords, kword->lexeme);
+	pp->shader_type = (int)(size_t)hashmap_getb(&pp->shader_keywords, kword->lexeme, strlen(kword->lexeme));
 }
 
 
@@ -181,9 +181,9 @@ struct preproc* pp_init(char* source, size_t source_length, hashmap_t* headers, 
 		return NULL;
 	}
 
-	hashmap_set(&pp->shader_keywords, "header",   (void*)(size_t)PP_SHADER_HEADER);
-	hashmap_set(&pp->shader_keywords, "vertex",   (void*)(size_t)PP_SHADER_VERTEX);
-	hashmap_set(&pp->shader_keywords, "fragment", (void*)(size_t)PP_SHADER_FRAGMENT);
+	hashmap_setb(&pp->shader_keywords, "header",   strlen("header"), (void*)(size_t)PP_SHADER_HEADER);
+	hashmap_setb(&pp->shader_keywords, "vertex",   strlen("vertex"), (void*)(size_t)PP_SHADER_VERTEX);
+	hashmap_setb(&pp->shader_keywords, "fragment", strlen("fragment"), (void*)(size_t)PP_SHADER_FRAGMENT);
 
 	return pp;
 }

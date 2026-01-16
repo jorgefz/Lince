@@ -4,11 +4,8 @@
 
 int main() {
 
-	LinceApp* app = LinceGetApp();
-	app->screen_width = 800;
-	app->screen_height = 500;
-	LinceAppSetTitle("My Window", sizeof("My Window")-1);
-
+	LinceAppSetConfigFile(string_scoped_lit("demos/blank/project.toml"));
+	
 	LinceRun();
 
 	return 0;
