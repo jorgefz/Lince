@@ -1,6 +1,7 @@
 #ifndef LINCE_ASSET_MANAGER_H
 #define LINCE_ASSET_MANAGER_H
 
+#include "toml.h"
 #include "lince/core/core.h"
 #include "lince/assetcache/sid.h"
 
@@ -93,6 +94,17 @@ LinceBool LinceAssetCacheAddType(LinceAssetCache* cache, LinceSID name, LinceAss
  * @returns LinceTrue if asset was succesfully registered, and LinceFalse otherwise.
 */
 LinceBool LinceAssetCacheRegister(LinceAssetCache* cache, LinceSID sid, LinceSID type, string_t path);
+
+/** @brief Registers assets predefined in an 'index' TOML file.
+ * @param cache Asset cache
+ * @param path  Location of asset index file
+ * @returns LinceTrue if all assets were succesfully registered, and LinceFalse otherwise.
+ * @note The 'asset index' file is essentially a list of TOMl tables with three items:
+ * 'name', 'type', 'path'. The 'name' is an unique string name from which the asset SID will be computed.
+ * The 'type' is the asset type that must have already been added with `LinceAssetCacheAddType()`.
+ * The 'path' is the path to the asset file relative to the asset folder.
+*/
+LinceBool LinceAssetCacheRegisterIndex(LinceAssetCache* cache, string_t index_path);
 
 /** @brief Adds an existing asset to the cache
  * The asset must be heap-allocated.

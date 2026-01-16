@@ -200,6 +200,101 @@ LinceBool LinceAssetCacheRegister(LinceAssetCache* cache, LinceSID sid, LinceSID
     return LinceTrue;
 }
 
+
+/** @brief Registers assets predefined in an 'index' TOML file.
+ * @param cache Asset cache
+ * @param path  Location of asset index file
+ * @returns LinceTrue if all assets were succesfully registered, and LinceFalse otherwise.
+ * @note The 'asset index' file is essentially a list of TOMl tables with three items:
+ * 'name', 'type', 'path'. The 'name' is an unique string name from which the asset SID will be computed.
+ * The 'type' is the asset type that must have already been added with `LinceAssetCacheAddType()`.
+ * The 'path' is the path to the asset file relative to the asset folder.
+*/
+LinceBool LinceAssetCacheRegisterIndex(LinceAssetCache* cache, string_t index_path){
+	string_t full_index_path = LinceAssetCacheFindPath(cache, index_path);
+    if(!string_ok(full_index_path)){
+        LINCE_WARN("Could not load asset index file '%s'", index_path.str);
+        return LinceFalse;
+    }
+    LINCE_INFO("Reading asset index file at '%'", full_index_path.str);
+
+	string_t content = LinceReadFile(full_index_path);
+    if(!string_ok(content)){
+        LINCE_WARN("Could not load asset index file at '%s'", full_index_path.str);
+        string_free(&full_index_path);
+        return LinceFalse;
+    }
+
+    static char errbuf[256];
+    toml_table_t* tab = toml_parse(content.str, errbuf, sizeof(errbuf));
+    string_free(&content);
+
+    if(!tab){
+        LINCE_WARN("Invalid format of asset index file at '%s'", full_index_path.str);
+        LINCE_WARN("%s", errbuf);
+        return LinceFalse;
+    }
+    
+	toml_array_t* assets = toml_array_in(tab, "assets");
+    if(!assets){
+        LINCE_WARN("Invalid format of asset index file at '%s'", full_index_path.str);
+        string_free(&full_index_path);
+        toml_free(tab);
+        return LinceFalse;
+    }
+    
+    uint32_t nelem  = (uint32_t)toml_array_nelem(assets);
+    if((toml_array_kind(assets) != 't')){
+        LINCE_WARN("Invalid format of asset index file at '%s'", full_index_path.str);
+        string_free(&full_index_path);
+        toml_free(tab);
+        return LinceFalse;
+    }
+
+    uint32_t nreg = 0; // Number of successfully registered assets
+
+	for(uint32_t i = 0; i != nelem; ++i){
+        toml_table_t* item = toml_table_at(assets, i);
+        if(!item){
+            LINCE_WARN("Failed to load asset %u/%u from index file", i+1, nelem);
+            continue;
+        }
+
+        toml_datum_t name = toml_string_in(item, "name");
+        toml_datum_t type = toml_string_in(item, "type");
+        toml_datum_t path = toml_string_in(item, "path");
+
+        if(!name.ok || !type.ok || !path.ok){
+            LINCE_WARN("Failed to load asset %u/%u from index file (name='%s', type='%s', path='%s')",
+                i+1, nelem, (name.ok ? name.u.s : "?"), (type.ok ? type.u.s : "?"), (path.ok ? path.u.s : "?"));
+            if(name.ok) LinceFree(name.u.s);
+            if(type.ok) LinceFree(type.u.s);
+            if(path.ok) LinceFree(path.u.s);
+            continue;
+        }
+
+        string_t name_str = string_scoped(name.u.s, strlen(name.u.s));
+		string_t type_str = string_scoped(type.u.s, strlen(type.u.s));
+		string_t path_str = string_scoped(path.u.s, strlen(path.u.s));
+        
+		LinceSID name_sid = LinceMakeSID(name_str);
+		LinceSID type_sid = LinceMakeSID(type_str);
+		LinceAssetCacheRegister(cache, name_sid, type_sid, path_str);
+        nreg++;
+
+        LinceFree(name.u.s);
+        LinceFree(type.u.s);
+        LinceFree(path.u.s);
+	}
+    
+    LINCE_INFO("Registered %u/%u assets from index file '%s'", nelem, nreg, full_index_path.str);
+    string_free(&full_index_path);
+	toml_free(tab);
+
+    return (nelem == nreg);
+}
+
+
 /** @brief Adds a pre-loaded asset to the cache.
  * The asset must be heap-allocated and not registered.
  * Passing it to the cache will mean transfering ownership to it, so don't free it yourself!
