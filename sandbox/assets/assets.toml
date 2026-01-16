@@ -1,0 +1,23 @@
+# 	name = "default_texture",      # Unique name used to fetch it from the asset cache
+# 	type = "texture",              # Used to find the approriate load/unload functions
+# 	path = "textures/default.png"  # Path to asset file
+
+[[assets]]
+name = "outside"
+type = "tilemap"
+path = "tilemaps/outside.toml"
+
+[[assets]]
+name = "inside"
+type = "tilemap"
+path = "tilemaps/inside.toml"
+
+[[assets]]
+name = "tileset_inside"
+type = "tileset"
+path = "tilesets/inside.toml"
+
+[[assets]]
+name = "tileset_outside"
+type = "tileset"
+path = "tilesets/outside.toml"
