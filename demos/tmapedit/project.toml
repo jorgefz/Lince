@@ -1,0 +1,9 @@
+root = "demos/tmapedit/"
+engine = "../../lince/assets/"
+assets = "assets/"
+
+[window]
+width = 1920
+height = 1080
+title = "tmapedit"
+resizable = true
