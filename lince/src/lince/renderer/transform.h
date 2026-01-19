@@ -40,8 +40,14 @@ typedef struct LincePoint {
 
 /** @brief Defines 2D rectangle */
 typedef struct LinceRect {
-	float x, y; ///< 2D position
-	float w, h; ///< Width and height
+	union {
+		struct { float x, y; }; ///< 2D position
+		LincePoint pos;         ///< 2D position as LincePoint
+	};
+	union {
+		struct { float w, h; }; ///< Width and height
+		LincePoint size;        ///< Width and height as LincePoint
+	};
 } LinceRect;
 
 
@@ -54,8 +60,13 @@ typedef enum LinceCoordSystem {
 
 /** @brief Holds the position and scale of an object */
 typedef struct LinceTransform {
-	float x, y;				 ///> Position
-	float w, h;				 ///> Scale
+	union {
+		struct {
+			float x, y;	 ///< Position
+			float w, h;	 ///< Scale
+		};
+		LinceRect r;     ///< LinceRect representation of Transform data
+	};
 	LinceCoordSystem coords; ///> Coordinate system of the transform 
 } LinceTransform;
 
@@ -119,7 +130,7 @@ float* LinceRectGetVertices(LinceRect* rect, LincePoint bounds[4]);
 /** @brief Get the coordinates of the four vertices of a rectangle
  * 	with origin on its lower left corner.
  * @param rect Rectangle
- * @param bounds Returns array of vertices, counter-clockwiss
+ * @param bounds Returns array of vertices, counter-clockwise
  * 				 and starting from bottom left corner.
  * @returns Pointer to bounds cast to float.
 */
