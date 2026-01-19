@@ -24,6 +24,20 @@ void LinceDrawSpriteTile(LinceSprite* sprite, LinceTransform* transform, LinceRe
     // Texture coordinates
     LincePoint bounds[4];
     float* coords = LinceRectGetVerticesLL(uv, bounds);
+
+    if(sprite->flags & LinceSprite_FlipY){
+        LincePoint temp;
+
+        temp = bounds[0];
+        bounds[0] = bounds[3];
+        bounds[3] = temp;
+        
+        temp = bounds[1];
+        bounds[1] = bounds[2];
+        bounds[2] = temp;
+
+    }
+
     memcpy(props.uv, coords, sizeof(float)*8);
 
     LinceDrawQuad(transform, &props, sprite->texture, shader);

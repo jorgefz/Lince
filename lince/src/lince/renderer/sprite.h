@@ -12,7 +12,8 @@ typedef struct LinceColor {
 } LinceColor;
 
 typedef enum LinceSpriteFlags {
-	LinceSprite_UseAlpha = 0x1 ///< Enable transparency
+	LinceSprite_UseAlpha = 0x1, ///< Enable transparency
+	LinceSprite_FlipY    = 0x2, ///< Flip sprite vertically when drawing
 } LinceSpriteFlags;
 
 /** @struct LinceSprite
