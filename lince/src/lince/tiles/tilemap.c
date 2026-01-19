@@ -70,7 +70,8 @@ void LinceDrawTilemap(LinceTilemap* map, LinceShader* shader){
             uint32_t grid_idx = *(uint32_t*)array_get(&map->indices, idx);
             LinceRect* uv = array_get(&map->tileset->coords, grid_idx);
             if(!uv) {
-                LINCE_WARN("Tileset does not have tile with index %u\n", grid_idx);
+                // Tileset has no tile with the given index.
+                // Easy way to have empty tiles in a tilemap - give them a very large index
                 continue;
             }
             LinceDrawSpriteTile(&map->sprite, transform, uv, shader);
